@@ -107,7 +107,7 @@ size_t serialize_vector(const std::vector<T>& vec, char* &buf) {
   buf = new char[buffer_size];
   size_t vec_len = vec.size();
   memcpy(buf, reinterpret_cast<char*>(&vec_len), len_size);
-  // The last elements
+  // The vector elements
   size_t total_size = len_size;
   T* p = (T*)vec.data();
   for (size_t i = 0; i < vec.size(); ++i) {
