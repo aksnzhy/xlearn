@@ -32,7 +32,8 @@ programming convenient.
 #include "base/stdint_msvc.h"           // Visual C++ use this header.
 #endif
 
-#include <x86intrin.h> // for SIMD intructions
+#include <pmmintrin.h> // for SSE instructions
+#include <x86intrin.h> // for AVX instructions
 #include <limits>
 
 #include "src/base/logging.h"
