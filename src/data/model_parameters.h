@@ -60,16 +60,16 @@ class Model {
   void LoadModel(const std::string& filename);
 
   // Get the pointer of current model parameters.
-  inline std::vector<real_t>* GetParameter() { return &parameters_; }
+  std::vector<real_t>* GetParameter() { return &parameters_; }
 
   // Get the pointer of current model cache.
-  inline std::vector<real_t>* GetParamCache() { return &param_cache_; }
+  std::vector<real_t>* GetParamCache() { return &param_cache_; }
 
   // Get the length of current model parameters.
-  inline index_t GetLength() { return parameters_num_; }
+  index_t GetLength() { return parameters_num_; }
 
   // Get the length of current model cache.
-  inline index_t GetCacheLength() { return cache_num_; }
+  index_t GetCacheLength() { return cache_num_; }
 
   // Reset current model to init state. We use the Gaussian
   // distribution by default.
