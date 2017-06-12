@@ -45,7 +45,7 @@ struct HyperParam {
 // Parameters for optimization method.
 //------------------------------------------------------------------------------
   real_t learning_rate = 0.01;      // Control learning step.
-  std::string updater_type = "sgd"; // SGD, adam, adagard, adadelta,
+  std::string updater_type = "sgd"; // sgd, adam, adagard, adadelta,
                                     // momentum, or rmsprop ?
   real_t decay_rate = 0.9;          // The decay factors used by updater.
   real_t second_decay_rate = 0.9;
@@ -54,7 +54,7 @@ struct HyperParam {
 //------------------------------------------------------------------------------
 // Parameters for dataset
 //------------------------------------------------------------------------------
-  std::string file_format = "libsvm"; // libsvm, libffm, or CSV ?
+  std::string file_format = "libsvm"; // libsvm, libffm, or csv ?
   index_t max_feature = 0;            // The max value of feature
   index_t num_param = 0;              // The number of model parameters.
   index_t num_cache = 0;              // The number of cache parameters.
