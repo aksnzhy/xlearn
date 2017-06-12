@@ -17,75 +17,60 @@
 /*
 Author: Chao Ma (mctt90@gmail.com)
 
-This file defines the hyper-parameters used by f2m.
+This file defines the hyper-parameters used by xLearn.
 */
 
-#ifndef F2M_DATA_HYPER_PARAMETER_H_
-#define F2M_DATA_HYPER_PARAMETER_H_
+#ifndef XLEARN_DATA_HYPER_PARAMETER_H_
+#define XLEARN_DATA_HYPER_PARAMETER_H_
 
 #include <string>
 
 #include "src/data/data_structure.h"
 
-namespace f2m {
+namespace xLearn {
 
 //------------------------------------------------------------------------------
 // We use a single data structure - HyperParam to handle all the
-// hyper parameters used by f2m.
+// hyper parameters used by xLearn.
 //------------------------------------------------------------------------------
 struct HyperParam {
-  // Train or Predict?
-  bool is_train = true;
-  // binary_classification or regression ?
-  std::string task_type = "binary_classification";
-  // linear, 
-  std::string model_type = "linear";
-  // Store gradient in a sparse or dense way.
-  bool is_sparse = false;
-  // Control the learning step.
-  real_t learning_rate = 0.01;
-  // Parser
-  ParserType parser = LibSVM;
-  // The index of the max feature (including the bias).
-  index_t max_feature = 0;
-  // Number of model parameters.
-  index_t num_param = 0;
-  // (optional) The number of field, only used by ffm.
-  int num_field = 0;
-  // The number of latent factors, only used by fm and ffm.
-  int num_factor = 0;
-  // Indicate which Updater we use in current task.
-  UpdaterType updater = SGD;
-  // The decay factor used by Updater.
-  real_t decay_rate = 0.9;
-  // The sceond decay factor used by Updater.
+//------------------------------------------------------------------------------
+// Parameters for learning algorithms.
+//------------------------------------------------------------------------------
+  bool is_train = true;                    // Train or Predict ?
+  std::string model_type = "linear";       // linear, FM, or FFM ?
+  std::string loss_type = "cross_entropy"; // cross_entropy, squared, or hinge ?
+  std::string regu_type = "l2";            // l1, l2, or Elastic-Net ?
+//------------------------------------------------------------------------------
+// Parameters for optimization method.
+//------------------------------------------------------------------------------
+  real_t learning_rate = 0.01;      // Control learning step.
+  std::string updater_type = "sgd"; // sgd, adam, adagard, adadelta,
+                                    // momentum rmsprop ?
+  real_t decay_rate = 0.9;          // The decay factors used by updater.
   real_t second_decay_rate = 0.9;
-  // lambda for regularizer
-  real_t regu_lambda = 0.01;
-  // Indicate which regularizer we use in current task.
-  RegularType regu_type = L2;
-  // Filename of trainning data set.
-  std::string train_set_file;
-  // Filename of test data set.
-  std::string test_set_file;
-  // File for saving model checkpoint.
-  std::string model_checkpoint_file;
-  // Number of iteration.
-  int num_iteration = 100;
-  // If using cross validation
-  bool cross_validation = true;
-  // Number of folds for cross-validation.
-  int num_folds = 5;
-  // in-memory or on-disk trainning.
-  bool in_memory_trainning = true;
-  // Mini-batch size in each iteration..
-  int batch_size = 0;
-  // Using Early-stop ?
-  bool early_stop = false;
-  // Using sigmoid ?
-  bool sigmoid = false;
+  real_t regu_lambda = 0.01;        // lambda for regularizer.
+  int num_iteration = 100;          // Iteration number.
+//------------------------------------------------------------------------------
+// Parameters for dataset
+//------------------------------------------------------------------------------
+  std::string file_format = "libsvm"; // libsvm, libffm, or CSV ?
+  index_t max_feature = 0;            // The max value of feature
+  index_t num_param = 0;              // The number of model parameters.
+  index_t num_cache = 0;              // The number of cache parameters.
+  index_t num_K = 0;                  // Only used in fm and ffm.
+  index_t num_field = 0;              // Only used in ffm.
+  std::string train_set_file;         // Filename of training data.
+  std::string test_set_file;          // Filename of test data.
+  std::string model_checkpoint_file;  // Filename for storing the model.
+//------------------------------------------------------------------------------
+// Parameters for validation
+//------------------------------------------------------------------------------
+  bool cross_validation = true;  // Using cross validation ?
+  int num_folds = 5;             // Number of folds for cross validation
+  bool early_stop = false;       // Using early-stop?
 };
 
-} // namespace f2m
+} // namespace XLEARN
 
-#endif // F2M_DATA_HYPER_PARAMETER_H_
+#endif // XLEARN_DATA_HYPER_PARAMETER_H_
