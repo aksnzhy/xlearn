@@ -89,7 +89,6 @@ class Model {
   std::vector<real_t> param_cache_;      // Cache for some parameter update functions.
   size_t              parameters_num_;   // Number of model parameters.
   size_t              cache_num_;        // Number of cache.
-  UpdaterType         updater_type_;     // What updater we use in this task.
 
   // Initialize model using Gaussian distribution.
   void InitModelUsingGaussian();

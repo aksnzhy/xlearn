@@ -24,7 +24,7 @@ This file tests data_structure.h
 
 #include "src/data/data_structure.h"
 
-namespace f2m {
+namespace xLearn {
 
 TEST(SPARSE_ROW_TEST, Init) {
   SparseRow row(10, true);
@@ -121,4 +121,4 @@ TEST(DMATRIX_TEST, CopyFrom) {
   EXPECT_EQ(matrix.can_release, true);
 }
 
-} // namespace f2m
+} // namespace xLearn

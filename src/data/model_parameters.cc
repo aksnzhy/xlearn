@@ -27,7 +27,7 @@ This file is the implementation of the Model class.
 #include "src/base/math.h"
 #include "src/base/stringprintf.h"
 
-namespace f2m {
+namespace xLearn {
 
 //------------------------------------------------------------------------------
 // The Model class
@@ -125,4 +125,4 @@ void Model::RemoveModelFile(const std::string filename) {
                           filename.c_str()).c_str());
 }
 
-} // namespace f2m
+} // namespace xLearn
