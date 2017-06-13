@@ -1,5 +1,5 @@
 # Build library reader
-add_library(reader parser.cc reader.cc)
+add_library(reader parser.cc reader.cc file_splitor.cc)
 
 # Build uinttests.
 set(LIBS reader gtest base)
@@ -10,8 +10,8 @@ target_link_libraries(parser_test gtest_main ${LIBS})
 add_executable(reader_test reader_test.cc)
 target_link_libraries(reader_test gtest_main ${LIBS})
 
-#add_executable(file_splitor_test file_splitor_test.cc)
-#target_link_libraries(file_splitor_test gtest_main ${LIBS})
+add_executable(file_splitor_test file_splitor_test.cc)
+target_link_libraries(file_splitor_test gtest_main ${LIBS})
 
 # Install library and header files
 install(TARGETS reader DESTINATION lib/reader)
