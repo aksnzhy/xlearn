@@ -17,48 +17,49 @@
 /*
 Author: Chao Ma (mctt90@gmail.com)
 
-This file tests reader.h
+This file tests the Reader class.
 */
 
 #include "gtest/gtest.h"
 
-#include <unistd.h> // for usleep()
-
 #include <string>
 #include <vector>
-#include <chrono>  // for std::chrono
 
-#include "src/base/file_util.h"
 #include "src/reader/reader.h"
-#include "src/data/data_structure.h"
+#include "src/base/file_util.h"
 
 using std::vector;
 using std::string;
 
-namespace f2m {
+namespace xLearn {
 
 const string kTestfilename = "/tmp/test_reader";
 const string kStr = "0 1:0.123 2:0.123 3:0.123\n";
 const string kStrFFM = "1 1:1:0.123 2:2:0.123 3:3:0.123\n";
+const string kStrCSV = "0 0.123 0.123 0.123\n";
 const index_t kFeatureNum = 3;
 const index_t kNumLines = 100000;
-const index_t kNumSamples = 10000;
-const int iteration_num = 300;
+const index_t kNumSamples = 200;
+const int iteration_num = 2000;
 
 Parser* parser_lr = new LibsvmParser;
 Parser* parser_ffm = new FFMParser;
+Parser* parser_csv = new CSVParser;
 
 class ReaderTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
     string lr_file = kTestfilename + "_LR.txt";
     string ffm_file = kTestfilename + "_ffm.txt";
+    string csv_file = kTestfilename + "_csv.txt";
+    // Create libsvm file
     FILE* file_lr = OpenFileOrDie(lr_file.c_str(), "w");
     for (index_t i = 0; i < kNumLines; ++i) {
       uint32 write_len = fwrite(kStr.c_str(), 1, kStr.size(), file_lr);
       EXPECT_EQ(write_len, kStr.size());
     }
     Close(file_lr);
+    // Create libffm file
     FILE* file_ffm = OpenFileOrDie(ffm_file.c_str(), "w");
     for (index_t i = 0; i < kNumLines; ++i) {
       uint32 write_len = fwrite(kStrFFM.c_str(), 1, kStrFFM.size(), file_ffm);
@@ -66,12 +67,21 @@ class ReaderTest : public ::testing::Test {
 
     }
     Close(file_ffm);
+    // Create csv file
+    FILE* file_csv = OpenFileOrDie(csv_file.c_str(), "w");
+    for (index_t i = 0; i < kNumLines; ++i) {
+      uint32 write_len = fwrite(kStrCSV.c_str(), 1, kStrCSV.size(), file_csv);
+      EXPECT_EQ(write_len, kStrCSV.size());
+    }
+    Close(file_csv);
   }
   virtual void TearDown() {
     string lr_file = kTestfilename + "_LR.txt";
     string ffm_file = kTestfilename + "_ffm.txt";
+    string csv_file = kTestfilename + "_csv.txt";
     RemoveFile(lr_file.c_str());
     RemoveFile(ffm_file.c_str());
+    RemoveFile(csv_file.c_str());
   }
 };
 
@@ -124,9 +134,10 @@ void CheckFFM(const DMatrix* matrix) {
 TEST_F(ReaderTest, SampleFromMemory) {
   string lr_file = kTestfilename + "_LR.txt";
   string ffm_file = kTestfilename + "_ffm.txt";
-  // lr
+  string csv_file = kTestfilename + "_csv.txt";
+  // libsvm
   InmemReader reader_lr;
-  reader_lr.Initialize(lr_file, kNumSamples, parser_lr, LR);
+  reader_lr.Initialize(lr_file, kNumSamples, parser_lr);
   DMatrix* matrix = NULL;
   int i = 0;
   for (; i < iteration_num; ++i) {
@@ -140,10 +151,10 @@ TEST_F(ReaderTest, SampleFromMemory) {
     CheckLR(matrix);
   }
   EXPECT_EQ(i, iteration_num);
-  // ffm
+  // libffm
   matrix = nullptr;
   InmemReader reader_ffm;
-  reader_ffm.Initialize(ffm_file, kNumSamples, parser_ffm, FFM);
+  reader_ffm.Initialize(ffm_file, kNumSamples, parser_ffm);
   for (i = 0; i < iteration_num; ++i) {
     int record_num = reader_ffm.Samples(matrix);
     if (record_num == 0) {
@@ -155,14 +166,28 @@ TEST_F(ReaderTest, SampleFromMemory) {
     CheckFFM(matrix);
   }
   EXPECT_EQ(i, iteration_num);
+  // csv
+  InmemReader reader_csv;
+  reader_csv.Initialize(csv_file, kNumSamples, parser_csv);
+  for (i = 0; i < iteration_num; ++i) {
+    int record_num = reader_csv.Samples(matrix);
+    if (record_num == 0) {
+      --i;
+      reader_csv.GoToHead();
+      continue;
+    }
+    EXPECT_EQ(record_num, kNumSamples);
+    CheckLR(matrix);
+  }
 }
 
 TEST_F(ReaderTest, SampleFromDisk) {
   string lr_file = kTestfilename + "_LR.txt";
   string ffm_file = kTestfilename + "_ffm.txt";
-  // lr
+  string csv_file = kTestfilename + "_csv.txt";
+  // libsvm
   OndiskReader reader_lr;
-  reader_lr.Initialize(lr_file, kNumSamples, parser_lr, LR);
+  reader_lr.Initialize(lr_file, kNumSamples, parser_lr);
   DMatrix* matrix = nullptr;
   int i = 0;
   for (; i < iteration_num; ++i) {
@@ -176,9 +201,9 @@ TEST_F(ReaderTest, SampleFromDisk) {
     CheckLR(matrix);
   }
   EXPECT_EQ(i, iteration_num);
-  // ffm
+  // libffm
   OndiskReader reader_ffm;
-  reader_ffm.Initialize(ffm_file, kNumSamples, parser_ffm, FFM);
+  reader_ffm.Initialize(ffm_file, kNumSamples, parser_ffm);
   for (i = 0; i < iteration_num; ++i) {
     int record_num = reader_ffm.Samples(matrix);
     if (record_num == 0) {
@@ -188,6 +213,20 @@ TEST_F(ReaderTest, SampleFromDisk) {
     }
     EXPECT_EQ(record_num, kNumSamples);
     CheckFFM(matrix);
+  }
+  EXPECT_EQ(i, iteration_num);
+  // csv
+  OndiskReader reader_csv;
+  reader_csv.Initialize(csv_file, kNumSamples, parser_csv);
+  for (i = 0; i < iteration_num; ++i) {
+    int record_num = reader_csv.Samples(matrix);
+    if (record_num == 0) {
+      --i;
+      reader_csv.GoToHead();
+      continue;
+    }
+    EXPECT_EQ(record_num, kNumSamples);
+    CheckLR(matrix);
   }
   EXPECT_EQ(i, iteration_num);
 }
@@ -203,4 +242,4 @@ TEST(READER_TEST, CreateReader) {
   EXPECT_TRUE(CreateReader("unknow_name") == NULL);
 }
 
-} // namespace f2m
+} // namespace xLearn

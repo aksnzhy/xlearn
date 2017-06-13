@@ -51,10 +51,13 @@ class Parser {
 
   virtual void Parse(const StringList& list, DMatrix& matrix) = 0;
 
+  std::string Type() { return parser_type; }
+
  protected:
   std::string m_splitor;        // Identify the spliting character
   StringList m_items;           // To store items divided by the splitor
   StringList m_single_item;     // To store every single item divided by ':'
+  std::string parser_type;      // libsvm, libffm, or csv ?
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Parser);
@@ -67,7 +70,7 @@ class Parser {
 //------------------------------------------------------------------------------
 class LibsvmParser : public Parser {
  public:
-  LibsvmParser() {  }
+  LibsvmParser() { parser_type = "libsvm"; }
   ~LibsvmParser() {  }
 
   virtual void Parse(const StringList& list, DMatrix& matrix);
@@ -83,7 +86,7 @@ class LibsvmParser : public Parser {
 //------------------------------------------------------------------------------
 class FFMParser : public Parser {
  public:
-  FFMParser() {  }
+  FFMParser() { parser_type = "libffm"; }
   ~FFMParser() {  }
 
   virtual void Parse(const StringList& list, DMatrix& matrix);
@@ -99,7 +102,7 @@ class FFMParser : public Parser {
 //------------------------------------------------------------------------------
 class CSVParser : public Parser {
  public:
-  CSVParser() { }
+  CSVParser() { parser_type = "csv"; }
   ~CSVParser() { }
 
   virtual void Parse(const StringList& list, DMatrix& matrix);

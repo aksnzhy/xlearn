@@ -22,24 +22,19 @@ This file is the implementation of Reader.
 
 #include "src/reader/reader.h"
 
-#include <vector>
-#include <string>
+#include <string.h>
 #include <algorithm> // for random_shuffle
 
-#include <string.h>
-
-#include "src/base/common.h"
 #include "src/base/file_util.h"
-#include "src/base/scoped_ptr.h"
 
 static const uint32 kMaxLineSize = 100 * 1024; // 100 KB for one line of data
 
-namespace f2m {
+namespace xLearn {
 
 //------------------------------------------------------------------------------
 // Class register
 //------------------------------------------------------------------------------
-CLASS_REGISTER_IMPLEMENT_REGISTRY(f2m_reader_registry, Reader);
+CLASS_REGISTER_IMPLEMENT_REGISTRY(xLearn_reader_registry, Reader);
 REGISTER_READER("memory", InmemReader);
 REGISTER_READER("disk", OndiskReader);
 
@@ -51,25 +46,23 @@ InmemReader::~InmemReader() {
   if (file_ptr_ != nullptr) {
     Close(file_ptr_);
   }
-  data_buf_.Release();
+  data_buf_.Release(); // Release the in-memory buffer
 }
 
 // Pre-load all the data into memory buffer.
 void InmemReader::Initialize(const std::string& filename,
                              int num_samples,
-                             Parser* parser,
-                             ModelType type) {
+                             Parser* parser) {
   CHECK_NE(filename.empty(), true)
   CHECK_GT(num_samples, 0);
   CHECK_NOTNULL(parser);
   filename_ = filename;
   num_samples_ = num_samples;
   parser_ = parser;
-  pos_ = 0;
   file_ptr_ = OpenFileOrDie(filename_.c_str(), "r");
   data_samples_.Resize(num_samples);
   uint64 file_size = GetFileSize(file_ptr_);
-  LOG(INFO) << "file size: " << file_size / 1024 / 1024 / 1024;
+  LOG(INFO) << "Data file size: " << file_size << " bytes.";
   scoped_array<char> buffer;
   try {
     buffer.reset(new char[file_size]);
@@ -84,15 +77,15 @@ void InmemReader::Initialize(const std::string& filename,
   CHECK_EQ(read_size, file_size);
   // Initialize the DMatrix buffer
   int num_lines = GetLineNumber(buffer.get(), read_size);
-  bool if_has_field = type == FFM ? true : false;
+  bool has_field = parser_->Type() == "libffm" ? true : false;
   data_buf_.Resize(num_lines);
-  data_buf_.InitSparseRow(if_has_field);
+  data_buf_.InitSparseRow(has_field);
   // Initialize order
   order_.resize(num_lines);
   for (int i = 0; i < num_lines; ++i) {
     order_[i] = i;
   }
-  // Parse each line of data from buffer
+  // Parse each line of data from the buffer
   StringList list(num_lines);
   scoped_array<char> line(new char[kMaxLineSize]);
   uint64 start_pos = 0;
@@ -114,6 +107,7 @@ void InmemReader::Initialize(const std::string& filename,
   parser_->Parse(list, data_buf_);
 }
 
+// Read one line of data from the memory buffer
 uint64 InmemReader::ReadLineFromMemory(char* line,
                                        char* buf,
                                        uint64 start_pos,
@@ -126,12 +120,14 @@ uint64 InmemReader::ReadLineFromMemory(char* line,
   while (*(buf + end_pos) != '\n') { ++end_pos; }
   uint64 read_size = end_pos - start_pos + 1;
   if (read_size > kMaxLineSize) {
-    LOG(FATAL) << "Encountered a too-long line. Please check the data.";
+    LOG(FATAL) << "Encountered a too-long line.    \
+                   Please check the data.";
   }
   memcpy(line, buf + start_pos, read_size);
   return read_size;
 }
 
+// How many lines are there in current memory buffer?
 int InmemReader::GetLineNumber(const char* buf, uint64 buf_size) {
   int num = 0;
   for (uint64 i = 0; i < buf_size; ++i) {
@@ -170,16 +166,6 @@ int InmemReader::Samples(DMatrix* &matrix) {
 // Return to the begining of the data buffer.
 void InmemReader::GoToHead() { pos_ = 0; }
 
-// Using Min-max normalization
-void InmemReader::Normalize(real_t max, real_t min) {
-  for (size_t i = 0; i < data_buf_.row_len; ++i) {
-    SparseRow* row = data_buf_.row[i];
-    for (size_t j = 0; j < row->column_len; ++j) {
-      row->X[j] = (row->X[j] - min) / (max - min);
-    }
-  }
-}
-
 //------------------------------------------------------------------------------
 // Implementation of OndiskReader.
 //------------------------------------------------------------------------------
@@ -188,13 +174,12 @@ OndiskReader::~OndiskReader() {
   if (file_ptr_ != nullptr) {
     Close(file_ptr_);
   }
-  data_samples_.Release();
+  data_samples_.Release(); // Release the data sample buffer
 }
 
 void OndiskReader::Initialize(const std::string& filename,
                               int num_samples,
-                              Parser* parser,
-                              ModelType type) {
+                              Parser* parser) {
   CHECK_NE(filename.empty(), true);
   CHECK_GT(num_samples, 0);
   CHECK_NOTNULL(parser);
@@ -202,9 +187,9 @@ void OndiskReader::Initialize(const std::string& filename,
   num_samples_ = num_samples;
   parser_ = parser;
   file_ptr_ = OpenFileOrDie(filename_.c_str(), "r");
-  bool if_has_field = type == FFM ? true : false;
+  bool has_field = parser_->Type() == "libffm" ? true : false;
   data_samples_.Resize(num_samples);
-  data_samples_.InitSparseRow(if_has_field);
+  data_samples_.InitSparseRow(has_field);
 }
 
 // Sample data from disk file.
@@ -223,7 +208,8 @@ int OndiskReader::Samples(DMatrix* &matrix) {
     }
     int read_len = strlen(line.get());
     if (line[read_len - 1] != '\n') {
-      LOG(FATAL) << "Encountered a too-long line. Please check the data.";
+      LOG(FATAL) << "Encountered a too-long line.   \
+                     Please check the data.";
     } else {
       line[read_len - 1] = '\0';
       // Handle the txt format in DOS and windows.
@@ -246,4 +232,4 @@ int OndiskReader::Samples(DMatrix* &matrix) {
 // Return to the begining of the file.
 void OndiskReader::GoToHead() { fseek(file_ptr_, 0, SEEK_SET); }
 
-} // namespace f2m
+} // namespace xLearn
