@@ -49,7 +49,8 @@ struct HyperParam {
                                     // momentum, or rmsprop ?
   real_t decay_rate = 0.9;          // The decay factors used by updater.
   real_t second_decay_rate = 0.9;
-  real_t regu_lambda = 0.01;        // lambda for regularizer.
+  real_t regu_lambda_1 = 0.01;      // lambda for regularizer.
+  real_t regu_lambda_2 = 0.01;
   int num_iteration = 100;          // Iteration number.
 //------------------------------------------------------------------------------
 // Parameters for dataset
