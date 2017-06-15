@@ -38,13 +38,11 @@ static const real_t kInitMean = 0.0;
 static const real_t kInitStdev = 0.01;
 
 // Basic contributor.
-Model::Model(size_t parameter_num, size_t cache_num, bool gaussian) :
-  parameters_num_(parameter_num), cache_num_(cache_num) {
+Model::Model(size_t parameter_num, bool gaussian) :
+  parameters_num_(parameter_num) {
   CHECK_GE(parameters_num_, 0);
-  CHECK_GE(cache_num_, 0);
   try {
     parameters_.resize(parameters_num_, 0.0);
-    param_cache_.resize(cache_num_, 0.0);
     if (gaussian) {
       InitModelUsingGaussian();
     }
@@ -68,8 +66,6 @@ void Model::SaveModel(const std::string& filename) {
       OpenFileOrDie(StringPrintf("%s_param", filename.c_str()).c_str(), "w");
   // Write param
   WriteVectorToFile<real_t>(file_ptr_param, this->parameters_);
-  // Write cache
-  WriteVectorToFile<real_t>(file_ptr_param, this->param_cache_);
   Close(file_ptr_param);
 }
 
@@ -81,9 +77,6 @@ void Model::LoadModel(const std::string& filename) {
   // Load param
   ReadVectorFromFile<real_t>(file_ptr_param, this->parameters_);
   parameters_num_ = parameters_.size();
-  // Load cache
-  ReadVectorFromFile<real_t>(file_ptr_param, this->param_cache_);
-  cache_num_ = param_cache_.size();
   Close(file_ptr_param);
 }
 

@@ -47,7 +47,7 @@ class UpdaterTest : public ::testing::Test {
 };
 
 TEST_F(UpdaterTest, update_func) {
-  Model model(kLength, kLength, false);
+  Model model(kLength, false);
   std::vector<real_t> grad_vec(kLength, 2.0);
   std::vector<real_t>* w = model.GetParameter();
   Updater updater;
@@ -74,7 +74,7 @@ TEST_F(UpdaterTest, batch_update_func) {
 
 TEST_F(UpdaterTest, l1_test) {
   param.regu_type = "l1";
-  Model model(kLength, kLength, false);
+  Model model(kLength, false);
   std::vector<real_t>* w = model.GetParameter();
   for (int i = 0; i < 100000; ++i) {
     (*w)[i] = 1.0;
@@ -92,7 +92,7 @@ TEST_F(UpdaterTest, l1_test) {
 
 TEST_F(UpdaterTest, l2_test) {
   param.regu_type = "l2";
-  Model model(kLength, kLength, false);
+  Model model(kLength, false);
   std::vector<real_t>* w = model.GetParameter();
   for (int i = 0; i < kLength; ++i) {
     (*w)[i] = 1.0;
@@ -107,7 +107,7 @@ TEST_F(UpdaterTest, l2_test) {
 
 TEST_F(UpdaterTest, l1_l2_test) {
   param.regu_type = "elastic_net";
-  Model model(kLength, kLength, false);
+  Model model(kLength, false);
   std::vector<real_t>* w = model.GetParameter();
   for (int i = 0; i < kLength; ++i) {
     (*w)[i] = 1.0;

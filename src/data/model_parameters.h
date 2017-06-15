@@ -46,9 +46,7 @@ class Model {
   ~Model() { }
 
   // Set all parameters to 0 or using Gaussian distribution.
-  explicit Model(size_t parameter_num,
-                 size_t cache_num,
-                 bool gaussian = true);
+  explicit Model(size_t parameter_num, bool gaussian = true);
 
   // Initialize model parameters from a checkpoint file.
   explicit Model(const std::string& filename);
@@ -62,14 +60,8 @@ class Model {
   // Get the pointer of current model parameters.
   std::vector<real_t>* GetParameter() { return &parameters_; }
 
-  // Get the pointer of current model cache.
-  std::vector<real_t>* GetParamCache() { return &param_cache_; }
-
   // Get the length of current model parameters.
   index_t GetLength() { return parameters_num_; }
-
-  // Get the length of current model cache.
-  index_t GetCacheLength() { return cache_num_; }
 
   // Reset current model to init state. We use the Gaussian
   // distribution by default.
@@ -86,9 +78,7 @@ class Model {
 
  protected:
   std::vector<real_t> parameters_;       // Storing the model parameters.
-  std::vector<real_t> param_cache_;      // Cache for some parameter update functions.
   size_t              parameters_num_;   // Number of model parameters.
-  size_t              cache_num_;        // Number of cache.
 
   // Initialize model using Gaussian distribution.
   void InitModelUsingGaussian();

@@ -39,29 +39,25 @@ const std::string kFilename = "/tmp/test_model.binary";
 
 TEST(MODEL_TEST, Init) {
   // Init model using gaussion.
-  Model model_lr(kParameter_num, kParameter_num);
+  Model model_lr(kParameter_num);
   std::vector<real_t>* para = model_lr.GetParameter();
   EXPECT_EQ(para->size(), kParameter_num);
 }
 
 TEST(MODEL_TEST, SaveModel) {
   // Init model (set all parameters to zero)
-  Model model_lr(kParameter_num, kParameter_num, false);
+  Model model_lr(kParameter_num, false);
   model_lr.SaveModel(kFilename);
 }
 
 TEST(MODEL_TEST, LoadModel) {
   // Init model with gaussion distribution.
-  Model model_lr(kParameter_num, kParameter_num, true);
+  Model model_lr(kParameter_num, true);
   // parameters become 0
   model_lr.LoadModel(kFilename);
   std::vector<real_t>* para = model_lr.GetParameter();
   for (index_t i = 0; i < para->size(); ++i) {
     EXPECT_EQ((*para)[i], (real_t)0.0);
-  }
-  std::vector<real_t>* cache = model_lr.GetParamCache();
-  for (index_t i = 0; i < cache->size(); ++i) {
-    EXPECT_EQ((*cache)[i], (real_t)0.0);
   }
 }
 
@@ -71,19 +67,15 @@ TEST(MODEL_TEST, InitModelFromDiskfile) {
   for (index_t i = 0; i < para->size(); ++i) {
     EXPECT_EQ((*para)[i], (real_t)0.0);
   }
-  std::vector<real_t>* cache = model_lr.GetParamCache();
-  for (index_t i = 0; i < cache->size(); ++i) {
-    EXPECT_EQ((*cache)[i], (real_t)0.0);
-  }
 }
 
 TEST(MODEL_TEST, RemoveFile) {
-  Model model_lr(kParameter_num, kParameter_num);
+  Model model_lr(kParameter_num);
   model_lr.RemoveModelFile(kFilename.c_str());
 }
 
 TEST(MODEL_TEST, SaveweightAndLoadweight) {
-  Model model_lr(kParameter_num, kParameter_num, false);
+  Model model_lr(kParameter_num, false);
   std::vector<real_t> vec(kParameter_num, 1.0);
   model_lr.Saveweight(vec);
   for (index_t i = 0; i < vec.size(); ++i) {
