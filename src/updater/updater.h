@@ -43,7 +43,7 @@ namespace xLearn {
 class Updater {
  public:
   // Constructor and Destructor.
-  Updater() {  }
+  Updater() {  }l
   virtual ~Updater() {  }
 
   // This function needs to be invoked before using this class.
@@ -85,7 +85,7 @@ class Updater {
   DISALLOW_COPY_AND_ASSIGN(Updater);
 };
 
-//------------------------------------------------------------------------------
+//-----------------;-------------------------------------------------------------
 // Class register
 //------------------------------------------------------------------------------
 CLASS_REGISTER_DEFINE_REGISTRY(xLearn_updater_registry, Updater);
