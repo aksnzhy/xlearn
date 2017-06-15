@@ -97,7 +97,8 @@ void Updater::Regularize_L2(Model* model) {
   for (size_t i = 0; i < w->size(); i += _MMX_INCREMENT) {
     __MX _w = _MMX_LOAD_PS(w->data() + i);
     __MX _delta_w = _MMX_MUL_PS(_regu_lambda, _w);
-    _MMX_STORE_PS(w->data()+i, _MMX_SUB_PS(_w, _delta_w));
+    _MMX_STORE_PS(w->data() + i,
+                  _MMX_SUB_PS(_w, _delta_w));
   }
 }
 
@@ -106,7 +107,6 @@ void Updater::Regularize_ElasticNet(Model* model) {
   CHECK_NOTNULL(model);
   std::vector<real_t>* w = model->GetParameter();
   CHECK_EQ(w->size() % _MMX_INCREMENT, 0);
-  std::vector<real_t> tmp_vec(w->begin(), w->end());
   // l1
   for (size_t i = 0; i < w->size(); ++i) {
     if ((*w)[i] > 0) {
@@ -118,9 +118,10 @@ void Updater::Regularize_ElasticNet(Model* model) {
   // l2
   __MX _regu_lambda = _MMX_SET1_PS(regu_lambda_2_);
   for (size_t i = 0; i < w->size(); i += _MMX_INCREMENT) {
-    __MX _w = _MMX_LOAD_PS(tmp_vec.data() + i);
+    __MX _w = _MMX_LOAD_PS(w->data() + i);
     __MX _delta_w = _MMX_MUL_PS(_regu_lambda, _w);
-    _MMX_STORE_PS(w->data()+i, _MMX_SUB_PS(_w, _delta_w));
+    _MMX_STORE_PS(w->data() + i,
+                  _MMX_SUB_PS(_w, _delta_w));
   }
 }
 

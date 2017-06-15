@@ -4,8 +4,8 @@ add_library(updater updater.cc)
 # Build unittests.
 set(LIBS updater gtest base data)
 
-#add_executable(updater_test updater_test.cc)
-#target_link_libraries(updater_test gtest_main ${LIBS})
+add_executable(updater_test updater_test.cc)
+target_link_libraries(updater_test gtest_main ${LIBS})
 
 # Install library and header files
 install(TARGETS updater DESTINATION lib/update)
