@@ -43,7 +43,7 @@ namespace xLearn {
 class Updater {
  public:
   // Constructor and Destructor.
-  Updater() {  }l
+  Updater() {  }
   virtual ~Updater() {  }
 
   // This function needs to be invoked before using this class.

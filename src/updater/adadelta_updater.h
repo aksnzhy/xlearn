@@ -20,8 +20,8 @@ Author: Yuze Liao and Chao Ma (mctt90@gmail.com)
 This files defines the AdaDeltaUpdater class.
 */
 
-#ifndef F2M_UPDATE_ADADELTA_UPDATER_H_
-#define F2M_UPDATE_ADADELTA_UPDATER_H_
+#ifndef XLEARN_UPDATE_ADADELTA_UPDATER_H_
+#define XLEARN_UPDATE_ADADELTA_UPDATER_H_
 
 #include <vector>
 
@@ -29,7 +29,7 @@ This files defines the AdaDeltaUpdater class.
 #include "src/data/hyper_parameters.h"
 #include "src/update/updater.h"
 
-namespace f2m {
+namespace xLearn {
 
 //------------------------------------------------------------------------------
 // AdaDelta is an extension of AdaGrad that seeks to reduce its aggressive,
@@ -63,6 +63,6 @@ class AdaDeltaUpdater : public Updater {
   DISALLOW_COPY_AND_ASSIGN(AdaDeltaUpdater);
 };
 
-} // namespace f2m
+} // namespace xLearn
 
-#endif // F2M_UPDATE_ADADELTA_UPDATER_H_
+#endif // XLEARN_UPDATE_ADADELTA_UPDATER_H_
