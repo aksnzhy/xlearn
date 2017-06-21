@@ -49,7 +49,7 @@ class Updater {
   // This function needs to be invoked before using this class.
   virtual void Initialize(const HyperParam& hyper_param);
 
-  // Using naive SGD update by default.
+  // Using naive SGD updater by default.
   virtual void Update(const index_t id,
                       const real_t grad,
                       std::vector<real_t>& param);

@@ -48,62 +48,37 @@ void Momentum::Initialize(const HyperParam& hyper_param) {
 // Momentum updater:
 // [ v = rho * v + dx ]
 // [ w -= learning_rate * v]
-void Momentum::Update(const real_t grad, real_t* param) {
+void Momentum::Update(const index_t id,
+                      const real_t grad,
+                      std::vector<real_t>& param) {
   // Do not check anything here
-  std::vector<real_t>* w = model->GetParameter();
-  std::vector<real_t>* v = model->GetParamCache();
-  real_t tmp = RegularTerm((*w)[key]) + grad;
-  (*v)[key] = mu_ * (*v)[key] - learning_rate_ * tmp;
-  (*w)[key] += (*v)[key];
+  v_[id] = rho_ * v_[id] + grad;
+  param[id] -= learning_rate_ * v_[id];
 }
 
-// Update model parameter in a mini-batch GD.
-// Using SSE to speed up.
-void Momentum::BatchUpdate(Gradient* grad, Model* model) {
-  // g /= row_len
-  size_t end = model->GetLength();
-  grad->Div(grad->GetMiniBatchSize());
-  std::vector<real_t>* w = model->GetParameter();
-  std::vector<real_t>* v = model->GetParamCache();
-  std::vector<real_t>* value = grad->GetDenseVector();
+// Update a continuous space of model parameters by
+// using sse/avx to speed up.
+void Momentum::BatchUpdate(const std::vector<real_t>& value,
+                           const index_t start_id,
+                           std::vector<real_t>& param) {
+  CHECK_EQ(value.empty(), false);
+  // Ensuring for sse/avx
+  CHECK_EQ(value.size() % _MMX_INCREMENT, 0);
   __MX _learning_rate = _MMX_SET1_PS(learning_rate_);
-  __MX _regu_lambda = _MMX_SET1_PS(regu_lambda_);
-  __MX _mu = _MMX_SET1_PS(mu_);
-  for (size_t start_key = 0; start_key < end; start_key += _MMX_INCREMENT) {
-     __MX _regular_term;
-    GetRegularTerm(_regular_term, regu_type_);
-    __MX _v = _MMX_LOAD_PS(&(*v)[start_key]);
-    __MX _w = _MMX_LOAD_PS(&(*w)[start_key]);
-    __MX _tmp = _MMX_ADD_PS(_MMX_MUL_PS(_regu_lambda, _regular_term),
-                             _MMX_LOAD_PS(&(*value)[start_key]));
-    _v = _MMX_SUB_PS(_MMX_MUL_PS(_mu, _v), _MMX_MUL_PS(_learning_rate, _tmp));
-    _MMX_STORE_PS(&(*w)[start_key], _MMX_ADD_PS(_w, _v));
-    _MMX_STORE_PS(&(*v)[start_key], _v);
-  }
-}
-
-// Update a continuous model parameter.
-// Using SSE to speed up.
-void Momentum::SeqUpdate(std::vector<real_t>& value,
-                                index_t start_key,
-                                Model* model) {
-  // Do not check anything here
-  index_t end = value.size();
-  std::vector<real_t>* w = model->GetParameter();
-  std::vector<real_t>* v = model->GetParamCache();
-  __MX _learning_rate = _MMX_SET1_PS(learning_rate_);
-  __MX _regu_lambda = _MMX_SET1_PS(regu_lambda_);
-  __MX _mu = _MMX_SET1_PS(mu_);
-  for (index_t i = 0; i < end; i += _MMX_INCREMENT) {
-    __MX _regular_term;
-    GetRegularTerm(_regular_term, regu_type_);
-    __MX _v = _MMX_LOAD_PS(&(*v)[start_key]);
-    __MX _w = _MMX_LOAD_PS(&(*w)[start_key]);
-    __MX _tmp = _MMX_ADD_PS(_MMX_MUL_PS(_regu_lambda, _regular_term), _MMX_LOAD_PS(&value[i]));
-    _v = _MMX_SUB_PS(_MMX_MUL_PS(_mu, _v), _MMX_MUL_PS(_learning_rate, _tmp));
-    _MMX_STORE_PS(&(*w)[start_key], _MMX_ADD_PS(_w, _v));
-    _MMX_STORE_PS(&(*v)[start_key], _v);
-    start_key += _MMX_INCREMENT;
+  __MX _rho = _MMX_SET1_PS(rho_);
+  // [ v = rho * v + grad ]
+  // [ w -= learning_rate * v ]
+  for (size_t i  = 0; i < value.size(); i += _MMX_INCREMENT) {
+    __MX _grad = _MMX_LOAD_PS(value.data() + i);
+    __MX _v = _MMX_LOAD_PS(v_.data() + start_id + i);
+    __MX _w = _MMX_LOAD_PS(param.data() + start_id + i);
+    __MX _tmp_v = _MMX_ADD_PS(_MMX_MUL_PS(_rho, _v),
+                              _grad);
+    __MMX_STORE(param.data() + start_id + i,
+               _MMX_SUB_PS(_w,
+                           _MMX_MUL_PS(_learning_rate, _tmp_v)));
+    __MMX_STORE(v_.data() + start_id + i,
+               _tmp_v);
   }
 }
 

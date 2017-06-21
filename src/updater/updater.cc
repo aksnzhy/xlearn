@@ -56,7 +56,7 @@ void Updater::Initialize(const HyperParam& hyper_param) {
 void Updater::Update(const index_t id,
                      const real_t grad,
                      std::vector<real_t>& param) {
-  // Do not check anything here for the performance
+  // Do not check anything here
   param[id] -= learning_rate_ * grad;
 }
 
