@@ -53,8 +53,7 @@ TEST_F(UpdaterTest, update_func) {
   Updater updater;
   updater.Initialize(param);
   for (int i = 0; i < kLength; ++i) {
-    real_t* weight = w->data() + i;
-    updater.Update(grad_vec[i], weight);
+    updater.Update(i, grad_vec[i], *w);
   }
   for (int i = 0; i < kLength; ++i) {
     EXPECT_EQ((*w)[i], (real_t)(-0.2));
@@ -66,7 +65,7 @@ TEST_F(UpdaterTest, batch_update_func) {
   std::vector<real_t> grad_vec(kFactor, 2.0);
   Updater updater;
   updater.Initialize(param);
-  updater.BatchUpdate(grad_vec, K.data());
+  updater.BatchUpdate(grad_vec, 0, K);
   for (int i = 0; i < kFactor; ++i) {
     EXPECT_EQ(K[i], (real_t)(-0.2));
   }

@@ -25,7 +25,7 @@ This file is the implementation of Updater.
 //#include "src/updater/adam_updater.h"
 //#include "src/updater/adagrad_updater.h"
 //#include "src/updater/adadelta_updater.h"
-#include "src/updater/momentum_updater.h"
+//#include "src/updater/momentum_updater.h"
 //#include "src/updater/rmsprop_updater.h"
 
 namespace xLearn {
@@ -38,7 +38,7 @@ REGISTER_UPDATER("sgd", Updater);
 //REGISTER_UPDATER("adam", AdamUpdater);
 //REGISTER_UPDATER("adagrad", AdaGradUpdater);
 //REGISTER_UPDATER("adadelta", AdaDeltaUpdater);
-REGISTER_UPDATER("momentum", Momentum);
+//REGISTER_UPDATER("momentum", Momentum);
 //REGISTER_UPDATER("rmsprop", RMSPropUpdater);
 
 // User need to invoke this function before updating.
@@ -52,26 +52,30 @@ void Updater::Initialize(const HyperParam& hyper_param) {
   regu_type_ = hyper_param.regu_type;
 }
 
-// SGD updater: [w -= eta * grad]
-void Updater::Update(const real_t grad, real_t* param) {
-  // Do not check anything here
-  (*param) -= learning_rate_ * grad;
+// SGD updater: [w -= learning_rate * gradient]
+void Updater::Update(const index_t id,
+                     const real_t grad,
+                     std::vector<real_t>& param) {
+  // Do not check anything here for the performance
+  param[id] -= learning_rate_ * grad;
 }
 
 // Update a continuous space of model parameters by
 // using SSE/AVX to speed up.
 void Updater::BatchUpdate(const std::vector<real_t>& value,
-                          real_t* param) {
+                          const index_t start_id,
+                          std::vector<real_t>& param) {
   CHECK_EQ(value.empty(), false);
+  // Ensuring for sse/avx
   CHECK_EQ(value.size() % _MMX_INCREMENT, 0);
   __MX _learning_rate = _MMX_SET1_PS(learning_rate_);
-  // w -= learning_rate * grad
+  // w -= learning_rate * gradient
   for (size_t i = 0; i < value.size(); i += _MMX_INCREMENT) {
     __MX _grad = _MMX_LOAD_PS(value.data() + i);
-    __MX _w = _MMX_LOAD_PS(param);
+    __MX _w = _MMX_LOAD_PS(param.data() + start_id + i);
     __MX _delta_g = _MMX_MUL_PS(_learning_rate, _grad);
-    _MMX_STORE_PS(param, _MMX_SUB_PS(_w, _delta_g));
-    param += _MMX_INCREMENT;
+    _MMX_STORE_PS(param.data() + start_id + i,
+                  _MMX_SUB_PS(_w, _delta_g));
   }
 }
 

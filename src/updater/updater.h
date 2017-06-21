@@ -38,7 +38,7 @@ namespace xLearn {
 // Updater class is responsible for updating current model parameters, and
 // it can be implemented by different update functions such as naive SGD,
 // Momentum, Adadelta, AdaGard, RMSprop, Adam, and so on.
-// We use the naive SGD updater by default: [ w -= eta * grad ]
+// We use the naive SGD updater by default: [ w -= learning_rate * gradient ]
 //------------------------------------------------------------------------------
 class Updater {
  public:
