@@ -17,11 +17,11 @@
 /*
 Author: Yuze Liao and Chao Ma (mctt90@gmail.com)
 
-This files defines the AdaDeltaUpdater class.
+This files defines the MomentumUpdater class.
 */
 
-#ifndef XLEARN_UPDATE_ADADELTA_UPDATER_H_
-#define XLEARN_UPDATE_ADADELTA_UPDATER_H_
+#ifndef XLEARN_UPDATE_MOMENTUM_UPDATER_H_
+#define XLEARN_UPDATE_MOMENTUM_UPDATER_H_
 
 #include <vector>
 
@@ -32,32 +32,42 @@ This files defines the AdaDeltaUpdater class.
 namespace xLearn {
 
 //------------------------------------------------------------------------------
-// AdaDelta is an extension of AdaGrad that seeks to reduce its aggressive,
-// monotonically decreasing learning rate. Instead of accumulating all past
-// squared gradients, AdaDelta restricts the window of accumulated past
-// gradients to some fixed size w.
+// SGD has trouble navigating ravines, i.e. areas where the surface curves
+// much more steeply in one dimension than in another, which are common
+// around local optimal. In these scenarios, SGD oscillates across the slopes
+// of the ravine while only making hesitant progress along the bottom towards
+// the local optimum.
+// Momentum is a method that helps accelerate SGD in the relevant direction
+// and dampens oscillations. It does this by a fraction 'velocity' (v) of the
+// update vector of the past time step to the current update vector:
+// [ v = rho * v  + dx ]
+// [ w -= learning_rate * v ]
+// The momentum term 'rho' is usually set to 0.9 or a similar value.
 //------------------------------------------------------------------------------
-class AdaDeltaUpdater : public Updater {
+class Momentum : public Updater {
  public:
-  // Constructor and Desstructor
-  AdaDeltaUpdater() {  }
-  ~AdaDeltaUpdater() {  }
+  // Constructor and Destructor
+  Momentum() {  }
+  ~Momentum() {  }
 
-  // This function needs to be invoked before update.
+  // This function need to be invoked before using this class.
   void Initialize(const HyperParam& hyper_param);
 
-  // AdaDelta update
-  void Update(index_t key, real_t grad, Model* model);
+  // Momentum update
+  void Update(const real_t grad, real_t* param);
 
-  // Update a continous space of model parameters using SSE/AVX.
+  // Update a continuous space of model parameters using SSE/AVX.
   void BatchUpdate(const std::vector<real_t>& value,
                    real_t* param);
+
  protected:
-  
+  real_t rho_;
+  std::vector<real_t> v_;
+
  private:
-  DISALLOW_COPY_AND_ASSIGN(AdaDeltaUpdater);
+  DISALLOW_COPY_AND_ASSIGN(Momentum);
 };
 
 } // namespace xLearn
 
-#endif // XLEARN_UPDATE_ADADELTA_UPDATER_H_
+#endif // XLEARN_UPDATE_MOMENTUM_UPDATER_H_

@@ -50,11 +50,14 @@ class Updater {
   virtual void Initialize(const HyperParam& hyper_param);
 
   // Using naive SGD update by default.
-  virtual void Update(const real_t grad, real_t* param);
+  virtual void Update(const index_t id,
+                      const real_t grad,
+                      std::vector<real_t>& param);
 
   // Update a continuous space of model parameters using SSE/AVX.
   virtual void BatchUpdate(const std::vector<real_t>& value,
-                           real_t* param);
+                           const index_t start_id,
+                           std::vector<real_t>& param);
 
   // Penalize model complexity
   inline void Regularizer(Model* model) {
