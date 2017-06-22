@@ -17,7 +17,7 @@
 /*
 Author: Chao Ma (mctt90@gmail.com)
 
-This file tests the Updater class.
+This file tests a set of updaters.
 */
 
 #include "gtest/gtest.h"
