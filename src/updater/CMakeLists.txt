@@ -1,11 +1,14 @@
 # Build library updater
-add_library(updater updater.cc)
+add_library(updater updater.cc momentum_updater.cc)
 
 # Build unittests.
 set(LIBS updater gtest base data)
 
 add_executable(updater_test updater_test.cc)
 target_link_libraries(updater_test gtest_main ${LIBS})
+
+add_executable(momentum_updater_test momentum_updater_test.cc)
+target_link_libraries(momentum_updater_test gtest_main ${LIBS})
 
 # Install library and header files
 install(TARGETS updater DESTINATION lib/update)

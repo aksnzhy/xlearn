@@ -17,7 +17,7 @@
 /*
 Author: Chao Ma (mctt90@gmail.com)
 
-This file tests a set of updaters.
+This file tests the Updater class.
 */
 
 #include "gtest/gtest.h"
@@ -28,7 +28,7 @@ This file tests a set of updaters.
 //#include "src/updater/adadelta_updater.h"
 //#include "src/updater/adagrad_updater.h"
 //#include "src/updater/adam_updater.h"
-//#include "src/updater/momentum_updater.h"
+#include "src/updater/momentum_updater.h"
 //#include "src/updater/rmsprop_updater.h"
 
 namespace xLearn {
@@ -128,7 +128,7 @@ TEST(UPDATER_TEST, CreateUpdater) {
   //EXPECT_TRUE(CreateUpdater("adadelta") != NULL);
   //EXPECT_TRUE(CreateUpdater("adagrad") != NULL);
   //EXPECT_TRUE(CreateUpdater("adam") != NULL);
-  //EXPECT_TRUE(CreateUpdater("momentum") != NULL);
+  EXPECT_TRUE(CreateUpdater("momentum") != NULL);
   //EXPECT_TRUE(CreateUpdater("rmsprop") != NULL);
   //EXPECT_TRUE(CreateUpdater("Unknow_Updater") == NULL);
 }

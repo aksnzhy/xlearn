@@ -27,7 +27,7 @@ This files defines the MomentumUpdater class.
 
 #include "src/base/common.h"
 #include "src/data/hyper_parameters.h"
-#include "src/update/updater.h"
+#include "src/updater/updater.h"
 
 namespace xLearn {
 

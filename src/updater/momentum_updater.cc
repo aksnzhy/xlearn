@@ -20,7 +20,7 @@ Author: Yuze Liao and Chao Ma (mctt90@gmail.com)
 This file is the implementations of Momentum updater.
 */
 
-#include "src/update/momentum_updater.h"
+#include "src/updater/momentum_updater.h"
 
 namespace xLearn {
 
@@ -37,7 +37,7 @@ void Momentum::Initialize(const HyperParam& hyper_param) {
   rho_ = hyper_param.decay_rate;
   // Allocating memory for the velocity vector
   try {
-    v_.resize(hyper_param.num_param);
+    v_.resize(hyper_param.num_param, 0.0);
   } catch (std::bad_alloc&) {
     LOG(FATAL) << "Cannot allocate enough memory for current    \
                    model parameters. Parameter size: "
@@ -74,11 +74,11 @@ void Momentum::BatchUpdate(const std::vector<real_t>& value,
     __MX _w = _MMX_LOAD_PS(param.data() + start_id + i);
     __MX _tmp_v = _MMX_ADD_PS(_MMX_MUL_PS(_rho, _v),
                               _grad);
-    __MMX_STORE(param.data() + start_id + i,
-               _MMX_SUB_PS(_w,
+    _MMX_STORE_PS(param.data() + start_id + i,
+                 _MMX_SUB_PS(_w,
                            _MMX_MUL_PS(_learning_rate, _tmp_v)));
-    __MMX_STORE(v_.data() + start_id + i,
-               _tmp_v);
+    _MMX_STORE_PS(v_.data() + start_id + i,
+                 _tmp_v);
   }
 }
 
