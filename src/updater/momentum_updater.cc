@@ -69,16 +69,15 @@ void Momentum::BatchUpdate(const std::vector<real_t>& value,
   // [ v = rho * v + grad ]
   // [ w -= learning_rate * v ]
   for (size_t i  = 0; i < value.size(); i += _MMX_INCREMENT) {
+    index_t id = start_id + i;
     __MX _grad = _MMX_LOAD_PS(value.data() + i);
-    __MX _v = _MMX_LOAD_PS(v_.data() + start_id + i);
-    __MX _w = _MMX_LOAD_PS(param.data() + start_id + i);
-    __MX _tmp_v = _MMX_ADD_PS(_MMX_MUL_PS(_rho, _v),
-                              _grad);
-    _MMX_STORE_PS(param.data() + start_id + i,
+    __MX _v = _MMX_LOAD_PS(v_.data() + id);
+    __MX _w = _MMX_LOAD_PS(param.data() + id);
+    _v = _MMX_ADD_PS(_MMX_MUL_PS(_rho, _v),  _grad);
+    _MMX_STORE_PS(param.data() + id,
                  _MMX_SUB_PS(_w,
-                           _MMX_MUL_PS(_learning_rate, _tmp_v)));
-    _MMX_STORE_PS(v_.data() + start_id + i,
-                 _tmp_v);
+                 _MMX_MUL_PS(_learning_rate, _v)));
+    _MMX_STORE_PS(v_.data() + id, _v);
   }
 }
 

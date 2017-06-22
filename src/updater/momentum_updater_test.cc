@@ -31,7 +31,7 @@ namespace xLearn {
 
 HyperParam param;
 const int kLength = _MMX_INCREMENT * 1000000;
-const int kFactor = _MMX_INCREMENT * 3;
+//const int kFactor = _MMX_INCREMENT * 3;
 
 class MomentumTest : public ::testing::Test {
  protected:
@@ -59,14 +59,14 @@ TEST_F(MomentumTest, update_func) {
 }
 
 TEST_F(MomentumTest, batch_update_func) {
-  std::vector<real_t> K(kFactor, 0.0);
-  std::vector<real_t> grad_vec(kFactor, 1.0);
+  std::vector<real_t> K(kLength, 0.0);
+  std::vector<real_t> grad_vec(kLength, 1.0);
   Momentum updater;
   updater.Initialize(param);
   for (int n = 0; n < 3; ++n) {
     updater.BatchUpdate(grad_vec, 0, K);
   }
-  for (int i = 0; i < kFactor; ++i) {
+  for (int i = 0; i < kLength; ++i) {
     EXPECT_EQ(K[i], (real_t)(-0.6));
   }
 }
