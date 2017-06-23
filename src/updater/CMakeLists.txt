@@ -1,5 +1,5 @@
 # Build library updater
-add_library(updater updater.cc momentum_updater.cc)
+add_library(updater updater.cc momentum_updater.cc nesterov_updater.cc)
 
 # Build unittests.
 set(LIBS updater gtest base data)

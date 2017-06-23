@@ -17,11 +17,11 @@
 /*
 Author: Yuze Liao and Chao Ma (mctt90@gmail.com)
 
-This files defines the Momentum class.
+This files defines the Nesterov class.
 */
 
-#ifndef XLEARN_UPDATE_MOMENTUM_UPDATER_H_
-#define XLEARN_UPDATE_MOMENTUM_UPDATER_H_
+#ifndef XLEARN_UPDATE_NESTORV_UPDATER_H_
+#define XLEARN_UPDATE_NESTORV_UPDATER_H_
 
 #include <vector>
 
@@ -32,28 +32,31 @@ This files defines the Momentum class.
 namespace xLearn {
 
 //------------------------------------------------------------------------------
-// SGD has trouble navigating ravines, i.e. areas where the surface curves
-// much more steeply in one dimension than in another, which are common
-// around local optimal. In these scenarios, SGD oscillates across the slopes
-// of the ravine while only making hesitant progress along the bottom towards
-// the local optimum.
-// Momentum is a method that helps accelerate SGD in the relevant direction
-// and dampens oscillations. It does this by a fraction 'velocity' (v) of the
-// update vector of the past time step to the current update vector:
-// [ v = rho * v  + gradient ]
-// [ w -= learning_rate * v ]
-// The momentum term 'rho' is usually set to 0.9 or a similar value.
+// A ball that rolls down a hill, blindly following the slope, is highly
+// unsatisfactory. We'd like to have a smarter ball, a ball that has a notion
+// of where it is going so that it knows to slow down before the hill slopes
+// up again. Nesterov accelerated gradient (NAG) is a way to give our momentum
+// term this kind of prescience. We know that we will use our momentum term
+// γ*v_t-1 to move the parameters θ. Computing θ − γ*v_t-1 thus gives us an
+// approximation of the next position of the parameters (the gradient is
+// missing for the full update), a rough idea where our parameters are going
+// to be. We can now effectively look ahead by calculating the gradient not
+// w.r.t. to our current parameters θ but w.r.t. the approximate future
+// position of our parameters:
+// [ old_v = v ]
+// [ v = rho * v - learning_rate* gradient ]
+// [ x += -rho * old_v + (1+rho) * v]
 //------------------------------------------------------------------------------
-class Momentum : public Updater {
+class Nesterov : public Updater {
  public:
   // Constructor and Destructor
-  Momentum() {  }
-  ~Momentum() {  }
+  Nesterov() { }
+  ~Nesterov() { }
 
   // This function need to be invoked before using this class.
   void Initialize(const HyperParam& hyper_param);
 
-  // Momentum updater
+  // Nesterov updater
   void Update(const index_t id,
               const real_t grad,
               std::vector<real_t>& param);
@@ -63,14 +66,15 @@ class Momentum : public Updater {
                    const index_t start_id,
                    std::vector<real_t>& param);
 
- protected:
-  real_t rho_;
-  std::vector<real_t> v_;
+protected:
+ real_t rho_;
+ std::vector<real_t> v_;
+ std::vector<real_t> old_v_;
 
- private:
-  DISALLOW_COPY_AND_ASSIGN(Momentum);
+private:
+ DISALLOW_COPY_AND_ASSIGN(Nesterov);
 };
 
 } // namespace xLearn
 
-#endif // XLEARN_UPDATE_MOMENTUM_UPDATER_H_
+#endif // XLEARN_UPDATE_NESTORV_UPDATER_H_

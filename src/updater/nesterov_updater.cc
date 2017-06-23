@@ -17,15 +17,15 @@
 /*
 Author: Yuze Liao and Chao Ma (mctt90@gmail.com)
 
-This file is the implementations of Momentum updater.
+This file is the implementations of Nesterov updater.
 */
 
-#include "src/updater/momentum_updater.h"
+#include "src/updater/nesterov_updater.h"
 
 namespace xLearn {
 
 // This function need to be invoked before using this class.
-void Momentum::Initialize(const HyperParam& hyper_param) {
+void Nesterov::Initialize(const HyperParam& hyper_param) {
   CHECK_GT(hyper_param.learning_rate, 0);
   CHECK_GT(hyper_param.regu_lambda_1, 0);
   CHECK_GT(hyper_param.regu_lambda_2, 0);
@@ -35,9 +35,10 @@ void Momentum::Initialize(const HyperParam& hyper_param) {
   regu_lambda_2_ = hyper_param.regu_lambda_2;
   regu_type_ = hyper_param.regu_type;
   rho_ = hyper_param.decay_rate;
-  // Allocating memory for the velocity vector
+  // Allocating memory for two velocity vectors
   try {
     v_.resize(hyper_param.num_param, 0.0);
+    old_v_.resize(hyper_param.num_param, 0.0);
   } catch (std::bad_alloc&) {
     LOG(FATAL) << "Cannot allocate enough memory for current    \
                    model parameters. Parameter size: "
@@ -45,20 +46,22 @@ void Momentum::Initialize(const HyperParam& hyper_param) {
   }
 }
 
-// Momentum updater:
-// [ v = rho * v + dx ]
-// [ w -= learning_rate * v]
-void Momentum::Update(const index_t id,
+// Nesterov updater:
+// [ old_v = v ]
+// [ v = rho * v - learning_rate * gradient ]
+// [ x += -rho * old_v + (1+rho) * v ]
+void Nesterov::Update(const index_t id,
                       const real_t grad,
                       std::vector<real_t>& param) {
   // Do not check anything here
-  v_[id] = rho_ * v_[id] + grad;
-  param[id] -= learning_rate_ * v_[id];
+  old_v_[id] = v_[id];
+  v_[id] = rho_ * v_[id] - learning_rate_ * grad;
+  param[id] += -rho_ * old_v_[id] + (1+rho_) * v_[id];
 }
 
-// Update a continuous space of model parameters by
+// Update a continous space of model parameters by
 // using sse/avx to speed up.
-void Momentum::BatchUpdate(const std::vector<real_t>& value,
+void Nesterov::BatchUpdate(const std::vector<real_t>& value,
                            const index_t start_id,
                            std::vector<real_t>& param) {
   CHECK_EQ(value.empty(), false);
@@ -66,19 +69,25 @@ void Momentum::BatchUpdate(const std::vector<real_t>& value,
   CHECK_EQ(value.size() % _MMX_INCREMENT, 0);
   __MX _learning_rate = _MMX_SET1_PS(learning_rate_);
   __MX _rho = _MMX_SET1_PS(rho_);
-  // [ v = rho * v + grad ]
-  // [ w -= learning_rate * v ]
-  for (size_t i  = 0; i < value.size(); i += _MMX_INCREMENT) {
+  __MX _rho_add_1 = _MMX_SET1_PS(rho_+1);
+  __MX _rho_neg = _MMX_SET1_PS(-rho_);
+  // [ old_v = v ]
+  // [ v = rho * v - learning_rate * gradient ]
+  // [ x += -rho * old_v + (1+rho) * v ]
+  for (int i = 0; i < value.size(); i += _MMX_INCREMENT) {
     index_t id = start_id + i;
     __MX _grad = _MMX_LOAD_PS(value.data() + i);
     __MX _v = _MMX_LOAD_PS(v_.data() + id);
+    __MX _old_v = _v;
     __MX _w = _MMX_LOAD_PS(param.data() + id);
-    _v = _MMX_ADD_PS(_MMX_MUL_PS(_rho, _v),  _grad);
+    _MMX_STORE_PS(old_v_.data() + id, _old_v);
+    _v = _MMX_SUB_PS(_MMX_MUL_PS(_rho, _v),
+                     _MMX_MUL_PS(_learning_rate, _grad));
+    __MX _tmp = _MMX_ADD_PS(_MMX_MUL_PS(_rho_neg, _old_v),
+                            _MMX_MUL_PS(_rho_add_1, _v));
     _MMX_STORE_PS(param.data() + id,
-                 _MMX_SUB_PS(_w,
-                 _MMX_MUL_PS(_learning_rate, _v)));
-    _MMX_STORE_PS(v_.data() + id, _v);
+                 _MMX_ADD_PS(_w, _tmp));
   }
 }
 
-}// namespace xLearn
+} // namespace xLearn
