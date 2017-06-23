@@ -66,13 +66,13 @@ class Nesterov : public Updater {
                    const index_t start_id,
                    std::vector<real_t>& param);
 
-protected:
- real_t rho_;
- std::vector<real_t> v_;
- std::vector<real_t> old_v_;
+ protected:
+  real_t rho_;
+  std::vector<real_t> v_;
+  std::vector<real_t> old_v_;
 
-private:
- DISALLOW_COPY_AND_ASSIGN(Nesterov);
+ private:
+  DISALLOW_COPY_AND_ASSIGN(Nesterov);
 };
 
 } // namespace xLearn
