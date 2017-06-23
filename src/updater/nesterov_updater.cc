@@ -77,7 +77,7 @@ void Nesterov::BatchUpdate(const std::vector<real_t>& value,
     index_t id = start_id + i;
     __MX _grad = _MMX_LOAD_PS(value.data() + i);
     __MX _v = _MMX_LOAD_PS(v_.data() + id);
-    __MX _old_v = _MMX_LOAD_PS(v_.data() + id);
+    __MX _old_v = _v;
     __MX _w = _MMX_LOAD_PS(param.data() + id);
     _MMX_STORE_PS(old_v_.data() + id, _old_v);
     _v = _MMX_SUB_PS(_MMX_MUL_PS(_rho, _v),
