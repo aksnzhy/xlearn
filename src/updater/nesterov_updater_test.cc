@@ -48,11 +48,13 @@ TEST_F(NesterovTest, update_func) {
   std::vector<real_t>* w = model.GetParameter();
   Nesterov updater;
   updater.Initialize(param);
-  for (int i = 0; i < kLength; ++i) {
-    updater.Update(i, grad_vec[i], *w);
+  for (int n = 0; n < 3; ++n) {
+    for (int i = 0; i < kLength; ++i) {
+      updater.Update(i, grad_vec[i], *w);
+    }
   }
   for (int i = 0; i < kLength; ++i) {
-    EXPECT_EQ((*w)[i], (real_t)(-0.2));
+    EXPECT_FLOAT_EQ((*w)[i], (real_t)(-0.9));
   }
 }
 
@@ -61,9 +63,11 @@ TEST_F(NesterovTest, batch_update_func) {
   std::vector<real_t> grad_vec(kFactor, 1.0);
   Nesterov updater;
   updater.Initialize(param);
-  updater.BatchUpdate(grad_vec, 0, K);
+  for (int n = 0; n < 3; ++n) {
+    updater.BatchUpdate(grad_vec, 0, K);
+  }
   for (int i = 0; i < kFactor; ++i) {
-    EXPECT_EQ(K[i], (real_t)(-0.2));
+    EXPECT_FLOAT_EQ(K[i], (real_t)(-0.9));
   }
 }
 

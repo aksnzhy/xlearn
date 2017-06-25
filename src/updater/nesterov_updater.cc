@@ -35,10 +35,9 @@ void Nesterov::Initialize(const HyperParam& hyper_param) {
   regu_lambda_2_ = hyper_param.regu_lambda_2;
   regu_type_ = hyper_param.regu_type;
   rho_ = hyper_param.decay_rate;
-  // Allocating memory for two velocity vectors
+  // Allocating memory for the velocity vector
   try {
     v_.resize(hyper_param.num_param, 0.0);
-    old_v_.resize(hyper_param.num_param, 0.0);
   } catch (std::bad_alloc&) {
     LOG(FATAL) << "Cannot allocate enough memory for current    \
                    model parameters. Parameter size: "
@@ -54,9 +53,9 @@ void Nesterov::Update(const index_t id,
                       const real_t grad,
                       std::vector<real_t>& param) {
   // Do not check anything here
-  old_v_[id] = v_[id];
+  real_t old_v = v_[id];
   v_[id] = rho_ * v_[id] - learning_rate_ * grad;
-  param[id] += -rho_ * old_v_[id] + (1+rho_) * v_[id];
+  param[id] += -rho_ * old_v + (1+rho_) * v_[id];
 }
 
 // Update a continous space of model parameters by
@@ -77,11 +76,11 @@ void Nesterov::BatchUpdate(const std::vector<real_t>& value,
     index_t id = start_id + i;
     __MX _grad = _MMX_LOAD_PS(value.data() + i);
     __MX _v = _MMX_LOAD_PS(v_.data() + id);
-    __MX _old_v = _v;
+    __MX _old_v = _MMX_LOAD_PS(v_.data() + id);
     __MX _w = _MMX_LOAD_PS(param.data() + id);
-    _MMX_STORE_PS(old_v_.data() + id, _old_v);
     _v = _MMX_SUB_PS(_MMX_MUL_PS(_rho, _v),
                      _MMX_MUL_PS(_learning_rate, _grad));
+    _MMX_STORE_PS(v_.data() + id, _v);
     __MX _tmp = _MMX_SUB_PS(_MMX_MUL_PS(_rho_add_1, _v),
                             _MMX_MUL_PS(_rho, _old_v));
     _MMX_STORE_PS(param.data() + id,

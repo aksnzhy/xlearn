@@ -69,7 +69,6 @@ class Nesterov : public Updater {
  protected:
   real_t rho_;
   std::vector<real_t> v_;
-  std::vector<real_t> old_v_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Nesterov);
