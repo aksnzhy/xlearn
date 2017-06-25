@@ -31,6 +31,7 @@ This file tests a set of updaters.
 //#include "src/updater/adagrad_updater.h"
 //#include "src/updater/adam_updater.h"
 #include "src/updater/momentum_updater.h"
+#include "src/updater/nesterov_updater.h"
 //#include "src/updater/rmsprop_updater.h"
 
 namespace xLearn {
@@ -141,6 +142,7 @@ TEST(UPDATER_TEST, CreateUpdater) {
   //EXPECT_TRUE(CreateUpdater("adagrad") != NULL);
   //EXPECT_TRUE(CreateUpdater("adam") != NULL);
   EXPECT_TRUE(CreateUpdater("momentum") != NULL);
+  EXPECT_TRUE(CreateUpdater("nesterov") != NULL);
   //EXPECT_TRUE(CreateUpdater("rmsprop") != NULL);
   //EXPECT_TRUE(CreateUpdater("Unknow_Updater") == NULL);
 }
