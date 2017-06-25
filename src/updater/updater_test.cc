@@ -22,6 +22,8 @@ This file tests a set of updaters.
 
 #include "gtest/gtest.h"
 
+#include <iostream>
+
 #include "src/base/common.h"
 
 #include "src/updater/updater.h"
@@ -52,11 +54,13 @@ TEST_F(UpdaterTest, update_func) {
   std::vector<real_t>* w = model.GetParameter();
   Updater updater;
   updater.Initialize(param);
-  for (int i = 0; i < kLength; ++i) {
-    updater.Update(i, grad_vec[i], *w);
+  for (int n = 0; n < 3; ++n) {
+    for (int i = 0; i < kLength; ++i) {
+      updater.Update(i, grad_vec[i], *w);
+    }
   }
   for (int i = 0; i < kLength; ++i) {
-    EXPECT_EQ((*w)[i], (real_t)(-0.2));
+    EXPECT_FLOAT_EQ((*w)[i], (real_t)(-0.6));
   }
 }
 
@@ -65,9 +69,11 @@ TEST_F(UpdaterTest, batch_update_func) {
   std::vector<real_t> grad_vec(kFactor, 2.0);
   Updater updater;
   updater.Initialize(param);
-  updater.BatchUpdate(grad_vec, 0, K);
+  for (int n = 0; n < 3; ++n) {
+    updater.BatchUpdate(grad_vec, 0, K);
+  }
   for (int i = 0; i < kFactor; ++i) {
-    EXPECT_EQ(K[i], (real_t)(-0.2));
+    EXPECT_FLOAT_EQ(K[i], (real_t)(-0.6));
   }
 }
 
@@ -80,12 +86,14 @@ TEST_F(UpdaterTest, l1_test) {
   }
   Updater updater;
   updater.Initialize(param);
-  updater.Regularizer(&model);
+  for (int n = 0; n < 3; ++n) {
+    updater.Regularizer(&model);
+  }
   for (int i = 0; i < 100000; ++i) {
-    EXPECT_EQ((*w)[i], (real_t)(0.8));
+    EXPECT_FLOAT_EQ((*w)[i], (real_t)(0.4));
   }
   for (int i = 100000; i < kLength; ++i) {
-    EXPECT_EQ((*w)[i], (real_t)(0.2));
+    EXPECT_FLOAT_EQ((*w)[i], (real_t)(0.2));
   }
 }
 
@@ -98,9 +106,11 @@ TEST_F(UpdaterTest, l2_test) {
   }
   Updater updater;
   updater.Initialize(param);
-  updater.Regularizer(&model);
+  for (int n = 0; n < 3; ++n) {
+    updater.Regularizer(&model);
+  }
   for (int i = 0; i < kLength; ++i) {
-    EXPECT_EQ((*w)[i], (real_t)(0.8));
+    EXPECT_FLOAT_EQ((*w)[i], (real_t)(0.512));
   }
 }
 
@@ -113,9 +123,11 @@ TEST_F(UpdaterTest, l1_l2_test) {
   }
   Updater updater;
   updater.Initialize(param);
-  updater.Regularizer(&model);
+  for (int n = 0; n < 3; ++n) {
+    updater.Regularizer(&model);
+  }
   for (int i = 0; i < kLength; ++i) {
-    EXPECT_EQ((*w)[i], (real_t)(0.56));
+    EXPECT_FLOAT_EQ((*w)[i], (real_t)(0.0364));
   }
 }
 
