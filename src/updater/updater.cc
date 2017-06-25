@@ -27,7 +27,7 @@ This file is the implementation of Updater.
 //#include "src/updater/adadelta_updater.h"
 #include "src/updater/momentum_updater.h"
 #include "src/updater/nesterov_updater.h"
-//#include "src/updater/rmsprop_updater.h"
+#include "src/updater/rmsprop_updater.h"
 
 namespace xLearn {
 
@@ -41,7 +41,7 @@ REGISTER_UPDATER("adagrad", AdaGrad);
 //REGISTER_UPDATER("adadelta", AdaDeltaUpdater);
 REGISTER_UPDATER("momentum", Momentum);
 REGISTER_UPDATER("nesterov", Nesterov);
-//REGISTER_UPDATER("rmsprop", RMSPropUpdater);
+REGISTER_UPDATER("rmsprop", RMSProp);
 
 // User need to invoke this function before updating.
 void Updater::Initialize(const HyperParam& hyper_param) {
