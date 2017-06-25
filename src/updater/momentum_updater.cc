@@ -52,8 +52,8 @@ void Momentum::Update(const index_t id,
                       const real_t grad,
                       std::vector<real_t>& param) {
   // Do not check anything here
-  v_[id] = rho_ * v_[id] + grad;
-  param[id] -= learning_rate_ * v_[id];
+  v_[id] = rho_ * v_[id] - learning_rate_ * grad;
+  param[id] += v_[id];
 }
 
 // Update a continuous space of model parameters by
@@ -73,10 +73,10 @@ void Momentum::BatchUpdate(const std::vector<real_t>& value,
     __MX _grad = _MMX_LOAD_PS(value.data() + i);
     __MX _v = _MMX_LOAD_PS(v_.data() + id);
     __MX _w = _MMX_LOAD_PS(param.data() + id);
-    _v = _MMX_ADD_PS(_MMX_MUL_PS(_rho, _v),  _grad);
+    _v = _MMX_SUB_PS(_MMX_MUL_PS(_rho, _v),
+                     _MMX_MUL_PS(_learning_rate, _grad));
     _MMX_STORE_PS(param.data() + id,
-                 _MMX_SUB_PS(_w,
-                 _MMX_MUL_PS(_learning_rate, _v)));
+                 _MMX_ADD_PS(_w, _v));
     _MMX_STORE_PS(v_.data() + id, _v);
   }
 }
