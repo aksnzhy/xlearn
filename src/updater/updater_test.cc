@@ -38,7 +38,6 @@ namespace xLearn {
 
 HyperParam param;
 const int kLength = _MMX_INCREMENT * 1000000;
-const int kFactor = _MMX_INCREMENT * 3;
 
 class UpdaterTest : public ::testing::Test {
  protected:
@@ -66,14 +65,14 @@ TEST_F(UpdaterTest, update_func) {
 }
 
 TEST_F(UpdaterTest, batch_update_func) {
-  std::vector<real_t> K(kFactor, 0.0);
-  std::vector<real_t> grad_vec(kFactor, 2.0);
+  std::vector<real_t> K(kLength, 0.0);
+  std::vector<real_t> grad_vec(kLength, 2.0);
   Updater updater;
   updater.Initialize(param);
   for (int n = 0; n < 3; ++n) {
     updater.BatchUpdate(grad_vec, 0, K);
   }
-  for (int i = 0; i < kFactor; ++i) {
+  for (int i = 0; i < kLength; ++i) {
     EXPECT_FLOAT_EQ(K[i], (real_t)(-0.6));
   }
 }
@@ -139,7 +138,7 @@ Updater* CreateUpdater(const char* format_name) {
 TEST(UPDATER_TEST, CreateUpdater) {
   EXPECT_TRUE(CreateUpdater("sgd") != NULL);
   //EXPECT_TRUE(CreateUpdater("adadelta") != NULL);
-  //EXPECT_TRUE(CreateUpdater("adagrad") != NULL);
+  EXPECT_TRUE(CreateUpdater("adagrad") != NULL);
   //EXPECT_TRUE(CreateUpdater("adam") != NULL);
   EXPECT_TRUE(CreateUpdater("momentum") != NULL);
   EXPECT_TRUE(CreateUpdater("nesterov") != NULL);

@@ -1,5 +1,5 @@
 # Build library updater
-add_library(updater updater.cc momentum_updater.cc nesterov_updater.cc)
+add_library(updater updater.cc momentum_updater.cc nesterov_updater.cc adagrad_updater.cc)
 
 # Build unittests.
 set(LIBS updater gtest base data)
@@ -12,6 +12,9 @@ target_link_libraries(momentum_updater_test gtest_main ${LIBS})
 
 add_executable(nesterov_updater_test nesterov_updater_test.cc)
 target_link_libraries(nesterov_updater_test gtest_main ${LIBS})
+
+add_executable(adagrad_updater_test adagrad_updater_test.cc)
+target_link_libraries(adagrad_updater_test gtest_main ${LIBS})
 
 # Install library and header files
 install(TARGETS updater DESTINATION lib/update)
