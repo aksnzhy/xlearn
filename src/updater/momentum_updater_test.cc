@@ -52,9 +52,10 @@ TEST_F(MomentumTest, update_func) {
     for (int i = 0; i < kLength; ++i) {
       updater.Update(i, grad_vec[i], *w);
     }
+    std::cout << "w: " << (*w)[0] << std::endl;
   }
   for (int i = 0; i < kLength; ++i) {
-    EXPECT_FLOAT_EQ((*w)[i], (real_t)(-3.3));
+    EXPECT_FLOAT_EQ((*w)[i], (real_t)(-0.6));
   }
 }
 
@@ -67,7 +68,7 @@ TEST_F(MomentumTest, batch_update_func) {
     updater.BatchUpdate(grad_vec, 0, K);
   }
   for (int i = 0; i < kFactor; ++i) {
-    EXPECT_FLOAT_EQ(K[i], (real_t)(-3.3));
+    EXPECT_FLOAT_EQ(K[i], (real_t)(-0.6));
   }
 }
 
