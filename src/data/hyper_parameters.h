@@ -52,6 +52,7 @@ struct HyperParam {
   real_t regu_lambda_1 = 0.01;      // lambda for regularizer.
   real_t regu_lambda_2 = 0.01;
   int num_iteration = 100;          // Iteration number.
+  int batch_size = 200;             // Number of data samples.
 //------------------------------------------------------------------------------
 // Parameters for dataset
 //------------------------------------------------------------------------------
