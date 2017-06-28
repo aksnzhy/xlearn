@@ -65,19 +65,21 @@ void AdaGrad::BatchUpdate(const std::vector<real_t>& value,
   CHECK_EQ(value.size() % _MMX_INCREMENT, 0);
   __MX _learning_rate = _MMX_SET1_PS(learning_rate_);
   __MX _small_num = _MMX_SET1_PS(kVerySmallNumber);
-  // [ cache = grad ** 2 ]
-  // [ w -= learning_rate_ * grad / sqrt(cache) ]
   for (size_t i = 0; i < value.size(); i += _MMX_INCREMENT) {
     index_t id = start_id + i;
     __MX _grad = _MMX_LOAD_PS(value.data() + i);
     __MX _w = _MMX_LOAD_PS(param.data() + id);
-    __MX _cache = _MMX_ADD_PS(_MMX_LOAD_PS(cache_.data() + id),
-                              _MMX_MUL_PS(_grad, _grad));
+    __MX _cache = _MMX_LOAD_PS(cache_.data() + id);
+    // [ cache = grad ** 2 ]
+    // [ w -= learning_rate_ * grad / sqrt(cache) ]
+    _cache = _MMX_ADD_PS(_cache, _MMX_MUL_PS(_grad, _grad));
     _MMX_STORE_PS(cache_.data() + id, _cache);
-    __MX _tmp = _MMX_MUL_PS(_MMX_MUL_PS(_learning_rate, _grad),
-                            _MMX_RSQRT_PS(_MMX_ADD_PS(_cache, _small_num)));
     _MMX_STORE_PS(param.data() + id,
-                  _MMX_SUB_PS(_w, _tmp));
+                  _MMX_SUB_PS(_w,
+                  _MMX_MUL_PS(_learning_rate,
+                  _MMX_MUL_PS(_grad,
+                  _MMX_RSQRT_PS(
+                  _MMX_ADD_PS(_cache, _small_num))))));
   }
 }
 

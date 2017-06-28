@@ -71,13 +71,14 @@ void Updater::BatchUpdate(const std::vector<real_t>& value,
   // Ensuring for sse/avx
   CHECK_EQ(value.size() % _MMX_INCREMENT, 0);
   __MX _learning_rate = _MMX_SET1_PS(learning_rate_);
-  // w -= learning_rate * gradient
   for (size_t i = 0; i < value.size(); i += _MMX_INCREMENT) {
+    index_t id = start_id + i;
     __MX _grad = _MMX_LOAD_PS(value.data() + i);
-    __MX _w = _MMX_LOAD_PS(param.data() + start_id + i);
-    __MX _delta_g = _MMX_MUL_PS(_learning_rate, _grad);
-    _MMX_STORE_PS(param.data() + start_id + i,
-                  _MMX_SUB_PS(_w, _delta_g));
+    __MX _w = _MMX_LOAD_PS(param.data() + id);
+    // w -= learning_rate * grad
+    _MMX_STORE_PS(param.data() + id,
+                  _MMX_SUB_PS(_w,
+                  _MMX_MUL_PS(_learning_rate, _grad)));
   }
 }
 

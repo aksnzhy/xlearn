@@ -49,8 +49,8 @@ void RMSProp::Initialize(const HyperParam& hyper_param) {
 // [ cache = decay_rate * cache + (1-decay_rate) * dx ^ 2 ]
 // [ w -= learning_rate * dx / sqrt(cache + 1e-7) ]
 void RMSProp::Update(const index_t id,
-                            const real_t grad,
-                            std::vector<real_t>& param) {
+                     const real_t grad,
+                     std::vector<real_t>& param) {
   // Do not check anything here
   cache_[id] = (1.0-decay_rate_) * grad * grad
                + decay_rate_ * cache_[id];
@@ -70,24 +70,23 @@ void RMSProp::BatchUpdate(const std::vector<real_t>& value,
   __MX _decay_rate = _MMX_SET1_PS(decay_rate_);
   __MX _1_minus_decay_rate = _MMX_SET1_PS(1-decay_rate_);
   __MX _small_num = _MMX_SET1_PS(kVerySmallNumber);
-  // [ cache = decay_rate * cache + (1-decay_rate) * dx ^ 2 ]
-  // [ w -= learning_rate * dx / sqrt(cache + 1e-7) ]
   for (size_t i = 0; i < value.size(); i += _MMX_INCREMENT) {
     index_t id = start_id + i;
     __MX _grad = _MMX_LOAD_PS(value.data() + i);
     __MX _cache = _MMX_LOAD_PS(cache_.data() + id);
     __MX _w = _MMX_LOAD_PS(param.data() + id);
-    _cache = _MMX_ADD_PS(_MMX_MUL_PS(_1_minus_decay_rate,
-                                    _MMX_MUL_PS(_grad, _grad)),
-                        _MMX_MUL_PS(_decay_rate, _cache));
+    // [ cache = decay_rate * cache + (1-decay_rate) * dx ^ 2 ]
+    // [ w -= learning_rate * dx / sqrt(cache + 1e-7) ]
+    _cache = _MMX_ADD_PS(_MMX_MUL_PS(
+             _MMX_MUL_PS(_1_minus_decay_rate, _grad),
+             _grad),
+             _MMX_MUL_PS(_decay_rate, _cache));
     _MMX_STORE_PS(cache_.data() + id,
-                  _cache);
+                 _cache);
     _MMX_STORE_PS(param.data() + id,
-                 _MMX_SUB_PS(_w,
-                 _MMX_MUL_PS(_learning_rate,
-                 _MMX_MUL_PS(_grad,
-                 _MMX_RSQRT_PS(_MMX_ADD_PS(_cache,
-                                           _small_num))))));
+                  _MMX_SUB_PS(_w, _MMX_MUL_PS(_learning_rate,
+                  _MMX_MUL_PS(_grad, _MMX_RSQRT_PS(
+                  _MMX_ADD_PS(_cache, _small_num))))));
   }
 }
 

@@ -69,21 +69,23 @@ void Nesterov::BatchUpdate(const std::vector<real_t>& value,
   __MX _learning_rate = _MMX_SET1_PS(learning_rate_);
   __MX _rho = _MMX_SET1_PS(rho_);
   __MX _rho_add_1 = _MMX_SET1_PS(rho_+1);
-  // [ old_v = v ]
-  // [ v = rho * v - learning_rate * gradient ]
-  // [ x += -rho * old_v + (1+rho) * v ]
   for (size_t i = 0; i < value.size(); i += _MMX_INCREMENT) {
     index_t id = start_id + i;
     __MX _grad = _MMX_LOAD_PS(value.data() + i);
-    __MX _old_v = _MMX_LOAD_PS(v_.data() + id);
+    __MX _v = _MMX_LOAD_PS(v_.data() + id);
     __MX _w = _MMX_LOAD_PS(param.data() + id);
-    __MX _v = _MMX_SUB_PS(_MMX_MUL_PS(_rho, _old_v),
-                         _MMX_MUL_PS(_learning_rate, _grad));
+    // [ old_v = v ]
+    // [ v = rho * v - learning_rate * gradient ]
+    // [ x += -rho * old_v + (1+rho) * v ]
+    __MX _old_v = _v;
+    _v = _MMX_SUB_PS(_MMX_MUL_PS(_rho, _v),
+                     _MMX_MUL_PS(_learning_rate, _grad));
     _MMX_STORE_PS(v_.data() + id, _v);
-    __MX _tmp = _MMX_SUB_PS(_MMX_MUL_PS(_rho_add_1, _v),
-                            _MMX_MUL_PS(_rho, _old_v));
     _MMX_STORE_PS(param.data() + id,
-                 _MMX_ADD_PS(_w, _tmp));
+                  _MMX_ADD_PS(_w,
+                  _MMX_SUB_PS(
+                  _MMX_MUL_PS(_rho_add_1, _v),
+                  _MMX_MUL_PS(_rho, _old_v))));
   }
 }
 
