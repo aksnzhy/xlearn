@@ -22,9 +22,9 @@ This file is the implementation of Updater.
 
 /* for class register */
 #include "src/updater/updater.h"
-//#include "src/updater/adam_updater.h"
+#include "src/updater/adam_updater.h"
 #include "src/updater/adagrad_updater.h"
-//#include "src/updater/adadelta_updater.h"
+#include "src/updater/adadelta_updater.h"
 #include "src/updater/momentum_updater.h"
 #include "src/updater/nesterov_updater.h"
 #include "src/updater/rmsprop_updater.h"
@@ -36,9 +36,9 @@ namespace xLearn {
 //------------------------------------------------------------------------------
 CLASS_REGISTER_IMPLEMENT_REGISTRY(xLearn_updater_registry, Updater);
 REGISTER_UPDATER("sgd", Updater);
-//REGISTER_UPDATER("adam", AdamUpdater);
+REGISTER_UPDATER("adam", Adam);
 REGISTER_UPDATER("adagrad", AdaGrad);
-//REGISTER_UPDATER("adadelta", AdaDeltaUpdater);
+REGISTER_UPDATER("adadelta", AdaDelta);
 REGISTER_UPDATER("momentum", Momentum);
 REGISTER_UPDATER("nesterov", Nesterov);
 REGISTER_UPDATER("rmsprop", RMSProp);
