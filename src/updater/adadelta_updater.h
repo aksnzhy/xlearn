@@ -27,7 +27,7 @@ This files defines the AdaDeltaUpdater class.
 
 #include "src/base/common.h"
 #include "src/data/hyper_parameters.h"
-#include "src/update/updater.h"
+#include "src/updater/updater.h"
 
 namespace xLearn {
 
@@ -36,26 +36,33 @@ namespace xLearn {
 // monotonically decreasing learning rate. Instead of accumulating all past
 // squared gradients, AdaDelta restricts the window of accumulated past
 // gradients to some fixed size w.
+// [ cache = (1-decay_rate) * (grad^2) + decay_rate * cache ]
+// [ w -= learning_rate * grad  / sqrt(cache) ]
 //------------------------------------------------------------------------------
-class AdaDeltaUpdater : public Updater {
+class AdaDelta : public Updater {
  public:
   // Constructor and Desstructor
-  AdaDeltaUpdater() {  }
-  ~AdaDeltaUpdater() {  }
+  AdaDelta() {  }
+  ~AdaDelta() {  }
 
   // This function needs to be invoked before update.
   void Initialize(const HyperParam& hyper_param);
 
   // AdaDelta update
-  void Update(index_t key, real_t grad, Model* model);
+  void Update(const index_t id,
+              const real_t grad,
+              std::vector<real_t>& param);
 
-  // Update a continous space of model parameters using SSE/AVX.
+  // Update a continous space of model parameters using sse/avx.
   void BatchUpdate(const std::vector<real_t>& value,
-                   real_t* param);
+                   const index_t start_id,
+                   std::vector<real_t>& param);
  protected:
-  
+  std::vector<real_t> cache_;
+  real_t decay_rate_;
+
  private:
-  DISALLOW_COPY_AND_ASSIGN(AdaDeltaUpdater);
+  DISALLOW_COPY_AND_ASSIGN(AdaDelta);
 };
 
 } // namespace xLearn

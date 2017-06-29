@@ -87,15 +87,15 @@ void Adam::BatchUpdate(const std::vector<real_t>& value,
   __MX _1_minus_beta_2 = _MMX_SET1_PS(1-beta2_);
   __MX _1_minus_pow_beta_2 = _MMX_SET1_PS(1-fastpow(beta2_, n));
   __MX _small_num = _MMX_SET1_PS(kVerySmallNumber);
-  // [ m = beta1 * m + (1-beta) * dx ]
-  // [ v = beta2 * v + (1-beta) * (dx^2) ]
-  // [ w -= learning_rate * m / (sqrt(v) + 1e-7) ]
   for (size_t i = 0; i < value.size(); i += _MMX_INCREMENT) {
     index_t id = start_id + i;
     __MX _grad = _MMX_LOAD_PS(value.data() + i);
     __MX _v = _MMX_LOAD_PS(v_.data() + id);
     __MX _m = _MMX_LOAD_PS(m_.data() + id);
     __MX _w = _MMX_LOAD_PS(param.data() + id);
+    // [ m = beta1 * m + (1-beta) * dx ]
+    // [ v = beta2 * v + (1-beta) * (dx^2) ]
+    // [ w -= learning_rate * m / (sqrt(v) + 1e-7) ]
     _m = _MMX_ADD_PS(_MMX_MUL_PS(_1_minus_beta_1, _grad),
                      _MMX_MUL_PS(_beta_1, _m));
     _MMX_STORE_PS(m_.data() + id, _m);
@@ -106,9 +106,9 @@ void Adam::BatchUpdate(const std::vector<real_t>& value,
     __MX _vb = _MMX_DIV_PS(_v, _1_minus_pow_beta_2);
     _w = _MMX_SUB_PS(_w, _MMX_MUL_PS(_learning_rate,
                          _MMX_MUL_PS(_mb,
-                         _MMX_RSQRT_PS(_MMX_ADD_PS(_vb, _small_num)))));
-    _MMX_STORE_PS(param.data() + id,
-                  _w);
+                         _MMX_RSQRT_PS(_MMX_ADD_PS(_vb,
+                                       _small_num)))));
+    _MMX_STORE_PS(param.data() + id, _w);
   }
   tmp_n++;
   if (tmp_n == count_num_) { n++; tmp_n = 0; }
