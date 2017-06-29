@@ -29,7 +29,7 @@ void Nesterov::Initialize(const HyperParam& hyper_param) {
   CHECK_GT(hyper_param.learning_rate, 0);
   CHECK_GT(hyper_param.regu_lambda_1, 0);
   CHECK_GT(hyper_param.regu_lambda_2, 0);
-  CHECK_GT(hyper_param.decay_rate, 0);
+  CHECK_GE(hyper_param.decay_rate, 0);
   learning_rate_ = hyper_param.learning_rate;
   regu_lambda_1_ = hyper_param.regu_lambda_1;
   regu_lambda_2_ = hyper_param.regu_lambda_2;

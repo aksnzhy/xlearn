@@ -36,8 +36,8 @@ class AdamTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
     param.learning_rate = 0.1;
-    param.decay_rate = 1.0;
-    param.second_decay_rate = 2.0;
+    param.decay_rate = 0.0;
+    param.second_decay_rate = 0.0;
     param.num_param = kLength;
   }
 };
@@ -52,12 +52,19 @@ TEST_F(AdamTest, update_func) {
     updater.Update(i, grad_vec[i], *w);
   }
   for (int i = 0; i < kLength; ++i) {
-    EXPECT_FLOAT_EQ((*w)[i], (real_t)(0.0));
+    EXPECT_FLOAT_EQ((*w)[i], (real_t)(-0.099830814));
   }
 }
 
 TEST_F(AdamTest, batch_update_func) {
-
+  std::vector<real_t> K(kLength, 0.0);
+  std::vector<real_t> grad_vec(kLength, 1.0);
+  Adam updater;
+  updater.Initialize(param);
+  updater.BatchUpdate(grad_vec, 0, K);
+  for (int i = 0; i < kLength; ++i) {
+    EXPECT_FLOAT_EQ(K[i], (real_t)(-0.099975586));
+  }
 }
 
 } // namespace xLearn

@@ -29,8 +29,8 @@ void Adam::Initialize(const HyperParam& hyper_param) {
   CHECK_GT(hyper_param.learning_rate, 0);
   CHECK_GT(hyper_param.regu_lambda_1, 0);
   CHECK_GT(hyper_param.regu_lambda_2, 0);
-  CHECK_GT(hyper_param.decay_rate, 0);
-  CHECK_GT(hyper_param.second_decay_rate, 0);
+  CHECK_GE(hyper_param.decay_rate, 0);
+  CHECK_GE(hyper_param.second_decay_rate, 0);
   CHECK_GT(hyper_param.batch_size, 0);
   learning_rate_ = hyper_param.learning_rate;
   regu_lambda_1_ = hyper_param.regu_lambda_1;
@@ -38,7 +38,7 @@ void Adam::Initialize(const HyperParam& hyper_param) {
   regu_type_ = hyper_param.regu_type;
   beta1_ = hyper_param.decay_rate;
   beta2_ = hyper_param.second_decay_rate;
-  count_num_ = hyper_param.batch_size * 100;
+  count_num_ = hyper_param.batch_size;
   // Allocating memory for two vectors
   try {
     m_.resize(hyper_param.num_param, 0.0);
