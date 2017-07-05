@@ -26,8 +26,10 @@ function or objective function.
 #include <vector>
 
 #include "src/base/common.h"
+#include "src/base/class_register.h"
 #include "src/data/model_parameters.h"
 #include "src/updater/updater.h"
+#include "src/loss/score_function.h"
 
 namespace xLearn {
 
@@ -65,6 +67,22 @@ class Loss {
   DISALLOW_COPY_AND_ASSIGN(Loss);
 };
 
+//------------------------------------------------------------------------------
+// Class register
+//------------------------------------------------------------------------------
+CLASS_REGISTER_DEFINE_REGISTRY(xLearn_loss_registry, Loss);
+
+#define REGISTER_LOSS(format_name, loss_name)             \
+  CLASS_REGISTER_OBJECT_CREATOR(                          \
+      xLearn_loss_registry,                               \
+      Loss,                                               \
+      format_name,                                        \
+      loss_name)
+
+#define CREATE_LOSS(format_name)                          \
+  CLASS_REGISTER_CREATE_OBJECT(                           \
+      xLearn_loss_registry,                               \
+      format_name)
 
 } // namespace xLearn
 
