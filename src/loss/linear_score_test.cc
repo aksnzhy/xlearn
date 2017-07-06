@@ -24,6 +24,7 @@ This file tests the LinearScore class.
 
 #include "src/base/common.h"
 #include "src/data/data_structure.h"
+#include "src/data/hyper_parameters.h"
 
 #include "src/loss/score_function.h"
 #include "src/loss/linear_score.h"

@@ -20,6 +20,7 @@ This file is the implementation of LinearScore class.
 */
 
 #include "src/loss/linear_score.h"
+#include "src/loss/fm_score.h"
 
 namespace xLearn {
 

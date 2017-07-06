@@ -33,8 +33,14 @@ namespace xLearn {
 //------------------------------------------------------------------------------
 class LinearScore : public Score {
  public:
+  // Constructor and Desstructor
   LinearScore() { }
   ~LinearScore() { }
+
+  // This function needs to be invoked before using this class.
+  void Initialize(const HyperParam& hyper_param) {
+    /* Do nothing */
+  }
 
   // Given one exmaple and current model, return the score.
   real_t CalcScore(const SparseRow* row,

@@ -28,6 +28,7 @@ FM score, FFM score, etc.
 #include "src/base/common.h"
 #include "src/base/class_register.h"
 #include "src/data/data_structure.h"
+#include "src/data/hyper_parameters.h"
 
 namespace xLearn {
 
@@ -38,8 +39,12 @@ namespace xLearn {
 //------------------------------------------------------------------------------
 class Score {
  public:
+  // Constructor and Desstructor
   Score() { }
   virtual ~Score() { }
+
+  // This function needs to be invoked before using this class.
+  virtual void Initialize(const HyperParam& hyper_param) = 0;
 
   // Given one exmaple and current model, return the score.
   virtual real_t CalcScore(const SparseRow* row,
