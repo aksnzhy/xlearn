@@ -33,7 +33,7 @@ namespace xLearn {
 
 index_t K = 10;
 index_t Kfeat = 3;
-index_t kLength = 3 + 3*10;
+index_t kLength = Kfeat + Kfeat*K;
 
 TEST(LINEAR_TEST, calc_score) {
   SparseRow row(Kfeat);
@@ -49,7 +49,7 @@ TEST(LINEAR_TEST, calc_score) {
   FMScore score;
   score.Initialize(hyper_param);
   real_t val = score.CalcScore(&row, &w);
-  // 6 + 40*6
+  // 6 + 10*4*3 = 126
   EXPECT_FLOAT_EQ(val, 126.0);
 }
 
