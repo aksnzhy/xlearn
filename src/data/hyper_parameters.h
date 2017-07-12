@@ -57,7 +57,7 @@ struct HyperParam {
 // Parameters for dataset
 //------------------------------------------------------------------------------
   std::string file_format = "libsvm"; // libsvm, libffm, or csv ?
-  index_t max_feature = 0;            // The max value of feature
+  index_t num_feature = 0;            // The max value of feature (bias is 0)
   index_t num_param = 0;              // The number of model parameters.
   index_t num_cache = 0;              // The number of cache parameters.
   index_t num_K = 0;                  // Only used in fm and ffm.

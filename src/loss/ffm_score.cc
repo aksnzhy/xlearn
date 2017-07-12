@@ -30,40 +30,35 @@ real_t FFMScore::CalcScore(const SparseRow* row,
   static index_t matrix_size = num_field_ * num_factor_;
   real_t score = 0.0;
   index_t col_len = row->column_len;
-  // linear term
+  // linear term： wTx
   for (index_t i = 0; i < col_len; ++i) {
     index_t pos = row->idx[i];
     score += (*w)[pos] * row->X[i];
   }
   // latent factor
-  const float* array_ = &((*w)[0]);
-  __MX accumulate_ = _MMX_SETZERO_PS();
-  for (index_t i = 1; i < col_len; ++i) {
-    index_t idx_i_mul_mxs_add_mf = row->idx[i] * matrix_size + max_feature_;
-    index_t field_i_mul_fac_mf = row->field[i] * num_factor_ + max_feature_;
-    real_t x_i = row->X[i];
+  for (index_t i = 0; i < col_len; ++i) {
+    index_t pos_i = row->idx[i];
+    real_t val_i = row->X[i];
+    index_t field_i = row->field[i];
+    index_t mat_mul_pos_i = matrix_size * pos_i;
+    index_t field_i_mul_fac = field_i * num_factor_;
+    const real_t* data = w->data() + num_feature_;
     for (index_t j = i+1; j < col_len; ++j) {
-      index_t pos_i = idx_i_mul_mxs_add_mf + row->field[j] * num_factor_;
-      index_t pos_j = row->idx[j] * matrix_size + field_i_mul_fac_mf;
-      real_t x_i_mul_x_j = row->X[j] * x_i;
-      __MX x_i_x_j = _MMX_SET1_PS(x_i_mul_x_j);
-      for (index_t k = 0; k < num_factor_; k += _MMX_INCREMENT) {
-        __MX wi = _MMX_LOAD_PS(array_ + pos_i + k);
-        __MX wj = _MMX_LOAD_PS(array_ + pos_j + k);
-        accumulate_ = _MMX_ADD_PS(accumulate_,
-                      _MMX_MUL_PS(wi,
-                      _MMX_MUL_PS(wj, x_i_x_j)));
+      index_t pos_j = row->idx[j];
+      real_t val_j = row->X[j];
+      index_t field_j = row->field[j];
+      const real_t* K_i = data + mat_mul_pos_i
+                          + field_j*num_factor_;
+      const real_t* K_j = data + matrix_size*pos_j
+                          + field_i_mul_fac;
+      real_t tmp = 0.0;
+      for (index_t k = 0; k < num_factor_; ++k) {
+        tmp += (*(K_i+k)) * (*(K_j+k));
       }
+      tmp = tmp * val_i * val_j;
+      score += tmp;
     }
   }
-#ifdef __AVX__
-  accumulate_ = _MMX_HADD_PS(accumulate_, accumulate_);
-  real_t tmp[8];
-  _MMX_STORE_SS(tmp, accumulate_);
-  score = tmp[0];
-#else
-  _MMX_STORE_SS(&score, accumulate_);
-#endif
   return score;
 }
 

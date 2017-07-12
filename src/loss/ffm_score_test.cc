@@ -46,14 +46,14 @@ TEST(LINEAR_TEST, calc_score) {
     row.X[i] = 2.0;
   }
   HyperParam hyper_param;
-  hyper_param.max_feature = Kfeat;
+  hyper_param.num_feature = Kfeat;
   hyper_param.num_K = K;
-  hyper_param.num_field =kfield;
+  hyper_param.num_field = kfield;
   FFMScore score;
   score.Initialize(hyper_param);
   real_t val = score.CalcScore(&row, &w);
-  // 6 + 8*4*3 = 98
-  EXPECT_FLOAT_EQ(val, 98.0);
+  // 6 + 8*4*3 = 102
+  EXPECT_FLOAT_EQ(val, 102.0);
 }
 
 } // namespace xLearn

@@ -35,7 +35,7 @@ index_t K = 10;
 index_t Kfeat = 3;
 index_t kLength = Kfeat + Kfeat*K;
 
-TEST(LINEAR_TEST, calc_score) {
+TEST(FM_TEST, calc_score) {
   SparseRow row(Kfeat);
   std::vector<real_t> w(kLength, 1.0);
   // Init SparseRow
@@ -44,7 +44,7 @@ TEST(LINEAR_TEST, calc_score) {
     row.X[i] = 2.0;
   }
   HyperParam hyper_param;
-  hyper_param.max_feature = Kfeat;
+  hyper_param.num_feature = Kfeat;
   hyper_param.num_K = K;
   FMScore score;
   score.Initialize(hyper_param);

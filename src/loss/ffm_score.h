@@ -43,10 +43,10 @@ public:
    CHECK_GT(hyper_param.num_K, 0);
    // for sse/avx
    CHECK_EQ(hyper_param.num_K % _MMX_INCREMENT, 0);
-   CHECK_GT(hyper_param.max_feature, 0);
+   CHECK_GT(hyper_param.num_feature, 0);
    CHECK_GT(hyper_param.num_field, 0);
    num_factor_ = hyper_param.num_K;
-   max_feature_ = hyper_param.max_feature;
+   num_feature_ = hyper_param.num_feature;
    num_field_ = hyper_param.num_field;
  }
 
@@ -56,7 +56,7 @@ public:
 
  private:
   index_t num_factor_;
-  index_t max_feature_;
+  index_t num_feature_;
   index_t num_field_;
 
   DISALLOW_COPY_AND_ASSIGN(FFMScore);
