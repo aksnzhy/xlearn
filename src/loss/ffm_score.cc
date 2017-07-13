@@ -23,6 +23,32 @@ This file is the implementation of FFMScore class.
 
 namespace xLearn {
 
+#ifdef __AVX__
+
+float sum8(__m256 x) {
+  // hiQuad = ( x7, x6, x5, x4 )
+  const __m128 hiQuad = _mm256_extractf128_ps(x, 1);
+  // loQuad = ( x3, x2, x1, x0 )
+  const __m128 loQuad = _mm256_castps256_ps128(x);
+  // sumQuad = ( x3 + x7, x2 + x6, x1 + x5, x0 + x4 )
+  const __m128 sumQuad = _mm_add_ps(loQuad, hiQuad);
+  // loDual = ( -, -, x1 + x5, x0 + x4 )
+  const __m128 loDual = sumQuad;
+  // hiDual = ( -, -, x3 + x7, x2 + x6 )
+  const __m128 hiDual = _mm_movehl_ps(sumQuad, sumQuad);
+  // sumDual = ( -, -, x1 + x3 + x5 + x7, x0 + x2 + x4 + x6 )
+  const __m128 sumDual = _mm_add_ps(loDual, hiDual);
+  // lo = ( -, -, -, x0 + x2 + x4 + x6 )
+  const __m128 lo = sumDual;
+  // hi = ( -, -, -, x1 + x3 + x5 + x7 )
+  const __m128 hi = _mm_shuffle_ps(sumDual, sumDual, 0x1);
+  // sum = ( -, -, -, x0 + x1 + x2 + x3 + x4 + x5 + x6 + x7 )
+  const __m128 sum = _mm_add_ss(lo, hi);
+  return _mm_cvtss_f32(sum);
+}
+
+#endif
+
 // y = wTx + sum[(V_i_fj*V_j_fi)(x_i * x_j)]
 // Using sse/avx to speed up
 real_t FFMScore::CalcScore(const SparseRow* row,
@@ -37,26 +63,34 @@ real_t FFMScore::CalcScore(const SparseRow* row,
   }
   // latent factor
   for (index_t i = 0; i < col_len; ++i) {
-    index_t pos_i = row->idx[i];
     real_t val_i = row->X[i];
-    index_t field_i = row->field[i];
-    index_t mat_mul_pos_i = matrix_size * pos_i;
-    index_t field_i_mul_fac = field_i * num_factor_;
+    index_t mat_mul_pos_i = matrix_size * row->idx[i];
+    index_t field_i_mul_fac = row->field[i] * num_factor_;
     const real_t* data = w->data() + num_feature_;
     for (index_t j = i+1; j < col_len; ++j) {
-      index_t pos_j = row->idx[j];
       real_t val_j = row->X[j];
-      index_t field_j = row->field[j];
       const real_t* K_i = data + mat_mul_pos_i
-                          + field_j*num_factor_;
-      const real_t* K_j = data + matrix_size*pos_j
+                          + row->field[j]*num_factor_;
+      const real_t* K_j = data + matrix_size*row->idx[j]
                           + field_i_mul_fac;
-      real_t tmp = 0.0;
-      for (index_t k = 0; k < num_factor_; ++k) {
-        tmp += (*(K_i+k)) * (*(K_j+k));
+      real_t sum = 0.0;
+      __MX _accu = _MMX_SET1_PS(0);
+      for (index_t k = 0; k < num_factor_; k += _MMX_INCREMENT) {
+        __MX _kj = _MMX_LOAD_PS(K_j+k);
+        __MX _ki = _MMX_LOAD_PS(K_i+k);
+        __MX _tmp = _MMX_MUL_PS(_ki, _kj);
+        _accu = _MMX_ADD_PS(_accu, _tmp);
       }
-      tmp = tmp * val_i * val_j;
-      score += tmp;
+      // accumulate _accu to sum
+#ifdef __AVX__
+      sum += sum8(_accu);
+#else // SSE
+      _accu = _mm_hadd_ps(_accu, _accu);
+      _accu = _mm_hadd_ps(_accu, _accu);
+      _mm_store_ss(&sum, _accu);
+#endif
+      sum *= val_i * val_j;
+      score += sum;
     }
   }
   return score;

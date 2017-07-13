@@ -36,7 +36,7 @@ index_t Kfeat = 3;
 index_t kfield = 3;
 index_t kLength = Kfeat + Kfeat*kfield*K;
 
-TEST(LINEAR_TEST, calc_score) {
+TEST(FFM_TEST, calc_score) {
   SparseRow row(Kfeat, true);
   std::vector<real_t> w(kLength, 1.0);
   // Init SparseRow
