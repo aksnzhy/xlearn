@@ -32,6 +32,7 @@ cmake_minimum_required(VERSION 2.8)
 # Using AVX instructions for speedup;
 #-------------------------------------------------------------------------------
 add_definitions("-Wall -Wno-sign-compare -Werror -O3 -std=c++11 -mavx")
+#add_definitions("-Wall -Wno-sign-compare -Werror -O3 -std=c++11")
 
 #-------------------------------------------------------------------------------
 # Declare where our project will be installed.

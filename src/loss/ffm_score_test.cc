@@ -31,7 +31,7 @@ This file tests the FFMScore class.
 
 namespace xLearn {
 
-index_t K = 8;
+index_t K = 24;
 index_t Kfeat = 3;
 index_t kfield = 3;
 index_t kLength = Kfeat + Kfeat*kfield*K;
@@ -51,9 +51,10 @@ TEST(FFM_TEST, calc_score) {
   hyper_param.num_field = kfield;
   FFMScore score;
   score.Initialize(hyper_param);
+  //real_t val = score.CalcScore(&row, &w);
   real_t val = score.CalcScore(&row, &w);
-  // 6 + 8*4*3 = 102
-  EXPECT_FLOAT_EQ(val, 102.0);
+  // 6 + 24*4*3 = 102
+  EXPECT_FLOAT_EQ(val, 294.0);
 }
 
 } // namespace xLearn

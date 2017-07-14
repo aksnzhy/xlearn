@@ -41,8 +41,7 @@ public:
  // This function needs to be invoked before using this class.
  void Initialize(const HyperParam& hyper_param) {
    CHECK_GT(hyper_param.num_K, 0);
-   // for sse/avx
-   CHECK_EQ(hyper_param.num_K % _MMX_INCREMENT, 0);
+   CHECK_EQ(hyper_param.num_K % _MMX_INCREMENT, 0); // for sse/avx
    CHECK_GT(hyper_param.num_feature, 0);
    CHECK_GT(hyper_param.num_field, 0);
    num_factor_ = hyper_param.num_K;
