@@ -62,17 +62,17 @@ real_t FFMScore::CalcScore(const SparseRow* row,
     score += (*w)[pos] * row->X[i];
   }
   // latent factor
-  for (index_t i = 0; i < col_len; ++i) {
+  for (index_t i = 1; i < col_len; ++i) {
     real_t val_i = row->X[i];
-    index_t idx_i = row->idx[i];
-    index_t field_i = row->field[i];
+    index_t idx_i = row->idx[i]-1;
+    index_t field_i = row->field[i]-1;
     index_t mat_mul_pos_i = matrix_size * idx_i;
     index_t field_i_mul_fac = field_i * num_factor_;
     const real_t* data = (&((*w)[0])) + num_feature_;
     for (index_t j = i+1; j < col_len; ++j) {
       real_t val_j = row->X[j];
-      index_t idx_j = row->idx[j];
-      index_t field_j = row->field[j];
+      index_t idx_j = row->idx[j]-1;
+      index_t field_j = row->field[j]-1;
       __MX _accu = _MMX_SET1_PS(0);
       for (index_t k = 0; k < num_factor_; k += _MMX_INCREMENT) {
         __MX _kj = _MMX_LOAD_PS(data + mat_mul_pos_i

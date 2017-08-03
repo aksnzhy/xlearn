@@ -20,8 +20,8 @@ This file defines the Loss class, which is also called error
 function or objective function.
 */
 
-#ifndef XLEARN_LOSS_FILE_SPLITER_H_
-#define XLEARN_LOSS_FILE_SPLITER_H_
+#ifndef XLEARN_LOSS_LOSS_H_
+#define XLEARN_LOSS_LOSS_H_
 
 #include <vector>
 
@@ -43,6 +43,9 @@ class Loss {
    // Constructor and Desstructor
    Loss();
    virtual ~Loss() { }
+
+   // This function needs to be invoked before using this class.
+   void Initialize(Score* score) { score_func_ = score; }
 
    // Given predictions and labels, return loss value.
    virtual real_t Evalute(const std::vector<real_t>& pred,
@@ -86,4 +89,4 @@ CLASS_REGISTER_DEFINE_REGISTRY(xLearn_loss_registry, Loss);
 
 } // namespace xLearn
 
-#endif // XLEARN_LOSS_FILE_SPLITER_H_
+#endif // XLEARN_LOSS_LOSS_H_

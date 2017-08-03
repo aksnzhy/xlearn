@@ -34,27 +34,29 @@ namespace xLearn {
 index_t K = 24;
 index_t Kfeat = 3;
 index_t kfield = 3;
-index_t kLength = Kfeat + Kfeat*kfield*K;
+index_t kLength = Kfeat + 1 + Kfeat*kfield*K;
 
 TEST(FFM_TEST, calc_score) {
-  SparseRow row(Kfeat, true);
+  SparseRow row(Kfeat+1, true);
   std::vector<real_t> w(kLength, 1.0);
   // Init SparseRow
-  for (index_t i = 0; i < Kfeat; ++i) {
+  for (index_t i = 1; i <= Kfeat; ++i) {
     row.idx[i] = i;
     row.field[i] = i;
     row.X[i] = 2.0;
   }
+  row.idx[0] = 0;   // bias
+  row.field[0] = 0;
+  row.X[0] = 1.0;
   HyperParam hyper_param;
   hyper_param.num_feature = Kfeat;
   hyper_param.num_K = K;
   hyper_param.num_field = kfield;
   FFMScore score;
   score.Initialize(hyper_param);
-  //real_t val = score.CalcScore(&row, &w);
   real_t val = score.CalcScore(&row, &w);
-  // 6 + 24*4*3 = 102
-  EXPECT_FLOAT_EQ(val, 294.0);
+  // 7 + 24*4*3 = 295.0
+  EXPECT_FLOAT_EQ(val, 295.0);
 }
 
 } // namespace xLearn

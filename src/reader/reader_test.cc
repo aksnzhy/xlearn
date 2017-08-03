@@ -144,7 +144,7 @@ TEST_F(ReaderTest, SampleFromMemory) {
     int record_num = reader_lr.Samples(matrix);
     if (record_num == 0) {
       --i;
-      reader_lr.GoToHead();
+      reader_lr.Reset();
       continue;
     }
     EXPECT_EQ(record_num, kNumSamples);
@@ -159,7 +159,7 @@ TEST_F(ReaderTest, SampleFromMemory) {
     int record_num = reader_ffm.Samples(matrix);
     if (record_num == 0) {
       --i;
-      reader_ffm.GoToHead();
+      reader_ffm.Reset();
       continue;
     }
     EXPECT_EQ(record_num, kNumSamples);
@@ -173,7 +173,7 @@ TEST_F(ReaderTest, SampleFromMemory) {
     int record_num = reader_csv.Samples(matrix);
     if (record_num == 0) {
       --i;
-      reader_csv.GoToHead();
+      reader_csv.Reset();
       continue;
     }
     EXPECT_EQ(record_num, kNumSamples);
@@ -194,7 +194,7 @@ TEST_F(ReaderTest, SampleFromDisk) {
     int record_num = reader_lr.Samples(matrix);
     if (record_num == 0) {
       --i;
-      reader_lr.GoToHead();
+      reader_lr.Reset();
       continue;
     }
     EXPECT_EQ(record_num, kNumSamples);
@@ -208,7 +208,7 @@ TEST_F(ReaderTest, SampleFromDisk) {
     int record_num = reader_ffm.Samples(matrix);
     if (record_num == 0) {
       --i;
-      reader_ffm.GoToHead();
+      reader_ffm.Reset();
       continue;
     }
     EXPECT_EQ(record_num, kNumSamples);
@@ -222,7 +222,7 @@ TEST_F(ReaderTest, SampleFromDisk) {
     int record_num = reader_csv.Samples(matrix);
     if (record_num == 0) {
       --i;
-      reader_csv.GoToHead();
+      reader_csv.Reset();
       continue;
     }
     EXPECT_EQ(record_num, kNumSamples);

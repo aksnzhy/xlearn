@@ -33,24 +33,26 @@ namespace xLearn {
 
 index_t K = 10;
 index_t Kfeat = 3;
-index_t kLength = Kfeat + Kfeat*K;
+index_t kLength = Kfeat + 1 + Kfeat*K;
 
 TEST(FM_TEST, calc_score) {
-  SparseRow row(Kfeat);
+  SparseRow row(Kfeat+1);
   std::vector<real_t> w(kLength, 1.0);
   // Init SparseRow
-  for (index_t i = 0; i < Kfeat; ++i) {
+  for (index_t i = 1; i <= Kfeat; ++i) {
     row.idx[i] = i;
     row.X[i] = 2.0;
   }
+  row.idx[0] = 0; // bias
+  row.X[0] = 1.0;
   HyperParam hyper_param;
   hyper_param.num_feature = Kfeat;
   hyper_param.num_K = K;
   FMScore score;
   score.Initialize(hyper_param);
   real_t val = score.CalcScore(&row, &w);
-  // 6 + 10*4*3 = 126
-  EXPECT_FLOAT_EQ(val, 126.0);
+  // 7 + 10*4*3 = 127
+  EXPECT_FLOAT_EQ(val, 127.0);
 }
 
 } // namespace xLearn

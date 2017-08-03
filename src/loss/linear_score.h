@@ -19,8 +19,8 @@ Author: Chao Ma (mctt90@gmail.com)
 This file defines the LinearScore class.
 */
 
-#ifndef XLEARN_LINEAR_SCORE_FILE_SPLITER_H_
-#define XLEARN_LINEAR_SCORE_FILE_SPLITER_H_
+#ifndef XLEARN_LINEAR_SCORE_H_
+#define XLEARN_LINEAR_SCORE_H_
 
 #include "src/base/common.h"
 #include "src/loss/score_function.h"
@@ -52,4 +52,4 @@ class LinearScore : public Score {
 
 } // namespace xLearn
 
-#endif // XLEARN_LINEAR_SCORE_FILE_SPLITER_H_
+#endif // XLEARN_LINEAR_SCORE_H_

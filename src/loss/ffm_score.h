@@ -20,8 +20,8 @@ This file defines the FFMScore (field-aware factorization
 machine) class.
 */
 
-#ifndef XLEARN_FFM_SCORE_FILE_SPLITER_H_
-#define XLEARN_FFM_SCORE_FILE_SPLITER_H_
+#ifndef XLEARN_LOSS_FFM_SCORE_H_
+#define XLEARN_LOSS_FFM_SCORE_H_
 
 #include "src/base/common.h"
 #include "src/loss/score_function.h"
@@ -45,7 +45,7 @@ public:
    CHECK_GT(hyper_param.num_feature, 0);
    CHECK_GT(hyper_param.num_field, 0);
    num_factor_ = hyper_param.num_K;
-   num_feature_ = hyper_param.num_feature;
+   num_feature_ = hyper_param.num_feature + 1; // add bias
    num_field_ = hyper_param.num_field;
  }
 
@@ -63,4 +63,4 @@ public:
 
 } // namespace xLearn
 
-#endif // XLEARN_FFM_SCORE_FILE_SPLITER_H_
+#endif // XLEARN_LOSS_FFM_SCORE_H_

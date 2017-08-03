@@ -51,15 +51,14 @@ struct HyperParam {
   real_t second_decay_rate = 0.9;
   real_t regu_lambda_1 = 0.01;      // lambda for regularizer.
   real_t regu_lambda_2 = 0.01;
-  int num_iteration = 100;          // Iteration number.
+  int num_epoch = 10;               // Epoch number.
   int batch_size = 200;             // Number of data samples.
 //------------------------------------------------------------------------------
 // Parameters for dataset
 //------------------------------------------------------------------------------
   std::string file_format = "libsvm"; // libsvm, libffm, or csv ?
-  index_t num_feature = 0;            // The max value of feature (bias is 0)
+  index_t num_feature = 0;            // Number of feature (not include bias)
   index_t num_param = 0;              // The number of model parameters.
-  index_t num_cache = 0;              // The number of cache parameters.
   index_t num_K = 0;                  // Only used in fm and ffm.
   index_t num_field = 0;              // Only used in ffm.
   std::string train_set_file;         // Filename of training data.

@@ -19,8 +19,8 @@ Author: Chao Ma (mctt90@gmail.com)
 This file defines the FMrScore (factorization machine) class.
 */
 
-#ifndef XLEARN_FM_SCORE_FILE_SPLITER_H_
-#define XLEARN_FM_SCORE_FILE_SPLITER_H_
+#ifndef XLEARN_LOSS_FM_SCORE_H_
+#define XLEARN_LOSS_FM_SCORE_H_
 
 #include "src/base/common.h"
 #include "src/loss/score_function.h"
@@ -42,7 +42,7 @@ class FMScore : public Score {
     CHECK_GT(hyper_param.num_K, 0);
     CHECK_GT(hyper_param.num_feature, 0);
     num_factor_ = hyper_param.num_K;
-    num_feature_ = hyper_param.num_feature;
+    num_feature_ = hyper_param.num_feature + 1; // add bias
   }
 
   // Given one exmaple and current model, return the score.
@@ -58,4 +58,4 @@ class FMScore : public Score {
 
 } // namespace xLearn
 
-#endif // XLEARN_FM_SCORE_FILE_SPLITER_H_
+#endif // XLEARN_LOSS_FM_SCORE_H_

@@ -34,7 +34,7 @@ void Loss::Predict(const DMatrix* data_matrix,
                    std::vector<real>& pred) {
   CHECK_NOTNULL(data_matrix);
   CHECK_NE(pred.empty(), true);
-  CHECK_EQ(pred.size(),data_matrix->row_len);
+  CHECK_EQ(pred.size(), data_matrix->row_len);
   std::vector<real_t>* w = model->GetParameter();
   for (size_t i = 0; i < data_matrix->row_len; ++i) {
     SparseRow* row = data_matrix->row[i];

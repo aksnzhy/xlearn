@@ -59,7 +59,7 @@ namespace xLearn {
 //   }
 //
 // The reader will return 0 when reaching the end of data source, and then
-// we can invoke GoToHead() to return to the begining of data.
+// we can invoke Reset() to return to the begining of data.
 //------------------------------------------------------------------------------
 class Reader {
  public:
@@ -77,7 +77,7 @@ class Reader {
   virtual int Samples(DMatrix* &matrix) = 0;
 
   // Return to the begining of the data.
-  virtual void GoToHead() = 0;
+  virtual void Reset() = 0;
 
  protected:
   std::string filename_;    // Indicate the input file
@@ -108,7 +108,7 @@ class InmemReader : public Reader {
   virtual int Samples(DMatrix* &matrix);
 
   // Return to the begining of the data.
-  virtual void GoToHead();
+  virtual void Reset();
 
  protected:
   DMatrix data_buf_;             // Data buffer
@@ -144,7 +144,7 @@ class OndiskReader : public Reader {
   virtual int Samples(DMatrix* &matrix);
 
   // Return to the begining of the file.
-  virtual void GoToHead();
+  virtual void Reset();
 
  private:
   DISALLOW_COPY_AND_ASSIGN(OndiskReader);

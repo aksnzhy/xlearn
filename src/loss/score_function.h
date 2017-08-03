@@ -20,8 +20,8 @@ This file defines the Score class, including linear score,
 FM score, FFM score, etc.
 */
 
-#ifndef XLEARN_SCORE_FILE_SPLITER_H_
-#define XLEARN_SCORE_FILE_SPLITER_H_
+#ifndef XLEARN_LOSS_SCORE_FUNCTION_H_
+#define XLEARN_LOSS_SCORE_FUNCTION_H_
 
 #include <vector>
 
@@ -72,6 +72,6 @@ CLASS_REGISTER_DEFINE_REGISTRY(xLearn_score_registry, Score);
       format_name)
 
 
-} // namespace xLeanr
+} // namespace xLearn
 
-#endif // XLEARN_SCORE_FILE_SPLITER_H_
+#endif // XLEARN_LOSS_SCORE_FUNCTION_H_
