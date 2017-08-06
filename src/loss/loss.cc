@@ -31,7 +31,7 @@ CLASS_REGISTER_IMPLEMENT_REGISTRY(xLearn_loss_registry, Loss);
 // Given data sample and current model, return predictions.
 void Loss::Predict(const DMatrix* data_matrix,
                    Model* model,
-                   std::vector<real>& pred) {
+                   std::vector<real_t>& pred) {
   CHECK_NOTNULL(data_matrix);
   CHECK_NE(pred.empty(), true);
   CHECK_EQ(pred.size(), data_matrix->row_len);

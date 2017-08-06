@@ -29,7 +29,7 @@ function or objective function.
 #include "src/base/class_register.h"
 #include "src/data/model_parameters.h"
 #include "src/updater/updater.h"
-#include "src/loss/score_function.h"
+#include "src/score/score_function.h"
 
 namespace xLearn {
 
@@ -41,7 +41,7 @@ namespace xLearn {
 class Loss {
  public:
    // Constructor and Desstructor
-   Loss();
+   Loss() { };
    virtual ~Loss() { }
 
    // This function needs to be invoked before using this class.
