@@ -23,7 +23,7 @@ This file defines the LinearScore class.
 #define XLEARN_LINEAR_SCORE_H_
 
 #include "src/base/common.h"
-#include "src/loss/score_function.h"
+#include "src/score/score_function.h"
 
 namespace xLearn {
 

@@ -19,7 +19,7 @@ Author: Chao Ma (mctt90@gmail.com)
 This file is the implementation of FFMScore class.
 */
 
-#include "src/loss/ffm_score.h"
+#include "src/score/ffm_score.h"
 
 namespace xLearn {
 

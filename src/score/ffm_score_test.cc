@@ -26,8 +26,8 @@ This file tests the FFMScore class.
 #include "src/data/data_structure.h"
 #include "src/data/hyper_parameters.h"
 
-#include "src/loss/score_function.h"
-#include "src/loss/ffm_score.h"
+#include "src/score/score_function.h"
+#include "src/score/ffm_score.h"
 
 namespace xLearn {
 

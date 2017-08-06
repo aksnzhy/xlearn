@@ -19,9 +19,9 @@ Author: Chao Ma (mctt90@gmail.com)
 This file is the implementation of the base Score class.
 */
 
-#include "src/loss/score_function.h"
-#include "src/loss/linear_score.h"
-#include "src/loss/fm_score.h"
+#include "src/score/score_function.h"
+#include "src/score/linear_score.h"
+#include "src/score/fm_score.h"
 
 namespace xLearn {
 

@@ -23,7 +23,7 @@ This file defines the FMrScore (factorization machine) class.
 #define XLEARN_LOSS_FM_SCORE_H_
 
 #include "src/base/common.h"
-#include "src/loss/score_function.h"
+#include "src/score/score_function.h"
 
 namespace xLearn {
 
