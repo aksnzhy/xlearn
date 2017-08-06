@@ -22,4 +22,35 @@ This file defines the SquaredLoss class.
 #ifndef XLEARN_LOSS_SQUARED_LOSS_H_
 #define XLEARN_LOSS_SQUARED_LOSS_H_
 
-#endif // XLEARN_LOSS_LOSS_H_
+#include "src/base/common.h"
+#include "src/loss/loss.h"
+
+namespace xLearn {
+
+//------------------------------------------------------------------------------
+// SquaredLoss is used for regression tasks in machine learning, which
+// has the following form:
+// loss = sum_1_n((pred - y) ^ 2)
+//------------------------------------------------------------------------------
+class SquaredLoss : public Loss {
+ public:
+  // Constructor and Desstructor
+  SquaredLoss() { };
+  ~SquaredLoss() { }
+
+  // Given predictions and labels, return loss value.
+  real_t Evalute(const std::vector<real_t>& pred,
+                 const std::vector<real_t>& label);
+
+  // Given data sample and current model, return gradients.
+  void CalcGrad(const DMatrix* data_matrix,
+                Model* model,
+                Updater* updater);
+
+ private:
+  DISALLOW_COPY_AND_ASSIGN(SquaredLoss);
+};
+
+} // namespace xLearn
+
+#endif // XLEARN_LOSS_SQUARED_LOSS_H_

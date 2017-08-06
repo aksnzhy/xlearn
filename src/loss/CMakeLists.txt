@@ -1,11 +1,14 @@
 # Build library loss
-add_library(loss loss.cc)
+add_library(loss loss.cc squared_loss.cc)
 
 # Build uinttests
 set(LIBS loss gtest base data score)
 
 add_executable(loss_test loss_test.cc)
 target_link_libraries(loss_test gtest_main ${LIBS})
+
+add_executable(squared_loss_test squared_loss_test.cc)
+target_link_libraries(squared_loss_test gtest_main ${LIBS})
 
 # Install library and header files
 install(TARGETS loss DESTINATION lib/loss)
