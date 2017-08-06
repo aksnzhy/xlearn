@@ -30,7 +30,7 @@ namespace xLearn {
 
 index_t kLine = 10;
 
-TEST(SQUARED_LOSS, Evalute) {
+TEST(ABSOLUTE_LOSS, Evalute) {
   // Create pred vector
   std::vector<real_t> pred(kLine);
   for (int i = 0; i < pred.size(); ++i) {
@@ -44,7 +44,7 @@ TEST(SQUARED_LOSS, Evalute) {
   // Create loss
   AbsLoss loss;
   real_t val = loss.Evalute(pred, label);
-  EXPECT_EQ(val, 45.0);
+  EXPECT_FLOAT_EQ(val, 45.0);
 }
 
 } // namespace xLearn
