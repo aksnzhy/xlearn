@@ -2,7 +2,7 @@
 add_library(reader parser.cc reader.cc file_splitor.cc)
 
 # Build uinttests.
-set(LIBS reader gtest base)
+set(LIBS reader gtest base data)
 
 add_executable(parser_test parser_test.cc)
 target_link_libraries(parser_test gtest_main ${LIBS})
