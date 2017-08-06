@@ -20,8 +20,8 @@ Author: Yuze Liao and Chao Ma (mctt90@gmail.com)
 This file defines the RMSProp class.
 */
 
-#ifndef XLEAR_UPDATE_RMSPROP_UPDATER_H_
-#define XLEAR_UPDATE_RMSPROP_UPDATER_H_
+#ifndef XLEAR_UPDATER_RMSPROP_UPDATER_H_
+#define XLEAR_UPDATER_RMSPROP_UPDATER_H_
 
 #include <vector>
 
@@ -69,4 +69,4 @@ class RMSProp : public Updater {
 
 } // namespace xLearn
 
-#endif // XLEAR_UPDATE_RMSPROP_UPDATER_H_
+#endif // XLEAR_UPDATER_RMSPROP_UPDATER_H_

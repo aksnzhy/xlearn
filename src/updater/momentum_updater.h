@@ -20,8 +20,8 @@ Author: Yuze Liao and Chao Ma (mctt90@gmail.com)
 This files defines the Momentum class.
 */
 
-#ifndef XLEARN_UPDATE_MOMENTUM_UPDATER_H_
-#define XLEARN_UPDATE_MOMENTUM_UPDATER_H_
+#ifndef XLEARN_UPDATER_MOMENTUM_UPDATER_H_
+#define XLEARN_UPDATER_MOMENTUM_UPDATER_H_
 
 #include <vector>
 
@@ -73,4 +73,4 @@ class Momentum : public Updater {
 
 } // namespace xLearn
 
-#endif // XLEARN_UPDATE_MOMENTUM_UPDATER_H_
+#endif // XLEARN_UPDATER_MOMENTUM_UPDATER_H_

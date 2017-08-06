@@ -20,8 +20,8 @@ Author: Yuze Liao and Chao Ma (mctt90@gmail.com)
 This files defines the Nesterov class.
 */
 
-#ifndef XLEARN_UPDATE_NESTORV_UPDATER_H_
-#define XLEARN_UPDATE_NESTORV_UPDATER_H_
+#ifndef XLEARN_UPDATER_NESTORV_UPDATER_H_
+#define XLEARN_UPDATER_NESTORV_UPDATER_H_
 
 #include <vector>
 
@@ -76,4 +76,4 @@ class Nesterov : public Updater {
 
 } // namespace xLearn
 
-#endif // XLEARN_UPDATE_NESTORV_UPDATER_H_
+#endif // XLEARN_UPDATER_NESTORV_UPDATER_H_

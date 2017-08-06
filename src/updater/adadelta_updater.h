@@ -20,8 +20,8 @@ Author: Yuze Liao and Chao Ma (mctt90@gmail.com)
 This files defines the AdaDeltaUpdater class.
 */
 
-#ifndef XLEARN_UPDATE_ADADELTA_UPDATER_H_
-#define XLEARN_UPDATE_ADADELTA_UPDATER_H_
+#ifndef XLEARN_UPDATER_ADADELTA_UPDATER_H_
+#define XLEARN_UPDATER_ADADELTA_UPDATER_H_
 
 #include <vector>
 
@@ -67,4 +67,4 @@ class AdaDelta : public Updater {
 
 } // namespace xLearn
 
-#endif // XLEARN_UPDATE_ADADELTA_UPDATER_H_
+#endif // XLEARN_UPDATER_ADADELTA_UPDATER_H_

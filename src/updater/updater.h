@@ -21,8 +21,8 @@ This file defines the Updater class that is responsible for updating
 current model parameters.
 */
 
-#ifndef XLEARN_UPDATE_UPDATER_H_
-#define XLEARN_UPDATE_UPDATER_H_
+#ifndef XLEARN_UPDATER_UPDATER_H_
+#define XLEARN_UPDATER_UPDATER_H_
 
 #include <vector>
 
@@ -107,5 +107,4 @@ CLASS_REGISTER_DEFINE_REGISTRY(xLearn_updater_registry, Updater);
 
 } // namespace xLearn
 
-#endif // XLEARN_UPDATE_UPDATER_H_
-
+#endif // XLEARN_UPDATER_UPDATER_H_

@@ -21,8 +21,8 @@ This file provides a set of fast ( but approximate )
 mathmatic methods.
 */
 
-#ifndef XLEARN_BASE_RANDOM_H_
-#define XLEARN_BASE_RANDOM_H_
+#ifndef XLEARN_BASE_MATH_H_
+#define XLEARN_BASE_MATH_H_
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -207,4 +207,4 @@ static inline real_t InvSqrt(real_t x) {
    return x;
 }
 
-#endif // XLEARN_BASE_RANDOM_H_
+#endif // XLEARN_BASE_MATH_H_
