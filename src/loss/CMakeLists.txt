@@ -1,5 +1,5 @@
 # Build library loss
-add_library(loss loss.cc squared_loss.cc absolute_loss.cc cross_entropy_loss.cc)
+add_library(loss loss.cc squared_loss.cc absolute_loss.cc cross_entropy_loss.cc hinge_loss.cc)
 
 # Build uinttests
 set(LIBS loss gtest base data score)
@@ -15,6 +15,9 @@ target_link_libraries(absolute_loss_test gtest_main ${LIBS})
 
 add_executable(cross_entropy_loss_test cross_entropy_loss_test.cc)
 target_link_libraries(cross_entropy_loss_test gtest_main ${LIBS})
+
+add_executable(hinge_loss_test hinge_loss_test.cc)
+target_link_libraries(hinge_loss_test gtest_main ${LIBS})
 
 # Install library and header files
 install(TARGETS loss DESTINATION lib/loss)
