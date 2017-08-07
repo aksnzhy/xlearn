@@ -36,11 +36,26 @@ real_t CrossEntropyLoss::Evalute(const std::vector<real_t>& pred,
   return val;
 }
 
-// Given data sample and current model, return gradients.
+// Given data sample and current model, calculate gradient
+// and update model.
 void CrossEntropyLoss::CalcGrad(const DMatrix* data_matrix,
                                 Model* model,
                                 Updater* updater) {
-
+  CHECK_NOTNULL(matrix);
+  CHECK_GT(matrix->row_len, 0);
+  CHECK_NOTNULL(updater);
+  std::vector<real_t>* w = param->GetParameter();
+  size_t row_len = matrix->row_len;
+  // Calculate gradient
+  for (size_t i = 0; i < row_len; ++i) {
+    SparseRow* row = row->row[i];
+    real_t score = score_func_->CalcScore(row, w);
+    // partial gradient
+    real_t y = matrix->Y[i] > 0 ? 1.0 : -1.0;
+    real_t pg = -y / (1.0 + (1.0 / exp(-y * score)));
+    // real gradient and update
+    score_func_->CalcGrad(row, *w, pg, updater);
+  }
 }
 
 } // namespace xLearn

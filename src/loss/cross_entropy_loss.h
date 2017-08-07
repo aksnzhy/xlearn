@@ -42,7 +42,8 @@ class CrossEntropyLoss : public Loss {
   real_t Evalute(const std::vector<real_t>& pred,
                  const std::vector<real_t>& label);
 
-  // Given data sample and current model, return gradients.
+  // Given data sample and current model, calculate gradient
+  // and update model.
   void CalcGrad(const DMatrix* data_matrix,
                 Model* model,
                 Updater* updater);

@@ -56,7 +56,8 @@ class Loss {
                         Model* model,
                         std::vector<real_t>& pred);
 
-   // Given data sample and current model, return gradients.
+   // Given data sample and current model, calculate gradient
+   // and update model.
    virtual void CalcGrad(const DMatrix* data_matrix,
                          Model* model,
                          Updater* updater) = 0;
