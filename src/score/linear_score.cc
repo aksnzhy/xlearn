@@ -35,4 +35,16 @@ real_t LinearScore::CalcScore(const SparseRow* row,
   return score;
 }
 
+// Calculate gradient and update current model.
+void LinearScore::CalcGrad(const SparseRow* row,
+                           std::vector<real_t>& param,
+                           real_t pg, /* partial gradient */
+                           Updater* updater) {
+  index_t col_len = row->column_len;
+  for (size_t i = 0; i < col_len; ++i) {
+    real_t gradient = pg * row->X[i];
+    updater->Update(row->idx[i], gradient, param);
+  }
+}
+
 } // namespace xLearn

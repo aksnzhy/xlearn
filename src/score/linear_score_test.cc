@@ -46,4 +46,8 @@ TEST(LINEAR_TEST, calc_score) {
   EXPECT_FLOAT_EQ(val, 600.0);
 }
 
+TEST(LINEAR_TEST, calc_grad) {
+
+}
+
 } // namespace xLearn

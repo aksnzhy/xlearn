@@ -29,6 +29,7 @@ FM score, FFM score, etc.
 #include "src/base/class_register.h"
 #include "src/data/data_structure.h"
 #include "src/data/hyper_parameters.h"
+#include "src/updater/updater.h"
 
 namespace xLearn {
 
@@ -49,6 +50,12 @@ class Score {
   // Given one exmaple and current model, return the score.
   virtual real_t CalcScore(const SparseRow* row,
                            const std::vector<real_t>* w) = 0;
+
+  // Calculate gradient and update current model.
+  virtual void CalcGrad(const SparseRow* row,
+                        std::vector<real_t>& param,
+                        real_t pg, /* partial gradient */
+                        Updater* updater) = 0;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Score);

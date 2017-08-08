@@ -53,4 +53,35 @@ real_t FMScore::CalcScore(const SparseRow* row,
   return score;
 }
 
+// Calculate gradient and update current model.
+void FMScore::CalcGrad(const SparseRow* row,
+                       std::vector<real_t>& param,
+                       real_t pg, /* partial gradient */
+                       Updater* updater) {
+  size_t col_len = row->column_len;
+  // for linear term
+  for (size_t i = 0; i < col_len; ++i) {
+    real_t gradient = pg * row->X[i];
+    updater->Update(row->idx[i], gradient, param);
+  }
+  // for latent factor
+  for (size_t k = 0; k < num_factor_; ++k) {
+    real_t v_mul_x = 0.0;
+    index_t tmp_idx = num_feature_ + k;
+    for (index_t i = 1; i < col_len; ++i) {
+      index_t pos = (row->idx[i]-1) * num_factor_ + tmp_idx;
+      real_t v = param[pos];
+      real_t x = row->X[i];
+      v_mul_x += (x*v);
+    }
+    for (index_t i = 1; i < col_len; ++i) {
+      index_t pos = (row->idx[i]-1) * num_factor_ + tmp_idx;
+      real_t v = param[pos];
+      real_t x = row->X[i];
+      real_t gradient = (x*v_mul_x - v*x*x) * pg;
+      updater->Update(pos, gradient, param);
+    }
+  }
+}
+
 } // namespace xLearn

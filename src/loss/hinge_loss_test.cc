@@ -39,7 +39,7 @@ TEST(HINGE_LOSS, Evalute) {
   // Create label vector
   std::vector<real_t> label(kLine);
   for (int i = 0; i < label.size(); ++i) {
-    label[i] = 2*i;
+    label[i] = 1.0;
   }
   // Create loss
   HingeLoss loss;
@@ -47,10 +47,10 @@ TEST(HINGE_LOSS, Evalute) {
   EXPECT_FLOAT_EQ(val, 1.0);
   // Test2
   for (int i = 0; i < label.size(); ++i) {
-    label[i] = 0.1*i;
+    label[i] = -1.0;
   }
   val = loss.Evalute(pred, label);
-  EXPECT_FLOAT_EQ(val, 2.6);
+  EXPECT_FLOAT_EQ(val, 55.0);
 }
 
 } // namespace xLearn

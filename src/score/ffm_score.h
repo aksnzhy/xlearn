@@ -53,6 +53,12 @@ public:
  real_t CalcScore(const SparseRow* row,
                   const std::vector<real_t>* w);
 
+ // Calculate gradient and update current model.
+ void CalcGrad(const SparseRow* row,
+               std::vector<real_t>& param,
+               real_t pg, /* partial gradient */
+               Updater* updater);
+
  private:
   index_t num_factor_;
   index_t num_feature_;

@@ -40,11 +40,18 @@ class LinearScore : public Score {
   // This function needs to be invoked before using this class.
   void Initialize(const HyperParam& hyper_param) {
     /* Do nothing */
+    return;
   }
 
   // Given one exmaple and current model, return the score.
   real_t CalcScore(const SparseRow* row,
                    const std::vector<real_t>* w);
+
+  // Calculate gradient and update current model.
+  void CalcGrad(const SparseRow* row,
+                std::vector<real_t>& param,
+                real_t pg, /* partial gradient */
+                Updater* updater);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(LinearScore);

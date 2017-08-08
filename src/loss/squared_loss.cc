@@ -31,7 +31,7 @@ real_t SquaredLoss::Evalute(const std::vector<real_t>& pred,
   real_t val = 0.0;
   for (size_t i = 0; i < pred.size(); ++i) {
     real_t tmp = pred[i] - label[i];
-    val += (tmp*tmp);
+    val += 0.5*(tmp*tmp);
   }
   return val;
 }
@@ -44,11 +44,11 @@ void SquaredLoss::CalcGrad(const DMatrix* matrix,
   CHECK_NOTNULL(matrix);
   CHECK_GT(matrix->row_len, 0);
   CHECK_NOTNULL(updater);
-  std::vector<real_t>* w = param->GetParameter();
+  std::vector<real_t>* w = model->GetParameter();
   size_t row_len = matrix->row_len;
   // Calculate gradient
   for (size_t i = 0; i < row_len; ++i) {
-    SparseRow* row = row->row[i];
+    SparseRow* row = matrix->row[i];
     real_t score = score_func_->CalcScore(row, w);
     // partial gradient
     real_t pg = score - matrix->Y[i];
