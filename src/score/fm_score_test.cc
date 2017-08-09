@@ -55,4 +55,37 @@ TEST(FM_TEST, calc_score) {
   EXPECT_FLOAT_EQ(val, 127.0);
 }
 
+TEST(FM_TEST, calc_grad) {
+  // Reset hyper parameters
+  K = 24;
+  Kfeat = 100;
+  kLength = Kfeat + 1 + Kfeat*K;
+  // Create SparseRow
+  SparseRow row(Kfeat+1);
+  for (index_t i = 0; i < Kfeat+1; ++i) {
+    row.idx[i] = i;
+    row.X[i] = 2.0;
+  }
+  // Create model
+  std::vector<real_t> w(kLength, 3.0);
+  // Create updater
+  Updater* updater = new Updater();
+  HyperParam hyper_param;
+  hyper_param.learning_rate = 0.1;
+  updater->Initialize(hyper_param);
+  // Create score function
+  FMScore score;
+  hyper_param.num_feature = Kfeat;
+  hyper_param.num_K = K;
+  score.Initialize(hyper_param);
+  score.CalcGrad(&row, w, 1.0, updater);
+  // Test
+  for (index_t i = 0; i < Kfeat+1; ++i) {
+    EXPECT_FLOAT_EQ(w[i], 2.8);
+  }
+  for (index_t i = Kfeat+1; i < kLength; ++i) {
+    EXPECT_FLOAT_EQ(w[i], -115.8);
+  }
+}
+
 } // namespace xLearn

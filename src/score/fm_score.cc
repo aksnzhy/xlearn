@@ -36,7 +36,7 @@ real_t FMScore::CalcScore(const SparseRow* row,
   // latent factor
   real_t tmp = 0.0;
   for (index_t k = 0; k < num_factor_; ++k) {
-    real_t square_sum = 0.0, sum_sqaure = 0.0;
+    real_t square_sum = 0.0, sum_square = 0.0;
     index_t tmp_idx = num_feature_ + k;
     // Skip the first element because it is the bias
     for (index_t i = 1; i < col_len; ++i) {
@@ -44,10 +44,10 @@ real_t FMScore::CalcScore(const SparseRow* row,
       index_t pos = (row->idx[i]-1) * num_factor_ + tmp_idx;
       real_t v = (*w)[pos];
       square_sum += (x*v);
-      sum_sqaure += (x*x*v*v);
+      sum_square += (x*x*v*v);
     }
     square_sum *= square_sum;
-    tmp += (square_sum - sum_sqaure);
+    tmp += (square_sum - sum_square);
   }
   score += 0.5 * tmp;
   return score;

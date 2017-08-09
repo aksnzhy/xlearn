@@ -164,4 +164,17 @@ TEST(LOSS, Predict_FFM) {
   }
 }
 
+Loss* CreateLoss(const char* format_name) {
+  return CREATE_LOSS(format_name);
+}
+
+TEST(LOSS_TEST, Create_Loss) {
+  EXPECT_TRUE(CreateLoss("squared") != NULL);
+  EXPECT_TRUE(CreateLoss("hinge") != NULL);
+  EXPECT_TRUE(CreateLoss("cross-entropy") != NULL);
+  EXPECT_TRUE(CreateLoss("abs") != NULL);
+  EXPECT_TRUE(CreateLoss("") == NULL);
+  EXPECT_TRUE(CreateLoss("unknow_name") == NULL);
+}
+
 } // namespace xLearn

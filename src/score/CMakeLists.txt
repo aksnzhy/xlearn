@@ -2,7 +2,10 @@
 add_library(score score_function.cc linear_score.cc fm_score.cc ffm_score.cc)
 
 # Build uinttests
-set(LIBS score gtest base data)
+set(LIBS score gtest base data updater)
+
+add_executable(score_function_test score_function_test.cc)
+target_link_libraries(score_function_test gtest_main ${LIBS})
 
 add_executable(linear_score_test linear_score_test.cc)
 target_link_libraries(linear_score_test gtest_main ${LIBS})

@@ -23,7 +23,7 @@ This file is the implementation of SquaredLoss class.
 
 namespace xLearn {
 
-// Given predictions and labels, return sqaured loss value.
+// Given predictions and labels, return squared loss value.
 real_t SquaredLoss::Evalute(const std::vector<real_t>& pred,
                             const std::vector<real_t>& label) {
   CHECK_EQ(pred.empty(), false);

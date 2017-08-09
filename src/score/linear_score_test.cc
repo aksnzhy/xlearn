@@ -25,6 +25,7 @@ This file tests the LinearScore class.
 #include "src/base/common.h"
 #include "src/data/data_structure.h"
 #include "src/data/hyper_parameters.h"
+#include "src/updater/updater.h"
 
 #include "src/score/score_function.h"
 #include "src/score/linear_score.h"
@@ -47,7 +48,26 @@ TEST(LINEAR_TEST, calc_score) {
 }
 
 TEST(LINEAR_TEST, calc_grad) {
-
+  // Create SparseRow
+  SparseRow row(kLength);
+  for (index_t i = 0; i < kLength; ++i) {
+    row.idx[i] = i;
+    row.X[i] = 2.0;
+  }
+  // Create model
+  std::vector<real_t> w(kLength, 3.0);
+  // Create updater
+  Updater* updater = new Updater();
+  HyperParam hyper_param;
+  hyper_param.learning_rate = 0.1;
+  updater->Initialize(hyper_param);
+  // Create score function
+  LinearScore score;
+  score.CalcGrad(&row, w, 1.0, updater);
+  // Test
+  for (index_t i = 0; i < kLength; ++i) {
+    EXPECT_FLOAT_EQ(w[i], 2.8);
+  }
 }
 
 } // namespace xLearn

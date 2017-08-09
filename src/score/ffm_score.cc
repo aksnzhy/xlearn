@@ -118,7 +118,7 @@ void FFMScore::CalcGrad(const SparseRow* row,
     updater->Update(row->idx[i], gradient, param);
   }
   // for latent factor
-  const real_t* array = param.data();
+  const real_t* array = &(param[0]);
   for (size_t i = 1; i < col_len; ++i) {
     //------------------------- feat_i --------------------//
     real_t x_i = row->X[i];

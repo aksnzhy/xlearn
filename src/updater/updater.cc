@@ -67,9 +67,7 @@ void Updater::Update(const index_t id,
 void Updater::BatchUpdate(const std::vector<real_t>& value,
                           const index_t start_id,
                           std::vector<real_t>& param) {
-  CHECK_EQ(value.empty(), false);
-  // Ensuring for sse/avx
-  CHECK_EQ(value.size() % _MMX_INCREMENT, 0);
+  // Do not check anything here
   __MX _learning_rate = _MMX_SET1_PS(learning_rate_);
   for (size_t i = 0; i < value.size(); i += _MMX_INCREMENT) {
     index_t id = start_id + i;
