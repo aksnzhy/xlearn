@@ -37,6 +37,7 @@ void AdaDelta::Initialize(const HyperParam& hyper_param) {
   regu_lambda_2_ = hyper_param.regu_lambda_2;
   regu_type_ = hyper_param.regu_type;
   decay_rate_ = hyper_param.decay_rate;
+  _lr = _MMX_SET1_PS(learning_rate_);
   // Allicating memory for cache vector
   try {
     cache_.resize(hyper_param.num_param, 0.0);
@@ -64,10 +65,7 @@ void AdaDelta::Update(const index_t id,
 void AdaDelta::BatchUpdate(const std::vector<real_t>& value,
                            const index_t start_id,
                            std::vector<real_t>& param) {
-  CHECK_EQ(value.empty(), false);
-  // Ensuring for sse/avx
-  CHECK_EQ(value.size() % _MMX_INCREMENT, 0);
-  __MX _learning_rate = _MMX_SET1_PS(learning_rate_);
+  // Do not check anything here
   __MX _small_num = _MMX_SET1_PS(kVerySmallNumber);
   __MX _1_minus_decay_rate = _MMX_SET1_PS(1-decay_rate_);
   __MX _decay_rate = _MMX_SET1_PS(decay_rate_);
@@ -84,7 +82,7 @@ void AdaDelta::BatchUpdate(const std::vector<real_t>& value,
     _MMX_STORE_PS(cache_.data() + id, _cache);
     _MMX_STORE_PS(param.data() + id,
                   _MMX_SUB_PS(_w,
-                  _MMX_MUL_PS(_learning_rate,
+                  _MMX_MUL_PS(_lr,
                   _MMX_MUL_PS(_grad,
                   _MMX_RSQRT_PS(
                   _MMX_ADD_PS(_cache, _small_num))))));

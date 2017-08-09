@@ -57,6 +57,7 @@ class AdaDelta : public Updater {
   void BatchUpdate(const std::vector<real_t>& value,
                    const index_t start_id,
                    std::vector<real_t>& param);
+                   
  protected:
   std::vector<real_t> cache_;
   real_t decay_rate_;

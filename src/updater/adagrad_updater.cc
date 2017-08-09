@@ -33,6 +33,7 @@ void AdaGrad::Initialize(const HyperParam& hyper_param) {
   regu_lambda_1_ = hyper_param.regu_lambda_1;
   regu_lambda_2_ = hyper_param.regu_lambda_2;
   regu_type_ = hyper_param.regu_type;
+  _lr = _MMX_SET1_PS(learning_rate_);
   // Allicating memory for cache vector
   try {
     cache_.resize(hyper_param.num_param, 0.0);
@@ -60,10 +61,7 @@ void AdaGrad::Update(const index_t id,
 void AdaGrad::BatchUpdate(const std::vector<real_t>& value,
                           const index_t start_id,
                           std::vector<real_t>& param) {
-  CHECK_EQ(value.empty(), false);
-  // Ensuring for sse/avx
-  CHECK_EQ(value.size() % _MMX_INCREMENT, 0);
-  __MX _learning_rate = _MMX_SET1_PS(learning_rate_);
+  // Do not check anything here
   __MX _small_num = _MMX_SET1_PS(kVerySmallNumber);
   for (size_t i = 0; i < value.size(); i += _MMX_INCREMENT) {
     index_t id = start_id + i;
@@ -76,7 +74,7 @@ void AdaGrad::BatchUpdate(const std::vector<real_t>& value,
     _MMX_STORE_PS(cache_.data() + id, _cache);
     _MMX_STORE_PS(param.data() + id,
                   _MMX_SUB_PS(_w,
-                  _MMX_MUL_PS(_learning_rate,
+                  _MMX_MUL_PS(_lr,
                   _MMX_MUL_PS(_grad,
                   _MMX_RSQRT_PS(
                   _MMX_ADD_PS(_cache, _small_num))))));

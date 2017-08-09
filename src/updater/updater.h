@@ -83,6 +83,7 @@ class Updater {
   real_t regu_lambda_1_;
   real_t regu_lambda_2_;
   std::string regu_type_;  /* l1, l2, elastic_net, or none */
+  __MX _lr;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Updater);

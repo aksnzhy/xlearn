@@ -35,6 +35,7 @@ void Momentum::Initialize(const HyperParam& hyper_param) {
   regu_lambda_2_ = hyper_param.regu_lambda_2;
   regu_type_ = hyper_param.regu_type;
   rho_ = hyper_param.decay_rate;
+  _lr = _MMX_SET1_PS(learning_rate_);
   // Allocating memory for the velocity vector
   try {
     v_.resize(hyper_param.num_param, 0.0);
@@ -61,10 +62,7 @@ void Momentum::Update(const index_t id,
 void Momentum::BatchUpdate(const std::vector<real_t>& value,
                            const index_t start_id,
                            std::vector<real_t>& param) {
-  CHECK_EQ(value.empty(), false);
-  // Ensuring for sse/avx
-  CHECK_EQ(value.size() % _MMX_INCREMENT, 0);
-  __MX _learning_rate = _MMX_SET1_PS(learning_rate_);
+  // Do not check anything here
   __MX _rho = _MMX_SET1_PS(rho_);
   for (size_t i  = 0; i < value.size(); i += _MMX_INCREMENT) {
     index_t id = start_id + i;
@@ -74,7 +72,7 @@ void Momentum::BatchUpdate(const std::vector<real_t>& value,
     // [ v = rho * v + grad ]
     // [ w -= learning_rate * v ]
     _v = _MMX_SUB_PS(_MMX_MUL_PS(_rho, _v),
-                     _MMX_MUL_PS(_learning_rate, _grad));
+                     _MMX_MUL_PS(_lr, _grad));
     _MMX_STORE_PS(v_.data() + id, _v);
     _MMX_STORE_PS(param.data() + id,
                  _MMX_ADD_PS(_w, _v));

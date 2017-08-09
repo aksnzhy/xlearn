@@ -52,6 +52,7 @@ void Updater::Initialize(const HyperParam& hyper_param) {
   regu_lambda_1_ = hyper_param.regu_lambda_1;
   regu_lambda_2_ = hyper_param.regu_lambda_2;
   regu_type_ = hyper_param.regu_type;
+  _lr = _MMX_SET1_PS(learning_rate_);
 }
 
 // SGD updater: [w -= learning_rate * gradient]
@@ -68,7 +69,6 @@ void Updater::BatchUpdate(const std::vector<real_t>& value,
                           const index_t start_id,
                           std::vector<real_t>& param) {
   // Do not check anything here
-  __MX _learning_rate = _MMX_SET1_PS(learning_rate_);
   for (size_t i = 0; i < value.size(); i += _MMX_INCREMENT) {
     index_t id = start_id + i;
     __MX _grad = _MMX_LOAD_PS(value.data() + i);
@@ -76,7 +76,7 @@ void Updater::BatchUpdate(const std::vector<real_t>& value,
     // w -= learning_rate * grad
     _MMX_STORE_PS(param.data() + id,
                   _MMX_SUB_PS(_w,
-                  _MMX_MUL_PS(_learning_rate, _grad)));
+                  _MMX_MUL_PS(_lr, _grad)));
   }
 }
 

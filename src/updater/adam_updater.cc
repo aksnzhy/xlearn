@@ -39,6 +39,7 @@ void Adam::Initialize(const HyperParam& hyper_param) {
   beta1_ = hyper_param.decay_rate;
   beta2_ = hyper_param.second_decay_rate;
   count_num_ = hyper_param.batch_size;
+  _lr = _MMX_SET1_PS(learning_rate_);
   // Allocating memory for two vectors
   try {
     m_.resize(hyper_param.num_param, 0.0);
@@ -77,9 +78,7 @@ void Adam::BatchUpdate(const std::vector<real_t>& value,
   static int n = 1;
   static int tmp_n = 0;
   CHECK_EQ(value.empty(), false);
-  // Ensuring for sse/avx
-  CHECK_EQ(value.size() % _MMX_INCREMENT, 0);
-  __MX _learning_rate = _MMX_SET1_PS(learning_rate_);
+  // Do not check anything here
   __MX _beta_1 = _MMX_SET1_PS(beta1_);
   __MX _1_minus_beta_1 = _MMX_SET1_PS(1-beta1_);
   __MX _1_minus_pow_beta_1 = _MMX_SET1_PS(1-fastpow(beta1_, n));
@@ -104,7 +103,7 @@ void Adam::BatchUpdate(const std::vector<real_t>& value,
     _MMX_STORE_PS(v_.data() + id, _v);
     __MX _mb = _MMX_DIV_PS(_m, _1_minus_pow_beta_1);
     __MX _vb = _MMX_DIV_PS(_v, _1_minus_pow_beta_2);
-    _w = _MMX_SUB_PS(_w, _MMX_MUL_PS(_learning_rate,
+    _w = _MMX_SUB_PS(_w, _MMX_MUL_PS(_lr,
                          _MMX_MUL_PS(_mb,
                          _MMX_RSQRT_PS(_MMX_ADD_PS(_vb,
                                        _small_num)))));
