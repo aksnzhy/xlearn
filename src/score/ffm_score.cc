@@ -100,7 +100,7 @@ real_t FFMScore::CalcScore(const SparseRow* row,
   return score;
 }
 
-// Calculate gradient and update current model.
+// Calculate gradient and update current model parameters.
 // Using sse/avx to speed up
 void FFMScore::CalcGrad(const SparseRow* row,
                         std::vector<real_t>& param,

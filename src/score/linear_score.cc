@@ -35,7 +35,7 @@ real_t LinearScore::CalcScore(const SparseRow* row,
   return score;
 }
 
-// Calculate gradient and update current model.
+// Calculate gradient and update current model parameters.
 void LinearScore::CalcGrad(const SparseRow* row,
                            std::vector<real_t>& param,
                            real_t pg, /* partial gradient */

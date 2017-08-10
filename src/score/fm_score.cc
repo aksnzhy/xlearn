@@ -53,7 +53,7 @@ real_t FMScore::CalcScore(const SparseRow* row,
   return score;
 }
 
-// Calculate gradient and update current model.
+// Calculate gradient and update current model parameters.
 void FMScore::CalcGrad(const SparseRow* row,
                        std::vector<real_t>& param,
                        real_t pg, /* partial gradient */

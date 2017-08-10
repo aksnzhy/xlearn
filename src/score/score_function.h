@@ -51,7 +51,7 @@ class Score {
   virtual real_t CalcScore(const SparseRow* row,
                            const std::vector<real_t>* w) = 0;
 
-  // Calculate gradient and update current model.
+  // Calculate gradient and update current model parameters.
   virtual void CalcGrad(const SparseRow* row,
                         std::vector<real_t>& param,
                         real_t pg, /* partial gradient */
