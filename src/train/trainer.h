@@ -24,7 +24,10 @@ class of the xLearn.
 #ifndef XLEARN_TRAIN_TRAINER_H_
 #define XLEARN_TRAIN_TRAINER_H_
 
+#include <string>
+
 #include "src/base/common.h"
+#include "src/data/hyper_parameters.h"
 
 namespace xLearn {
 
@@ -51,9 +54,14 @@ class Trainer {
   void Finalize();
 
  protected:
-  // Train or Inference
-  void StartTrain();
-  void StartInference();
+  HyperParam hyper_param_;
+
+  void print_logo();
+  void start_train();
+  void start_inference();
+  std::string option_help();
+  void parse_and_check_options(int argc, char* argv[]);
+  void read_problem();
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Trainer);

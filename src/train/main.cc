@@ -31,6 +31,5 @@ int main(int argc, char* argv[]) {
   trainer.Initialize(argc, argv);
   trainer.StartWork();
   trainer.Finalize();
-
   return 0;
 }
