@@ -44,18 +44,19 @@ struct HyperParam {
 //------------------------------------------------------------------------------
 // Parameters for optimization method.
 //------------------------------------------------------------------------------
-  real_t learning_rate = 0.01;      // Control learning step.
+  real_t learning_rate = 0.03;      // Control learning step.
   std::string updater_type = "sgd"; // sgd, adam, adagard, adadelta,
                                     // momentum, or rmsprop ?
-  real_t decay_rate = 0.9;          // The decay factors used by updater.
-  real_t second_decay_rate = 0.9;
-  real_t regu_lambda_1 = 0.01;      // lambda for regularizer.
-  real_t regu_lambda_2 = 0.01;
+  real_t decay_rate = 0.1;          // The decay factors used by updater.
+  real_t second_decay_rate = 0.1;
+  real_t regu_lambda_1 = 0.03;      // lambda for regularizer.
+  real_t regu_lambda_2 = 0.03;
   int num_epoch = 10;               // Epoch number.
   int batch_size = 200;             // Number of data samples.
 //------------------------------------------------------------------------------
 // Parameters for dataset
 //------------------------------------------------------------------------------
+  bool on_disk = false;               // on-disk training for limited memory
   std::string file_format = "libsvm"; // libsvm, libffm, or csv ?
   index_t num_feature = 0;            // Number of feature (not include bias)
   index_t num_param = 0;              // The number of model parameters.
