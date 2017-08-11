@@ -103,6 +103,7 @@ std::string Trainer::option_help() {
 "----------------------------- Inference task -------------------------------\n"
 "\n"
 "Usage: xlearn --is_inference [options] \n"
+"options: \n"
 /* must have value */
 "-model_file <path>: path of your pre-trained model file \n"
 /* must have value */
