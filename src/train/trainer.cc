@@ -28,7 +28,7 @@ This file is the implementation of the Trainer class.
 namespace xLearn {
 
 //------------------------------------------------------------------------------
-// Initialize:
+// Functions for Initialize()
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
@@ -142,8 +142,6 @@ void Trainer::parse_and_check_options(int argc, char* argv[]) {
                << "'xlearn --is_train [options]' for training task \n"
                << "or 'xlearn --is_inference [options]' for inference task\n";
   }
-  // Print logo
-  print_logo();
 }
 
 // Parse and check options for training task
@@ -166,16 +164,18 @@ void Trainer::read_problem(std::string train_set_file,
 void Trainer::Initialize(int argc, char* argv[]) {
   // Parse and check arguments
   parse_and_check_options(argc, argv);
+  // Print logo
+  print_logo();
 }
 
 //------------------------------------------------------------------------------
-// StartWork:
+// Functions for StartWork()
 //------------------------------------------------------------------------------
 
 void Trainer::StartWork() {}
 
 //------------------------------------------------------------------------------
-// Finalize:
+// Functions for Finalize()
 //------------------------------------------------------------------------------
 
 void Trainer::Finalize() {}
