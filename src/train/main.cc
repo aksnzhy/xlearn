@@ -27,7 +27,7 @@ This file is the entry of the xLearn.
 //------------------------------------------------------------------------------
 
 int main(int argc, char* argv[]) {
-  Trainer trainer;
+  xLearn::Trainer trainer;
   trainer.Initialize(argc, argv);
   trainer.StartWork();
   trainer.Finalize();

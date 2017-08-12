@@ -61,7 +61,10 @@ class Trainer {
   void start_inference();
   std::string option_help();
   void parse_and_check_options(int argc, char* argv[]);
-  void read_problem();
+  void check_train_options(int argc, char* argv[]);
+  void check_inference_options(int argc, char* argv[]);
+  void read_problem(std::string train_set_file,
+                    std::string test_set_file);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Trainer);
