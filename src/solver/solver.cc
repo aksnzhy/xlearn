@@ -19,10 +19,11 @@ Author: Chao Ma (mctt90@gmail.com)
 This file is the implementation of the Trainer class.
 */
 
-#include "src/train/trainer.h"
+#include "src/solver/solver.h"
 
 #include <vector>
 #include <string>
+#include <algorithm>
 #include <stdexcept>
 
 namespace xLearn {
@@ -41,7 +42,7 @@ namespace xLearn {
 //
 //      xLearn   -- 0.10 Version --
 //------------------------------------------------------------------------------
-void Trainer::print_logo() {
+void Solver::print_logo() {
   std::cout <<
 "----------------------------------------------------------------------------\n"
             << "      _\n"
@@ -55,8 +56,9 @@ void Trainer::print_logo() {
 "----------------------------------------------------------------------------\n";
 }
 
+
 // Option help menu
-std::string Trainer::option_help() {
+std::string Solver::option_help() {
   return std::string(
 "--------------------------------  Train task  ------------------------------\n"
 "Usage: xlearn --is_train [options] \n"
@@ -64,8 +66,7 @@ std::string Trainer::option_help() {
 "options: \n\n"
 /* must have value */
 "    -train_data <path>: path of your training data file \n"
-"    -test_data <path> (optional, if use cross_validation): \n"
-"                      path of your validation data file \n"
+"    -test_data <path> (optional): path of your validation data file \n"
 "    -model_file <path> (optional, use '/tmp/xlearn-model' by default): \n"
 "                       path of your model checkpoint file \n"
 /* must have value */
@@ -121,10 +122,16 @@ std::string Trainer::option_help() {
   );
 }
 
+// Store all the possible options
+//std::string kMenu[2] = {"-train_data", "-test_data", "-model_file",
+//                       "-score", "", "",
+//                       "", "", "",
+//                       "", "", ""};
+
 // Parse and check the command line args
-void Trainer::parse_and_check_options(int argc, char* argv[]) {
+void Solver::parse_and_check_options(int argc, char* argv[]) {
   // Get all of the arguments
-  std::vector<std::string> args;
+  StringList args;
   for (int i = 0; i < argc; ++i) {
     args.push_back(std::string(argv[i]));
   }
@@ -132,36 +139,75 @@ void Trainer::parse_and_check_options(int argc, char* argv[]) {
     std::cout << option_help();
     exit(0);
   }
-  // Parse and check arguments
+  // Parse and check argument
   if (args[1].compare("--is_train") == 0) {
-    check_train_options(argc, argv);
+    check_train_options(args);
   } else if (args[1].compare("--is_inference") == 0) {
-    check_inference_options(argc, argv);
+    check_inference_options(args);
   } else {
-    LOG(FATAL) << "Arguments error! Please use: \n"
-               << "'xlearn --is_train [options]' for training task \n"
-               << "or 'xlearn --is_inference [options]' for inference task\n";
+    std::cout << "Arguments error. Please use: \n"
+              << " 'xlearn --is_train [options]' for training task \n"
+              << "or \n 'xlearn --is_inference [options]' for inference task\n"
+              << "Type 'xlearn' for the details of the [options]\n";
+    exit(0);
   }
 }
 
-// Parse and check options for training task
-void Trainer::check_train_options(int argc, char* argv[]) {
+// find a str in StringList
+bool find_str(StringList& list, std::string str) {
+  StringList::iterator it;
+  it = find(list.begin(), list.end(), str);
+  if (it != list.end()) {
+    return true;
+  }
+  return false;
+}
 
+// Parse and check options for training task
+void Solver::check_train_options(StringList& args) {
+  bool bo = true;
+  // Check the arguments that must be setted by user
+  StringList list(args.begin()+2, args.end());
+  // user must set the -train_data
+  if (!find_str(list, std::string("-train_data"))) {
+    std::cout << "User need to set the option [-train_data] "
+              << "to specify the input training data file.\n";
+    bo = false;
+  }
+  // user must set the -score
+  if (!find_str(list, std::string("-score"))) {
+    std::cout << "User need to set the option [-score] "
+              << "to specify the score function, which can be 'linear', "
+              << "'fm', and 'ffm' \n";
+    bo = false;
+  }
+  // user must set the -loss
+  if (!find_str(list, std::string("-loss"))) {
+    std::cout << "User need to set the option [-loss] "
+              << "to specify the loss function, which can be 'squared', "
+              << "'absolute', 'cross_entropy', and 'hinge' \n";
+    bo = false;
+  }
+  if (!bo) { exit(0); }
+  // parse avery single argument
+  for (int i = 0; i < list.size(); ++i) {
+
+  }
 }
 
 // Parse and check options for inference task
-void Trainer::check_inference_options(int argc, char* argv[]) {
+void Solver::check_inference_options(StringList& args) {
 
 }
 
 // Read training dataset and
-void Trainer::read_problem(std::string train_set_file,
+void Solver::read_problem(std::string train_set_file,
                            std::string test_set_file) {
 
 }
 
 // Initialize Trainer
-void Trainer::Initialize(int argc, char* argv[]) {
+void Solver::Initialize(int argc, char* argv[]) {
   // Parse and check arguments
   parse_and_check_options(argc, argv);
   // Print logo
@@ -172,12 +218,12 @@ void Trainer::Initialize(int argc, char* argv[]) {
 // Functions for StartWork()
 //------------------------------------------------------------------------------
 
-void Trainer::StartWork() {}
+void Solver::StartWork() {}
 
 //------------------------------------------------------------------------------
 // Functions for Finalize()
 //------------------------------------------------------------------------------
 
-void Trainer::Finalize() {}
+void Solver::Finalize() {}
 
 } // namespace xLearn

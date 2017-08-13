@@ -17,13 +17,14 @@
 /*
 Author: Chao Ma (mctt90@gmail.com)
 
-This file defines the Trainer class, which is the entry
+This file defines the Solver class, which is the entry
 class of the xLearn.
 */
 
-#ifndef XLEARN_TRAIN_TRAINER_H_
-#define XLEARN_TRAIN_TRAINER_H_
+#ifndef XLEARN_TRAIN_SOLVER_H_
+#define XLEARN_TRAIN_SOLVER_H_
 
+#include <vector>
 #include <string>
 
 #include "src/base/common.h"
@@ -31,16 +32,18 @@ class of the xLearn.
 
 namespace xLearn {
 
+typedef std::vector<std::string> StringList;
+
 //------------------------------------------------------------------------------
-// Trainer is entry class of xLearn, which can perform training or inference
+// Solver is entry class of xLearn, which can perform training or inference
 // tasks. There are three important functions in this class, including
 // Initialize(), StartWork(), and Finalize() .
 //------------------------------------------------------------------------------
-class Trainer {
+class Solver {
  public:
   // Constructor and Desstructor
-  Trainer() { }
-  ~Trainer() { }
+  Solver() { }
+  ~Solver() { }
 
   // Initialize the xLearn environment, including checking
   // and parsing the arguments, reading problem (training data
@@ -61,15 +64,15 @@ class Trainer {
   void start_inference();
   std::string option_help();
   void parse_and_check_options(int argc, char* argv[]);
-  void check_train_options(int argc, char* argv[]);
-  void check_inference_options(int argc, char* argv[]);
+  void check_train_options(StringList& args);
+  void check_inference_options(StringList& args);
   void read_problem(std::string train_set_file,
                     std::string test_set_file);
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(Trainer);
+  DISALLOW_COPY_AND_ASSIGN(Solver);
 };
 
 } // namespace xLearn
 
-#endif // XLEARN_TRAIN_TRAINER_H_
+#endif // XLEARN_TRAIN_SOLVER_H_

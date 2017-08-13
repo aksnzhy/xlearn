@@ -20,16 +20,17 @@ Author: Chao Ma (mctt90@gmail.com)
 This file is the entry of the xLearn.
 */
 
-#include "src/train/trainer.h"
+#include "src/solver/solver.h"
 
 //------------------------------------------------------------------------------
 // The pre-defined main function
 //------------------------------------------------------------------------------
 
 int main(int argc, char* argv[]) {
-  xLearn::Trainer trainer;
-  trainer.Initialize(argc, argv);
-  trainer.StartWork();
-  trainer.Finalize();
+  xLearn::Solver solver;
+  solver.Initialize(argc, argv);
+  solver.StartWork();
+  solver.Finalize();
+
   return 0;
 }
