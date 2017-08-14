@@ -17,50 +17,50 @@
 /*
 Author: Chao Ma (mctt90@gmail.com)
 
-This file defines the Solver class, which is the entry
-of the xLearn.
+This file defines the StrSimilar class, which can be used to
+find similar strings.
 */
 
-#ifndef XLEARN_SOLVER_SOLVER_H_
-#define XLEARN_SOLVER_SOLVER_H_
+#ifndef XLEARN_BASE_LEVEN_SHTEIN_DISTANCE_H_
+#define XLEARN_BASE_LEVEN_SHTEIN_DISTANCE_H_
+
+#include <vector>
+#include <string>
 
 #include "src/base/common.h"
-#include "src/data/hyper_parameters.h"
-#include "src/solver/checker.h"
 
 namespace xLearn {
+
+typedef std::vector<std::string> StringList;
+
 //------------------------------------------------------------------------------
-// Solver is entry class of xLearn, which can perform training or inference
-// tasks. There are three important functions in this class, including the
-// Initialize(), StartWork(), and Finalize() funtions.
+// StrSimilar class is used to find the similar string from the
+// target string list.
 //------------------------------------------------------------------------------
-class Solver {
+class StrSimilar {
  public:
-  // Constructor and Desstructor
-  Solver() { }
-  ~Solver() { }
+  // Constructor and Destructor
+  StrSimilar() { }
+  ~StrSimilar() { }
 
-  // Initialize the xLearn environment, including checking
-  // and parsing the arguments, reading problem (training data
-  // or testing data), create model parameters, and so on.
-  void Initialize(int argc, char* argv[]);
+  // Return true (false) if str is (not) in target string list
+  bool Find(const std::string& str,
+            const StringList& list);
 
-  // Start training task or start inference task.
-  void StartWork();
-
-  // Finalize the xLearn environment.
-  void Finalize();
-
- protected:
-  HyperParam hyper_param_;
-  Checker checker_;
-
-  void print_logo() const;
+  // Find the most similar string from string list
+  // Return the minimal levenshtein distance
+  int FindSimilar(const std::string& str,
+                  const StringList& list,
+                  std::string& result);
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(Solver);
+  // Levenshtein distance
+  int ldistance(const std::string& source,
+                const std::string& target);
+
+  DISALLOW_COPY_AND_ASSIGN(StrSimilar);
 };
 
 } // namespace xLearn
 
-#endif // XLEARN_SOLVER_SOLVER_H_
+#endif // XLEARN_BASE_LEVEN_SHTEIN_DISTANCE_H_

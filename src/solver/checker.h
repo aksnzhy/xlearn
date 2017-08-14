@@ -17,50 +17,49 @@
 /*
 Author: Chao Ma (mctt90@gmail.com)
 
-This file defines the Solver class, which is the entry
-of the xLearn.
+This file defines the Checker class, which can check and parse
+the command line arguments.
 */
 
-#ifndef XLEARN_SOLVER_SOLVER_H_
-#define XLEARN_SOLVER_SOLVER_H_
+#ifndef XLEARN_SOLVER_CHECKER_H_
+#define XLEARN_SOLVER_CHECKER_H_
+
+#include <vector>
+#include <string>
 
 #include "src/base/common.h"
 #include "src/data/hyper_parameters.h"
-#include "src/solver/checker.h"
 
 namespace xLearn {
-//------------------------------------------------------------------------------
-// Solver is entry class of xLearn, which can perform training or inference
-// tasks. There are three important functions in this class, including the
-// Initialize(), StartWork(), and Finalize() funtions.
-//------------------------------------------------------------------------------
-class Solver {
- public:
-  // Constructor and Desstructor
-  Solver() { }
-  ~Solver() { }
 
-  // Initialize the xLearn environment, including checking
-  // and parsing the arguments, reading problem (training data
-  // or testing data), create model parameters, and so on.
+typedef std::vector<std::string> StringList;
+
+//------------------------------------------------------------------------------
+// Checker is used to check and parse command line arguments for xLearn.
+//------------------------------------------------------------------------------
+class Checker {
+ public:
+  // Constructor and Destructor
+  Checker() { }
+  ~Checker() { }
+
+  // Initialize Checker
   void Initialize(int argc, char* argv[]);
 
-  // Start training task or start inference task.
-  void StartWork();
-
-  // Finalize the xLearn environment.
-  void Finalize();
-
- protected:
-  HyperParam hyper_param_;
-  Checker checker_;
-
-  void print_logo() const;
+  // Check and parse arguments
+  bool Check(HyperParam& hyper_param);
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(Solver);
+  StringList menu_;    /* Store all the possible options */
+  StringList args_;    /* Store the user input args */
+
+  std::string option_help() const;
+  bool check_train_options(HyperParam& hyper_param);
+  bool check_inference_options(HyperParam& hyper_param);
+
+  DISALLOW_COPY_AND_ASSIGN(Checker);
 };
 
 } // namespace xLearn
 
-#endif // XLEARN_SOLVER_SOLVER_H_
+#endif // XLEARN_SOLVER_CHECKER_H_
