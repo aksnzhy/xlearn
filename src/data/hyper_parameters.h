@@ -64,7 +64,9 @@ struct HyperParam {
   index_t num_field = 0;              // Only used in ffm.
   std::string train_set_file;         // Filename of training data.
   std::string test_set_file;          // Filename of test data.
+  std::string inference_file;         // Filename of inference data.
   std::string model_checkpoint_file;  // Filename for storing the model.
+  std::string output_file;            // Filename of output result.
 //------------------------------------------------------------------------------
 // Parameters for validation
 //------------------------------------------------------------------------------

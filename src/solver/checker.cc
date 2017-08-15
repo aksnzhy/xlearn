@@ -20,8 +20,11 @@ This file is the implementation of the Checker class.
 */
 
 #include <string>
+#include <cstdlib>
+#include <algorithm>
 
 #include "src/solver/checker.h"
+#include "src/base/levenshtein_distance.h"
 
 namespace xLearn {
 
@@ -90,6 +93,13 @@ std::string Checker::option_help() const {
   );
 }
 
+// Convert uper case to lower case
+char easy_to_lower(char in) {
+  if(in<='Z' && in>='A')
+    return in-('Z'-'z');
+  return in;
+}
+
 // Initialize Checker
 void Checker::Initialize(int argc, char* argv[]) {
   // All the possible options
@@ -119,6 +129,13 @@ void Checker::Initialize(int argc, char* argv[]) {
   for (int i = 0; i < argc; ++i) {
     args_.push_back(std::string(argv[i]));
   }
+  // convert args to lower case
+  for (int i = 0; i < args_.size(); ++i) {
+    std::transform(args_[i].begin(),
+                   args_[i].end(),
+                   args_[i].begin(),
+                   easy_to_lower);
+  }
 }
 
 // Check and parse user input
@@ -144,28 +161,27 @@ bool Checker::Check(HyperParam& hyper_param) {
   }
 }
 
-
 // Check options for training tasks
 bool Checker::check_train_options(HyperParam& hyper_param) {
-  /*
   bool bo = true;
   // Check the arguments that must be setted by user
-  StringList list(args.begin()+2, args.end());
+  StringList list(args_.begin()+2, args_.end());
+  StrSimilar ss;
   // user must set the -train_data
-  if (!find_str(list, std::string("-train_data"))) {
+  if (!ss.Find(std::string("-train_data"), list)) {
     std::cout << "User need to set the option [-train_data] "
               << "to specify the input training data file.\n";
     bo = false;
   }
   // user must set the -score
-  if (!find_str(list, std::string("-score"))) {
+  if (!ss.Find(std::string("-score"), list)) {
     std::cout << "User need to set the option [-score] "
               << "to specify the score function, which can be 'linear', "
               << "'fm', and 'ffm' \n";
     bo = false;
   }
   // user must set the -loss
-  if (!find_str(list, std::string("-loss"))) {
+  if (!ss.Find(std::string("-loss"), list)) {
     std::cout << "User need to set the option [-loss] "
               << "to specify the loss function, which can be 'squared', "
               << "'absolute', 'cross_entropy', and 'hinge' \n";
@@ -173,7 +189,209 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
   }
   if (!bo) { return false; }
   // Check every single elements
-*/
+  std::string similar_str;
+  for (int i = 0; i < list.size(); i+=2) {
+    CHECK_GT(list.size(), i+1);
+    if (list[i].compare("-train_data") == 0) {
+      hyper_param.train_set_file = list[i+1];
+    } else if (list[i].compare("-test_data") == 0) {
+      hyper_param.test_set_file = list[i+1];
+    } else if (list[i].compare("-model_file") == 0) {
+      hyper_param.model_checkpoint_file = list[i+1];
+    } else if (list[i].compare("-score") == 0) {
+      std::string value = list[i+1];
+      if (value.compare("linear") != 0 &&
+          value.compare("fm") != 0 &&
+          value.compare("ffm") != 0) {
+        std::cout << "Unknow score function '" << value << "'\n"
+                  << "-score can only be 'linear', 'fm', or 'ffm'\n";
+        bo = false;
+      } else {
+        hyper_param.score_func = value;
+      }
+    } else if (list[i].compare("-loss") == 0) {
+      std::string value = list[i+1];
+      if (value.compare("squared") != 0 &&
+          value.compare("hinge") != 0 &&
+          value.compare("cross_entropy") != 0 &&
+          value.compare("absolute") != 0) {
+        std::cout << "Unknow loss function '" << value << "'\n"
+                  << "-loss can only be 'squared', 'hinge', 'cross_entropy', "
+                  << "or 'absolute'\n";
+        bo = false;
+      } else {
+        hyper_param.loss_func = value;
+      }
+    } else if (list[i].compare("-regular") == 0) {
+      std::string value = list[i+1];
+      if (value.compare("l1") != 0 &&
+          value.compare("l2") != 0 &&
+          value.compare("l1_l2") != 0 &&
+          value.compare("none") != 0) {
+        std::cout << "Unknow regular type '" << value << "'\n"
+                  << "-regular can only be 'l1', 'l2', 'l1_l2', or 'none'\n";
+        bo = false;
+      } else {
+        hyper_param.regu_type = value;
+      }
+    } else if (list[i].compare("-updater") == 0) {
+      std::string value = list[i+1];
+      if (value.compare("sgd") != 0 &&
+          value.compare("adam") != 0 &&
+          value.compare("adagrad") != 0 &&
+          value.compare("adadelta") != 0 &&
+          value.compare("rmsprop") != 0 &&
+          value.compare("momentum") != 0) {
+        std::cout << "Unknow updater '" << value << "'\n"
+                  << "-updater can only be 'sgd', 'adam', 'adagrad', "
+                  << "'rmsprop', or 'momentum'\n";
+        bo = false;
+      } else {
+        hyper_param.updater_type = value;
+      }
+    } else if (list[i].compare("-k") == 0) {
+      int value = atoi(list[i+1].c_str());
+      if (value % 8 != 0) {
+        std::cout << "Error -k : " << list[i] << "\n The number "
+                  << "of latent factor must be a multiple of 8 \n";
+        bo = false;
+      } else {
+        hyper_param.num_K = value;
+      }
+    } else if (list[i].compare("-lr") == 0) {
+      real_t value = atof(list[i+1].c_str());
+      if (value <= 0) {
+        std::cout << "Error -lr: " << list[i] << "\n The learning rate "
+                  << "must be greater than 0 \n";
+        bo = false;
+      } else {
+        hyper_param.learning_rate = value;
+      }
+    } else if (list[i].compare("-decay_rate") == 0) {
+      real_t value = atof(list[i+1].c_str());
+      if (value < 0) {
+        std::cout << "Error -decay_rate: " << list[i] << "\n The decay rate "
+                  << "must be greater than 0 \n";
+        bo = false;
+      } else {
+        hyper_param.decay_rate = value;
+      }
+    } else if (list[i].compare("-second_decay_rate") == 0) {
+      real_t value = atof(list[i+1].c_str());
+      if (value < 0) {
+        std::cout << "Error -second_decay_rate: " << list[i] << "\n The "
+                  << "second decay rate must be greater than 0 \n";
+        bo = false;
+      } else {
+        hyper_param.second_decay_rate = value;
+      }
+    } else if (list[i].compare("-regu_lambda_1") == 0) {
+      real_t value = atof(list[i+1].c_str());
+      if (value < 0) {
+        std::cout << "Error -regu_lambda_1: " << list[i] << "\n The "
+                  << "regular lambda must be greater than 0\n";
+        bo = false;
+      } else {
+        hyper_param.regu_lambda_1 = value;
+      }
+    } else if (list[i].compare("-regu_lambda_2") == 0) {
+      real_t value = atof(list[i+1].c_str());
+      if (value < 0) {
+        std::cout << "Error -regu_lambda_2: " << list[i] << "\n The "
+                  << "regular lambda must be greater than 0\n";
+        bo = false;
+      } else {
+        hyper_param.regu_lambda_2 = value;
+      }
+    } else if (list[i].compare("-epoch") == 0) {
+      int value = atoi(list[i+1].c_str());
+      if (value < 0) {
+        std::cout << "Error -epoch: " << list[i] << "\n The "
+                  << "number of epoch must be greater than 0\n";
+        bo = false;
+      } else {
+        hyper_param.num_epoch = value;
+      }
+    } else if (list[i].compare("-batch_size") == 0) {
+      int value = atoi(list[i+1].c_str());
+      if (value < 0) {
+        std::cout << "Error -batch_size: " << list[i] << "\n The "
+                  << "batch size must be greater than 0\n";
+        bo = false;
+      } else {
+        hyper_param.batch_size = value;
+      }
+    } else if (list[i].compare("-file_format") == 0) {
+      std::string value = list[i+1];
+      if (value.compare("libsvm") != 0 &&
+          value.compare("libffm") != 0 &&
+          value.compare("csv") != 0) {
+        std::cout << "Unknow file format: '" << value << "'\n"
+                  << "-file_format can only be 'libsvm', 'libffm', \n"
+                  << "or 'csv' \n";
+        bo = false;
+      } else {
+        hyper_param.file_format = value;
+      }
+    } else if (list[i].compare("-cv") == 0) {
+      std::string value = list[i+1];
+      if (value.compare("true") != 0 &&
+          value.compare("false") != 0) {
+        std::cout << "Error -cv: " << list[i] << "\n The -cv can "
+                  << "only be 'true' or 'false'\n";
+        bo = false;
+      } else {
+        hyper_param.cross_validation = value.compare("true") == 0 ?
+                                         true : false;
+      }
+    } else if (list[i].compare("-fold") == 0) {
+      int value = atoi(list[i+1].c_str());
+      if (value < 0) {
+        std::cout << "Error -fold: " << list[i] << "\n The "
+                  << "number of fold must be greater than 0\n";
+        bo = false;
+      } else {
+        hyper_param.num_folds = value;
+      }
+    } else if (list[i].compare("-early_stop") == 0) {
+      std::string value = list[i+1];
+      if (value.compare("true") != 0 &&
+          value.compare("false") != 0) {
+        std::cout << "Error -early_stop: " << list[i] << "\n The "
+                  << "-early_stop can only be 'false' and 'true' \n";
+        bo = false;
+      } else {
+        hyper_param.early_stop = value.compare("true") == 0 ?
+                                   true : false;
+      }
+    } else if (list[i].compare("-on_disk") == 0) {
+      std::string value = list[i+1];
+      if (value.compare("true") != 0 &&
+          value.compare("false") != 0) {
+        std::cout << "Error -on_disk: " << list[i] << "\n The "
+                  << "-on_disk can only be 'false' and 'true' \n";
+        bo = false;
+      } else {
+        hyper_param.on_disk = value.compare("true") == 0 ?
+                                true : false;
+      }
+    } else if (list[i].compare("-infer_data") == 0) {
+      std::string value = list[i+1];
+      hyper_param.inference_file = value;
+    } else if (list[i].compare("-out_data") == 0) {
+      std::string value = list[i+1];
+      hyper_param.output_file = value;
+    } else { // no option match
+      if (ss.FindSimilar(list[i], menu_, similar_str) > 7) {
+        std::cout << "Unknow argument: " << "'" << list[i] << "'\n";
+      } else {
+        std::cout << "Unknow argument: " << "'" << list[i] << "' \n"
+                 << " Do you mean '" << similar_str << "' ?\n";
+      }
+      bo = false;
+    }
+  }
+  if (!bo) { return false; }
   return true;
 }
 
