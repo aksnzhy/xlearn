@@ -25,6 +25,7 @@ This file is the implementation of the Trainer class.
 #include <string>
 #include <algorithm>
 #include <stdexcept>
+#include <cstdio>
 
 namespace xLearn {
 
@@ -39,17 +40,17 @@ namespace xLearn {
 //      xLearn   -- 0.10 Version --
 //------------------------------------------------------------------------------
 void Solver::print_logo() const {
-  std::cout <<
+  printf(""
 "----------------------------------------------------------------------------\n"
-            << "      _\n"
-            << "     | |\n"
-            << "__  _| |     ___  __ _ _ __ _ __\n"
-            << "\\ \\/ / |    / _ \\/ _` | '__| '_ \\ \n"
-            << " >  <| |___|  __/ (_| | |  | | | |\n"
-            << "/_/\\_\\_____/\\___|\\__,_|_|  |_| |_|\n\n"
-            << "   xLearn   -- 0.10 Version --\n"
-            <<
-"----------------------------------------------------------------------------\n";
+               "      _\n"
+               "     | |\n"
+               "__  _| |     ___  __ _ _ __ _ __\n"
+               "\\ \\/ / |    / _ \\/ _` | '__| '_ \\ \n"
+               " >  <| |___|  __/ (_| | |  | | | |\n"
+               "/_/\\_\\_____/\\___|\\__,_|_|  |_| |_|\n\n"
+               "   xLearn   -- 0.10 Version --\n"
+"----------------------------------------------------------------------------\n"
+  );
 }
 
 // Initialize Trainer
@@ -59,6 +60,7 @@ void Solver::Initialize(int argc, char* argv[]) {
   // Check and parse command line arguments
   checker_.Initialize(argc, argv);
   if (!checker_.Check(hyper_param_)) {
+    printf("Arguments error \n");
     exit(0);
   }
 }

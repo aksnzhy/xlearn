@@ -18,10 +18,10 @@
 Author: Chao Ma (mctt90@gmail.com)
 This file is the implementation of the Checker class.
 */
-
 #include <string>
 #include <cstdlib>
 #include <algorithm>
+#include <cstdio>
 
 #include "src/solver/checker.h"
 #include "src/base/levenshtein_distance.h"
@@ -95,8 +95,8 @@ std::string Checker::option_help() const {
 
 // Convert uper case to lower case
 char easy_to_lower(char in) {
-  if(in<='Z' && in>='A')
-    return in-('Z'-'z');
+  if(in <= 'Z' && in >= 'A')
+    return in - ('Z'-'z');
   return in;
 }
 
@@ -142,7 +142,7 @@ void Checker::Initialize(int argc, char* argv[]) {
 bool Checker::Check(HyperParam& hyper_param) {
   // Do not have any args
   if (args_.size() == 1) {
-    std::cout << option_help();
+    printf("%s\n", option_help().c_str());
     return false;
   }
   // Parse and check argument
@@ -153,10 +153,10 @@ bool Checker::Check(HyperParam& hyper_param) {
     hyper_param.is_train = false;
     return check_inference_options(hyper_param);
   } else {
-    std::cout << "Arguments error. Please use: \n"
-              << " 'xlearn --is_train [options]' for training task \n"
-              << "or \n 'xlearn --is_inference [options]' for inference task\n"
-              << "Type 'xlearn' for the details of the [options]\n";
+    printf("Please use: \n"
+           " 'xlearn --is_train [options]' for training task \n"
+           "or \n 'xlearn --is_inference [options]' for inference task \n"
+           "Type 'xlearn' for the details of the [options] \n");
     return false;
   }
 }
@@ -164,34 +164,37 @@ bool Checker::Check(HyperParam& hyper_param) {
 // Check options for training tasks
 bool Checker::check_train_options(HyperParam& hyper_param) {
   bool bo = true;
-  // Check the arguments that must be setted by user
+  // Remove the first two arguments
   StringList list(args_.begin()+2, args_.end());
   StrSimilar ss;
-  // user must set the -train_data
+  // Every option should have a value
+  if (list.size() % 2 != 0) {
+    printf("Every option should have a value \n");
+    return false;
+  }
+  // User must set the -train_data
   if (!ss.Find(std::string("-train_data"), list)) {
-    std::cout << "User need to set the option [-train_data] "
-              << "to specify the input training data file.\n";
+    printf("User need to set the option [-train_data] "
+           "to specify the input training data file. \n");
     bo = false;
   }
-  // user must set the -score
+  // User must set the -score
   if (!ss.Find(std::string("-score"), list)) {
-    std::cout << "User need to set the option [-score] "
-              << "to specify the score function, which can be 'linear', "
-              << "'fm', and 'ffm' \n";
+    printf("User need to set the option [-score] "
+           "to specify the score function, which can be 'linear', "
+           "'fm', and 'ffm' \n");
     bo = false;
   }
-  // user must set the -loss
+  // User must set the -loss
   if (!ss.Find(std::string("-loss"), list)) {
-    std::cout << "User need to set the option [-loss] "
-              << "to specify the loss function, which can be 'squared', "
-              << "'absolute', 'cross_entropy', and 'hinge' \n";
+    printf("User need to set the option [-loss] "
+           "to specify the loss function, which can be 'squared', "
+           "'absolute', 'cross_entropy', and 'hinge' \n");
     bo = false;
   }
   if (!bo) { return false; }
-  // Check every single elements
-  std::string similar_str;
+  // Check every single element
   for (int i = 0; i < list.size(); i+=2) {
-    CHECK_GT(list.size(), i+1);
     if (list[i].compare("-train_data") == 0) {
       hyper_param.train_set_file = list[i+1];
     } else if (list[i].compare("-test_data") == 0) {
@@ -203,8 +206,9 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       if (value.compare("linear") != 0 &&
           value.compare("fm") != 0 &&
           value.compare("ffm") != 0) {
-        std::cout << "Unknow score function '" << value << "'\n"
-                  << "-score can only be 'linear', 'fm', or 'ffm'\n";
+        printf("Unknow score function '%s' \n"
+               " -score can only be 'linear', 'fm', or 'ffm' \n",
+               value.c_str());
         bo = false;
       } else {
         hyper_param.score_func = value;
@@ -215,9 +219,10 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
           value.compare("hinge") != 0 &&
           value.compare("cross_entropy") != 0 &&
           value.compare("absolute") != 0) {
-        std::cout << "Unknow loss function '" << value << "'\n"
-                  << "-loss can only be 'squared', 'hinge', 'cross_entropy', "
-                  << "or 'absolute'\n";
+        printf("Unknow loss function '%s' \n"
+               " -loss can only be 'squared', "
+               "'hinge', 'cross_entropy', or 'absolute' \n",
+               value.c_str());
         bo = false;
       } else {
         hyper_param.loss_func = value;
@@ -228,8 +233,10 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
           value.compare("l2") != 0 &&
           value.compare("l1_l2") != 0 &&
           value.compare("none") != 0) {
-        std::cout << "Unknow regular type '" << value << "'\n"
-                  << "-regular can only be 'l1', 'l2', 'l1_l2', or 'none'\n";
+        printf("Unknow regular type: '%s' \n"
+               " -regular can only be 'l1', 'l2', 'l1_l2', "
+               "or 'none'\n",
+               value.c_str());
         bo = false;
       } else {
         hyper_param.regu_type = value;
@@ -242,9 +249,10 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
           value.compare("adadelta") != 0 &&
           value.compare("rmsprop") != 0 &&
           value.compare("momentum") != 0) {
-        std::cout << "Unknow updater '" << value << "'\n"
-                  << "-updater can only be 'sgd', 'adam', 'adagrad', "
-                  << "'rmsprop', or 'momentum'\n";
+        printf("%sUnknow updater '%s' \n",
+               " -updater can only be 'sgd', 'adam', 'adagrad' "
+               "'rmsprop', or 'momentum' \n",
+               value.c_str());
         bo = false;
       } else {
         hyper_param.updater_type = value;
@@ -252,8 +260,9 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-k") == 0) {
       int value = atoi(list[i+1].c_str());
       if (value % 8 != 0) {
-        std::cout << "Error -k : " << list[i] << "\n The number "
-                  << "of latent factor must be a multiple of 8 \n";
+        printf("Illegal -k '%i' \n"
+               " -k must be a multiple of 8 \n",
+               value);
         bo = false;
       } else {
         hyper_param.num_K = value;
@@ -261,8 +270,9 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-lr") == 0) {
       real_t value = atof(list[i+1].c_str());
       if (value <= 0) {
-        std::cout << "Error -lr: " << list[i] << "\n The learning rate "
-                  << "must be greater than 0 \n";
+        printf("Illegal -lr '%f' \n"
+               " -lr must be greater than zero \n",
+               value);
         bo = false;
       } else {
         hyper_param.learning_rate = value;
@@ -270,8 +280,9 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-decay_rate") == 0) {
       real_t value = atof(list[i+1].c_str());
       if (value < 0) {
-        std::cout << "Error -decay_rate: " << list[i] << "\n The decay rate "
-                  << "must be greater than 0 \n";
+        printf("Illegal -decay_rate '%f' \n"
+               " -decay_rate must be greater than zero \n",
+               value);
         bo = false;
       } else {
         hyper_param.decay_rate = value;
@@ -279,8 +290,9 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-second_decay_rate") == 0) {
       real_t value = atof(list[i+1].c_str());
       if (value < 0) {
-        std::cout << "Error -second_decay_rate: " << list[i] << "\n The "
-                  << "second decay rate must be greater than 0 \n";
+        printf("Illegal -second_decay_rate '%f' \n"
+               " -second_decay_rate must be greater than zero \n",
+               value);
         bo = false;
       } else {
         hyper_param.second_decay_rate = value;
@@ -288,8 +300,9 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-regu_lambda_1") == 0) {
       real_t value = atof(list[i+1].c_str());
       if (value < 0) {
-        std::cout << "Error -regu_lambda_1: " << list[i] << "\n The "
-                  << "regular lambda must be greater than 0\n";
+        printf("Illegal -regu_lambda_1 '%f' \n"
+               " -regu_lambda_1 must be greater than zero \n",
+               value);
         bo = false;
       } else {
         hyper_param.regu_lambda_1 = value;
@@ -297,8 +310,9 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-regu_lambda_2") == 0) {
       real_t value = atof(list[i+1].c_str());
       if (value < 0) {
-        std::cout << "Error -regu_lambda_2: " << list[i] << "\n The "
-                  << "regular lambda must be greater than 0\n";
+        printf("Illegal -regu_lambda_2 '%f' \n"
+               " -regu_lambda_2 must be greater than zero \n",
+               value);
         bo = false;
       } else {
         hyper_param.regu_lambda_2 = value;
@@ -306,8 +320,9 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-epoch") == 0) {
       int value = atoi(list[i+1].c_str());
       if (value < 0) {
-        std::cout << "Error -epoch: " << list[i] << "\n The "
-                  << "number of epoch must be greater than 0\n";
+        printf("Illegal -epoch '%i' \n"
+               " -epoch must be greater than zero \n",
+               value);
         bo = false;
       } else {
         hyper_param.num_epoch = value;
@@ -315,8 +330,9 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-batch_size") == 0) {
       int value = atoi(list[i+1].c_str());
       if (value < 0) {
-        std::cout << "Error -batch_size: " << list[i] << "\n The "
-                  << "batch size must be greater than 0\n";
+        printf("Illegal -batch_size '%i' \n"
+               " -batch_size must be greater than zero \n",
+               value);
         bo = false;
       } else {
         hyper_param.batch_size = value;
@@ -326,9 +342,10 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       if (value.compare("libsvm") != 0 &&
           value.compare("libffm") != 0 &&
           value.compare("csv") != 0) {
-        std::cout << "Unknow file format: '" << value << "'\n"
-                  << "-file_format can only be 'libsvm', 'libffm', \n"
-                  << "or 'csv' \n";
+        printf("Unknow file format '%s' \n"
+               " -file_format can only be 'libsvm', 'libffm', "
+               "or 'csv' \n",
+               value.c_str());
         bo = false;
       } else {
         hyper_param.file_format = value;
@@ -337,18 +354,20 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       std::string value = list[i+1];
       if (value.compare("true") != 0 &&
           value.compare("false") != 0) {
-        std::cout << "Error -cv: " << list[i] << "\n The -cv can "
-                  << "only be 'true' or 'false'\n";
+        printf("Illegal -cv '%s' \n"
+               " -cv can only be 'true' or 'false' \n",
+               value.c_str());
         bo = false;
       } else {
-        hyper_param.cross_validation = value.compare("true") == 0 ?
-                                         true : false;
+        hyper_param.cross_validation =
+          value.compare("true") == 0 ? true : false;
       }
     } else if (list[i].compare("-fold") == 0) {
       int value = atoi(list[i+1].c_str());
       if (value < 0) {
-        std::cout << "Error -fold: " << list[i] << "\n The "
-                  << "number of fold must be greater than 0\n";
+        printf("Illegal -fold '%i' \n"
+               " -fold must be greater than zero \n",
+               value);
         bo = false;
       } else {
         hyper_param.num_folds = value;
@@ -357,23 +376,25 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       std::string value = list[i+1];
       if (value.compare("true") != 0 &&
           value.compare("false") != 0) {
-        std::cout << "Error -early_stop: " << list[i] << "\n The "
-                  << "-early_stop can only be 'false' and 'true' \n";
+        printf("Illegal -early_stop '%s' \n"
+               " -early_stop can only be 'true' or 'false' \n",
+               value.c_str());
         bo = false;
       } else {
-        hyper_param.early_stop = value.compare("true") == 0 ?
-                                   true : false;
+        hyper_param.early_stop =
+          value.compare("true") == 0 ? true : false;
       }
     } else if (list[i].compare("-on_disk") == 0) {
       std::string value = list[i+1];
       if (value.compare("true") != 0 &&
           value.compare("false") != 0) {
-        std::cout << "Error -on_disk: " << list[i] << "\n The "
-                  << "-on_disk can only be 'false' and 'true' \n";
+        printf("Illegal -on_disk '%s' \n"
+               " -on_disk can only be 'true' or 'false' \n",
+               value.c_str());
         bo = false;
       } else {
-        hyper_param.on_disk = value.compare("true") == 0 ?
-                                true : false;
+        hyper_param.on_disk =
+          value.compare("true") == 0 ? true : false;
       }
     } else if (list[i].compare("-infer_data") == 0) {
       std::string value = list[i+1];
@@ -382,21 +403,76 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       std::string value = list[i+1];
       hyper_param.output_file = value;
     } else { // no option match
+      std::string similar_str;
       if (ss.FindSimilar(list[i], menu_, similar_str) > 7) {
-        std::cout << "Unknow argument: " << "'" << list[i] << "'\n";
+        printf("Unknow argument '%s'\n", list[i].c_str());
       } else {
-        std::cout << "Unknow argument: " << "'" << list[i] << "' \n"
-                 << " Do you mean '" << similar_str << "' ?\n";
+        printf("Unknow argument '%s'\n"
+               " Do you mean '%s' ?\n",
+               list[i].c_str(),
+               similar_str.c_str());
       }
       bo = false;
     }
   }
   if (!bo) { return false; }
+
   return true;
 }
 
 // Check options for inference tasks
 bool Checker::check_inference_options(HyperParam& hyper_param) {
+  bool bo = true;
+  // Remove the first two arguments
+  StringList list(args_.begin()+2, args_.end());
+  StrSimilar ss;
+  // Every option should have a value
+  if (list.size() % 2 != 0) {
+    printf("Every option should have a value \n");
+    return false;
+  }
+  // // User must set the -infer_data
+  if (!ss.Find(std::string("-infer_data"), list)) {
+    printf("User need to set the option [-infer_data] "
+           "to specify which file storing the inference data \n");
+    bo = false;
+  }
+  // User must set the -out_data
+  if (!ss.Find(std::string("-out_data"), list)) {
+    printf("User need to set the option [-out_data] "
+           "to specify which file storing the output data \n");
+    bo = false;
+  }
+  // User must set the -model_file
+  if (!ss.Find(std::string("-model_file"), list)) {
+    printf("User need to set the option [-model_file] "
+           "to specify which file storing the model checkpoint \n");
+    bo = false;
+  }
+  if (!bo) { return false; }
+  // Check every single element
+  for (int i = 0; i < list.size(); i+=2) {
+    if (list[i].compare("-infer_data") == 0) {
+      hyper_param.inference_file = list[i+1];
+    } else if (list[i].compare("-out_data") == 0) {
+      hyper_param.output_file = list[i+1];
+    } else if (list[i].compare("-model_file") == 0) {
+      hyper_param.model_checkpoint_file = list[i+1];
+    } else {
+      std::string similar_str;
+      if (ss.FindSimilar(list[i], menu_, similar_str) > 7) {
+        printf("Unknow argument '%s'\n", list[i].c_str());
+      } else {
+        printf("Unknow argument '%s'\n"
+               " Do you mean '%s' ?\n",
+               list[i].c_str(),
+               similar_str.c_str());
+      }
+      bo = false;
+    }
+  }
+  if (!bo) { return false; }
+
   return true;
 }
 
