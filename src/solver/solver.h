@@ -26,6 +26,10 @@ of the xLearn.
 
 #include "src/base/common.h"
 #include "src/data/hyper_parameters.h"
+#include "src/data/data_structure.h"
+#include "src/reader/reader.h"
+#include "src/reader/parser.h"
+#include "src/reader/file_splitor.h"
 #include "src/solver/checker.h"
 
 namespace xLearn {
@@ -54,6 +58,14 @@ class Solver {
  protected:
   HyperParam hyper_param_;
   Checker checker_;
+  std::vector<Reader*> reader_;
+  FileSpliter splitor_;
+  Parser* parser_;
+
+  Parser* create_parser();
+  Reader* create_reader();
+  index_t find_max_feature(DMatrix* matrix, int num_samples);
+  index_t find_max_field(DMatrix* matrix, int num_samples);
 
   void print_logo() const;
 

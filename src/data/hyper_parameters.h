@@ -38,7 +38,7 @@ struct HyperParam {
 // Parameters for learning algorithms.
 //------------------------------------------------------------------------------
   bool is_train = true;                    // Train or Predict ?
-  std::string score_func = "linear";       // linear, FM, or FFM ?
+  std::string score_func = "linear";       // linear, fm, or ffm ?
   std::string loss_func = "cross_entropy"; // cross_entropy, squared, or hinge ?
   std::string regu_type = "l2";            // l1, l2, or Elastic-Net ?
 //------------------------------------------------------------------------------
