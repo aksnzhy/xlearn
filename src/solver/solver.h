@@ -75,6 +75,10 @@ class Solver {
   Updater* create_updater();
   Score* create_score();
   Loss* create_loss();
+  void start_train_work();
+  void start_inference_work();
+  void finalize_train_work();
+  void finalize_inference_work();
   index_t find_max_feature(DMatrix* matrix, int num_samples);
   index_t find_max_field(DMatrix* matrix, int num_samples);
 

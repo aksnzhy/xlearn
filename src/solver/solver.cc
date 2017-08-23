@@ -186,23 +186,47 @@ void Solver::Initialize(int argc, char* argv[]) {
     // Step 4: Init model parameter
     //-------------------------------------------------------
     // TODO: modify model to store the hyper-parameters
-    
+
     //-------------------------------------------------------
     // Step 5: Init score function
     //-------------------------------------------------------
-
+    score_ = create_score();
+    score_->Initialize(hyper_param_);
     //-------------------------------------------------------
     // Step 6: Init loss function
     //-------------------------------------------------------
-
+    loss_ = create_loss();
+    loss_->Initialize(score_);
   }
 }
 
 // Start training or inference
-void Solver::StartWork() { }
+void Solver::StartWork() {
+  if (hyper_param_.is_train) {
+    start_train_work();
+  } else {
+    start_inference_work();
+  }
+}
 
 // Finalize xLearn
-void Solver::Finalize() { }
+void Solver::Finalize() {
+  if (hyper_param_.is_train) {
+    finalize_train_work();
+  } else {
+    finalize_inference_work();
+  }
+}
+
+// Train
+void Solver::start_train_work() {}
+
+void Solver::finalize_train_work() {}
+
+// Inference
+void Solver::start_inference_work() {}
+
+void Solver::finalize_inference_work() {}
 
 // Create Parser by a given string
 Parser* Solver::create_parser() {
