@@ -82,7 +82,6 @@ void Solver::Initialize(int argc, char* argv[]) {
                      hyper_param_.num_folds);
     }
     // Init Reader
-    // First get file list
     int num_reader = 0;
     std::vector<std::string> file_list;
     if (hyper_param_.cross_validation) {
@@ -102,6 +101,7 @@ void Solver::Initialize(int argc, char* argv[]) {
         file_list.push_back(hyper_param_.test_set_file);
       }
     }
+    reader_.resize(num_reader, NULL);
     // Create Parser
     parser_ = create_parser();
     // Create Reader
@@ -137,13 +137,63 @@ void Solver::Initialize(int argc, char* argv[]) {
     //-------------------------------------------------------
     // Step 4: Init model parameter
     //-------------------------------------------------------
-
+    if (hyper_param_.score_func.compare("fm") == 0) {
+      hyper_param_.num_param = max_feat + 1 +
+                            max_feat * hyper_param_.num_K;
+    } else if (hyper_param_.score_func.compare("ffm") == 0) {
+      hyper_param_.num_param = max_feat + 1 +
+                       max_feat * max_field * hyper_param_.num_K;
+    } else { // linear socre
+      hyper_param_.num_param = max_feat + 1;
+    }
+    if (hyper_param_.score_func.compare("linear") == 0) {
+      // Initialize all parameters to zero
+      model_ = new Model(hyper_param_.num_param, false);
+    } else {
+      // Initialize parameters using Gaussian distribution
+      model_ = new Model(hyper_param_.num_param, true);
+    }
     //-------------------------------------------------------
     // Step 4: Init Updater
     //-------------------------------------------------------
+    updater_ = create_updater();
+    updater_->Initialize(hyper_param_);
+    //-------------------------------------------------------
+    // Step 5: Init score function
+    //-------------------------------------------------------
+    score_ = create_score();
+    score_->Initialize(hyper_param_);
+    //-------------------------------------------------------
+    // Step 6: Init loss function
+    //-------------------------------------------------------
+    loss_ = create_loss();
+    loss_->Initialize(score_);
   }
   // For inference
   if (!hyper_param_.is_train) {
+    //-------------------------------------------------------
+    // Step 3: Init Reader and reader problem
+    //-------------------------------------------------------
+    // Create Parser
+    parser_ = create_parser();
+    // Create Reader
+    reader_.resize(1, create_reader());
+    CHECK_NE(hyper_param_.inference_file.empty(), true);
+    reader_[0]->Initialize(hyper_param_.inference_file,
+                           hyper_param_.batch_size,
+                           parser_);
+    //-------------------------------------------------------
+    // Step 4: Init model parameter
+    //-------------------------------------------------------
+    // TODO: modify model to store the hyper-parameters
+    
+    //-------------------------------------------------------
+    // Step 5: Init score function
+    //-------------------------------------------------------
+
+    //-------------------------------------------------------
+    // Step 6: Init loss function
+    //-------------------------------------------------------
 
   }
 }
@@ -171,17 +221,54 @@ Reader* Solver::create_reader() {
   std::string str = hyper_param_.on_disk ? "disk" : "memory";
   reader = CREATE_READER(str.c_str());
   if (reader == NULL) {
-    LOG(ERROR) << "Cannot create reader: "
-               << str;
+    LOG(ERROR) << "Cannot create reader: " << str;
   }
   return reader;
+}
+
+// Create Updater by a given string
+Updater* Solver::create_updater() {
+  Updater* updater;
+  updater = CREATE_UPDATER(hyper_param_.updater_type.c_str());
+  if (updater == NULL) {
+    LOG(ERROR) << "Cannot create updater: "
+               << hyper_param_.updater_type;
+  }
+  return updater;
+}
+
+// Create Score by a given string
+Score* Solver::create_score() {
+  Score* score;
+  score = CREATE_SCORE(hyper_param_.score_func.c_str());
+  if (score == NULL) {
+    LOG(ERROR) << "Cannot create score: "
+               << hyper_param_.score_func;
+  }
+  return score;
+}
+
+// Create Loss by a given string
+Loss* Solver::create_loss() {
+  Loss* loss;
+  loss = CREATE_LOSS(hyper_param_.loss_func.c_str());
+  if (loss == NULL) {
+    LOG(ERROR) << "Cannot create loss: "
+               << hyper_param_.loss_func;
+  }
+  return loss;
 }
 
 // Find max feature in a data matrix
 index_t Solver::find_max_feature(DMatrix* matrix, int num_samples) {
   index_t res = 0;
   for (int i = 0; i < num_samples; ++i) {
-
+    SparseRow* row = matrix->row[i];
+    for (int j = 0; j < row->column_len; ++j) {
+      if (row->idx[j] > res) {
+        res = row->X[j];
+      }
+    }
   }
   return res;
 }
@@ -190,7 +277,12 @@ index_t Solver::find_max_feature(DMatrix* matrix, int num_samples) {
 index_t Solver::find_max_field(DMatrix* matrix, int num_samples) {
   index_t res = 0;
   for (int i = 0; i < num_samples; ++i) {
-
+    SparseRow* row = matrix->row[i];
+    for (int j = 0; j < row->column_len; ++j) {
+      if (row->field[j] > res) {
+        res = row->field[j];
+      }
+    }
   }
   return res;
 }
