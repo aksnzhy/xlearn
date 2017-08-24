@@ -78,6 +78,13 @@ class Model {
   // Delete the model file.
   void RemoveModelFile(const std::string filename);
 
+  // Get function
+  size_t GetNumParameter() { return parameters_num_; }
+  std::string GetScoreFunction() { return score_func_; }
+  index_t GetNumFeature() { return num_feat_; }
+  index_t GetNumField() { return num_field_; }
+  int GetNumK() { return num_K_; }
+
  protected:
   std::vector<real_t> parameters_;       // Storing the model parameters.
   size_t              parameters_num_;   // Number of model parameters.

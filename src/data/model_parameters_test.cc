@@ -41,7 +41,7 @@ const std::string kFilename = "/tmp/test_model.binary";
 // Init hyper-parameters
 HyperParam Init() {
   HyperParam hyper_param;
-  hyper_param.score_func = "linear";
+  hyper_param.score_func = "ffm";
   hyper_param.num_feature = 10;
   hyper_param.num_K = 8;
   hyper_param.num_field = 10;
@@ -52,33 +52,41 @@ HyperParam Init() {
 TEST(MODEL_TEST, Init) {
   // Init model using gaussion.
   HyperParam hyper_param = Init();
-  Model model_lr(hyper_param);
-  std::vector<real_t>* para = model_lr.GetParameter();
+  Model model_ffm(hyper_param);
+  std::vector<real_t>* para = model_ffm.GetParameter();
   EXPECT_EQ(para->size(), kParameter_num);
 }
 
 TEST(MODEL_TEST, SaveModel) {
   // Init model (set all parameters to zero)
   HyperParam hyper_param = Init();
-  Model model_lr(hyper_param, false);
-  model_lr.SaveModel(kFilename);
+  Model model_ffm(hyper_param, false);
+  model_ffm.SaveModel(kFilename);
 }
 
 TEST(MODEL_TEST, LoadModel) {
   // Init model with gaussion distribution.
   HyperParam hyper_param = Init();
-  Model model_lr(hyper_param, true);
+  Model model_ffm(hyper_param, true);
   // parameters become 0
-  model_lr.LoadModel(kFilename);
-  std::vector<real_t>* para = model_lr.GetParameter();
+  model_ffm.LoadModel(kFilename);
+  EXPECT_EQ(model_ffm.GetScoreFunction(), "ffm");
+  EXPECT_EQ(model_ffm.GetNumFeature(), 10);
+  EXPECT_EQ(model_ffm.GetNumK(), 8);
+  EXPECT_EQ(model_ffm.GetNumField(), 10);
+  std::vector<real_t>* para = model_ffm.GetParameter();
   for (index_t i = 0; i < para->size(); ++i) {
     EXPECT_EQ((*para)[i], (real_t)0.0);
   }
 }
 
 TEST(MODEL_TEST, InitModelFromDiskfile) {
-  Model model_lr(kFilename);
-  std::vector<real_t>* para = model_lr.GetParameter();
+  Model model_ffm(kFilename);
+  EXPECT_EQ(model_ffm.GetScoreFunction(), "ffm");
+  EXPECT_EQ(model_ffm.GetNumFeature(), 10);
+  EXPECT_EQ(model_ffm.GetNumK(), 8);
+  EXPECT_EQ(model_ffm.GetNumField(), 10);
+  std::vector<real_t>* para = model_ffm.GetParameter();
   for (index_t i = 0; i < para->size(); ++i) {
     EXPECT_EQ((*para)[i], (real_t)0.0);
   }
@@ -86,21 +94,21 @@ TEST(MODEL_TEST, InitModelFromDiskfile) {
 
 TEST(MODEL_TEST, RemoveFile) {
   HyperParam hyper_param = Init();
-  Model model_lr(hyper_param);
-  model_lr.RemoveModelFile(kFilename.c_str());
+  Model model_ffm(hyper_param);
+  model_ffm.RemoveModelFile(kFilename.c_str());
 }
 
 TEST(MODEL_TEST, SaveweightAndLoadweight) {
   HyperParam hyper_param = Init();
-  Model model_lr(hyper_param, false);
+  Model model_ffm(hyper_param, false);
   std::vector<real_t> vec(kParameter_num, 1.0);
-  model_lr.Saveweight(vec);
+  model_ffm.Saveweight(vec);
   for (index_t i = 0; i < vec.size(); ++i) {
     EXPECT_EQ(vec[i], 0);
     vec[i] = 2.0;
   }
-  model_lr.Loadweight(vec);
-  std::vector<real_t>* para = model_lr.GetParameter();
+  model_ffm.Loadweight(vec);
+  std::vector<real_t>* para = model_ffm.GetParameter();
   for (index_t i = 0; i < para->size(); ++i) {
     EXPECT_EQ((*para)[i], 2.0);
   }
