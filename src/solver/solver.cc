@@ -185,8 +185,16 @@ void Solver::Initialize(int argc, char* argv[]) {
     //-------------------------------------------------------
     // Step 4: Init model parameter
     //-------------------------------------------------------
-    // TODO: modify model to store the hyper-parameters
-
+    model_ = new Model(hyper_param_.model_checkpoint_file);
+    hyper_param_.score_func = model_->GetScoreFunction();
+    hyper_param_.num_feature = model_->GetNumFeature();
+    if (hyper_param_.score_func.compare("fm") == 0 ||
+        hyper_param_.score_func.compare("ffm") == 0) {
+      hyper_param_.num_K = model_->GetNumK();
+    }
+    if (hyper_param_.score_func.compare("ffm") == 0) {
+      hyper_param_.num_field = model_->GetNumField();
+    }
     //-------------------------------------------------------
     // Step 5: Init score function
     //-------------------------------------------------------
