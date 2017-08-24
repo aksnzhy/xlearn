@@ -35,6 +35,8 @@ This file tests the Loss class.
 
 namespace xLearn {
 
+HyperParam param;
+
 class TestLoss : public Loss {
  public:
   TestLoss() { }
@@ -59,7 +61,8 @@ index_t kLine = 10;
 TEST(LOSS, Predict_Linear) {
   // Create Model for Linear
   index_t parameter_num = kFeature_num + 1;
-  Model model_lr(parameter_num);
+  param.num_param = parameter_num;
+  Model model_lr(param);
   std::vector<real_t>* para = model_lr.GetParameter();
   for (size_t i = 0; i < para->size(); ++i) {
     (*para)[i] = 2.0;
@@ -91,7 +94,8 @@ TEST(LOSS, Predict_Linear) {
 TEST(LOSS, Predict_FM) {
   // Create Model for FM
   index_t parameter_num = kFeature_num + 1 + kFeature_num*K;
-  Model model_lr(parameter_num);
+  param.num_param = parameter_num;
+  Model model_lr(param);
   std::vector<real_t>* para = model_lr.GetParameter();
   for (size_t i = 0; i < para->size(); ++i) {
     (*para)[i] = 2.0;
@@ -128,7 +132,8 @@ TEST(LOSS, Predict_FM) {
 TEST(LOSS, Predict_FFM) {
   // Create Model for FM
   index_t parameter_num = kFeature_num + 1 + kFeature_num*K*kField_num;
-  Model model_lr(parameter_num);
+  param.num_param = parameter_num;
+  Model model_lr(param);
   std::vector<real_t>* para = model_lr.GetParameter();
   for (size_t i = 0; i < para->size(); ++i) {
     (*para)[i] = 2.0;

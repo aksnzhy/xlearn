@@ -42,7 +42,7 @@ class MomentumTest : public ::testing::Test {
 };
 
 TEST_F(MomentumTest, update_func) {
-  Model model(kLength, false);
+  Model model(param, false);
   std::vector<real_t> grad_vec(kLength, 1.0);
   std::vector<real_t>* w = model.GetParameter();
   Momentum updater;

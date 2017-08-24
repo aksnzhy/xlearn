@@ -26,6 +26,7 @@ This file tests model_parameters.h
 #include <vector>
 
 #include "src/data/model_parameters.h"
+#include "src/data/hyper_parameters.h"
 #include "src/base/file_util.h"
 
 namespace xLearn {
@@ -37,22 +38,36 @@ const std::string kFilename = "/tmp/test_model.binary";
 // Model test
 //------------------------------------------------------------------------------
 
+// Init hyper-parameters
+HyperParam Init() {
+  HyperParam hyper_param;
+  hyper_param.score_func = "linear";
+  hyper_param.num_feature = 10;
+  hyper_param.num_K = 8;
+  hyper_param.num_field = 10;
+  hyper_param.num_param = kParameter_num;
+  return hyper_param;
+}
+
 TEST(MODEL_TEST, Init) {
   // Init model using gaussion.
-  Model model_lr(kParameter_num);
+  HyperParam hyper_param = Init();
+  Model model_lr(hyper_param);
   std::vector<real_t>* para = model_lr.GetParameter();
   EXPECT_EQ(para->size(), kParameter_num);
 }
 
 TEST(MODEL_TEST, SaveModel) {
   // Init model (set all parameters to zero)
-  Model model_lr(kParameter_num, false);
+  HyperParam hyper_param = Init();
+  Model model_lr(hyper_param, false);
   model_lr.SaveModel(kFilename);
 }
 
 TEST(MODEL_TEST, LoadModel) {
   // Init model with gaussion distribution.
-  Model model_lr(kParameter_num, true);
+  HyperParam hyper_param = Init();
+  Model model_lr(hyper_param, true);
   // parameters become 0
   model_lr.LoadModel(kFilename);
   std::vector<real_t>* para = model_lr.GetParameter();
@@ -70,12 +85,14 @@ TEST(MODEL_TEST, InitModelFromDiskfile) {
 }
 
 TEST(MODEL_TEST, RemoveFile) {
-  Model model_lr(kParameter_num);
+  HyperParam hyper_param = Init();
+  Model model_lr(hyper_param);
   model_lr.RemoveModelFile(kFilename.c_str());
 }
 
 TEST(MODEL_TEST, SaveweightAndLoadweight) {
-  Model model_lr(kParameter_num, false);
+  HyperParam hyper_param = Init();
+  Model model_lr(hyper_param, false);
   std::vector<real_t> vec(kParameter_num, 1.0);
   model_lr.Saveweight(vec);
   for (index_t i = 0; i < vec.size(); ++i) {

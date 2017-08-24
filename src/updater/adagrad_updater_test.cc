@@ -35,13 +35,14 @@ const int kLength = _MMX_INCREMENT * 1000000;
 class AdagradTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
+    param.num_param = kLength;
     param.learning_rate = 0.1;
     param.num_param = kLength;
   }
 };
 
 TEST_F(AdagradTest, update_func) {
-  Model model(kLength, false);
+  Model model(param, false);
   std::vector<real_t> grad_vec(kLength, 1.0);
   std::vector<real_t>* w = model.GetParameter();
   AdaGrad updater;

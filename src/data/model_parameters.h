@@ -29,6 +29,7 @@ used by xLearn.
 
 #include "src/base/common.h"
 #include "src/data/data_structure.h"
+#include "src/data/hyper_parameters.h"
 
 namespace xLearn {
 
@@ -46,7 +47,8 @@ class Model {
   ~Model() { }
 
   // Set all parameters to 0 or using Gaussian distribution.
-  explicit Model(size_t parameter_num, bool gaussian = true);
+  explicit Model(const HyperParam& hyper_param,
+                 bool gaussian = true);
 
   // Initialize model parameters from a checkpoint file.
   explicit Model(const std::string& filename);
@@ -79,6 +81,12 @@ class Model {
  protected:
   std::vector<real_t> parameters_;       // Storing the model parameters.
   size_t              parameters_num_;   // Number of model parameters.
+  std::string         score_func_;       // linear, fm, or ffm
+  index_t             num_feat_;         // Number of feature
+  index_t             num_field_;        // Number of field (used in ffm)
+  int                 num_K_;            // Number of K (used in fm and ffm)
+
+  std::string getline(FILE* file_ptr);   // Get one line of data
 
   // Initialize model using Gaussian distribution.
   void InitModelUsingGaussian();

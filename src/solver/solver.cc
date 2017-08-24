@@ -148,10 +148,10 @@ void Solver::Initialize(int argc, char* argv[]) {
     }
     if (hyper_param_.score_func.compare("linear") == 0) {
       // Initialize all parameters to zero
-      model_ = new Model(hyper_param_.num_param, false);
+      model_ = new Model(hyper_param_, false);
     } else {
       // Initialize parameters using Gaussian distribution
-      model_ = new Model(hyper_param_.num_param, true);
+      model_ = new Model(hyper_param_, true);
     }
     //-------------------------------------------------------
     // Step 4: Init Updater
