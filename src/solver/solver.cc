@@ -21,6 +21,9 @@ This file is the implementation of the Trainer class.
 
 #include "src/solver/solver.h"
 
+#include <sys/utsname.h>
+#include <unistd.h>
+
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -69,17 +72,28 @@ void Solver::Initialize(int argc, char* argv[]) {
     printf("Arguments error \n");
     exit(0);
   }
+  //-------------------------------------------------------
+  // Step 3: Init log file
+  //-------------------------------------------------------
+  std::string prefix = get_log_file();
+  InitializeLogger(StringPrintf("%s.INFO", prefix.c_str()),
+                   StringPrintf("%s.WARN", prefix.c_str()),
+                   StringPrintf("%s.ERROR", prefix.c_str()));
   // For training
   if (hyper_param_.is_train) {
     //-------------------------------------------------------
-    // Step 3: Init Reader and read problem
+    // Step 4: Init Reader and read problem
     //-------------------------------------------------------
+    LOG(INFO) << "Start to init Reader";
     // Split file if use -cv
     if (hyper_param_.cross_validation) {
       CHECK_NE(hyper_param_.train_set_file.empty(), true);
       CHECK_GT(hyper_param_.num_folds, 0);
       splitor_.split(hyper_param_.train_set_file,
                      hyper_param_.num_folds);
+      LOG(INFO) << "Split file into "
+                << hyper_param_.num_folds
+                << " parts.";
     }
     // Init Reader
     int num_reader = 0;
@@ -101,6 +115,7 @@ void Solver::Initialize(int argc, char* argv[]) {
         file_list.push_back(hyper_param_.test_set_file);
       }
     }
+    LOG(INFO) << "Number of Reader: " << num_reader;
     reader_.resize(num_reader, NULL);
     // Create Parser
     parser_ = create_parser();
@@ -110,6 +125,7 @@ void Solver::Initialize(int argc, char* argv[]) {
       reader_[i]->Initialize(file_list[i],
                              hyper_param_.batch_size,
                              parser_);
+      LOG(INFO) << "Init Reader: " << file_list[i];
     }
     // Read problem and init some hyper-parameters
     DMatrix* matrix = NULL;
@@ -131,11 +147,13 @@ void Solver::Initialize(int argc, char* argv[]) {
       } while (num_samples != 0);
       hyper_param_.num_feature = max_feat;
       hyper_param_.num_field = max_field;
+      LOG(INFO) << "Number of feature: " << max_feat;
+      LOG(INFO) << "Number of field: " << max_field;
       // return to the begining
       reader_[i]->Reset();
     }
     //-------------------------------------------------------
-    // Step 4: Init model parameter
+    // Step 5: Init model parameter
     //-------------------------------------------------------
     if (hyper_param_.score_func.compare("fm") == 0) {
       hyper_param_.num_param = max_feat + 1 +
@@ -146,33 +164,39 @@ void Solver::Initialize(int argc, char* argv[]) {
     } else { // linear socre
       hyper_param_.num_param = max_feat + 1;
     }
+    LOG(INFO) << "Number parameters: " << hyper_param_.num_param;
     if (hyper_param_.score_func.compare("linear") == 0) {
       // Initialize all parameters to zero
       model_ = new Model(hyper_param_, false);
+      LOG(INFO) << "Initialize model to zero.";
     } else {
       // Initialize parameters using Gaussian distribution
       model_ = new Model(hyper_param_, true);
+      LOG(INFO) << "Initialize model using Gaussian distribution.";
     }
     //-------------------------------------------------------
-    // Step 4: Init Updater
+    // Step 6: Init Updater
     //-------------------------------------------------------
     updater_ = create_updater();
     updater_->Initialize(hyper_param_);
+    LOG(INFO) << "Initialize Updater.";
     //-------------------------------------------------------
-    // Step 5: Init score function
+    // Step 7: Init score function
     //-------------------------------------------------------
     score_ = create_score();
     score_->Initialize(hyper_param_);
+    LOG(INFO) << "Initialize score function.";
     //-------------------------------------------------------
-    // Step 6: Init loss function
+    // Step 8: Init loss function
     //-------------------------------------------------------
     loss_ = create_loss();
     loss_->Initialize(score_);
+    LOG(INFO) << "Initialize loss function.";
   }
   // For inference
   if (!hyper_param_.is_train) {
     //-------------------------------------------------------
-    // Step 3: Init Reader and reader problem
+    // Step 4: Init Reader and reader problembal
     //-------------------------------------------------------
     // Create Parser
     parser_ = create_parser();
@@ -182,10 +206,11 @@ void Solver::Initialize(int argc, char* argv[]) {
     reader_[0]->Initialize(hyper_param_.inference_file,
                            hyper_param_.batch_size,
                            parser_);
+    LOG(INFO) << "Initialize Parser ans Reader.";
     //-------------------------------------------------------
-    // Step 4: Init model parameter
+    // Step 5: Init model parameter
     //-------------------------------------------------------
-    model_ = new Model(hyper_param_.model_checkpoint_file);
+    model_ = new Model(hyper_param_.model_file);
     hyper_param_.score_func = model_->GetScoreFunction();
     hyper_param_.num_feature = model_->GetNumFeature();
     if (hyper_param_.score_func.compare("fm") == 0 ||
@@ -195,24 +220,29 @@ void Solver::Initialize(int argc, char* argv[]) {
     if (hyper_param_.score_func.compare("ffm") == 0) {
       hyper_param_.num_field = model_->GetNumField();
     }
+    LOG(INFO) << "Initialize model.";
     //-------------------------------------------------------
-    // Step 5: Init score function
+    // Step 6: Init score function
     //-------------------------------------------------------
     score_ = create_score();
     score_->Initialize(hyper_param_);
+    LOG(INFO) << "Initialize score function.";
     //-------------------------------------------------------
-    // Step 6: Init loss function
+    // Step 7: Init loss function
     //-------------------------------------------------------
     loss_ = create_loss();
     loss_->Initialize(score_);
+    LOG(INFO) << "Initialize score function.";
   }
 }
 
 // Start training or inference
 void Solver::StartWork() {
   if (hyper_param_.is_train) {
+    LOG(INFO) << "Start training work.";
     start_train_work();
   } else {
+    LOG(INFO) << "Start inference work.";
     start_inference_work();
   }
 }
@@ -298,7 +328,7 @@ index_t Solver::find_max_feature(DMatrix* matrix, int num_samples) {
     SparseRow* row = matrix->row[i];
     for (int j = 0; j < row->column_len; ++j) {
       if (row->idx[j] > res) {
-        res = row->X[j];
+        res = row->idx[j];
       }
     }
   }
@@ -317,6 +347,48 @@ index_t Solver::find_max_field(DMatrix* matrix, int num_samples) {
     }
   }
   return res;
+}
+
+// Get host name
+std::string Solver::get_host_name() {
+  struct utsname buf;
+  if (0 != uname(&buf)) {
+    *buf.nodename = '\0';
+  }
+  return std::string(buf.nodename);
+}
+
+// Get user name
+std::string Solver::get_user_name() {
+  const char* username = getenv("USER");
+  return username != NULL ? username : getenv("USERNAME");
+}
+
+// Get current system time
+std::string Solver::print_current_time() {
+  time_t current_time = time(NULL);
+  struct tm broken_down_time;
+  CHECK(localtime_r(&current_time, &broken_down_time) == &broken_down_time);
+  return StringPrintf("%04d%02d%02d-%02d%02d%02d",
+                      1900 + broken_down_time.tm_year,
+                      1 + broken_down_time.tm_mon,
+                      broken_down_time.tm_mday, broken_down_time.tm_hour,
+                      broken_down_time.tm_min,  broken_down_time.tm_sec);
+}
+
+// The log file name = base + host_name + username +
+  //                   date_time + process_id
+std::string Solver::get_log_file() {
+  CHECK(!hyper_param_.log_file.empty());
+  std::string filename_prefix;
+  SStringPrintf(&filename_prefix,
+                "%s.%s.%s.%s.%u",
+                hyper_param_.log_file.c_str(),
+                get_host_name().c_str(),
+                get_user_name().c_str(),
+                print_current_time().c_str(),
+                getpid());
+  return filename_prefix;
 }
 
 } // namespace xLearn

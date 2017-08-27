@@ -37,42 +37,43 @@ struct HyperParam {
 //------------------------------------------------------------------------------
 // Parameters for learning algorithms.
 //------------------------------------------------------------------------------
-  bool is_train = true;                    // Train or Predict ?
-  std::string score_func = "linear";       // linear, fm, or ffm ?
-  std::string loss_func = "cross_entropy"; // cross_entropy, squared, or hinge ?
-  std::string regu_type = "l2";            // l1, l2, or Elastic-Net ?
+  bool is_train = true;            // Train or Predict
+  std::string score_func;          // linear, fm, or ffm
+  std::string loss_func;           // cross_entropy, abs, squared, or hinge
+  std::string regu_type = "none";  // l1, l2, Elastic-Net, or none
 //------------------------------------------------------------------------------
 // Parameters for optimization method.
 //------------------------------------------------------------------------------
-  real_t learning_rate = 0.03;      // Control learning step.
-  std::string updater_type = "sgd"; // sgd, adam, adagard, adadelta,
-                                    // momentum, or rmsprop ?
-  real_t decay_rate = 0.1;          // The decay factors used by updater.
-  real_t second_decay_rate = 0.1;
-  real_t regu_lambda_1 = 0.03;      // lambda for regularizer.
-  real_t regu_lambda_2 = 0.03;
-  int num_epoch = 10;               // Epoch number.
-  int batch_size = 200;             // Number of data samples.
+  real_t learning_rate = 0.03;       // Control learning step
+  std::string updater_type = "sgd";  // sgd, adam, adagard, adadelta,
+                                     // momentum, or rmsprop
+  real_t decay_rate = 0.1;           // The decay factor used by updater
+  real_t second_decay_rate = 0.1;    // The second decay factor used by updater
+  real_t regu_lambda_1 = 0.03;       // lambda_1 for regularizer
+  real_t regu_lambda_2 = 0.03;       // lambda_2 for regularizer
+  int num_epoch = 10;                // Epoch number
+  int batch_size = 200;              // Number of data samples
 //------------------------------------------------------------------------------
 // Parameters for dataset
 //------------------------------------------------------------------------------
-  bool on_disk = false;               // on-disk training for limited memory
-  std::string file_format = "libsvm"; // libsvm, libffm, or csv ?
-  index_t num_feature = 0;            // Number of feature (not include bias)
-  index_t num_param = 0;              // The number of model parameters.
-  index_t num_K = 0;                  // Only used in fm and ffm.
-  index_t num_field = 0;              // Only used in ffm.
-  std::string train_set_file;         // Filename of training data.
-  std::string test_set_file;          // Filename of test data.
-  std::string inference_file;         // Filename of inference data.
-  std::string model_checkpoint_file;  // Filename for storing the model.
-  std::string output_file;            // Filename of output result.
+  bool on_disk = false;                 // on-disk training for limited memory
+  std::string file_format = "libsvm";   // libsvm, libffm, or csv
+  index_t num_feature = 0;              // Number of feature (not include bias)
+  index_t num_param = 0;                // The number of model parameters
+  index_t num_K = 8;                    // Only used in fm and ffm
+  index_t num_field = 0;                // Only used in ffm
+  std::string train_set_file;           // Filename of training data
+  std::string test_set_file;            // Filename of test data
+  std::string inference_file;           // Filename of inference data
+  std::string model_file = "./xlearn_model";  // Filename for storing the model
+  std::string output_file = "./xlearn_out";   // Filename of output result
+  std::string log_file = "./xlearn_log";      // Filename of log file
 //------------------------------------------------------------------------------
 // Parameters for validation
 //------------------------------------------------------------------------------
-  bool cross_validation = true;  // Using cross validation ?
-  int num_folds = 5;             // Number of folds for cross validation
-  bool early_stop = false;       // Using early-stop?
+  bool cross_validation = false;  // Using cross validation
+  int num_folds = 5;              // Number of folds for cross validation
+  bool early_stop = false;        // Using early-stop
 };
 
 } // namespace XLEARN

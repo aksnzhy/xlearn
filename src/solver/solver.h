@@ -81,6 +81,10 @@ class Solver {
   void finalize_inference_work();
   index_t find_max_feature(DMatrix* matrix, int num_samples);
   index_t find_max_field(DMatrix* matrix, int num_samples);
+  std::string get_host_name();
+  std::string get_user_name();
+  std::string print_current_time();
+  std::string get_log_file();
 
   void print_logo() const;
 

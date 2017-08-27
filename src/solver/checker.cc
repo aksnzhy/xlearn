@@ -38,7 +38,7 @@ std::string Checker::option_help() const {
 /* must have value */
 "    -train_data <path>: path of your training data file \n"
 "    -test_data <path> (optional): path of your validation data file \n"
-"    -model_file <path> (optional, use '/tmp/xlearn-model' by default): \n"
+"    -model_file <path> (optional, use './xlearn-model' by default): \n"
 "                       path of your model checkpoint file \n"
 /* must have value */
 "    -score <score_func>: score_func can be 'linear', 'fm', and 'ffm' \n"
@@ -77,18 +77,20 @@ std::string Checker::option_help() const {
 "                                using early-stop in training \n"
 "    -on_disk <true or false> (optional, use false by default): \n"
 "                             using on-disk training for limited memory \n"
+"    -log_file <path> (optional, use './xlearn_log' by default): \n"
+"                     path of your log file. \n"
 "----------------------------------------------------------------------------\n"
 "\n"
 "----------------------------- Inference task -------------------------------\n"
 "Usage: xlearn --is_inference [options] \n"
 "\n"
 "options: \n\n"
-/* must have value */
-"   -model_file <path>: path of your pre-trained model file \n"
+"   -model_file <path> (optional, use './xlearn_model' by default): \n"
+"                      path of your pre-trained model file \n"
 /* must have value */
 "   -infer_data <path>: path of your inference data file \n"
-/* must have value */
-"   -out_data <path>: path of your output file \n"
+"   -out_data <path> (optional, use './xlearn_out' by default): \n"
+"                    path of your output file \n"
 "----------------------------------------------------------------------------\n"
   );
 }
@@ -143,7 +145,7 @@ bool Checker::Check(HyperParam& hyper_param) {
   // Do not have any args
   if (args_.size() == 1) {
     printf("%s\n", option_help().c_str());
-    return false;
+    exit(0);
   }
   // Parse and check argument
   if (args_[1].compare("--is_train") == 0) {
@@ -153,7 +155,7 @@ bool Checker::Check(HyperParam& hyper_param) {
     hyper_param.is_train = false;
     return check_inference_options(hyper_param);
   } else {
-    printf("Please use: \n"
+    printf("[Error] Please use: \n"
            " 'xlearn --is_train [options]' for training task \n"
            "or \n 'xlearn --is_inference [options]' for inference task \n"
            "Type 'xlearn' for the details of the [options] \n");
@@ -169,30 +171,32 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
   StrSimilar ss;
   // Every option should have a value
   if (list.size() % 2 != 0) {
-    printf("Every option should have a value \n");
+    printf("[Error] Every options should have a value \n");
     return false;
   }
   // User must set the -train_data
   if (!ss.Find(std::string("-train_data"), list)) {
-    printf("User need to set the option [-train_data] "
+    printf("[Error] User need to set the option [-train_data] "
            "to specify the input training data file. \n");
     bo = false;
   }
   // User must set the -score
   if (!ss.Find(std::string("-score"), list)) {
-    printf("User need to set the option [-score] "
+    printf("[Error] User need to set the option [-score] "
            "to specify the score function, which can be 'linear', "
            "'fm', and 'ffm' \n");
     bo = false;
   }
   // User must set the -loss
   if (!ss.Find(std::string("-loss"), list)) {
-    printf("User need to set the option [-loss] "
+    printf("[Error] User need to set the option [-loss] "
            "to specify the loss function, which can be 'squared', "
            "'absolute', 'cross_entropy', and 'hinge' \n");
     bo = false;
   }
+
   if (!bo) { return false; }
+
   // Check every single element
   for (int i = 0; i < list.size(); i+=2) {
     if (list[i].compare("-train_data") == 0) {
@@ -200,13 +204,13 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-test_data") == 0) {
       hyper_param.test_set_file = list[i+1];
     } else if (list[i].compare("-model_file") == 0) {
-      hyper_param.model_checkpoint_file = list[i+1];
+      hyper_param.model_file = list[i+1];
     } else if (list[i].compare("-score") == 0) {
       std::string value = list[i+1];
       if (value.compare("linear") != 0 &&
           value.compare("fm") != 0 &&
           value.compare("ffm") != 0) {
-        printf("Unknow score function '%s' \n"
+        printf("[Error] Unknow score function '%s' \n"
                " -score can only be 'linear', 'fm', or 'ffm' \n",
                value.c_str());
         bo = false;
@@ -217,11 +221,11 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       std::string value = list[i+1];
       if (value.compare("squared") != 0 &&
           value.compare("hinge") != 0 &&
-          value.compare("cross_entropy") != 0 &&
+          value.compare("cross-entropy") != 0 &&
           value.compare("absolute") != 0) {
-        printf("Unknow loss function '%s' \n"
+        printf("[Error] Unknow loss function '%s' \n"
                " -loss can only be 'squared', "
-               "'hinge', 'cross_entropy', or 'absolute' \n",
+               "'hinge', 'cross-entropy', or 'absolute' \n",
                value.c_str());
         bo = false;
       } else {
@@ -233,7 +237,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
           value.compare("l2") != 0 &&
           value.compare("l1_l2") != 0 &&
           value.compare("none") != 0) {
-        printf("Unknow regular type: '%s' \n"
+        printf("[Error] Unknow regular type: '%s' \n"
                " -regular can only be 'l1', 'l2', 'l1_l2', "
                "or 'none'\n",
                value.c_str());
@@ -249,7 +253,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
           value.compare("adadelta") != 0 &&
           value.compare("rmsprop") != 0 &&
           value.compare("momentum") != 0) {
-        printf("%sUnknow updater '%s' \n",
+        printf("[Error] Unknow updater '%s' \n"
                " -updater can only be 'sgd', 'adam', 'adagrad' "
                "'rmsprop', or 'momentum' \n",
                value.c_str());
@@ -260,7 +264,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-k") == 0) {
       int value = atoi(list[i+1].c_str());
       if (value % 8 != 0) {
-        printf("Illegal -k '%i' \n"
+        printf("[Error] Illegal -k '%i' \n"
                " -k must be a multiple of 8 \n",
                value);
         bo = false;
@@ -270,7 +274,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-lr") == 0) {
       real_t value = atof(list[i+1].c_str());
       if (value <= 0) {
-        printf("Illegal -lr '%f' \n"
+        printf("[Error] Illegal -lr '%f' \n"
                " -lr must be greater than zero \n",
                value);
         bo = false;
@@ -280,7 +284,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-decay_rate") == 0) {
       real_t value = atof(list[i+1].c_str());
       if (value < 0) {
-        printf("Illegal -decay_rate '%f' \n"
+        printf("[Error] Illegal -decay_rate '%f' \n"
                " -decay_rate must be greater than zero \n",
                value);
         bo = false;
@@ -290,7 +294,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-second_decay_rate") == 0) {
       real_t value = atof(list[i+1].c_str());
       if (value < 0) {
-        printf("Illegal -second_decay_rate '%f' \n"
+        printf("[Error] Illegal -second_decay_rate '%f' \n"
                " -second_decay_rate must be greater than zero \n",
                value);
         bo = false;
@@ -300,7 +304,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-regu_lambda_1") == 0) {
       real_t value = atof(list[i+1].c_str());
       if (value < 0) {
-        printf("Illegal -regu_lambda_1 '%f' \n"
+        printf("[Error] Illegal -regu_lambda_1 '%f' \n"
                " -regu_lambda_1 must be greater than zero \n",
                value);
         bo = false;
@@ -310,7 +314,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-regu_lambda_2") == 0) {
       real_t value = atof(list[i+1].c_str());
       if (value < 0) {
-        printf("Illegal -regu_lambda_2 '%f' \n"
+        printf("[Error] Illegal -regu_lambda_2 '%f' \n"
                " -regu_lambda_2 must be greater than zero \n",
                value);
         bo = false;
@@ -320,7 +324,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-epoch") == 0) {
       int value = atoi(list[i+1].c_str());
       if (value < 0) {
-        printf("Illegal -epoch '%i' \n"
+        printf("[Error] Illegal -epoch '%i' \n"
                " -epoch must be greater than zero \n",
                value);
         bo = false;
@@ -330,7 +334,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-batch_size") == 0) {
       int value = atoi(list[i+1].c_str());
       if (value < 0) {
-        printf("Illegal -batch_size '%i' \n"
+        printf("[Error] Illegal -batch_size '%i' \n"
                " -batch_size must be greater than zero \n",
                value);
         bo = false;
@@ -342,7 +346,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       if (value.compare("libsvm") != 0 &&
           value.compare("libffm") != 0 &&
           value.compare("csv") != 0) {
-        printf("Unknow file format '%s' \n"
+        printf("[Error] Unknow file format '%s' \n"
                " -file_format can only be 'libsvm', 'libffm', "
                "or 'csv' \n",
                value.c_str());
@@ -354,7 +358,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       std::string value = list[i+1];
       if (value.compare("true") != 0 &&
           value.compare("false") != 0) {
-        printf("Illegal -cv '%s' \n"
+        printf("[Error] Illegal -cv '%s' \n"
                " -cv can only be 'true' or 'false' \n",
                value.c_str());
         bo = false;
@@ -365,7 +369,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-fold") == 0) {
       int value = atoi(list[i+1].c_str());
       if (value < 0) {
-        printf("Illegal -fold '%i' \n"
+        printf("[Error] Illegal -fold '%i' \n"
                " -fold must be greater than zero \n",
                value);
         bo = false;
@@ -376,7 +380,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       std::string value = list[i+1];
       if (value.compare("true") != 0 &&
           value.compare("false") != 0) {
-        printf("Illegal -early_stop '%s' \n"
+        printf("[Error] Illegal -early_stop '%s' \n"
                " -early_stop can only be 'true' or 'false' \n",
                value.c_str());
         bo = false;
@@ -388,7 +392,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       std::string value = list[i+1];
       if (value.compare("true") != 0 &&
           value.compare("false") != 0) {
-        printf("Illegal -on_disk '%s' \n"
+        printf("[Error] Illegal -on_disk '%s' \n"
                " -on_disk can only be 'true' or 'false' \n",
                value.c_str());
         bo = false;
@@ -405,9 +409,9 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else { // no option match
       std::string similar_str;
       if (ss.FindSimilar(list[i], menu_, similar_str) > 7) {
-        printf("Unknow argument '%s'\n", list[i].c_str());
+        printf("[Error] Unknow argument '%s'\n", list[i].c_str());
       } else {
-        printf("Unknow argument '%s'\n"
+        printf("[Error] Unknow argument '%s'\n"
                " Do you mean '%s' ?\n",
                list[i].c_str(),
                similar_str.c_str());
@@ -415,6 +419,22 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       bo = false;
     }
   }
+
+  if (!bo) { return false; }
+
+  // Check warning
+  if (hyper_param.score_func.compare("ffm") == 0 &&
+      hyper_param.file_format.compare("libsvm") == 0) {
+    printf("[Warning] FFM model cannot use the libsvm file. "
+           "Already Change it to libffm format.\n");
+    hyper_param.file_format = "libffm";
+  }
+  if (hyper_param.cross_validation &&
+     !hyper_param.test_set_file.empty()) {
+    printf("[Warning] xLearn will use cross validation. "
+           "The test file will not work.\n");
+  }
+
   if (!bo) { return false; }
 
   return true;
@@ -428,28 +448,18 @@ bool Checker::check_inference_options(HyperParam& hyper_param) {
   StrSimilar ss;
   // Every option should have a value
   if (list.size() % 2 != 0) {
-    printf("Every option should have a value \n");
+    printf("[Error] Every option should have a value \n");
     return false;
   }
-  // // User must set the -infer_data
+  // User must set the -infer_data
   if (!ss.Find(std::string("-infer_data"), list)) {
-    printf("User need to set the option [-infer_data] "
+    printf("[Error] User need to set the option [-infer_data] "
            "to specify which file storing the inference data \n");
     bo = false;
   }
-  // User must set the -out_data
-  if (!ss.Find(std::string("-out_data"), list)) {
-    printf("User need to set the option [-out_data] "
-           "to specify which file storing the output data \n");
-    bo = false;
-  }
-  // User must set the -model_file
-  if (!ss.Find(std::string("-model_file"), list)) {
-    printf("User need to set the option [-model_file] "
-           "to specify which file storing the model checkpoint \n");
-    bo = false;
-  }
+
   if (!bo) { return false; }
+
   // Check every single element
   for (int i = 0; i < list.size(); i+=2) {
     if (list[i].compare("-infer_data") == 0) {
@@ -457,13 +467,13 @@ bool Checker::check_inference_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-out_data") == 0) {
       hyper_param.output_file = list[i+1];
     } else if (list[i].compare("-model_file") == 0) {
-      hyper_param.model_checkpoint_file = list[i+1];
+      hyper_param.model_file = list[i+1];
     } else {
       std::string similar_str;
       if (ss.FindSimilar(list[i], menu_, similar_str) > 7) {
-        printf("Unknow argument '%s'\n", list[i].c_str());
+        printf("[Error] Unknow argument '%s'\n", list[i].c_str());
       } else {
-        printf("Unknow argument '%s'\n"
+        printf("[Error] Unknow argument '%s'\n"
                " Do you mean '%s' ?\n",
                list[i].c_str(),
                similar_str.c_str());
