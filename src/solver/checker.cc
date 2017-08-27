@@ -435,6 +435,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
            "The test file will not work.\n");
   }
 
+
   if (!bo) { return false; }
 
   return true;
@@ -481,6 +482,7 @@ bool Checker::check_inference_options(HyperParam& hyper_param) {
       bo = false;
     }
   }
+
   if (!bo) { return false; }
 
   return true;

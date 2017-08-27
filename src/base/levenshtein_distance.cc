@@ -56,7 +56,7 @@ int StrSimilar::FindSimilar(const std::string& str,
   return min_dis;
 }
 
-// Levenshtein distance using DP
+// Levenshtein distance using dynamic programing (DP)
 int StrSimilar::ldistance(const std::string& source,
                           const std::string& target) {
   //step 1

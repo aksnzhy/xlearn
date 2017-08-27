@@ -60,9 +60,6 @@ class SolverTest : public ::testing::Test {
     }
     Close(file_ffm);
   }
-  virtual void TearDown() {
-    //RemoveFile(filename.c_str());
-  }
 }; // class SolverTest
 
 class TSolver : public Solver {
@@ -82,7 +79,7 @@ TEST_F(SolverTest, Train_CV_Init) {
   argv[14] = "-cv";
   argv[15] = "true";
   argv[16] = "-fold";
-  argv[17] = "3";
+  argv[17] = "4";
   TSolver solver;
   solver.Initialize(argc, const_cast<char**>(argv));
   HyperParam hyper_param = solver.GetHyperParam();
