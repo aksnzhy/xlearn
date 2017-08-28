@@ -57,7 +57,7 @@ class Model {
   void SaveModel(const std::string& filename);
 
   // Deserialize model from a checkpoint file.
-  void LoadModel(const std::string& filename);
+  bool LoadModel(const std::string& filename);
 
   // Get the pointer of current model parameters.
   std::vector<real_t>* GetParameter() { return &parameters_; }

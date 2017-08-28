@@ -50,7 +50,7 @@ InmemReader::~InmemReader() {
 }
 
 // Pre-load all the data into memory buffer.
-void InmemReader::Initialize(const std::string& filename,
+bool InmemReader::Initialize(const std::string& filename,
                              int num_samples,
                              Parser* parser) {
   CHECK_NE(filename.empty(), true)
@@ -60,6 +60,7 @@ void InmemReader::Initialize(const std::string& filename,
   num_samples_ = num_samples;
   parser_ = parser;
   file_ptr_ = OpenFileOrDie(filename_.c_str(), "r");
+  if (file_ptr_ == NULL) { return false; }
   data_samples_.Resize(num_samples);
   uint64 file_size = GetFileSize(file_ptr_);
   LOG(INFO) << "Data file size: " << file_size << " bytes.";
@@ -105,6 +106,7 @@ void InmemReader::Initialize(const std::string& filename,
   }
   // Parse StringList to DMatrix.
   parser_->Parse(list, data_buf_);
+  return true;
 }
 
 // Read one line of data from the memory buffer
@@ -177,7 +179,7 @@ OndiskReader::~OndiskReader() {
   data_samples_.Release(); // Release the data sample buffer
 }
 
-void OndiskReader::Initialize(const std::string& filename,
+bool OndiskReader::Initialize(const std::string& filename,
                               int num_samples,
                               Parser* parser) {
   CHECK_NE(filename.empty(), true);
@@ -187,9 +189,11 @@ void OndiskReader::Initialize(const std::string& filename,
   num_samples_ = num_samples;
   parser_ = parser;
   file_ptr_ = OpenFileOrDie(filename_.c_str(), "r");
+  if (file_ptr_ == NULL) { return false; }
   bool has_field = parser_->Type() == "libffm" ? true : false;
   data_samples_.Resize(num_samples);
   data_samples_.InitSparseRow(has_field);
+  return false;
 }
 
 // Sample data from disk file.

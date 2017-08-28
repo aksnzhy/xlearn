@@ -66,7 +66,11 @@ Model::Model(const HyperParam& hyper_param, bool gaussian) {
 // Initialize model from a checkpoint file.
 Model::Model(const std::string& filename) {
   CHECK_NE(filename.empty(), true);
-  this->LoadModel(filename);
+  if (this->LoadModel(filename) == false) {
+    printf("Cannot Load model from the file: %s\n",
+           filename.c_str());
+    exit(0);
+  }
 }
 
 // Serialize current model to a checkpoint file.
@@ -117,11 +121,12 @@ std::string Model::getline(FILE* file) {
 }
 
 // Deserialize model from a checkpoint file.
-void Model::LoadModel(const std::string& filename) {
+bool Model::LoadModel(const std::string& filename) {
   static std::string data_line;
   CHECK_NE(filename.empty(), true);
   FILE* file = OpenFileOrDie(StringPrintf("%s_param",
                         filename.c_str()).c_str(), "r");
+  if (file == NULL) { return false; }
   // The 1st line: score function
   score_func_ = getline(file);
   // The 2nd line: feature num
@@ -145,6 +150,7 @@ void Model::LoadModel(const std::string& filename) {
   ReadVectorFromFile<real_t>(file, this->parameters_);
   parameters_num_ = parameters_.size();
   Close(file);
+  return true;
 }
 
 // Reset current model to init state.

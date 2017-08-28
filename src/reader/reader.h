@@ -67,7 +67,7 @@ class Reader {
   virtual ~Reader() {  }
 
   // We need to invoke this method before we sample data.
-  virtual void Initialize(const std::string& filename,
+  virtual bool Initialize(const std::string& filename,
                           int num_samples,
                           Parser* parser) = 0;
 
@@ -100,7 +100,7 @@ class InmemReader : public Reader {
   ~InmemReader();
 
   // Pre-load all the data into memory buffer.
-  virtual void Initialize(const std::string& filename,
+  virtual bool Initialize(const std::string& filename,
                           int num_samples,
                           Parser* parser);
 
@@ -136,7 +136,7 @@ class OndiskReader : public Reader {
   OndiskReader() {  }
   ~OndiskReader();
 
-  virtual void Initialize(const std::string& filename,
+  virtual bool Initialize(const std::string& filename,
                           int num_samples,
                           Parser* parser);
 

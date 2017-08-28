@@ -125,6 +125,11 @@ void Solver::Initialize(int argc, char* argv[]) {
       reader_[i]->Initialize(file_list[i],
                              hyper_param_.batch_size,
                              parser_);
+      if (reader_[i] == NULL) {
+        printf("Cannot open the file %s\n",
+               file_list[i].c_str());
+        exit(0);
+      }
       LOG(INFO) << "Init Reader: " << file_list[i];
     }
     // Read problem and init some hyper-parameters
@@ -206,6 +211,11 @@ void Solver::Initialize(int argc, char* argv[]) {
     reader_[0]->Initialize(hyper_param_.inference_file,
                            hyper_param_.batch_size,
                            parser_);
+    if (reader_[0] == NULL) {
+      printf("Cannot open the file %s\n",
+             hyper_param_.inference_file.c_str());
+      exit(0);
+    }
     LOG(INFO) << "Initialize Parser ans Reader.";
     //-------------------------------------------------------
     // Step 5: Init model parameter
@@ -271,7 +281,7 @@ void Solver::start_inference_work() {
 }
 
 void Solver::finalize_inference_work() {
-  LOG(INFO) << "Finalize inference work."
+  LOG(INFO) << "Finalize inference work.";
 }
 
 // Create Parser by a given string

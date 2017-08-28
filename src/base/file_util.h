@@ -36,7 +36,7 @@ This file contains facilitlies controlling file I/O.
 inline FILE* OpenFileOrDie(const char* filename, const char* mode) {
   FILE* input_stream = fopen(filename, mode);
   if (input_stream == nullptr) {
-    LOG(FATAL) << "Cannot open file: " << filename
+    LOG(ERROR) << "Cannot open file: " << filename
                << " with mode: " << mode;
   }
   return input_stream;
@@ -45,7 +45,7 @@ inline FILE* OpenFileOrDie(const char* filename, const char* mode) {
 // Close file using fclose.
 inline void Close(FILE *file) {
   if (fclose(file) == -1) {
-    LOG(FATAL) << "Error invoke fclose().";
+    LOG(ERROR) << "Error invoke fclose().";
   }
 }
 
@@ -53,11 +53,11 @@ inline void Close(FILE *file) {
 // Return the size. Note that here we need use uint64 for large files.
 inline uint64 GetFileSize(FILE* file) {
   if (fseek(file, 0L, SEEK_END) != 0) {
-    LOG(FATAL) << "Error: invoke fseek().";
+    LOG(ERROR) << "Error: invoke fseek().";
   }
   uint64 total_size = ftell(file);
   if (total_size == -1) {
-    LOG(FATAL) << "Error: invoke ftell().";
+    LOG(ERROR) << "Error: invoke ftell().";
   }
   rewind(file);
   return total_size;
@@ -68,7 +68,7 @@ inline uint64 GetFileSize(FILE* file) {
 inline size_t WriteDataToDisk(FILE* file, const char* buf, size_t len) {
   size_t write_len = fwrite(buf, 1, len, file);
   if (write_len != len) {
-    LOG(FATAL) << "Error: invoke fwrite().";
+    LOG(ERROR) << "Error: invoke fwrite().";
   }
   return write_len;
 }
@@ -88,7 +88,7 @@ inline size_t ReadDataFromDisk(FILE* file, char* buf, size_t max_len) {
 // Delete target file from disk.
 inline void RemoveFile(const char* filename) {
   if (remove(filename) == -1) {
-    LOG(FATAL) << "Error: invoke remove().";
+    LOG(ERROR) << "Error: invoke remove().";
   }
 }
 
