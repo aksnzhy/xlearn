@@ -31,6 +31,5 @@ int main(int argc, char* argv[]) {
   solver.Initialize(argc, argv);
   solver.StartWork();
   solver.Finalize();
-
   return 0;
 }

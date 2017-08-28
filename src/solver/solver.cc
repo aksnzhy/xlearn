@@ -257,14 +257,22 @@ void Solver::Finalize() {
 }
 
 // Train
-void Solver::start_train_work() {}
+void Solver::start_train_work() {
 
-void Solver::finalize_train_work() {}
+}
+
+void Solver::finalize_train_work() {
+  LOG(INFO) << "Finalize training work.";
+}
 
 // Inference
-void Solver::start_inference_work() {}
+void Solver::start_inference_work() {
 
-void Solver::finalize_inference_work() {}
+}
+
+void Solver::finalize_inference_work() {
+  LOG(INFO) << "Finalize inference work."
+}
 
 // Create Parser by a given string
 Parser* Solver::create_parser() {
@@ -372,12 +380,14 @@ std::string Solver::print_current_time() {
   return StringPrintf("%04d%02d%02d-%02d%02d%02d",
                       1900 + broken_down_time.tm_year,
                       1 + broken_down_time.tm_mon,
-                      broken_down_time.tm_mday, broken_down_time.tm_hour,
-                      broken_down_time.tm_min,  broken_down_time.tm_sec);
+                      broken_down_time.tm_mday,
+                      broken_down_time.tm_hour,
+                      broken_down_time.tm_min,
+                      broken_down_time.tm_sec);
 }
 
 // The log file name = base + host_name + username +
-  //                   date_time + process_id
+//                     date_time + process_id
 std::string Solver::get_log_file() {
   CHECK(!hyper_param_.log_file.empty());
   std::string filename_prefix;
