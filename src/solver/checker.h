@@ -50,8 +50,8 @@ class Checker {
   bool Check(HyperParam& hyper_param);
 
  private:
-  StringList menu_;    /* Store all the possible options */
-  StringList args_;    /* Store the user input args */
+  StringList menu_;  // Store all the options
+  StringList args_;  // User input command line
 
   std::string option_help() const;
   bool check_train_options(HyperParam& hyper_param);

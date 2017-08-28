@@ -74,6 +74,29 @@ class TSolver : public Solver {
    DISALLOW_COPY_AND_ASSIGN(TSolver);
 };
 
+TEST_F(SolverTest, Train_No_CV_Init) {
+  TSolver solver;
+  solver.Initialize(argc, const_cast<char**>(argv));
+  HyperParam hyper_param = solver.GetHyperParam();
+  EXPECT_EQ(hyper_param.num_K, 16);
+  EXPECT_EQ(hyper_param.learning_rate, 0.5);
+  EXPECT_EQ(hyper_param.num_feature, 17);
+  EXPECT_EQ(hyper_param.num_field, 12);
+  std::vector<Reader*> reader = solver.GetReader();
+  EXPECT_EQ(reader.size(), 1);
+  int iteration_num = 10;
+  DMatrix* matrix = NULL;
+  for (int i = 0; i < iteration_num; ++i) {
+    int record_num = reader[0]->Samples(matrix);
+    if (record_num == 0) {
+      --i;
+      reader[0]->Reset();
+      continue;
+    }
+    EXPECT_EQ(record_num, hyper_param.batch_size);
+  }
+}
+
 TEST_F(SolverTest, Train_CV_Init) {
   argc = 18;
   argv[14] = "-cv";
@@ -87,20 +110,8 @@ TEST_F(SolverTest, Train_CV_Init) {
   EXPECT_EQ(hyper_param.learning_rate, 0.5);
   EXPECT_EQ(hyper_param.num_feature, 17);
   EXPECT_EQ(hyper_param.num_field, 12);
-}
-
-TEST_F(SolverTest, Train_No_CV_Init) {
-  TSolver solver;
-  solver.Initialize(argc, const_cast<char**>(argv));
-  HyperParam hyper_param = solver.GetHyperParam();
-  EXPECT_EQ(hyper_param.num_K, 16);
-  EXPECT_EQ(hyper_param.learning_rate, 0.5);
-  EXPECT_EQ(hyper_param.num_feature, 17);
-  EXPECT_EQ(hyper_param.num_field, 12);
-}
-
-TEST_F(SolverTest, Inference_Init) {
-
+  std::vector<Reader*> reader = solver.GetReader();
+  EXPECT_EQ(reader.size(), 4);
 }
 
 } // namespace xLearn

@@ -18,6 +18,7 @@
 Author: Chao Ma (mctt90@gmail.com)
 This file is the implementation of the Checker class.
 */
+
 #include <string>
 #include <cstdlib>
 #include <algorithm>
@@ -131,7 +132,7 @@ void Checker::Initialize(int argc, char* argv[]) {
   for (int i = 0; i < argc; ++i) {
     args_.push_back(std::string(argv[i]));
   }
-  // convert args to lower case
+  // Convert args to lower case
   for (int i = 0; i < args_.size(); ++i) {
     std::transform(args_[i].begin(),
                    args_[i].end(),
@@ -401,11 +402,11 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
           value.compare("true") == 0 ? true : false;
       }
     } else if (list[i].compare("-infer_data") == 0) {
-      std::string value = list[i+1];
-      hyper_param.inference_file = value;
+      printf("[Warning] -infer_data can only be used in inference. \n"
+             "xLearn will ignore this option \n");
     } else if (list[i].compare("-out_data") == 0) {
-      std::string value = list[i+1];
-      hyper_param.output_file = value;
+      printf("[Warning] -out_data can only be used in inference. \n"
+             "xLearn will ignore this option \n");
     } else { // no option match
       std::string similar_str;
       if (ss.FindSimilar(list[i], menu_, similar_str) > 7) {
@@ -469,7 +470,19 @@ bool Checker::check_inference_options(HyperParam& hyper_param) {
       hyper_param.output_file = list[i+1];
     } else if (list[i].compare("-model_file") == 0) {
       hyper_param.model_file = list[i+1];
-    } else {
+    } else { // options used in training
+      bool bk = true;
+      for (int j = 0; j < menu_.size(); ++j) {
+        if (list[i].compare(menu_[j]) == 0) {
+          printf("[Warning] %s can only be used in training \n"
+                 "xLearn will ignore this option \n",
+                 list[i].c_str());
+          bk = false;
+          break;
+        }
+      }
+      if (!bk) { continue; }
+      // no match
       std::string similar_str;
       if (ss.FindSimilar(list[i], menu_, similar_str) > 7) {
         printf("[Error] Unknow argument '%s'\n", list[i].c_str());
