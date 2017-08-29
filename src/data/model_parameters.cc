@@ -57,7 +57,7 @@ Model::Model(const HyperParam& hyper_param, bool gaussian) {
       InitModelUsingGaussian();
     }
   } catch (std::bad_alloc&) {
-    LOG(FATAL) << "Cannot allocate enough memory for current      \
+    LOG(FATAL) << "Cannot allocate enough memory for current  \
                    model parameters. Parameter size: "
                << parameters_num_;
   }
