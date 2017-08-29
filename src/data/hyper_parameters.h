@@ -37,10 +37,10 @@ struct HyperParam {
 //------------------------------------------------------------------------------
 // Parameters for learning algorithms.
 //------------------------------------------------------------------------------
-  bool is_train = true;            // Train or Predict
-  std::string score_func;          // linear, fm, or ffm
-  std::string loss_func;           // cross_entropy, abs, squared, or hinge
-  std::string regu_type = "none";  // l1, l2, Elastic-Net, or none
+  bool is_train = true;               // Train or Predict
+  std::string score_func = "linear";  // linear, fm, or ffm
+  std::string loss_func;              // cross_entropy, abs, squared, or hinge
+  std::string regu_type = "none";     // l1, l2, Elastic-Net, or none
 //------------------------------------------------------------------------------
 // Parameters for optimization method.
 //------------------------------------------------------------------------------
