@@ -102,8 +102,8 @@ void Solver::Initialize(int argc, char* argv[]) {
       num_reader += hyper_param_.num_folds;
       for (int i = 0; i < hyper_param_.num_folds; ++i) {
         std::string filename = StringPrintf("%s_%d",
-                                 hyper_param_.train_set_file.c_str(),
-                                 i);
+                          hyper_param_.train_set_file.c_str(),
+                          i);
         file_list.push_back(filename);
       }
     } else { // do not use CV
@@ -197,9 +197,7 @@ void Solver::Initialize(int argc, char* argv[]) {
     loss_ = create_loss();
     loss_->Initialize(score_);
     LOG(INFO) << "Initialize loss function.";
-  }
-  // For inference
-  if (!hyper_param_.is_train) {
+  } else {  // For inference
     //-------------------------------------------------------
     // Step 4: Init Reader and reader problembal
     //-------------------------------------------------------
@@ -268,7 +266,11 @@ void Solver::Finalize() {
 
 // Train
 void Solver::start_train_work() {
+  if (hyper_param_.cross_validation) {
 
+  } else { // do not use cv
+
+  }
 }
 
 void Solver::finalize_train_work() {

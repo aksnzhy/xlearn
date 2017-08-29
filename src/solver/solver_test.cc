@@ -114,4 +114,32 @@ TEST_F(SolverTest, Train_CV_Init) {
   EXPECT_EQ(reader.size(), 4);
 }
 
+TEST_F(SolverTest, Infer_Init) {
+  // Init hyper_param and odel
+  HyperParam hyper_param;
+  hyper_param.score_func = "ffm";
+  hyper_param.num_feature = 10;
+  hyper_param.num_K = 8;
+  hyper_param.num_field = 10;
+  hyper_param.num_param = 10 + 1 + 10*10*8;
+  Model model(hyper_param);
+  model.SaveModel("/tmp/xlearn_model.txt");
+  argc = 10;
+  argv[1] = {"--is_inference"};
+  argv[2] = {"-infer_data"};
+  argv[3] = {"/tmp/solver_test.txt"};
+  argv[4] = {"-model_file"};
+  argv[5] = {"/tmp/xlearn_model.txt"};
+  argv[6] = {"-score"};
+  argv[7] = {"ffm"};
+  argv[8] = {"-loss"};
+  argv[9] = {"cross-entropy"};
+  TSolver solver;
+  solver.Initialize(argc, const_cast<char**>(argv));
+  HyperParam new_param = solver.GetHyperParam();
+  EXPECT_EQ(new_param.num_K, 8);
+  EXPECT_EQ(new_param.num_feature, 10);
+  EXPECT_EQ(new_param.num_field, 10);
+}
+
 } // namespace xLearn

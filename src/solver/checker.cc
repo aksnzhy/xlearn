@@ -459,6 +459,20 @@ bool Checker::check_inference_options(HyperParam& hyper_param) {
            "to specify which file storing the inference data \n");
     bo = false;
   }
+  // User must set the -score
+  if (!ss.Find(std::string("-score"), list)) {
+    printf("[Error] User need to set the option [-score] "
+           "to specify the score function, which can be 'linear', "
+           "'fm', and 'ffm' \n");
+    bo = false;
+  }
+  // User must set the -loss
+  if (!ss.Find(std::string("-loss"), list)) {
+    printf("[Error] User need to set the option [-loss] "
+           "to specify the loss function, which can be 'squared', "
+           "'absolute', 'cross_entropy', and 'hinge' \n");
+    bo = false;
+  }
 
   if (!bo) { return false; }
 
@@ -470,6 +484,32 @@ bool Checker::check_inference_options(HyperParam& hyper_param) {
       hyper_param.output_file = list[i+1];
     } else if (list[i].compare("-model_file") == 0) {
       hyper_param.model_file = list[i+1];
+    } else if (list[i].compare("-score") == 0) {
+      std::string value = list[i+1];
+      if (value.compare("linear") != 0 &&
+          value.compare("fm") != 0 &&
+          value.compare("ffm") != 0) {
+        printf("[Error] Unknow score function '%s' \n"
+               " -score can only be 'linear', 'fm', or 'ffm' \n",
+               value.c_str());
+        bo = false;
+      } else {
+        hyper_param.score_func = value;
+      }
+    } else if (list[i].compare("-loss") == 0) {
+      std::string value = list[i+1];
+      if (value.compare("squared") != 0 &&
+          value.compare("hinge") != 0 &&
+          value.compare("cross-entropy") != 0 &&
+          value.compare("absolute") != 0) {
+        printf("[Error] Unknow loss function '%s' \n"
+               " -loss can only be 'squared', "
+               "'hinge', 'cross-entropy', or 'absolute' \n",
+               value.c_str());
+        bo = false;
+      } else {
+        hyper_param.loss_func = value;
+      }
     } else { // options used in training
       bool bk = true;
       for (int j = 0; j < menu_.size(); ++j) {
@@ -494,6 +534,13 @@ bool Checker::check_inference_options(HyperParam& hyper_param) {
       }
       bo = false;
     }
+  }
+  // Check warning
+  if (hyper_param.score_func.compare("ffm") == 0 &&
+      hyper_param.file_format.compare("libsvm") == 0) {
+    printf("[Warning] FFM model cannot use the libsvm file. "
+           "Already Change it to libffm format.\n");
+    hyper_param.file_format = "libffm";
   }
 
   if (!bo) { return false; }
