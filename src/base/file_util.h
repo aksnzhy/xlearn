@@ -23,6 +23,8 @@ This file contains facilitlies controlling file I/O.
 #ifndef XLEARN_BASE_FILE_UTIL_H_
 #define XLEARN_BASE_FILE_UTIL_H_
 
+#include <unistd.h>
+#include <fcntl.h>
 #include <stdio.h> // for remove()
 
 #include "src/base/common.h"
@@ -30,6 +32,14 @@ This file contains facilitlies controlling file I/O.
 //------------------------------------------------------------------------------
 // Basic operations for a file
 //------------------------------------------------------------------------------
+
+// Check a file if it exists.
+inline bool FileExist(const char* filename) {
+  if (access(filename, F_OK) != -1) {
+    return true;
+  }
+  return false;
+}
 
 // Open file using fopen.
 // Return the file pointer.

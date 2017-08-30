@@ -39,6 +39,7 @@ class AdamTest : public ::testing::Test {
     param.decay_rate = 0.0;
     param.second_decay_rate = 0.0;
     param.num_param = kLength;
+    param.loss_func = "sqaured";
   }
 };
 

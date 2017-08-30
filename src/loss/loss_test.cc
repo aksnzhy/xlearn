@@ -62,6 +62,7 @@ TEST(LOSS, Predict_Linear) {
   // Create Model for Linear
   index_t parameter_num = kFeature_num + 1;
   param.num_param = parameter_num;
+  param.loss_func = "sqaured";
   Model model_lr(param);
   std::vector<real_t>* para = model_lr.GetParameter();
   for (size_t i = 0; i < para->size(); ++i) {
@@ -95,6 +96,7 @@ TEST(LOSS, Predict_FM) {
   // Create Model for FM
   index_t parameter_num = kFeature_num + 1 + kFeature_num*K;
   param.num_param = parameter_num;
+  param.loss_func = "sqaured";
   Model model_lr(param);
   std::vector<real_t>* para = model_lr.GetParameter();
   for (size_t i = 0; i < para->size(); ++i) {
@@ -133,6 +135,7 @@ TEST(LOSS, Predict_FFM) {
   // Create Model for FM
   index_t parameter_num = kFeature_num + 1 + kFeature_num*K*kField_num;
   param.num_param = parameter_num;
+  param.loss_func = "sqaured";
   Model model_lr(param);
   std::vector<real_t>* para = model_lr.GetParameter();
   for (size_t i = 0; i < para->size(); ++i) {

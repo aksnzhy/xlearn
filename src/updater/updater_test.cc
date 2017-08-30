@@ -46,6 +46,7 @@ class UpdaterTest : public ::testing::Test {
     param.regu_lambda_1 = 0.2;
     param.regu_lambda_2 = 0.3;
     param.num_param = kLength;
+    param.loss_func = "sqaured";
   }
 };
 

@@ -76,9 +76,15 @@ void Solver::Initialize(int argc, char* argv[]) {
   // Step 3: Init log file
   //-------------------------------------------------------
   std::string prefix = get_log_file();
+  if (hyper_param_.is_train) {
+    prefix += "_train";
+  } else {
+    prefix += "_infer";
+  }
   InitializeLogger(StringPrintf("%s.INFO", prefix.c_str()),
                    StringPrintf("%s.WARN", prefix.c_str()),
                    StringPrintf("%s.ERROR", prefix.c_str()));
+
   // For training
   if (hyper_param_.is_train) {
     //-------------------------------------------------------
@@ -87,7 +93,6 @@ void Solver::Initialize(int argc, char* argv[]) {
     LOG(INFO) << "Start to init Reader";
     // Split file if use -cv
     if (hyper_param_.cross_validation) {
-      CHECK_NE(hyper_param_.train_set_file.empty(), true);
       CHECK_GT(hyper_param_.num_folds, 0);
       splitor_.split(hyper_param_.train_set_file,
                      hyper_param_.num_folds);
@@ -199,7 +204,28 @@ void Solver::Initialize(int argc, char* argv[]) {
     LOG(INFO) << "Initialize loss function.";
   } else {  // For inference
     //-------------------------------------------------------
-    // Step 4: Init Reader and reader problembal
+    // Step 4: Init model parameter
+    //-------------------------------------------------------
+    model_ = new Model(hyper_param_.model_file);
+    hyper_param_.score_func = model_->GetScoreFunction();
+    if (hyper_param_.score_func.compare("ffm") == 0 &&
+        hyper_param_.file_format.compare("libsvm") == 0) {
+      printf("[Warning] FFM model cannot use the libsvm file. "
+             "Already Change it to libffm format.\n");
+      hyper_param_.file_format = "libffm";
+    }
+    hyper_param_.loss_func = model_->GetLossFunction();
+    hyper_param_.num_feature = model_->GetNumFeature();
+    if (hyper_param_.score_func.compare("fm") == 0 ||
+        hyper_param_.score_func.compare("ffm") == 0) {
+      hyper_param_.num_K = model_->GetNumK();
+    }
+    if (hyper_param_.score_func.compare("ffm") == 0) {
+      hyper_param_.num_field = model_->GetNumField();
+    }
+    LOG(INFO) << "Initialize model.";
+    //-------------------------------------------------------
+    // Step 5: Init Reader and reader problembal
     //-------------------------------------------------------
     // Create Parser
     parser_ = create_parser();
@@ -215,20 +241,6 @@ void Solver::Initialize(int argc, char* argv[]) {
       exit(0);
     }
     LOG(INFO) << "Initialize Parser ans Reader.";
-    //-------------------------------------------------------
-    // Step 5: Init model parameter
-    //-------------------------------------------------------
-    model_ = new Model(hyper_param_.model_file);
-    hyper_param_.score_func = model_->GetScoreFunction();
-    hyper_param_.num_feature = model_->GetNumFeature();
-    if (hyper_param_.score_func.compare("fm") == 0 ||
-        hyper_param_.score_func.compare("ffm") == 0) {
-      hyper_param_.num_K = model_->GetNumK();
-    }
-    if (hyper_param_.score_func.compare("ffm") == 0) {
-      hyper_param_.num_field = model_->GetNumField();
-    }
-    LOG(INFO) << "Initialize model.";
     //-------------------------------------------------------
     // Step 6: Init score function
     //-------------------------------------------------------

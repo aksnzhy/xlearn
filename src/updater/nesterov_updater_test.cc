@@ -38,6 +38,7 @@ class NesterovTest : public ::testing::Test {
     param.learning_rate = 0.1;
     param.decay_rate = 1.0;
     param.num_param = kLength;
+    param.loss_func = "sqaured";
   }
 };
 

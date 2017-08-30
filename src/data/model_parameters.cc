@@ -43,11 +43,13 @@ static const uint32 kMaxLineSize = 100 * 1024; // 100 KB for one line of data
 Model::Model(const HyperParam& hyper_param, bool gaussian) {
   parameters_num_ = hyper_param.num_param;
   score_func_ = hyper_param.score_func;
+  loss_func_ = hyper_param.loss_func;
   num_feat_ = hyper_param.num_feature;
   num_field_ = hyper_param.num_field;
   num_K_ = hyper_param.num_K;
   CHECK_GE(parameters_num_, 0);
   CHECK_NE(score_func_.empty(), true);
+  CHECK_NE(loss_func_.empty(), true);
   CHECK_GE(num_feat_, 0);
   CHECK_GE(num_field_, 0);
   CHECK_GE(num_K_, 0);
@@ -77,19 +79,22 @@ Model::Model(const std::string& filename) {
 void Model::SaveModel(const std::string& filename) {
   static std::string data_line;
   CHECK_NE(filename.empty(), true);
-  FILE* file = OpenFileOrDie(StringPrintf("%s_param",
+  FILE* file = OpenFileOrDie(StringPrintf("%s",
                         filename.c_str()).c_str(), "w");
   // The 1st line: score function
-  // The 2nd line: feature num
-  data_line = StringPrintf("%s\n%d\n",
-                    score_func_.c_str(), num_feat_);
-  // The 3nd line: number of K (used in fm and ffm)
+  // The 2nd line: loss function
+  // The 3nd line: feature num
+  data_line = StringPrintf("%s\n%s\n%d\n",
+                    score_func_.c_str(),
+                    loss_func_.c_str(),
+                    num_feat_);
+  // The 4th line: number of K (used in fm and ffm)
   if (score_func_.compare("fm") == 0 ||
       score_func_.compare("ffm") == 0) {
     data_line = StringPrintf("%s%d\n",
                       data_line.c_str(), num_K_);
   }
-  // The 4th line: number of field (used in ffm)
+  // The 5th line: number of field (used in ffm)
   if (score_func_.compare("ffm") == 0) {
     data_line = StringPrintf("%s%d\n",
                       data_line.c_str(), num_field_);
@@ -124,23 +129,25 @@ std::string Model::getline(FILE* file) {
 bool Model::LoadModel(const std::string& filename) {
   static std::string data_line;
   CHECK_NE(filename.empty(), true);
-  FILE* file = OpenFileOrDie(StringPrintf("%s_param",
+  FILE* file = OpenFileOrDie(StringPrintf("%s",
                         filename.c_str()).c_str(), "r");
   if (file == NULL) { return false; }
   // The 1st line: score function
   score_func_ = getline(file);
-  // The 2nd line: feature num
+  // The 2nd line: loss function
+  loss_func_ = getline(file);
+  // The 3nd line: feature num
   data_line = getline(file);
   num_feat_ = atoi(data_line.c_str());
   data_line.clear();
-  // The 3nd line: number of K (used in fm and ffm)
+  // The 4nd line: number of K (used in fm and ffm)
   if (score_func_.compare("fm") == 0 ||
       score_func_.compare("ffm") == 0) {
     data_line = getline(file);
     num_K_ = atoi(data_line.c_str());
     data_line.clear();
   }
-  // The 4th line: number of field (used in ffm)
+  // The 5th line: number of field (used in ffm)
   if (score_func_.compare("ffm") == 0) {
     data_line = getline(file);
     num_field_ = atoi(data_line.c_str());
@@ -187,8 +194,7 @@ void Model::InitModelUsingGaussian() {
 // Delete the model file and cache file.
 void Model::RemoveModelFile(const std::string filename) {
   // Remove model file
-  RemoveFile(StringPrintf("%s_param",
-                          filename.c_str()).c_str());
+  RemoveFile(StringPrintf("%s", filename.c_str()).c_str());
 }
 
 } // namespace xLearn

@@ -81,6 +81,7 @@ class Model {
   // Get function
   size_t GetNumParameter() { return parameters_num_; }
   std::string GetScoreFunction() { return score_func_; }
+  std::string GetLossFunction() { return loss_func_; }
   index_t GetNumFeature() { return num_feat_; }
   index_t GetNumField() { return num_field_; }
   int GetNumK() { return num_K_; }
@@ -89,6 +90,7 @@ class Model {
   std::vector<real_t> parameters_;       // Storing the model parameters.
   size_t              parameters_num_;   // Number of model parameters.
   std::string         score_func_;       // linear, fm, or ffm
+  std::string         loss_func_;        // loss function
   index_t             num_feat_;         // Number of feature
   index_t             num_field_;        // Number of field (used in ffm)
   int                 num_K_;            // Number of K (used in fm and ffm)

@@ -38,6 +38,7 @@ class AdagradTest : public ::testing::Test {
     param.num_param = kLength;
     param.learning_rate = 0.1;
     param.num_param = kLength;
+    param.loss_func = "sqaured";
   }
 };
 

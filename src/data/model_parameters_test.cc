@@ -42,6 +42,7 @@ const std::string kFilename = "/tmp/test_model.binary";
 HyperParam Init() {
   HyperParam hyper_param;
   hyper_param.score_func = "ffm";
+  hyper_param.loss_func = "squared";
   hyper_param.num_feature = 10;
   hyper_param.num_K = 8;
   hyper_param.num_field = 10;
@@ -71,6 +72,7 @@ TEST(MODEL_TEST, LoadModel) {
   // parameters become 0
   model_ffm.LoadModel(kFilename);
   EXPECT_EQ(model_ffm.GetScoreFunction(), "ffm");
+  EXPECT_EQ(model_ffm.GetLossFunction(), "squared");
   EXPECT_EQ(model_ffm.GetNumFeature(), 10);
   EXPECT_EQ(model_ffm.GetNumK(), 8);
   EXPECT_EQ(model_ffm.GetNumField(), 10);
@@ -83,6 +85,7 @@ TEST(MODEL_TEST, LoadModel) {
 TEST(MODEL_TEST, InitModelFromDiskfile) {
   Model model_ffm(kFilename);
   EXPECT_EQ(model_ffm.GetScoreFunction(), "ffm");
+  EXPECT_EQ(model_ffm.GetLossFunction(), "squared");
   EXPECT_EQ(model_ffm.GetNumFeature(), 10);
   EXPECT_EQ(model_ffm.GetNumK(), 8);
   EXPECT_EQ(model_ffm.GetNumField(), 10);
