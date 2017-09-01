@@ -96,6 +96,8 @@ class Trainer {
   // cross_validation training
   void CVTrain();
 
+  size_t SaveModel();
+
  protected:
   Reader* train_reader_;
   Reader* test_reader_;

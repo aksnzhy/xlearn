@@ -28,7 +28,13 @@ void Trainer::Train() {
 }
 
 void Trainer::CVTrain() {
-  
+
+}
+
+size_t Trainer::SaveModel() {
+  size_t model_size = 0;
+
+  return model_size;  
 }
 
 } // namespace xLearn

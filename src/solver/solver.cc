@@ -285,6 +285,7 @@ void Solver::start_train_work() {
     int n = hyper_param_.num_folds;
     std::vector<Trainer> trainer_list(n);
     for (int i = 0; i < n; ++i) {
+      printf("Task %d / %d: \n", i, n);
       trainer_list[i].Initialize(reader_,  /* reader list */
                                  i,        /* id */
                                  epoch,
@@ -292,6 +293,7 @@ void Solver::start_train_work() {
                                  loss_,
                                  updater_,
                                  early_stop);
+      LOG(INFO) << "Start to train " << i << "/" << n;
       trainer_list[i].CVTrain();
     }
   } else { // do not use cv
@@ -308,7 +310,11 @@ void Solver::start_train_work() {
                        loss_,
                        updater_,
                        early_stop);
+    printf("Start to train ... \n");
     trainer.Train();
+    printf("Finish training and save model to %s\n",
+           hyper_param_.model_file.c_str());
+    trainer.SaveModel();
   }
 }
 
