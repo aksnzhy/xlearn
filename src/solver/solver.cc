@@ -312,9 +312,9 @@ void Solver::start_train_work() {
                        early_stop);
     printf("Start to train ... \n");
     trainer.Train();
+    trainer.SaveModel();
     printf("Finish training and save model to %s\n",
            hyper_param_.model_file.c_str());
-    trainer.SaveModel();
   }
 }
 
