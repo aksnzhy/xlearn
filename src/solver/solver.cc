@@ -16,7 +16,7 @@
 
 /*
 Author: Chao Ma (mctt90@gmail.com)
-This file is the implementation of the Trainer class.
+This file is the implementation of the Solver class.
 */
 
 #include "src/solver/solver.h"
@@ -278,10 +278,37 @@ void Solver::Finalize() {
 
 // Train
 void Solver::start_train_work() {
+  int epoch = hyper_param_.num_epoch;
+  bool early_stop = hyper_param_.early_stop;
   if (hyper_param_.cross_validation) {
-
+    // for n folds
+    int n = hyper_param_.num_folds;
+    std::vector<Trainer> trainer_list(n);
+    for (int i = 0; i < n; ++i) {
+      trainer_list[i].Initialize(reader_,  /* reader list */
+                                 i,        /* id */
+                                 epoch,
+                                 model_,
+                                 loss_,
+                                 updater_,
+                                 early_stop);
+      trainer_list[i].CVTrain();
+    }
   } else { // do not use cv
-
+    Trainer trainer;
+    Reader* train_reader = reader_[0];
+    Reader* test_reader = NULL;
+    if (!hyper_param_.test_set_file.empty()) {
+      test_reader = reader_[1];
+    }
+    trainer.Initialize(train_reader,
+                       test_reader,
+                       epoch,
+                       model_,
+                       loss_,
+                       updater_,
+                       early_stop);
+    trainer.Train();
   }
 }
 

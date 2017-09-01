@@ -35,6 +35,7 @@ of the xLearn.
 #include "src/score/score_function.h"
 #include "src/loss/loss.h"
 #include "src/solver/checker.h"
+#include "src/solver/trainer.h"
 
 namespace xLearn {
 //------------------------------------------------------------------------------
