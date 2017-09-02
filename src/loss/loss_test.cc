@@ -172,6 +172,29 @@ TEST(LOSS, Predict_FFM) {
   }
 }
 
+TEST(LOSS_TEST, Sigmoid_Test) {
+  std::vector<real_t> pred(6);
+  pred[0] = 0.5;
+  pred[1] = 3;
+  pred[2] = 20;
+  pred[3] = -0.5;
+  pred[4] = -3;
+  pred[5] = -20;
+  std::vector<real_t> new_pred(pred.size());
+  // Create score function
+  LinearScore score;
+  // Create loss function
+  TestLoss loss;
+  loss.Initialize(&score);
+  loss.Sigmoid(pred, new_pred);
+  EXPECT_GT(new_pred[0], 0.5);
+  EXPECT_GT(new_pred[1], 0.5);
+  EXPECT_GT(new_pred[2], 0.5);
+  EXPECT_LT(new_pred[3], 0.5);
+  EXPECT_LT(new_pred[4], 0.5);
+  EXPECT_LT(new_pred[5], 0.5);
+}
+
 Loss* CreateLoss(const char* format_name) {
   return CREATE_LOSS(format_name);
 }

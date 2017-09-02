@@ -62,7 +62,21 @@ class Loss {
                          Model* model,
                          Updater* updater) = 0;
 
+   // The Sigmoid function, which map the predictions to 0~1.
+   void Sigmoid(const std::vector<real_t>& pred,
+                std::vector<real_t>& new_pred) {
+     CHECK_EQ(pred.size(), new_pred.size());
+     for (size_t i = 0; i < pred.size(); ++i) {
+       new_pred[i] = fast_sigmoid(pred[i]);
+     }
+   }
+
  protected:
+  // fast sigmoid function
+  inline real_t fast_sigmoid(real_t x) {
+    return 1.0f / (1.0f + fastexp(-x));
+  }
+
   // The score function, e.g. Linear_Score,
   // FM_Score, FFM_Score, etc.
   Score* score_func_;
