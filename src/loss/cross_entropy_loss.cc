@@ -33,6 +33,7 @@ real_t CrossEntropyLoss::Evalute(const std::vector<real_t>& pred,
     real_t y = label[i] > 0 ? 1.0 : -1.0;
     val += log(1.0 + exp(-y*pred[i]));
   }
+  val /= pred.size();
   return val;
 }
 

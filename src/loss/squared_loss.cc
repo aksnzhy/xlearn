@@ -33,6 +33,7 @@ real_t SquaredLoss::Evalute(const std::vector<real_t>& pred,
     real_t tmp = pred[i] - label[i];
     val += 0.5*(tmp*tmp);
   }
+  val /= pred.size();
   return val;
 }
 

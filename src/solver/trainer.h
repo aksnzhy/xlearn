@@ -53,8 +53,8 @@ class Trainer {
     CHECK_NOTNULL(train_reader);
     CHECK_GT(epoch, 0);
     CHECK_NOTNULL(model);
-    CHECK_NOTNULL(loss_);
-    CHECK_NOTNULL(updater_);
+    CHECK_NOTNULL(loss);
+    CHECK_NOTNULL(updater);
     train_reader_ = train_reader;
     test_reader_ = test_reader;
     epoch_ = epoch;
@@ -80,8 +80,8 @@ class Trainer {
     CHECK_GE(id, 0);
     CHECK_GT(epoch, 0);
     CHECK_NOTNULL(model);
-    CHECK_NOTNULL(loss_);
-    CHECK_NOTNULL(updater_);
+    CHECK_NOTNULL(loss);
+    CHECK_NOTNULL(updater);
     id_ = id;
     epoch_ = epoch;
     model_ = model;

@@ -34,6 +34,7 @@ real_t HingeLoss::Evalute(const std::vector<real_t>& pred,
     real_t tmp = pred[i] * y;
     if (tmp < 1) { val += 1-tmp; }
   }
+  val /= pred.size();
   return val;
 }
 
