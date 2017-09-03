@@ -90,11 +90,4 @@ void Trainer::CVTrain() {
 
 }
 
-// Save model to disk file
-size_t Trainer::SaveModel() {
-  size_t model_size = 0;
-
-  return model_size;
-}
-
 } // namespace xLearn

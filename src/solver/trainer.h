@@ -96,7 +96,10 @@ class Trainer {
   // cross_validation training
   void CVTrain();
 
-  size_t SaveModel();
+  // Save model to disk file.
+  void SaveModel(const std::string& filename) {
+    model_->SaveModel(filename);
+  }
 
  protected:
   Reader* train_reader_;

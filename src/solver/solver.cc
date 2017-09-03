@@ -170,6 +170,7 @@ void Solver::Initialize(int argc, char* argv[]) {
     //-------------------------------------------------------
     // Step 5: Init model parameter
     //-------------------------------------------------------
+    printf("Initialize model ...\n");
     if (hyper_param_.score_func.compare("fm") == 0) {
       hyper_param_.num_param = hyper_param_.num_feature +
                                hyper_param_.num_feature * hyper_param_.num_K;
@@ -321,10 +322,10 @@ void Solver::start_train_work() {
                        early_stop);
     printf("Start to train ... \n");
     trainer.Train();
-    trainer.SaveModel();
     printf("Finish training and start to save model ...\n"
            "  Filename: %s\n",
            hyper_param_.model_file.c_str());
+    trainer.SaveModel(hyper_param_.model_file);
   }
 }
 
