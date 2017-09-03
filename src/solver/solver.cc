@@ -161,11 +161,11 @@ void Solver::Initialize(int argc, char* argv[]) {
     }
     hyper_param_.num_feature = max_feat+1;
     LOG(INFO) << "Number of feature: " << hyper_param_.num_feature;
-    printf("  Feature number: %d \n", hyper_param_.num_feature);
+    printf("  Number of Feature: %d \n", hyper_param_.num_feature);
     if (hyper_param_.score_func.compare("ffm") == 0) {
       hyper_param_.num_field = max_field+1;
       LOG(INFO) << "Number of field: " << hyper_param_.num_field;
-      printf("  Field number: %d \n", hyper_param_.num_field);
+      printf("  Number of Field: %d \n", hyper_param_.num_field);
     }
     //-------------------------------------------------------
     // Step 5: Init model parameter
@@ -181,6 +181,9 @@ void Solver::Initialize(int argc, char* argv[]) {
       hyper_param_.num_param = hyper_param_.num_feature;
     }
     LOG(INFO) << "Number parameters: " << hyper_param_.num_param;
+    printf("  Model size: %.2f MB\n",
+            (double) hyper_param_.num_param /
+            (1024.0 * 1024.0));
     if (hyper_param_.score_func.compare("linear") == 0) {
       // Initialize all parameters to zero
       model_ = new Model(hyper_param_, false);
