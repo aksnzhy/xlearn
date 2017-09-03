@@ -166,7 +166,10 @@ int InmemReader::Samples(DMatrix* &matrix) {
 }
 
 // Return to the begining of the data buffer.
-void InmemReader::Reset() { pos_ = 0; }
+void InmemReader::Reset() {
+  pos_ = 0;
+  data_samples_.Setlength(num_samples_);
+}
 
 //------------------------------------------------------------------------------
 // Implementation of OndiskReader.
@@ -234,6 +237,9 @@ int OndiskReader::Samples(DMatrix* &matrix) {
 }
 
 // Return to the begining of the file.
-void OndiskReader::Reset() { fseek(file_ptr_, 0, SEEK_SET); }
+void OndiskReader::Reset() {
+  fseek(file_ptr_, 0, SEEK_SET);
+  data_samples_.Setlength(num_samples_);
+}
 
 } // namespace xLearn
