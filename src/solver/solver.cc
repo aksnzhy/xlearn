@@ -158,21 +158,22 @@ void Solver::Initialize(int argc, char* argv[]) {
       // return to the begining
       reader_[i]->Reset();
     }
-    hyper_param_.num_feature = max_feat;
-    hyper_param_.num_field = max_field;
-    LOG(INFO) << "Number of feature: " << max_feat;
-    LOG(INFO) << "Number of field: " << max_field;
+    hyper_param_.num_feature = max_feat+1;
+    hyper_param_.num_field = max_field+1;
+    LOG(INFO) << "Number of feature: " << hyper_param_.num_feature;
+    LOG(INFO) << "Number of field: " << hyper_param_.num_field;
     //-------------------------------------------------------
     // Step 5: Init model parameter
     //-------------------------------------------------------
     if (hyper_param_.score_func.compare("fm") == 0) {
-      hyper_param_.num_param = max_feat + 1 +
-                            max_feat * hyper_param_.num_K;
+      hyper_param_.num_param = hyper_param_.num_feature +
+                               hyper_param_.num_feature * hyper_param_.num_K;
     } else if (hyper_param_.score_func.compare("ffm") == 0) {
-      hyper_param_.num_param = max_feat + 1 +
-                       max_feat * max_field * hyper_param_.num_K;
+      hyper_param_.num_param = hyper_param_.num_feature +
+                               hyper_param_.num_feature *
+                               hyper_param_.num_field * hyper_param_.num_K;
     } else { // linear socre
-      hyper_param_.num_param = max_feat + 1;
+      hyper_param_.num_param = hyper_param_.num_feature;
     }
     LOG(INFO) << "Number parameters: " << hyper_param_.num_param;
     if (hyper_param_.score_func.compare("linear") == 0) {

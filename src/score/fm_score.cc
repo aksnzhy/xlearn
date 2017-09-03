@@ -39,9 +39,9 @@ real_t FMScore::CalcScore(const SparseRow* row,
     real_t square_sum = 0.0, sum_square = 0.0;
     index_t tmp_idx = num_feature_ + k;
     // Skip the first element because it is the bias
-    for (index_t i = 1; i < col_len; ++i) {
+    for (index_t i = 0; i < col_len; ++i) {
       real_t x = row->X[i];
-      index_t pos = (row->idx[i]-1) * num_factor_ + tmp_idx;
+      index_t pos = row->idx[i] * num_factor_ + tmp_idx;
       real_t v = (*w)[pos];
       square_sum += (x*v);
       sum_square += (x*x*v*v);
@@ -68,14 +68,14 @@ void FMScore::CalcGrad(const SparseRow* row,
   for (size_t k = 0; k < num_factor_; ++k) {
     real_t v_mul_x = 0.0;
     index_t tmp_idx = num_feature_ + k;
-    for (index_t i = 1; i < col_len; ++i) {
-      index_t pos = (row->idx[i]-1) * num_factor_ + tmp_idx;
+    for (index_t i = 0; i < col_len; ++i) {
+      index_t pos = row->idx[i] * num_factor_ + tmp_idx;
       real_t v = param[pos];
       real_t x = row->X[i];
       v_mul_x += (x*v);
     }
-    for (index_t i = 1; i < col_len; ++i) {
-      index_t pos = (row->idx[i]-1) * num_factor_ + tmp_idx;
+    for (index_t i = 0; i < col_len; ++i) {
+      index_t pos = row->idx[i] * num_factor_ + tmp_idx;
       real_t v = param[pos];
       real_t x = row->X[i];
       real_t gradient = (x*v_mul_x - v*x*x) * pg;

@@ -59,9 +59,6 @@ void LibsvmParser::Parse(const StringList& list, DMatrix& matrix) {
       m_single_item.clear();
       SplitStringUsing(m_items[j], ":", &m_single_item);
       CHECK_EQ(m_single_item.size(), 2);
-      // fix
-      index_t idx = atoi(m_single_item[1].c_str());
-      if (idx == 0) { idx = 1; }
       matrix.row[i]->idx[j] = atoi(m_single_item[0].c_str());
       matrix.row[i]->X[j] = atof(m_single_item[1].c_str());
     }
@@ -92,13 +89,8 @@ void FFMParser::Parse(const StringList& list, DMatrix& matrix) {
       m_single_item.clear();
       SplitStringUsing(m_items[j], ":", &m_single_item);
       CHECK_EQ(m_single_item.size(), 3);
-      int field = atoi(m_single_item[0].c_str());
-      index_t idx = atoi(m_single_item[1].c_str());
-      // fix
-      if (field == 0) { field = 1; }
-      if (idx == 0) { idx = 1; }
-      matrix.row[i]->field[j] =field;
-      matrix.row[i]->idx[j] = idx;
+      matrix.row[i]->field[j] = atoi(m_single_item[0].c_str());
+      matrix.row[i]->idx[j] = atoi(m_single_item[1].c_str());;
       matrix.row[i]->X[j] = atof(m_single_item[2].c_str());
     }
   }

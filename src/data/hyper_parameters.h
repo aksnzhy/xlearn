@@ -58,7 +58,7 @@ struct HyperParam {
 //------------------------------------------------------------------------------
   bool on_disk = false;                 // on-disk training for limited memory
   std::string file_format = "libsvm";   // libsvm, libffm, or csv
-  index_t num_feature = 0;              // Number of feature (not include bias)
+  index_t num_feature = 0;              // Number of feature (include the bias)
   index_t num_param = 0;                // The number of model parameters
   index_t num_K = 8;                    // Only used in fm and ffm
   index_t num_field = 0;                // Only used in ffm

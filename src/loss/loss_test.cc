@@ -60,7 +60,7 @@ index_t kLine = 10;
 
 TEST(LOSS, Predict_Linear) {
   // Create Model for Linear
-  index_t parameter_num = kFeature_num + 1;
+  index_t parameter_num = kFeature_num;
   param.num_param = parameter_num;
   param.loss_func = "sqaured";
   Model model_lr(param);
@@ -73,8 +73,8 @@ TEST(LOSS, Predict_Linear) {
   matrix.InitSparseRow();
   for (int i = 0; i < kLine; ++i) {
     matrix.Y[i] = 0;
-    matrix.row[i]->Resize(kFeature_num + 1);
-    for (int j = 0; j < kFeature_num+1; ++j) {
+    matrix.row[i]->Resize(kFeature_num);
+    for (int j = 0; j < kFeature_num; ++j) {
       matrix.row[i]->X[j] = 1.0;
       matrix.row[i]->idx[j] = j;
     }
@@ -88,13 +88,13 @@ TEST(LOSS, Predict_Linear) {
   std::vector<real_t> pred(kLine);
   loss.Predict(&matrix, &model_lr, pred);
   for (int i = 0; i < kLine; ++i) {
-    EXPECT_FLOAT_EQ(pred[i], 8.0);
+    EXPECT_FLOAT_EQ(pred[i], 6.0);
   }
 }
 
 TEST(LOSS, Predict_FM) {
   // Create Model for FM
-  index_t parameter_num = kFeature_num + 1 + kFeature_num*K;
+  index_t parameter_num = kFeature_num + kFeature_num * K;
   param.num_param = parameter_num;
   param.loss_func = "sqaured";
   Model model_lr(param);
@@ -107,8 +107,8 @@ TEST(LOSS, Predict_FM) {
   matrix.InitSparseRow();
   for (int i = 0; i < kLine; ++i) {
     matrix.Y[i] = 0;
-    matrix.row[i]->Resize(kFeature_num + 1);
-    for (int j = 0; j < kFeature_num+1; ++j) {
+    matrix.row[i]->Resize(kFeature_num);
+    for (int j = 0; j < kFeature_num; ++j) {
       matrix.row[i]->X[j] = 1.0;
       matrix.row[i]->idx[j] = j;
     }
@@ -127,13 +127,13 @@ TEST(LOSS, Predict_FM) {
   std::vector<real_t> pred(kLine);
   loss.Predict(&matrix, &model_lr, pred);
   for (int i = 0; i < kLine; ++i) {
-    EXPECT_FLOAT_EQ(pred[i], 296.0);
+    EXPECT_FLOAT_EQ(pred[i], 294.0);
   }
 }
 
 TEST(LOSS, Predict_FFM) {
   // Create Model for FM
-  index_t parameter_num = kFeature_num + 1 + kFeature_num*K*kField_num;
+  index_t parameter_num = kFeature_num + kFeature_num * K * kField_num;
   param.num_param = parameter_num;
   param.loss_func = "sqaured";
   Model model_lr(param);
@@ -146,8 +146,8 @@ TEST(LOSS, Predict_FFM) {
   matrix.InitSparseRow(true);
   for (int i = 0; i < kLine; ++i) {
     matrix.Y[i] = 0;
-    matrix.row[i]->Resize(kFeature_num + 1);
-    for (int j = 0; j < kFeature_num+1; ++j) {
+    matrix.row[i]->Resize(kFeature_num);
+    for (int j = 0; j < kFeature_num; ++j) {
       matrix.row[i]->X[j] = 1.0;
       matrix.row[i]->idx[j] = j;
       matrix.row[i]->field[j] = j;
@@ -168,7 +168,7 @@ TEST(LOSS, Predict_FFM) {
   std::vector<real_t> pred(kLine);
   loss.Predict(&matrix, &model_lr, pred);
   for (int i = 0; i < kLine; ++i) {
-    EXPECT_FLOAT_EQ(pred[i], 296.0);
+    EXPECT_FLOAT_EQ(pred[i], 294.0);
   }
 }
 

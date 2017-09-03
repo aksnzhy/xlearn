@@ -80,8 +80,8 @@ TEST_F(SolverTest, Train_No_CV_Init) {
   HyperParam hyper_param = solver.GetHyperParam();
   EXPECT_EQ(hyper_param.num_K, 16);
   EXPECT_EQ(hyper_param.learning_rate, 0.5);
-  EXPECT_EQ(hyper_param.num_feature, 17);
-  EXPECT_EQ(hyper_param.num_field, 12);
+  EXPECT_EQ(hyper_param.num_feature, 18);
+  EXPECT_EQ(hyper_param.num_field, 13);
   std::vector<Reader*> reader = solver.GetReader();
   EXPECT_EQ(reader.size(), 1);
   int iteration_num = 10;
@@ -108,8 +108,8 @@ TEST_F(SolverTest, Train_CV_Init) {
   HyperParam hyper_param = solver.GetHyperParam();
   EXPECT_EQ(hyper_param.num_K, 16);
   EXPECT_EQ(hyper_param.learning_rate, 0.5);
-  EXPECT_EQ(hyper_param.num_feature, 17);
-  EXPECT_EQ(hyper_param.num_field, 12);
+  EXPECT_EQ(hyper_param.num_feature, 18);
+  EXPECT_EQ(hyper_param.num_field, 13);
   std::vector<Reader*> reader = solver.GetReader();
   EXPECT_EQ(reader.size(), 4);
 }
@@ -122,7 +122,7 @@ TEST_F(SolverTest, Infer_Init) {
   hyper_param.num_feature = 10;
   hyper_param.num_K = 8;
   hyper_param.num_field = 10;
-  hyper_param.num_param = 10+1+10*10*8;
+  hyper_param.num_param = 10+10*10*8;
   Model model(hyper_param);
   model.SaveModel("./xlearn_model");
   argc = 6;

@@ -45,7 +45,7 @@ public:
    CHECK_GT(hyper_param.num_feature, 0);
    CHECK_GT(hyper_param.num_field, 0);
    num_factor_ = hyper_param.num_K;
-   num_feature_ = hyper_param.num_feature + 1; // add bias
+   num_feature_ = hyper_param.num_feature;
    num_field_ = hyper_param.num_field;
  }
 

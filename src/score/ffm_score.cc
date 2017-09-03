@@ -62,17 +62,17 @@ real_t FFMScore::CalcScore(const SparseRow* row,
     score += (*w)[pos] * row->X[i];
   }
   // latent factor
-  for (index_t i = 1; i < col_len; ++i) {
+  for (index_t i = 0; i < col_len; ++i) {
     real_t val_i = row->X[i];
-    index_t idx_i = row->idx[i]-1;
-    index_t field_i = row->field[i]-1;
+    index_t idx_i = row->idx[i];
+    index_t field_i = row->field[i];
     index_t mat_mul_pos_i = matrix_size * idx_i;
     index_t field_i_mul_fac = field_i * num_factor_;
     const real_t* data = (&((*w)[0])) + num_feature_;
     for (index_t j = i+1; j < col_len; ++j) {
       real_t val_j = row->X[j];
-      index_t idx_j = row->idx[j]-1;
-      index_t field_j = row->field[j]-1;
+      index_t idx_j = row->idx[j];
+      index_t field_j = row->field[j];
       __MX _accu = _MMX_SET1_PS(0);
       for (index_t k = 0; k < num_factor_; k += _MMX_INCREMENT) {
         __MX _kj = _MMX_LOAD_PS(data + mat_mul_pos_i
@@ -119,14 +119,14 @@ void FFMScore::CalcGrad(const SparseRow* row,
   }
   // for latent factor
   const real_t* array = &(param[0]);
-  for (size_t i = 1; i < col_len; ++i) {
+  for (size_t i = 0; i < col_len; ++i) {
     //------------------------- feat_i --------------------//
     real_t x_i = row->X[i];
     index_t idx_i = row->idx[i];
     index_t field_i = row->field[i];
     //------------------------- tmp ----------------------//
-    index_t tmp_1 = num_feature_ + (idx_i-1) * matrix_size;
-    index_t tmp_2 = num_feature_ + (field_i-1) * num_factor_;
+    index_t tmp_1 = num_feature_ + idx_i * matrix_size;
+    index_t tmp_2 = num_feature_ + field_i * num_factor_;
     real_t tmp_3 = x_i * pg;
     for (size_t j = i+1; j < col_len; ++j) {
       //--------------------- feat_j ------------------------//
@@ -134,8 +134,8 @@ void FFMScore::CalcGrad(const SparseRow* row,
       index_t idx_j = row->idx[j];
       index_t field_j = row->field[j];
       //----------------- pos_i and pos_j -------------------//
-      index_t pos_i = tmp_1 + (field_j-1) * num_factor_;
-      index_t pos_j = tmp_2 + (idx_j-1) * matrix_size;
+      index_t pos_i = tmp_1 + field_j * num_factor_;
+      index_t pos_j = tmp_2 + idx_j * matrix_size;
       real_t tmp_4 = x_j * tmp_3;
       __MX val_tmp = _MMX_SET1_PS(tmp_4);
       const real_t* array_i = array + pos_i;

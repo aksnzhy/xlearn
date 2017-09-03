@@ -42,7 +42,7 @@ class FMScore : public Score {
     CHECK_GT(hyper_param.num_K, 0);
     CHECK_GT(hyper_param.num_feature, 0);
     num_factor_ = hyper_param.num_K;
-    num_feature_ = hyper_param.num_feature + 1; // add bias
+    num_feature_ = hyper_param.num_feature;
   }
 
   // Given one exmaple and current model, return the score.

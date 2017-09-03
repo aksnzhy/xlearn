@@ -34,20 +34,17 @@ namespace xLearn {
 index_t K = 24;
 index_t Kfeat = 3;
 index_t kfield = 3;
-index_t kLength = Kfeat + 1 + Kfeat*kfield*K;
+index_t kLength = Kfeat + Kfeat*kfield*K;
 
 TEST(FFM_TEST, calc_score) {
-  SparseRow row(Kfeat+1, true);
+  SparseRow row(Kfeat, true);
   std::vector<real_t> w(kLength, 1.0);
   // Init SparseRow
-  for (index_t i = 1; i <= Kfeat; ++i) {
+  for (index_t i = 0; i < Kfeat; ++i) {
     row.idx[i] = i;
     row.field[i] = i;
     row.X[i] = 2.0;
   }
-  row.idx[0] = 0;   // bias
-  row.field[0] = 0;
-  row.X[0] = 1.0;
   HyperParam hyper_param;
   hyper_param.num_feature = Kfeat;
   hyper_param.num_K = K;
@@ -55,8 +52,8 @@ TEST(FFM_TEST, calc_score) {
   FFMScore score;
   score.Initialize(hyper_param);
   real_t val = score.CalcScore(&row, &w);
-  // 7 + 24*4*3 = 295.0
-  EXPECT_FLOAT_EQ(val, 295.0);
+  // 6 + 24*4*3 = 294.0
+  EXPECT_FLOAT_EQ(val, 294.0);
 }
 
 TEST(FFM_TEST, calc_grad) {
@@ -64,10 +61,10 @@ TEST(FFM_TEST, calc_grad) {
   K = 24;
   Kfeat = 100;
   kfield = 100;
-  kLength = Kfeat + 1 + Kfeat*kfield*K;
+  kLength = Kfeat + Kfeat*kfield*K;
   // Create SparseRow
-  SparseRow row(Kfeat+1, true);
-  for (index_t i = 0; i < Kfeat+1; ++i) {
+  SparseRow row(Kfeat, true);
+  for (index_t i = 0; i < Kfeat; ++i) {
     row.idx[i] = i;
     row.X[i] = 2.0;
     row.field[i] = i;
@@ -87,10 +84,10 @@ TEST(FFM_TEST, calc_grad) {
   score.Initialize(hyper_param);
   score.CalcGrad(&row, w, 1.0, updater);
   // Test
-  for (index_t i = 0; i < Kfeat+1; ++i) {
+  for (index_t i = 0; i < Kfeat; ++i) {
     EXPECT_FLOAT_EQ(w[i], 2.8);
   }
-  for (index_t i = Kfeat+1; i < kLength; ++i) {
+  for (index_t i = Kfeat; i < kLength; ++i) {
     if (w[i] != 3.0) {
       EXPECT_FLOAT_EQ(w[i], 1.8);
     }
