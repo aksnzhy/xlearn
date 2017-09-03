@@ -44,13 +44,13 @@ TEST(HINGE_LOSS, Evalute) {
   // Create loss
   HingeLoss loss;
   real_t val = loss.Evalute(pred, label);
-  EXPECT_FLOAT_EQ(val, 0.1);
+  EXPECT_FLOAT_EQ(val, 1.0);
   // Test2
   for (int i = 0; i < label.size(); ++i) {
     label[i] = -1.0;
   }
   val = loss.Evalute(pred, label);
-  EXPECT_FLOAT_EQ(val, 5.5);
+  EXPECT_FLOAT_EQ(val, 55);
 }
 
 } // namespace xLearn

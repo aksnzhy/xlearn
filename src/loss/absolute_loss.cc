@@ -37,7 +37,6 @@ real_t AbsLoss::Evalute(const std::vector<real_t>& pred,
   for (size_t i = 0; i < pred.size(); ++i) {
     val += abs(pred[i] - label[i]);
   }
-  val /= pred.size();
   return val;
 }
 

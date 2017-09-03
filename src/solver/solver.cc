@@ -155,13 +155,13 @@ void Solver::Initialize(int argc, char* argv[]) {
           }
         }
       } while (num_samples != 0);
-      hyper_param_.num_feature = max_feat;
-      hyper_param_.num_field = max_field;
-      LOG(INFO) << "Number of feature: " << max_feat;
-      LOG(INFO) << "Number of field: " << max_field;
       // return to the begining
       reader_[i]->Reset();
     }
+    hyper_param_.num_feature = max_feat;
+    hyper_param_.num_field = max_field;
+    LOG(INFO) << "Number of feature: " << max_feat;
+    LOG(INFO) << "Number of field: " << max_field;
     //-------------------------------------------------------
     // Step 5: Init model parameter
     //-------------------------------------------------------
