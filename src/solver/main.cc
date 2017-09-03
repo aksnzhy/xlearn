@@ -20,6 +20,7 @@ Author: Chao Ma (mctt90@gmail.com)
 This file is the entry of the xLearn.
 */
 
+#include "src/base/common.h"
 #include "src/solver/solver.h"
 
 //------------------------------------------------------------------------------
@@ -27,9 +28,13 @@ This file is the entry of the xLearn.
 //------------------------------------------------------------------------------
 
 int main(int argc, char* argv[]) {
+  TIME_START();
   xLearn::Solver solver;
   solver.Initialize(argc, argv);
   solver.StartWork();
   solver.Finalize();
+  TIME_END();
+  SHOW_TIME();
+  printf("\n");
   return 0;
 }

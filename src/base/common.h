@@ -24,6 +24,7 @@ programming convenient.
 #ifndef XLEARN_BASE_COMMON_H_
 #define XLEARN_BASE_COMMON_H_
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #ifndef _MSC_VER
@@ -210,14 +211,16 @@ static const double kVerySmallNumberDouble = 1e-15;
 //  TIME_END_MS();
 //------------------------------------------------------------------------------
 
-#define TIME_START_MS()                                                   \
-   clock_t start, end;                                                    \
-   start = clock()                                                        \
+#define TIME_START()                                                   \
+   clock_t start, end;                                                 \
+   start = clock()                                                     \
 
-#define TIME_END_MS()                                                     \
-   end = clock();                                                         \
-   LOG(INFO) << "Execution time: "                                        \
-             << (double)(end-start) / CLOCKS_PER_SEC * 1000 << " ms."
+#define TIME_END()                                                     \
+   end = clock()
+
+#define SHOW_TIME()                                                    \
+   printf("Time: %.4f sec", (float)(end-start) / CLOCKS_PER_SEC)       \
+
 
 //------------------------------------------------------------------------------
 // SSE and AVX for vectorization

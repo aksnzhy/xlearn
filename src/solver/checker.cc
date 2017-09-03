@@ -46,7 +46,7 @@ std::string Checker::option_help() const {
 "                        score_func can be 'linear', 'fm', and 'ffm' \n"
 /* must have value */
 "    -loss <loss_func>: loss_function can be 'squared', 'absolute', \n"
-"                       'cross_entropy', and 'hinge' \n"
+"                       'cross-entropy', and 'hinge' \n"
 "    -regular <regular> (optional, use 'none' by default): \n"
 "                       regular can be 'l1', 'l2', 'l1_l2', and 'none' \n"
 "    -updater <updater_method> (optional, use 'sgd' by default): \n"
@@ -238,7 +238,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
           value.compare("absolute") != 0) {
         printf("[Error] Unknow loss function '%s' \n"
                " -loss can only be 'squared', "
-               "'hinge', 'cross_entropy', or 'absolute' \n",
+               "'hinge', 'cross-entropy', or 'absolute' \n",
                value.c_str());
         bo = false;
       } else {

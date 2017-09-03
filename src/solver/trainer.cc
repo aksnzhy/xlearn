@@ -31,6 +31,7 @@ namespace xLearn {
 void Trainer::Train() {
   //for in n epoch
   for (int n = 0; n < epoch_; ++n) {
+    TIME_START();
     // Return to the head of the data
     train_reader_->Reset();
     if (test_reader_ != NULL) {
@@ -77,7 +78,10 @@ void Trainer::Train() {
       loss_val /= count_sample;
       printf("  Test loss: %f  |", loss_val);
     }
-    printf("\n");
+    TIME_END();
+    printf("  ");
+    SHOW_TIME();
+    printf("  |\n");
   }
 }
 
