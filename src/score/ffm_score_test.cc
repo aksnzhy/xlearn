@@ -95,11 +95,6 @@ TEST(FFM_TEST, calc_grad) {
       EXPECT_FLOAT_EQ(w[i], 1.8);
     }
   }
-  // Test speed
-  int line = 1000;
-  for (int i = 0 ; i < line; ++i) {
-    score.CalcGrad(&row, w, 1.0, updater);
-  }
 }
 
 } // namespace xLearn
