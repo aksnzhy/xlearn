@@ -90,6 +90,7 @@ void Solver::Initialize(int argc, char* argv[]) {
     //-------------------------------------------------------
     // Step 4: Init Reader and read problem
     //-------------------------------------------------------
+    printf("Read data ... \n");
     LOG(INFO) << "Start to init Reader";
     // Split file if use -cv
     if (hyper_param_.cross_validation) {
@@ -159,9 +160,13 @@ void Solver::Initialize(int argc, char* argv[]) {
       reader_[i]->Reset();
     }
     hyper_param_.num_feature = max_feat+1;
-    hyper_param_.num_field = max_field+1;
     LOG(INFO) << "Number of feature: " << hyper_param_.num_feature;
-    LOG(INFO) << "Number of field: " << hyper_param_.num_field;
+    printf("  Feature number: %d \n", hyper_param_.num_feature);
+    if (hyper_param_.score_func.compare("ffm") == 0) {
+      hyper_param_.num_field = max_field+1;
+      LOG(INFO) << "Number of field: " << hyper_param_.num_field;
+      printf("  Field number: %d \n", hyper_param_.num_field);
+    }
     //-------------------------------------------------------
     // Step 5: Init model parameter
     //-------------------------------------------------------

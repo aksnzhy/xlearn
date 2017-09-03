@@ -42,6 +42,10 @@ REGISTER_READER("disk", OndiskReader);
 // Implementation of InmemReader
 //------------------------------------------------------------------------------
 
+const size_t KB = 1024.0;
+const size_t MB = 1024.0 * 1024.0;
+const size_t GB = 1024.0 * 1024.0 * 1024.0;
+
 InmemReader::~InmemReader() {
   if (file_ptr_ != nullptr) {
     Close(file_ptr_);
@@ -64,6 +68,19 @@ bool InmemReader::Initialize(const std::string& filename,
   data_samples_.Resize(num_samples);
   uint64 file_size = GetFileSize(file_ptr_);
   LOG(INFO) << "Data file size: " << file_size << " bytes.";
+  if (file_size > GB) {
+    printf("  Filename: %s  Size: %.2f GB\n",
+            filename.c_str(),
+            (double) file_size / GB);
+  } else if (file_size > MB) {
+    printf("  Filename: %s  Size: %.2f MB\n",
+            filename.c_str(),
+            (double) file_size / MB);
+  } else {
+    printf("  Filename: %s  Size: %.2f KB\n",
+            filename.c_str(),
+            (double) file_size / KB);
+  }
   scoped_array<char> buffer;
   try {
     buffer.reset(new char[file_size]);

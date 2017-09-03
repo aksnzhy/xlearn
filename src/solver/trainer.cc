@@ -58,7 +58,7 @@ void Trainer::Train() {
       loss_val += loss_->Evalute(pred, matrix->Y);
     }
     loss_val /= count_sample;
-    printf("Epoch %d: the train loss is %f", n, loss_val);
+    printf("  Epoch %d: |  Train loss: %f  |", n, loss_val);
     // Calc Test loss
     if (test_reader_ != NULL) {
       count_sample = 0;
@@ -75,7 +75,7 @@ void Trainer::Train() {
         loss_val += loss_->Evalute(pred, matrix->Y);
       }
       loss_val /= count_sample;
-      printf(", and the test loss is %f", loss_val);
+      printf("   Test loss: %f  |", loss_val);
     }
     printf("\n");
   }
