@@ -47,8 +47,8 @@ struct HyperParam {
   real_t learning_rate = 0.01;       // Control learning step
   std::string updater_type = "sgd";  // sgd, adam, adagard, adadelta,
                                      // momentum, or rmsprop
-  real_t decay_rate = 0.1;           // The decay factor used by updater
-  real_t second_decay_rate = 0.1;    // The second decay factor used by updater
+  real_t decay_rate = 0.01;          // The decay factor used by updater
+  real_t second_decay_rate = 0.01;   // The second decay factor used by updater
   real_t regu_lambda_1 = 0.03;       // lambda_1 for regularizer
   real_t regu_lambda_2 = 0.03;       // lambda_2 for regularizer
   int num_epoch = 10;                // Epoch number

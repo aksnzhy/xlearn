@@ -51,7 +51,8 @@ std::string Checker::option_help() const {
 "                       regular can be 'l1', 'l2', 'l1_l2', and 'none' \n"
 "    -updater <updater_method> (optional, use 'sgd' by default): \n"
 "                              updater can be 'sgd', 'adagrad', 'adam' \n"
-"                              'adadelta', 'rmsprop', and 'momentum' \n"
+"                              'adadelta', 'rmsprop', 'nesterov', "
+"                               and 'momentum' \n"
 "    -k <value of factor> (optional, use 8 by default): \n"
 "                         number of latent factor for fm and ffm. \n"
 "                         Note that -k must be a multiple of 8 like 8, 16.. \n"
@@ -265,10 +266,11 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
           value.compare("adagrad") != 0 &&
           value.compare("adadelta") != 0 &&
           value.compare("rmsprop") != 0 &&
-          value.compare("momentum") != 0) {
+          value.compare("momentum") != 0 &&
+          value.compare("nesterov") != 0) {
         printf("[Error] Unknow updater '%s' \n"
                " -updater can only be 'sgd', 'adam', 'adagrad' "
-               "'rmsprop', or 'momentum' \n",
+               "'rmsprop', 'nesterov', or 'momentum' \n",
                value.c_str());
         bo = false;
       } else {
