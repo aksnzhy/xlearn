@@ -291,21 +291,16 @@ void Solver::start_train_work() {
   int epoch = hyper_param_.num_epoch;
   bool early_stop = hyper_param_.early_stop;
   if (hyper_param_.cross_validation) {
-    // for n folds
-    int n = hyper_param_.num_folds;
-    std::vector<Trainer> trainer_list(n);
-    for (int i = 0; i < n; ++i) {
-      printf("Task %d / %d: \n", i, n);
-      trainer_list[i].Initialize(reader_,  /* reader list */
-                                 i,        /* id */
-                                 epoch,
-                                 model_,
-                                 loss_,
-                                 updater_,
-                                 early_stop);
-      LOG(INFO) << "Start to train " << i << "/" << n;
-      trainer_list[i].CVTrain();
-    }
+    Trainer trainer;
+    trainer.Initialize(reader_, /* reader list*/
+                       epoch,
+                       model_,
+                       loss_,
+                       updater_,
+                       early_stop);
+    printf("Start to train ... \n");
+    trainer.CVTrain();
+    printf("Finish training. \n");
   } else { // do not use cv
     Trainer trainer;
     Reader* train_reader = reader_[0];

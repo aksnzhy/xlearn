@@ -66,23 +66,21 @@ class Trainer {
 
   // Init for cross-entropy training
   void Initialize(std::vector<Reader*> reader_list,
-                  int id,
                   int epoch,
                   Model* model,
                   Loss* loss,
                   Updater* updater,
                   bool early_stop) {
-    CHECK_NE(reader_list.empty(), false);
+    CHECK_NE(reader_list.empty(), true);
+    reader_list_.resize(reader_list.size(), NULL);
     for (int i = 0; i < reader_list.size(); ++i) {
       CHECK_NOTNULL(reader_list[i]);
       reader_list_[i] = reader_list[i];
     }
-    CHECK_GE(id, 0);
     CHECK_GT(epoch, 0);
     CHECK_NOTNULL(model);
     CHECK_NOTNULL(loss);
     CHECK_NOTNULL(updater);
-    id_ = id;
     epoch_ = epoch;
     model_ = model;
     loss_ = loss;
@@ -96,7 +94,7 @@ class Trainer {
   // cross_validation training
   void CVTrain();
 
-  // Save model to disk file.
+  // Save model to disk file
   void SaveModel(const std::string& filename) {
     model_->SaveModel(filename);
   }
@@ -105,7 +103,6 @@ class Trainer {
   Reader* train_reader_;
   Reader* test_reader_;
   std::vector<Reader*> reader_list_;
-  int id_;
   int epoch_;
   Model* model_;
   Loss* loss_;
