@@ -90,7 +90,7 @@ void Solver::Initialize(int argc, char* argv[]) {
     //-------------------------------------------------------
     // Step 4: Init Reader and read problem
     //-------------------------------------------------------
-    printf("Read data ... \n");
+    printf("Read and parse data ... \n");
     LOG(INFO) << "Start to init Reader";
     // Split file if use -cv
     if (hyper_param_.cross_validation) {
