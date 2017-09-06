@@ -59,31 +59,11 @@ class Updater {
                            const index_t start_id,
                            std::vector<real_t>& param);
 
-  // Penalize model complexity
-  inline void Regularizer(Model* model) {
-    if (regu_type_ == "l1") {
-      return Regularize_L1(model);
-    }
-    else if (regu_type_ == "l2") {
-      return Regularize_L2(model);
-    }
-    else if (regu_type_ == "elastic_net") {
-      return Regularize_ElasticNet(model);
-    }
-    else return;
-  }
-
  protected:
-  // A set of Regularizer
-  void Regularize_L1(Model* model);
-  void Regularize_L2(Model* model);
-  void Regularize_ElasticNet(Model* model);
-
   real_t learning_rate_;
-  real_t regu_lambda_1_;
-  real_t regu_lambda_2_;
-  std::string regu_type_;  /* l1, l2, elastic_net, or none */
+  real_t regu_lambda_;
   __MX _lr;
+  __MX _lambda;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Updater);

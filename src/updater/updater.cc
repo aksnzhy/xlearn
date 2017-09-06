@@ -21,6 +21,7 @@ This file is the implementation of Updater.
 */
 
 /* for class register */
+#include "src/base/math.h"
 #include "src/updater/updater.h"
 #include "src/updater/adam_updater.h"
 #include "src/updater/adagrad_updater.h"
@@ -46,13 +47,11 @@ REGISTER_UPDATER("rmsprop", RMSProp);
 // User need to invoke this function before updating.
 void Updater::Initialize(const HyperParam& hyper_param) {
   CHECK_GT(hyper_param.learning_rate, 0);
-  CHECK_GT(hyper_param.regu_lambda_1, 0);
-  CHECK_GT(hyper_param.regu_lambda_2, 0);
+  CHECK_GE(hyper_param.regu_lambda_, 0);
   learning_rate_ = hyper_param.learning_rate;
-  regu_lambda_1_ = hyper_param.regu_lambda_1;
-  regu_lambda_2_ = hyper_param.regu_lambda_2;
-  regu_type_ = hyper_param.regu_type;
+  regu_lambda_ = hyper_param.regu_lambda_;
   _lr = _MMX_SET1_PS(learning_rate_);
+  _lambda = _MMX_SET1_PS(regu_lambda_);
 }
 
 // SGD updater: [w -= learning_rate * gradient]
@@ -60,7 +59,8 @@ void Updater::Update(const index_t id,
                      const real_t grad,
                      std::vector<real_t>& param) {
   // Do not check anything here
-  param[id] -= learning_rate_ * grad;
+  param[id] -= (learning_rate_*grad +
+                regu_lambda_1_*param[id]);
 }
 
 // Update a continuous space of model parameters by
