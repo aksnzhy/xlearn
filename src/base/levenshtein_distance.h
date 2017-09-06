@@ -35,7 +35,27 @@ typedef std::vector<std::string> StringList;
 
 //------------------------------------------------------------------------------
 // StrSimilar class is used to find the similar string from the
-// target string list.
+// target string list. We can use this class like this:
+//
+//   vector<string> list;
+//   list.push_back("alex");
+//   list.push_back("apple");
+//   list.push_back("mac");
+//   StrSimilar ss;
+//   bool bo;
+//
+//   bo = ss.Find(std::string("alex"), list);  /* return true */
+//   bo = ss.Find(std::string("zz"), list); /* return false */
+//
+//   std::string similar;
+//   int distance = ss.FindSimilar(std::string("alexx"),
+//                                 list,
+//                                 result);
+//
+//   /* The distance will 1, which is the levenshtein distance
+//      between 'alexx' and 'alex'.
+//      And, the result will be 'alex', which is the most similar
+//      string in the list compared with 'alexx'. */
 //------------------------------------------------------------------------------
 class StrSimilar {
  public:

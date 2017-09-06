@@ -209,6 +209,7 @@ static const double kVerySmallNumberDouble = 1e-15;
 //    ... test this section of code
 //
 //  TIME_END_MS();
+//  SHOW_TIME();
 //------------------------------------------------------------------------------
 
 #define TIME_START()                                                   \
@@ -219,7 +220,7 @@ static const double kVerySmallNumberDouble = 1e-15;
    end = clock()
 
 #define SHOW_TIME()                                                    \
-   printf("Time: %.4f sec", (float)(end-start) / CLOCKS_PER_SEC)       \
+   printf("Time: %.2f sec", (float)(end-start) / CLOCKS_PER_SEC)       \
 
 
 //------------------------------------------------------------------------------
