@@ -63,6 +63,9 @@ namespace xLearn {
 //    // Then, we can save model to a disk file.
 //    model.SaveModel("/tmp/model.txt");
 //
+//    // We can get the model parameter vector:
+//    vector<real_t>* param = model.GetParameter()
+//
 //    // Also, we can load model from this file.
 //    Model new_model("/tmp/model.txt");
 //------------------------------------------------------------------------------
