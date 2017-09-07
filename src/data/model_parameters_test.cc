@@ -53,7 +53,13 @@ HyperParam Init() {
 TEST(MODEL_TEST, Init) {
   // Init model using gaussion.
   HyperParam hyper_param = Init();
-  Model model_ffm(hyper_param);
+  Model model_ffm;
+  model_ffm.Initialize(hyper_param.num_param,
+                       hyper_param.score_func,
+                       hyper_param.loss_func,
+                       hyper_param.num_feature,
+                       hyper_param.num_field,
+                       hyper_param.num_K);
   std::vector<real_t>* para = model_ffm.GetParameter();
   EXPECT_EQ(para->size(), kParameter_num);
 }
@@ -61,14 +67,27 @@ TEST(MODEL_TEST, Init) {
 TEST(MODEL_TEST, SaveModel) {
   // Init model (set all parameters to zero)
   HyperParam hyper_param = Init();
-  Model model_ffm(hyper_param, false);
+  Model model_ffm;
+  model_ffm.Initialize(hyper_param.num_param,
+                       hyper_param.score_func,
+                       hyper_param.loss_func,
+                       hyper_param.num_feature,
+                       hyper_param.num_field,
+                       hyper_param.num_K,
+                       false);
   model_ffm.SaveModel(kFilename);
 }
 
 TEST(MODEL_TEST, LoadModel) {
   // Init model with gaussion distribution.
   HyperParam hyper_param = Init();
-  Model model_ffm(hyper_param, true);
+  Model model_ffm;
+  model_ffm.Initialize(hyper_param.num_param,
+                       hyper_param.score_func,
+                       hyper_param.loss_func,
+                       hyper_param.num_feature,
+                       hyper_param.num_field,
+                       hyper_param.num_K);
   // parameters become 0
   model_ffm.LoadModel(kFilename);
   EXPECT_EQ(model_ffm.GetScoreFunction(), "ffm");
@@ -96,14 +115,20 @@ TEST(MODEL_TEST, InitModelFromDiskfile) {
 }
 
 TEST(MODEL_TEST, RemoveFile) {
-  HyperParam hyper_param = Init();
-  Model model_ffm(hyper_param);
-  model_ffm.RemoveModelFile(kFilename.c_str());
+  Model model;
+  model.RemoveModelFile(kFilename.c_str());
 }
 
 TEST(MODEL_TEST, SaveweightAndLoadweight) {
   HyperParam hyper_param = Init();
-  Model model_ffm(hyper_param, false);
+  Model model_ffm;
+  model_ffm.Initialize(hyper_param.num_param,
+                       hyper_param.score_func,
+                       hyper_param.loss_func,
+                       hyper_param.num_feature,
+                       hyper_param.num_field,
+                       hyper_param.num_K,
+                       false);
   std::vector<real_t> vec(kParameter_num, 1.0);
   model_ffm.Saveweight(vec);
   for (index_t i = 0; i < vec.size(); ++i) {

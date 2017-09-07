@@ -28,10 +28,14 @@ This file contains facilitlies controlling file I/O.
 #include <stdio.h> // for remove()
 
 #include "src/base/common.h"
+#include "src/base/scoped_ptr.h"
 
 //------------------------------------------------------------------------------
 // Basic operations for a file
 //------------------------------------------------------------------------------
+
+// 100 KB for one line of data
+static const uint32 kMaxLineSize = 100 * 1024;
 
 // Check a file if it exists.
 inline bool FileExist(const char* filename) {
@@ -71,6 +75,24 @@ inline uint64 GetFileSize(FILE* file) {
   }
   rewind(file);
   return total_size;
+}
+
+// Get one line of data
+inline void GetLine(FILE* file, std::string& str_line) {
+  static scoped_array<char> line(new char[kMaxLineSize]);
+  fgets(line.get(), kMaxLineSize, file);
+  int read_len = strlen(line.get());
+  if (line[read_len - 1] != '\n') {
+    LOG(FATAL) << "Encountered a too-long line.   \
+                   Please check the data.";
+  } else {
+    line[read_len - 1] = '\0';
+    // Handle the txt format in DOS and windows.
+    if (read_len > 1 && line[read_len - 2] == '\r') {
+      line[read_len - 2] = '\0';
+    }
+  }
+  str_line.assign(line.get());
 }
 
 // Write data from a buffer to target file.

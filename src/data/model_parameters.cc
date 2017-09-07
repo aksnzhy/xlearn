@@ -25,7 +25,6 @@ This file is the implementation of the Model class.
 #include "src/base/common.h"
 #include "src/base/file_util.h"
 #include "src/base/math.h"
-#include "src/base/stringprintf.h"
 #include "src/base/scoped_ptr.h"
 
 namespace xLearn {
@@ -37,22 +36,27 @@ namespace xLearn {
 // Hyper parameters for Gaussian distribution.
 static const real_t kInitMean = 0.0;
 static const real_t kInitStdev = 0.01;
-static const uint32 kMaxLineSize = 100 * 1024; // 100 KB for one line of data
 
 // Basic contributor.
-Model::Model(const HyperParam& hyper_param, bool gaussian) {
-  parameters_num_ = hyper_param.num_param;
-  score_func_ = hyper_param.score_func;
-  loss_func_ = hyper_param.loss_func;
-  num_feat_ = hyper_param.num_feature;
-  num_field_ = hyper_param.num_field;
-  num_K_ = hyper_param.num_K;
-  CHECK_GE(parameters_num_, 0);
-  CHECK_NE(score_func_.empty(), true);
-  CHECK_NE(loss_func_.empty(), true);
-  CHECK_GE(num_feat_, 0);
-  CHECK_GE(num_field_, 0);
-  CHECK_GE(num_K_, 0);
+void Model::Initialize(index_t num_param,
+                       const std::string& score_func,
+                       const std::string& loss_func,
+                       index_t num_feature,
+                       int num_field,
+                       int num_K,
+                       bool gaussian) {
+  CHECK_GT(num_param, 0);
+  CHECK_NE(score_func.empty(), true);
+  CHECK_NE(loss_func.empty(), true);
+  CHECK_GT(num_feature, 0);
+  CHECK_GE(num_field, 0);
+  CHECK_GE(num_K, 0);
+  parameters_num_ = num_param;
+  score_func_ = score_func;
+  loss_func_ = loss_func;
+  num_feat_ = num_feature;
+  num_field_ = num_field;
+  num_K_ = num_K;
   try {
     parameters_.resize(parameters_num_, 0.0);
     if (gaussian) {
@@ -105,26 +109,6 @@ void Model::SaveModel(const std::string& filename) {
   Close(file);
 }
 
-// Get one line of data from disk file
-std::string Model::getline(FILE* file) {
-  static scoped_array<char> line(new char[kMaxLineSize]);
-  static std::string res_str;
-  fgets(line.get(), kMaxLineSize, file);
-  int read_len = strlen(line.get());
-  if (line[read_len - 1] != '\n') {
-    LOG(FATAL) << "Encountered a too-long line.   \
-                   Please check the data.";
-  } else {
-    line[read_len - 1] = '\0';
-    // Handle the txt format in DOS and windows.
-    if (read_len > 1 && line[read_len - 2] == '\r') {
-      line[read_len - 2] = '\0';
-    }
-  }
-  res_str.assign(line.get());
-  return res_str;
-}
-
 // Deserialize model from a checkpoint file.
 bool Model::LoadModel(const std::string& filename) {
   static std::string data_line;
@@ -133,23 +117,23 @@ bool Model::LoadModel(const std::string& filename) {
                         filename.c_str()).c_str(), "r");
   if (file == NULL) { return false; }
   // The 1st line: score function
-  score_func_ = getline(file);
+  GetLine(file, score_func_);
   // The 2nd line: loss function
-  loss_func_ = getline(file);
+  GetLine(file, loss_func_);
   // The 3nd line: feature num
-  data_line = getline(file);
+  GetLine(file, data_line);
   num_feat_ = atoi(data_line.c_str());
   data_line.clear();
   // The 4nd line: number of K (used in fm and ffm)
   if (score_func_.compare("fm") == 0 ||
       score_func_.compare("ffm") == 0) {
-    data_line = getline(file);
+    GetLine(file, data_line);
     num_K_ = atoi(data_line.c_str());
     data_line.clear();
   }
   // The 5th line: number of field (used in ffm)
   if (score_func_.compare("ffm") == 0) {
-    data_line = getline(file);
+    GetLine(file, data_line);
     num_field_ = atoi(data_line.c_str());
     data_line.clear();
   }
@@ -189,12 +173,6 @@ void Model::InitModelUsingGaussian() {
   for (size_t i = 0; i < parameters_num_; ++i) {
     parameters_[i] = ran_gaussion(kInitMean, kInitStdev);
   }
-}
-
-// Delete the model file and cache file.
-void Model::RemoveModelFile(const std::string filename) {
-  // Remove model file
-  RemoveFile(StringPrintf("%s", filename.c_str()).c_str());
 }
 
 } // namespace xLearn

@@ -59,7 +59,7 @@ struct HyperParam {
   /* decay_rate_2 for updater */
   real_t decay_rate_2 = 0.05;         // The second decay factor used by updater
   /* lambda for regularizer */
-  real_t regu_lambda_ = 0.00002;      // xlearn uses sparse regularizer
+  real_t regu_lambda_ = 0.00002;      // xLearn uses sparse regularizer
   /* Number of epoch (iteration) */
   int num_epoch = 10;                 // Could be changed in early-stop
   /* Sample size for on-disk model */
@@ -81,7 +81,7 @@ struct HyperParam {
   /* Filename for training set */
   std::string train_set_file;           // Must have value in training task
   /* Filename for test set */
-  std::string test_set_file;            // Can be empty
+  std::string test_set_file;            // It can be empty
   /* Filename for inference set */
   std::string inference_file;           // Must have value in predict task
   /* Filename of model */

@@ -28,6 +28,8 @@ used by xLearn.
 #include <string>
 
 #include "src/base/common.h"
+#include "src/base/stringprintf.h"
+#include "src/base/file_util.h"
 #include "src/data/data_structure.h"
 #include "src/data/hyper_parameters.h"
 
@@ -38,7 +40,11 @@ namespace xLearn {
 // will be represented in a flat way, that is, no matter what model method we
 // use, such as LR, FM, or FFM, we store the model parameters in a big array.
 // We can make a checkpoint for current model, and we can also load a model
-// checkpoint from disk file.
+// checkpoint from disk file. We can use the Model class like this:
+//
+//   HyperParam hyper_param;
+//   Init(hyper_param);
+//
 //------------------------------------------------------------------------------
 class Model {
  public:
@@ -46,12 +52,18 @@ class Model {
   Model() { }
   ~Model() { }
 
-  // Set all parameters to 0 or using Gaussian distribution.
-  explicit Model(const HyperParam& hyper_param,
-                 bool gaussian = true);
-
-  // Initialize model parameters from a checkpoint file.
+  // Initialize model from a checkpoint file.
   explicit Model(const std::string& filename);
+
+  // Initialize model to zero or using
+  // Gaussian distribution (by default)
+  void Initialize(index_t num_param,
+                  const std::string& score_func,
+                  const std::string& loss_func,
+                  index_t num_feature,
+                  int num_field,
+                  int num_K,
+                  bool gaussian = true);
 
   // Serialize model to a checkpoint file.
   void SaveModel(const std::string& filename);
@@ -62,11 +74,8 @@ class Model {
   // Get the pointer of current model parameters.
   std::vector<real_t>* GetParameter() { return &parameters_; }
 
-  // Get the length of current model parameters.
-  index_t GetLength() { return parameters_num_; }
-
-  // Reset current model to init state. We use the Gaussian
-  // distribution by default.
+  // Reset current model to init state.
+  // We use the Gaussian distribution by default.
   void Reset(bool gaussion = true);
 
   // Save model parameters to a temp vector.
@@ -75,10 +84,13 @@ class Model {
   // Load model parameters from a temp vector.
   void Loadweight(const std::vector<real_t>& vec);
 
-  // Delete the model file.
-  void RemoveModelFile(const std::string filename);
+  // Delete the model file and cache file.
+  static void RemoveModelFile(const std::string& filename) {
+    RemoveFile(StringPrintf("%s",
+               filename.c_str()).c_str());
+  }
 
-  // Get function
+  // Get functions
   size_t GetNumParameter() { return parameters_num_; }
   std::string GetScoreFunction() { return score_func_; }
   std::string GetLossFunction() { return loss_func_; }
@@ -88,14 +100,12 @@ class Model {
 
  protected:
   std::vector<real_t> parameters_;       // Storing the model parameters.
-  size_t              parameters_num_;   // Number of model parameters.
-  std::string         score_func_;       // linear, fm, or ffm
-  std::string         loss_func_;        // loss function
+  index_t             parameters_num_;   // Number of model parameters.
+  std::string         score_func_;       // Score function
+  std::string         loss_func_;        // Loss function
   index_t             num_feat_;         // Number of feature
-  index_t             num_field_;        // Number of field (used in ffm)
+  int                 num_field_;        // Number of field (used in ffm)
   int                 num_K_;            // Number of K (used in fm and ffm)
-
-  std::string getline(FILE* file_ptr);   // Get one line of data
 
   // Initialize model using Gaussian distribution.
   void InitModelUsingGaussian();

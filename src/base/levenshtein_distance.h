@@ -17,8 +17,8 @@
 /*
 Author: Chao Ma (mctt90@gmail.com)
 
-This file defines the StrSimilar class, which can be used to
-find similar strings.
+This file defines the StrSimilar class, which can be
+used to find similar strings.
 */
 
 #ifndef XLEARN_BASE_LEVEN_SHTEIN_DISTANCE_H_
@@ -30,8 +30,6 @@ find similar strings.
 #include "src/base/common.h"
 
 namespace xLearn {
-
-typedef std::vector<std::string> StringList;
 
 //------------------------------------------------------------------------------
 // StrSimilar class is used to find the similar string from the
@@ -65,12 +63,12 @@ class StrSimilar {
 
   // Return true (false) if str is (not) in target string list
   bool Find(const std::string& str,
-            const StringList& list);
+            const std::vector<std::string>& list);
 
   // Find the most similar string from string list
   // Return the minimal levenshtein distance
   int FindSimilar(const std::string& str,
-                  const StringList& list,
+                  const std::vector<std::string>& list,
                   std::string& result);
 
  private:

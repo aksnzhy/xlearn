@@ -31,8 +31,8 @@ namespace xLearn {
 // Find str in string list
 // Return true if we can find str in target string list
 bool StrSimilar::Find(const std::string& str,
-                      const StringList& list) {
-  StringList::const_iterator it;
+                      const std::vector<std::string>& list) {
+  std::vector<std::string>::const_iterator it;
   it = std::find(list.begin(), list.end(), str);
   if (it != list.end()) {
     return true;
@@ -43,7 +43,7 @@ bool StrSimilar::Find(const std::string& str,
 // Find the most similar string from string list
 // Return the minimal levenshtein distance
 int StrSimilar::FindSimilar(const std::string& str,
-                            const StringList& list,
+                            const std::vector<std::string>& list,
                             std::string& result) {
   int min_dis = kInt32Max;
   for (int i = 0; i < list.size(); ++i) {
@@ -56,7 +56,8 @@ int StrSimilar::FindSimilar(const std::string& str,
   return min_dis;
 }
 
-// Levenshtein distance using dynamic programing (DP)
+// Calculate Levenshtein distance by using
+// dynamic programing (DP)
 int StrSimilar::ldistance(const std::string& source,
                           const std::string& target) {
   //step 1
