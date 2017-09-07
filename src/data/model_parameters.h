@@ -109,8 +109,7 @@ class Model {
 
   // Delete the model file and cache file.
   static void RemoveModelFile(const std::string& filename) {
-    RemoveFile(StringPrintf("%s",
-               filename.c_str()).c_str());
+    RemoveFile(StringPrintf("%s", filename.c_str()).c_str());
   }
 
   // Get functions
