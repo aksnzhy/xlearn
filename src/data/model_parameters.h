@@ -40,11 +40,31 @@ namespace xLearn {
 // will be represented in a flat way, that is, no matter what model method we
 // use, such as LR, FM, or FFM, we store the model parameters in a big array.
 // We can make a checkpoint for current model, and we can also load a model
-// checkpoint from disk file. We can use the Model class like this:
+// checkpoint from disk file.
+// A model can be initialized by Initialize() function or from a
+// checkpoint file. We can use the Model class like this:
 //
-//   HyperParam hyper_param;
-//   Init(hyper_param);
+//    HyperParam hyper_param;
+//    hyper_param.score_func = "ffm";
+//    hyper_param.loss_func = "squared";
+//    hyper_param.num_feature = 10;
+//    hyper_param.num_K = 8;
+//    hyper_param.num_field = 10;
+//    hyper_param.num_param = kParameter_num;
 //
+//    Model model;
+//    model_ffm.Initialize(hyper_param.num_param,
+//                     hyper_param.score_func,
+//                     hyper_param.loss_func,
+//                     hyper_param.num_feature,
+//                     hyper_param.num_field,
+//                     hyper_param.num_K);
+//
+//    // Then, we can save model to a disk file.
+//    model.SaveModel("/tmp/model.txt");
+//
+//    // Also, we can load model from this file.
+//    Model new_model("/tmp/model.txt");
 //------------------------------------------------------------------------------
 class Model {
  public:

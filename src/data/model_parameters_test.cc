@@ -31,7 +31,7 @@ This file tests model_parameters.h
 
 namespace xLearn {
 
-const uint32 kParameter_num = 2500 * 4; // Assume kParameter_num % 4 == 0
+const uint32 kParameter_num = 10000;
 const std::string kFilename = "/tmp/test_model.binary";
 
 //------------------------------------------------------------------------------
@@ -55,11 +55,11 @@ TEST(MODEL_TEST, Init) {
   HyperParam hyper_param = Init();
   Model model_ffm;
   model_ffm.Initialize(hyper_param.num_param,
-                       hyper_param.score_func,
-                       hyper_param.loss_func,
-                       hyper_param.num_feature,
-                       hyper_param.num_field,
-                       hyper_param.num_K);
+                    hyper_param.score_func,
+                    hyper_param.loss_func,
+                    hyper_param.num_feature,
+                    hyper_param.num_field,
+                    hyper_param.num_K);
   std::vector<real_t>* para = model_ffm.GetParameter();
   EXPECT_EQ(para->size(), kParameter_num);
 }
@@ -69,12 +69,12 @@ TEST(MODEL_TEST, SaveModel) {
   HyperParam hyper_param = Init();
   Model model_ffm;
   model_ffm.Initialize(hyper_param.num_param,
-                       hyper_param.score_func,
-                       hyper_param.loss_func,
-                       hyper_param.num_feature,
-                       hyper_param.num_field,
-                       hyper_param.num_K,
-                       false);
+                    hyper_param.score_func,
+                    hyper_param.loss_func,
+                    hyper_param.num_feature,
+                    hyper_param.num_field,
+                    hyper_param.num_K,
+                    false);
   model_ffm.SaveModel(kFilename);
 }
 
@@ -83,11 +83,11 @@ TEST(MODEL_TEST, LoadModel) {
   HyperParam hyper_param = Init();
   Model model_ffm;
   model_ffm.Initialize(hyper_param.num_param,
-                       hyper_param.score_func,
-                       hyper_param.loss_func,
-                       hyper_param.num_feature,
-                       hyper_param.num_field,
-                       hyper_param.num_K);
+                    hyper_param.score_func,
+                    hyper_param.loss_func,
+                    hyper_param.num_feature,
+                    hyper_param.num_field,
+                    hyper_param.num_K);
   // parameters become 0
   model_ffm.LoadModel(kFilename);
   EXPECT_EQ(model_ffm.GetScoreFunction(), "ffm");
@@ -123,12 +123,12 @@ TEST(MODEL_TEST, SaveweightAndLoadweight) {
   HyperParam hyper_param = Init();
   Model model_ffm;
   model_ffm.Initialize(hyper_param.num_param,
-                       hyper_param.score_func,
-                       hyper_param.loss_func,
-                       hyper_param.num_feature,
-                       hyper_param.num_field,
-                       hyper_param.num_K,
-                       false);
+                    hyper_param.score_func,
+                    hyper_param.loss_func,
+                    hyper_param.num_feature,
+                    hyper_param.num_field,
+                    hyper_param.num_K,
+                    false);
   std::vector<real_t> vec(kParameter_num, 1.0);
   model_ffm.Saveweight(vec);
   for (index_t i = 0; i < vec.size(); ++i) {
