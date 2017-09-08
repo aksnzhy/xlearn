@@ -29,8 +29,6 @@ This file is the implementation of the fileSpliter class.
 #include "src/base/stringprintf.h"
 #include "src/reader/file_splitor.h"
 
-static const uint32 kMaxLineSize = 100 * 1024; // 100 KB
-
 namespace xLearn {
 
 //------------------------------------------------------------------------------

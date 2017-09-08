@@ -27,8 +27,6 @@ This file is the implementation of Reader.
 
 #include "src/base/file_util.h"
 
-static const uint32 kMaxLineSize = 100 * 1024; // 100 KB for one line of data
-
 namespace xLearn {
 
 //------------------------------------------------------------------------------

@@ -63,8 +63,7 @@ struct HyperParam {
   /* Number of epoch (iteration) */
   int num_epoch = 10;                 // Could be changed in early-stop
   /* Sample size for on-disk model */
-  int sample_size = 200;              // reader->Samples(matrix) will return
-                                      // this value
+  int sample_size = 200;              // reader->Samples(matrix) will return it
 //------------------------------------------------------------------------------
 // Parameters for dataset
 //------------------------------------------------------------------------------

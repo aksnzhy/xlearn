@@ -1,8 +1,8 @@
 # Copyright (c) 2016 by contributors.
 # Authour: Chao Ma (mctt90@gmail.com)
 #
-# This is the root CMakeLists.txt file of the xLearn project,
-# which build all subdirectories (packages) in the order of
+# This is the root CMakeLists.txt file of the xLearn project, which
+# build all subdirectories (packages) in the order of
 # inter-package dependence.
 #
 # you can build the xLearn using the following commands:
@@ -64,8 +64,8 @@ add_subdirectory(gtest)
 #add_subdirectory(demo)
 add_subdirectory(src/base)
 add_subdirectory(src/data)
-#add_subdirectory(src/reader)
+add_subdirectory(src/reader)
 #add_subdirectory(src/score)
 #add_subdirectory(src/loss)
-add_subdirectory(src/updater)
+#add_subdirectory(src/updater)
 #add_subdirectory(src/solver)
