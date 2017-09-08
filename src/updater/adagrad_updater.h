@@ -47,7 +47,11 @@ class AdaGrad : public Updater {
   ~AdaGrad() {  }
 
   // This function neede to be invoked before using this class.
-  void Initialize(const HyperParam& hyper_param);
+  void Initialize(real_t learning_rate,
+                  real_t regu_lambda,
+                  real_t decay_rate_1,
+                  real_t decay_rate_2,
+                  index_t num_param);
 
   // AdaGrad updater
   void Update(const index_t id,
@@ -61,6 +65,7 @@ class AdaGrad : public Updater {
 
  protected:
   std::vector<real_t> cache_;
+  __MX _small_num;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(AdaGrad);

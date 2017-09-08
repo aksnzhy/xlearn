@@ -69,12 +69,8 @@ class Updater {
  protected:
   real_t learning_rate_;
   real_t regu_lambda_;
-  real_t decay_rate_1_;
-  real_t decay_rate_2_;
   __MX _lr;
   __MX _lambda;
-  __MX _decay_rate_1;
-  __MX _decay_rate_2;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Updater);

@@ -1,5 +1,5 @@
 # Build library updater
-add_library(updater updater.cc momentum_updater.cc nesterov_updater.cc adagrad_updater.cc rmsprop_updater.cc adam_updater.cc adadelta_updater.cc)
+add_library(updater updater.cc adagrad_updater.cc momentum_updater.cc adadelta_updater.cc rmsprop_updater.cc)
 
 # Build unittests.
 set(LIBS updater gtest base data)
@@ -10,17 +10,11 @@ target_link_libraries(updater_test gtest_main ${LIBS})
 add_executable(momentum_updater_test momentum_updater_test.cc)
 target_link_libraries(momentum_updater_test gtest_main ${LIBS})
 
-add_executable(nesterov_updater_test nesterov_updater_test.cc)
-target_link_libraries(nesterov_updater_test gtest_main ${LIBS})
-
 add_executable(adagrad_updater_test adagrad_updater_test.cc)
 target_link_libraries(adagrad_updater_test gtest_main ${LIBS})
 
 add_executable(rmsprop_updater_test rmsprop_updater_test.cc)
 target_link_libraries(rmsprop_updater_test gtest_main ${LIBS})
-
-add_executable(adam_updater_test adam_updater_test.cc)
-target_link_libraries(adam_updater_test gtest_main ${LIBS})
 
 add_executable(adadelta_updater_test adadelta_updater_test.cc)
 target_link_libraries(adadelta_updater_test gtest_main ${LIBS})

@@ -64,7 +64,10 @@ class RMSProp : public Updater {
                    std::vector<real_t>& param);
 
  protected:
+  real_t decay_rate_;
   std::vector<real_t> cache_;
+  __MX _decay_rate;
+  __MX _small_num;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(RMSProp);

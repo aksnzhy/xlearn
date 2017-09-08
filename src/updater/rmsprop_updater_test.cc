@@ -36,18 +36,34 @@ class RMSPropTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
     param.learning_rate = 0.1;
-    param.decay_rate = 0.75;
+    param.regu_lambda = 0;
+    param.decay_rate_1 = 0.75;
     param.num_param = kLength;
     param.loss_func = "sqaured";
+    param.score_func = "linear";
+    param.num_feature = 100;
+    param.num_field = 10;
+    param.num_K = 8;
   }
 };
 
 TEST_F(RMSPropTest, update_func) {
-  Model model(param, false);
+  Model model;
+  model.Initialize(param.num_param,
+                param.score_func,
+                param.loss_func,
+                param.num_feature,
+                param.num_field,
+                param.num_K,
+                false);
   std::vector<real_t> grad_vec(kLength, 1.0);
   std::vector<real_t>* w = model.GetParameter();
   RMSProp updater;
-  updater.Initialize(param);
+  updater.Initialize(param.learning_rate,
+                  param.regu_lambda,
+                  param.decay_rate_1,
+                  0,
+                  param.num_param);
   for (int i = 0; i < kLength; ++i) {
     updater.Update(i, grad_vec[i], *w);
   }
@@ -60,7 +76,11 @@ TEST_F(RMSPropTest, batch_update_func) {
   std::vector<real_t> K(kLength, 0.0);
   std::vector<real_t> grad_vec(kLength, 1.0);
   RMSProp updater;
-  updater.Initialize(param);
+  updater.Initialize(param.learning_rate,
+                  param.regu_lambda,
+                  param.decay_rate_1,
+                  0,
+                  param.num_param);
   updater.BatchUpdate(grad_vec, 0, K);
   for (int i = 0; i < kLength; ++i) {
     EXPECT_FLOAT_EQ(K[i], (real_t)(-0.19995117));

@@ -40,9 +40,9 @@ namespace xLearn {
 // Momentum is a method that helps accelerate SGD in the relevant direction
 // and dampens oscillations. It does this by a fraction 'velocity' (v) of the
 // update vector of the past time step to the current update vector:
-// [ v = rho * v  + gradient ]
-// [ w -= learning_rate * v ]
-// The momentum term 'rho' is usually set to 0.9 or a similar value.
+// [ cache = decay_rate * cache  + gradient ]
+// [ w -= learning_rate * cache ]
+// The momentum term 'decay_rate' is usually set to 0.9 or a similar value.
 //------------------------------------------------------------------------------
 class Momentum : public Updater {
  public:
@@ -51,7 +51,11 @@ class Momentum : public Updater {
   ~Momentum() {  }
 
   // This function need to be invoked before using this class.
-  void Initialize(const HyperParam& hyper_param);
+  void Initialize(real_t learning_rate,
+                  real_t regu_lambda,
+                  real_t decay_rate_1,
+                  real_t decay_rate_2,
+                  index_t num_param);
 
   // Momentum updater
   void Update(const index_t id,
@@ -64,8 +68,9 @@ class Momentum : public Updater {
                    std::vector<real_t>& param);
 
  protected:
-  real_t rho_;
-  std::vector<real_t> v_;
+  real_t decay_rate_;
+  __MX _decay_rate;
+  std::vector<real_t> cache_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Momentum);

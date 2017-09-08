@@ -22,25 +22,31 @@ This file is the implementation of AdaGrad updater.
 
 #include "src/updater/adagrad_updater.h"
 
+#include "src/base/math.h"
+
 namespace xLearn {
 
 // This function need to be invoked before using this class.
-void AdaGrad::Initialize(const HyperParam& hyper_param) {
-  CHECK_GT(hyper_param.learning_rate, 0);
-  CHECK_GT(hyper_param.regu_lambda_1, 0);
-  CHECK_GT(hyper_param.regu_lambda_2, 0);
-  learning_rate_ = hyper_param.learning_rate;
-  regu_lambda_1_ = hyper_param.regu_lambda_1;
-  regu_lambda_2_ = hyper_param.regu_lambda_2;
-  regu_type_ = hyper_param.regu_type;
+void AdaGrad::Initialize(real_t learning_rate,
+                         real_t regu_lambda,
+                         real_t decay_rate_1 = 0,
+                         real_t decay_rate_2 = 0,
+                         index_t num_param = 0) {
+  CHECK_GT(learning_rate, 0);
+  // regu_lambda == 0 means that we will not use regularizer
+  CHECK_GE(regu_lambda, 0);
+  learning_rate_ = learning_rate;
+  regu_lambda_ = regu_lambda;
   _lr = _MMX_SET1_PS(learning_rate_);
-  // Allicating memory for cache vector
+  _lambda = _MMX_SET1_PS(regu_lambda_);
+  _small_num = _MMX_SET1_PS(kVerySmallNumber);
+  // Allocating memory for cache vector
   try {
-    cache_.resize(hyper_param.num_param, 0.0);
+    cache_.resize(num_param, 0.0);
   } catch (std::bad_alloc&) {
     LOG(FATAL) << "Cannot allocate enough memory for current    \
                    model parameters. Parameter size: "
-               << hyper_param.num_param;
+               << num_param;
   }
 }
 
@@ -53,7 +59,9 @@ void AdaGrad::Update(const index_t id,
   // Do not check anything here
   cache_[id] += grad * grad;
   // InvSqrt(n) == 1 / sqrt(n)
-  param[id] -= learning_rate_ * grad * InvSqrt((cache_)[id]);
+  param[id] -= (learning_rate_ * grad * InvSqrt((cache_)[id] +
+                kVerySmallNumber) +           // grad
+                regu_lambda_*param[id]);      // regular
 }
 
 // Update a contributors space of model parameters by
@@ -62,7 +70,6 @@ void AdaGrad::BatchUpdate(const std::vector<real_t>& value,
                           const index_t start_id,
                           std::vector<real_t>& param) {
   // Do not check anything here
-  __MX _small_num = _MMX_SET1_PS(kVerySmallNumber);
   for (size_t i = 0; i < value.size(); i += _MMX_INCREMENT) {
     index_t id = start_id + i;
     __MX _grad = _MMX_LOAD_PS(value.data() + i);
@@ -74,10 +81,18 @@ void AdaGrad::BatchUpdate(const std::vector<real_t>& value,
     _MMX_STORE_PS(cache_.data() + id, _cache);
     _MMX_STORE_PS(param.data() + id,
                   _MMX_SUB_PS(_w,
-                  _MMX_MUL_PS(_lr,
-                  _MMX_MUL_PS(_grad,
-                  _MMX_RSQRT_PS(
-                  _MMX_ADD_PS(_cache, _small_num))))));
+                    _MMX_ADD_PS(
+                      _MMX_MUL_PS(_lr,
+                        _MMX_MUL_PS(_grad,
+                          _MMX_RSQRT_PS(
+                            _MMX_ADD_PS(_cache, _small_num)
+                          )
+                        )
+                      ),
+                      _MMX_MUL_PS(_lambda, _w)
+                    )
+                  )
+                );
   }
 }
 

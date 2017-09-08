@@ -23,12 +23,12 @@ This file is the implementation of Updater.
 /* for class register */
 #include "src/base/math.h"
 #include "src/updater/updater.h"
-#include "src/updater/adam_updater.h"
-#include "src/updater/adagrad_updater.h"
-#include "src/updater/adadelta_updater.h"
-#include "src/updater/momentum_updater.h"
-#include "src/updater/nesterov_updater.h"
-#include "src/updater/rmsprop_updater.h"
+//#include "src/updater/adam_updater.h"
+//#include "src/updater/adagrad_updater.h"
+//#include "src/updater/adadelta_updater.h"
+//#include "src/updater/momentum_updater.h"
+//#include "src/updater/nesterov_updater.h"
+//#include "src/updater/rmsprop_updater.h"
 
 namespace xLearn {
 
@@ -37,20 +37,21 @@ namespace xLearn {
 //------------------------------------------------------------------------------
 CLASS_REGISTER_IMPLEMENT_REGISTRY(xLearn_updater_registry, Updater);
 REGISTER_UPDATER("sgd", Updater);
-REGISTER_UPDATER("adam", Adam);
-REGISTER_UPDATER("adagrad", AdaGrad);
-REGISTER_UPDATER("adadelta", AdaDelta);
-REGISTER_UPDATER("momentum", Momentum);
-REGISTER_UPDATER("nesterov", Nesterov);
-REGISTER_UPDATER("rmsprop", RMSProp);
+//REGISTER_UPDATER("adam", Adam);
+//REGISTER_UPDATER("adagrad", AdaGrad);
+//REGISTER_UPDATER("adadelta", AdaDelta);
+//REGISTER_UPDATER("momentum", Momentum);
+//REGISTER_UPDATER("nesterov", Nesterov);
+//REGISTER_UPDATER("rmsprop", RMSProp);
 
 // User need to invoke this function before updating.
 void Updater::Initialize(real_t learning_rate,
-                    real_t regu_lambda,
-                    real_t decay_rate_1 = 0,
-                    real_t decay_rate_2 = 0,
-                    index_t num_param = 0) {
+                         real_t regu_lambda,
+                         real_t decay_rate_1 = 0,
+                         real_t decay_rate_2 = 0,
+                         index_t num_param = 0) {
   CHECK_GT(learning_rate, 0);
+  // regu_lambda == 0 means that we will not use regularizer
   CHECK_GE(regu_lambda, 0);
   learning_rate_ = learning_rate;
   regu_lambda_ = regu_lambda;
@@ -63,8 +64,8 @@ void Updater::Update(const index_t id,
                      const real_t grad,
                      std::vector<real_t>& param) {
   // Do not check anything here
-  param[id] -= (learning_rate_*grad +
-                regu_lambda_*param[id]);
+  param[id] -= (learning_rate_*grad +      // grad
+                regu_lambda_*param[id]);   // regular
 }
 
 // Update a continuous space of model parameters by
@@ -82,7 +83,7 @@ void Updater::BatchUpdate(const std::vector<real_t>& value,
                   _MMX_SUB_PS(_w,
                     _MMX_ADD_PS(
                       _MMX_MUL_PS(_lr, _grad),
-                      _MMX_MUL_PS(_regu_lambda, _w)
+                      _MMX_MUL_PS(_lambda, _w)
                     )
                    )
                  );

@@ -35,19 +35,34 @@ const int kLength = _MMX_INCREMENT * 1000000;
 class AdagradTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
-    param.num_param = kLength;
     param.learning_rate = 0.1;
+    param.regu_lambda = 0;
     param.num_param = kLength;
     param.loss_func = "sqaured";
+    param.score_func = "linear";
+    param.num_feature = 100;
+    param.num_field = 10;
+    param.num_K = 8;
   }
 };
 
 TEST_F(AdagradTest, update_func) {
-  Model model(param, false);
+  Model model;
+  model.Initialize(param.num_param,
+                param.score_func,
+                param.loss_func,
+                param.num_feature,
+                param.num_field,
+                param.num_K,
+                false);
   std::vector<real_t> grad_vec(kLength, 1.0);
   std::vector<real_t>* w = model.GetParameter();
   AdaGrad updater;
-  updater.Initialize(param);
+  updater.Initialize(param.learning_rate,
+                  param.regu_lambda,
+                  0,
+                  0,
+                  param.num_param);
   for (int i = 0; i < kLength; ++i) {
     updater.Update(i, grad_vec[i], *w);
   }
@@ -60,7 +75,11 @@ TEST_F(AdagradTest, batch_update_func) {
   std::vector<real_t> K(kLength, 0.0);
   std::vector<real_t> grad_vec(kLength, 1.0);
   AdaGrad updater;
-  updater.Initialize(param);
+  updater.Initialize(param.learning_rate,
+                  param.regu_lambda,
+                  0,
+                  0,
+                  param.num_param);
   updater.BatchUpdate(grad_vec, 0, K);
   for (int i = 0; i < kLength; ++i) {
     EXPECT_FLOAT_EQ(K[i], (real_t)(-0.099975586));
