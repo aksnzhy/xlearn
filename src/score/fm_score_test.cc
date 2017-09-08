@@ -47,7 +47,8 @@ TEST(FM_TEST, calc_score) {
   hyper_param.num_feature = Kfeat;
   hyper_param.num_K = K;
   FMScore score;
-  score.Initialize(hyper_param);
+  score.Initialize(hyper_param.num_feature,
+                   hyper_param.num_K);
   real_t val = score.CalcScore(&row, &w);
   // 6 + 10*4*3 = 126
   EXPECT_FLOAT_EQ(val, 126.0);
@@ -75,7 +76,8 @@ TEST(FM_TEST, calc_grad) {
   FMScore score;
   hyper_param.num_feature = Kfeat;
   hyper_param.num_K = K;
-  score.Initialize(hyper_param);
+  score.Initialize(hyper_param.num_feature,
+                   hyper_param.num_K);
   score.CalcGrad(&row, w, 1.0, updater);
   // Test
   for (index_t i = 0; i < Kfeat; ++i) {

@@ -47,7 +47,11 @@ class RMSProp : public Updater {
   ~RMSProp() {  }
 
   // This function needs to be invoked before using this class.
-  void Initialize(const HyperParam& hyper_param);
+  void Initialize(real_t learning_rate,
+                  real_t regu_lambda,
+                  real_t decay_rate_1,
+                  real_t decay_rate_2,
+                  index_t num_param);
 
   // RMSProp updater
   void Update(const index_t id,
@@ -60,7 +64,6 @@ class RMSProp : public Updater {
                    std::vector<real_t>& param);
 
  protected:
-  real_t decay_rate_;
   std::vector<real_t> cache_;
 
  private:

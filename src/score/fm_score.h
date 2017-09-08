@@ -38,11 +38,11 @@ class FMScore : public Score {
   ~FMScore() { }
 
   // This function needs to be invoked before using this class.
-  void Initialize(const HyperParam& hyper_param) {
-    CHECK_GT(hyper_param.num_K, 0);
-    CHECK_GT(hyper_param.num_feature, 0);
-    num_factor_ = hyper_param.num_K;
-    num_feature_ = hyper_param.num_feature;
+  void Initialize(index_t num_feat, int k, int field = 0) {
+    CHECK_GT(k, 0);
+    CHECK_GT(num_feat, 0);
+    num_factor_ = k;
+    num_feature_ = num_feat;
   }
 
   // Given one exmaple and current model, return the score.
@@ -56,9 +56,6 @@ class FMScore : public Score {
                 Updater* updater);
 
  private:
-  index_t num_factor_;
-  index_t num_feature_;
-
   DISALLOW_COPY_AND_ASSIGN(FMScore);
 };
 

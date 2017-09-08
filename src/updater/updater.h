@@ -27,7 +27,6 @@ current model parameters.
 #include <vector>
 
 #include "src/base/common.h"
-#include "src/base/math.h"
 #include "src/base/class_register.h"
 #include "src/data/model_parameters.h"
 #include "src/data/hyper_parameters.h"
@@ -37,8 +36,12 @@ namespace xLearn {
 //------------------------------------------------------------------------------
 // Updater class is responsible for updating current model parameters, and
 // it can be implemented by different update functions such as naive SGD,
-// Momentum, Adadelta, AdaGard, RMSprop, Adam, and so on.
+// Momentum, Adadelta, AdaGard, RMSprop, Nesterov, Adam, and so on.
 // We use the naive SGD updater by default: [ w -= learning_rate * gradient ]
+// Updater is used for the Loss class. For the linear and fm score, we use
+// Update() method to update model parameters, while using BatchUpdate()
+// to update ffm model for speedup.
+// We use sparse regularizer in the Updater.
 //------------------------------------------------------------------------------
 class Updater {
  public:
@@ -47,7 +50,11 @@ class Updater {
   virtual ~Updater() {  }
 
   // This function needs to be invoked before using this class.
-  virtual void Initialize(const HyperParam& hyper_param);
+  virtual void Initialize(real_t learning_rate,
+                          real_t regu_lambda,
+                          real_t decay_rate_1,
+                          real_t decay_rate_2,
+                          index_t num_param);
 
   // Using naive SGD updater by default.
   virtual void Update(const index_t id,
@@ -62,8 +69,12 @@ class Updater {
  protected:
   real_t learning_rate_;
   real_t regu_lambda_;
+  real_t decay_rate_1_;
+  real_t decay_rate_2_;
   __MX _lr;
   __MX _lambda;
+  __MX _decay_rate_1;
+  __MX _decay_rate_2;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Updater);

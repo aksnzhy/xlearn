@@ -36,7 +36,15 @@ namespace xLearn {
 //------------------------------------------------------------------------------
 // Score is an abstract class, which can be implemented by different
 // score functions such as LinearScore (liner_score.h), FMScore (fm_score.h)
-// FFMScore (ffm_score.h) etc.
+// FFMScore (ffm_score.h) etc. On common, we initial a Score function and
+// pass its pointer to a Loss class like this:
+//
+//  Score* score = new FMScore();
+//  score->Initialize(num_feat, K, num_field);
+//  Loss* loss = new AbsLoss();
+//  loss->Initialize(score);
+//
+//  The CalcScore() and CalcGrad() function are used by Loss class.
 //------------------------------------------------------------------------------
 class Score {
  public:
@@ -45,7 +53,7 @@ class Score {
   virtual ~Score() { }
 
   // This function needs to be invoked before using this class.
-  virtual void Initialize(const HyperParam& hyper_param) = 0;
+  virtual void Initialize(index_t num_feat, int k, int field) = 0;
 
   // Given one exmaple and current model, return the score.
   virtual real_t CalcScore(const SparseRow* row,
@@ -58,6 +66,10 @@ class Score {
                         Updater* updater) = 0;
 
  private:
+  index_t num_factor_;
+  index_t num_feature_;
+  index_t num_field_;
+
   DISALLOW_COPY_AND_ASSIGN(Score);
 };
 

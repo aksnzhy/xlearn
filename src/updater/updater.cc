@@ -45,11 +45,15 @@ REGISTER_UPDATER("nesterov", Nesterov);
 REGISTER_UPDATER("rmsprop", RMSProp);
 
 // User need to invoke this function before updating.
-void Updater::Initialize(const HyperParam& hyper_param) {
-  CHECK_GT(hyper_param.learning_rate, 0);
-  CHECK_GE(hyper_param.regu_lambda_, 0);
-  learning_rate_ = hyper_param.learning_rate;
-  regu_lambda_ = hyper_param.regu_lambda_;
+void Updater::Initialize(real_t learning_rate,
+                    real_t regu_lambda,
+                    real_t decay_rate_1 = 0,
+                    real_t decay_rate_2 = 0,
+                    index_t num_param = 0) {
+  CHECK_GT(learning_rate, 0);
+  CHECK_GE(regu_lambda, 0);
+  learning_rate_ = learning_rate;
+  regu_lambda_ = regu_lambda;
   _lr = _MMX_SET1_PS(learning_rate_);
   _lambda = _MMX_SET1_PS(regu_lambda_);
 }
@@ -60,7 +64,7 @@ void Updater::Update(const index_t id,
                      std::vector<real_t>& param) {
   // Do not check anything here
   param[id] -= (learning_rate_*grad +
-                regu_lambda_1_*param[id]);
+                regu_lambda_*param[id]);
 }
 
 // Update a continuous space of model parameters by
@@ -76,58 +80,12 @@ void Updater::BatchUpdate(const std::vector<real_t>& value,
     // w -= learning_rate * grad
     _MMX_STORE_PS(param.data() + id,
                   _MMX_SUB_PS(_w,
-                  _MMX_MUL_PS(_lr, _grad)));
-  }
-}
-
-// L1 regularize
-void Updater::Regularize_L1(Model* model) {
-  CHECK_NOTNULL(model);
-  std::vector<real_t>* w = model->GetParameter();
-  for (size_t i = 0; i < w->size(); ++i) {
-    if ((*w)[i] > 0) {
-      (*w)[i] -= regu_lambda_1_;
-    } else {
-      (*w)[i] += regu_lambda_1_;
-    }
-  }
-}
-
-// L2 regularize. Using AVX/SSE to speed up
-void Updater::Regularize_L2(Model* model) {
-  CHECK_NOTNULL(model);
-  std::vector<real_t>* w = model->GetParameter();
-  CHECK_EQ(w->size() % _MMX_INCREMENT, 0);
-  __MX _regu_lambda = _MMX_SET1_PS(regu_lambda_1_);
-  // w -= regu_lambda_ * w
-  for (size_t i = 0; i < w->size(); i += _MMX_INCREMENT) {
-    __MX _w = _MMX_LOAD_PS(w->data() + i);
-    __MX _delta_w = _MMX_MUL_PS(_regu_lambda, _w);
-    _MMX_STORE_PS(w->data() + i,
-                  _MMX_SUB_PS(_w, _delta_w));
-  }
-}
-
-// ElasticNet (L1_L2) regularize
-void Updater::Regularize_ElasticNet(Model* model) {
-  CHECK_NOTNULL(model);
-  std::vector<real_t>* w = model->GetParameter();
-  CHECK_EQ(w->size() % _MMX_INCREMENT, 0);
-  // l1
-  for (size_t i = 0; i < w->size(); ++i) {
-    if ((*w)[i] > 0) {
-      (*w)[i] -= regu_lambda_1_;
-    } else {
-      (*w)[i] += regu_lambda_1_;
-    }
-  }
-  // l2
-  __MX _regu_lambda = _MMX_SET1_PS(regu_lambda_2_);
-  for (size_t i = 0; i < w->size(); i += _MMX_INCREMENT) {
-    __MX _w = _MMX_LOAD_PS(w->data() + i);
-    __MX _delta_w = _MMX_MUL_PS(_regu_lambda, _w);
-    _MMX_STORE_PS(w->data() + i,
-                  _MMX_SUB_PS(_w, _delta_w));
+                    _MMX_ADD_PS(
+                      _MMX_MUL_PS(_lr, _grad),
+                      _MMX_MUL_PS(_regu_lambda, _w)
+                    )
+                   )
+                 );
   }
 }
 

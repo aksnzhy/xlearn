@@ -38,7 +38,7 @@ class LinearScore : public Score {
   ~LinearScore() { }
 
   // This function needs to be invoked before using this class.
-  void Initialize(const HyperParam& hyper_param) {
+  void Initialize(index_t num_feat = 0, int k = 0, int field = 0) {
     /* Do nothing */
     return;
   }

@@ -25,24 +25,28 @@ This file is the implementation of the RMSProp updater.
 namespace xLearn {
 
 // This function needs to be invoked before update.
-void RMSProp::Initialize(const HyperParam& hyper_param) {
-  CHECK_GT(hyper_param.learning_rate, 0);
-  CHECK_GT(hyper_param.regu_lambda_1, 0);
-  CHECK_GT(hyper_param.regu_lambda_2, 0);
-  CHECK_GE(hyper_param.decay_rate, 0);
-  learning_rate_ = hyper_param.learning_rate;
-  regu_lambda_1_ = hyper_param.regu_lambda_1;
-  regu_lambda_2_ = hyper_param.regu_lambda_2;
-  regu_type_ = hyper_param.regu_type;
-  decay_rate_ = hyper_param.decay_rate;
+void RMSProp::Initialize(real_t learning_rate,
+                      real_t regu_lambda,
+                      real_t decay_rate_1,
+                      real_t decay_rate_2,
+                      index_t num_param) {
+  CHECK_GT(learning_rate, 0);
+  CHECK_GE(regu_lambda, 0);
+  CHECK_GE(decay_rate_1, 0);
+  CHECK_GT(num_param, 0);
+  learning_rate_ = learning_rate;
+  regu_lambda_ = regu_lambda_;
+  decay_rate_1_ = decay_rate_1;
   _lr = _MMX_SET1_PS(learning_rate_);
+  _regu_lambda = _MMX_SET1_PS(regu_lambda_);
+  _decay_rate_1 = _MMX_SET1_PS(decay_rate_1_);
   // Allocating memory for the cache vector
   try {
-    cache_.resize(hyper_param.num_param, 0.0);
+    cache_.resize(num_param, 0.0);
   } catch (std::bad_alloc&) {
     LOG(FATAL) << "Cannot allocate enough emmroy for current    \
                    model parameter. Parameter size: "
-               << hyper_param.num_param;
+               << num_param;
   }
 }
 
@@ -53,10 +57,11 @@ void RMSProp::Update(const index_t id,
                      const real_t grad,
                      std::vector<real_t>& param) {
   // Do not check anything here
-  cache_[id] = (1.0-decay_rate_) * grad * grad
-               + decay_rate_ * cache_[id];
+  cache_[id] = (1.0-decay_rate_)*grad*grad
+               + decay_rate_*cache_[id];
   // InvSqrt(n) == 1 / sqrt(n)
-  param[id] -= learning_rate_ * grad * InvSqrt(cache_[id]);
+  param[id] -= (learning_rate_*grad*InvSqrt(cache_[id]) +
+                regu_lambda_*param[id]);
 }
 
 // Update a continuous space of model parameters by
@@ -65,9 +70,8 @@ void RMSProp::BatchUpdate(const std::vector<real_t>& value,
                           const index_t start_id,
                           std::vector<real_t>& param) {
   // Do not check anything here
-  __MX _decay_rate = _MMX_SET1_PS(decay_rate_);
-  __MX _1_minus_decay_rate = _MMX_SET1_PS(1-decay_rate_);
-  __MX _small_num = _MMX_SET1_PS(kVerySmallNumber);
+  static __MX _1_minus_decay_rate = _MMX_SET1_PS(1-decay_rate_);
+  static __MX _small_num = _MMX_SET1_PS(kVerySmallNumber);
   for (size_t i = 0; i < value.size(); i += _MMX_INCREMENT) {
     index_t id = start_id + i;
     __MX _grad = _MMX_LOAD_PS(value.data() + i);

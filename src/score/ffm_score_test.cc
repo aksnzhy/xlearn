@@ -50,7 +50,9 @@ TEST(FFM_TEST, calc_score) {
   hyper_param.num_K = K;
   hyper_param.num_field = kfield;
   FFMScore score;
-  score.Initialize(hyper_param);
+  score.Initialize(hyper_param.num_feature,
+                hyper_param.num_K,
+                hyper_param.num_field);
   real_t val = score.CalcScore(&row, &w);
   // 6 + 24*4*3 = 294.0
   EXPECT_FLOAT_EQ(val, 294.0);
@@ -81,7 +83,9 @@ TEST(FFM_TEST, calc_grad) {
   hyper_param.num_feature = Kfeat;
   hyper_param.num_K = K;
   hyper_param.num_field = kfield;
-  score.Initialize(hyper_param);
+  score.Initialize(hyper_param.num_feature,
+                hyper_param.num_K,
+                hyper_param.num_field);
   score.CalcGrad(&row, w, 1.0, updater);
   // Test
   for (index_t i = 0; i < Kfeat; ++i) {

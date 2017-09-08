@@ -81,12 +81,12 @@ class Model {
   // Initialize model to zero or using
   // Gaussian distribution (by default)
   void Initialize(index_t num_param,
-                  const std::string& score_func,
-                  const std::string& loss_func,
-                  index_t num_feature,
-                  int num_field,
-                  int num_K,
-                  bool gaussian = true);
+              const std::string& score_func,
+              const std::string& loss_func,
+              index_t num_feature,
+              int num_field,
+              int num_K,
+              bool gaussian = true);
 
   // Serialize model to a checkpoint file.
   void SaveModel(const std::string& filename);

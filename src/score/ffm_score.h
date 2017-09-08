@@ -30,7 +30,8 @@ namespace xLearn {
 
 //------------------------------------------------------------------------------
 // FFMScore is used to implemente field-aware factorization machines,
-// in which the socre function is y = wTx + sum[(V_i_fj*V_j_fi)(x_i * x_j)]
+// in which the socre function is:
+//   y = wTx + sum[(V_i_fj*V_j_fi)(x_i * x_j)]
 //------------------------------------------------------------------------------
 class FFMScore : public Score {
 public:
@@ -39,14 +40,14 @@ public:
  ~FFMScore() { }
 
  // This function needs to be invoked before using this class.
- void Initialize(const HyperParam& hyper_param) {
-   CHECK_GT(hyper_param.num_K, 0);
-   CHECK_EQ(hyper_param.num_K % _MMX_INCREMENT, 0); // for sse/avx
-   CHECK_GT(hyper_param.num_feature, 0);
-   CHECK_GT(hyper_param.num_field, 0);
-   num_factor_ = hyper_param.num_K;
-   num_feature_ = hyper_param.num_feature;
-   num_field_ = hyper_param.num_field;
+ void Initialize(index_t num_feat, int k, int num_field) {
+   CHECK_GT(k, 0);
+   CHECK_EQ(k % _MMX_INCREMENT, 0); // for sse/avx
+   CHECK_GT(num_feat, 0);
+   CHECK_GT(num_field, 0);
+   num_factor_ = k;
+   num_feature_ = num_feat;
+   num_field_ = num_field;
  }
 
  // Given one exmaple and current model, return the score.
@@ -60,10 +61,6 @@ public:
                Updater* updater);
 
  private:
-  index_t num_factor_;
-  index_t num_feature_;
-  index_t num_field_;
-
   DISALLOW_COPY_AND_ASSIGN(FFMScore);
 };
 

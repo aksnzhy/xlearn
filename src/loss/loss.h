@@ -37,6 +37,36 @@ namespace xLearn {
 // The Loss is an abstract class, which can be implemented by the real
 // loss functions such as cross-entropy loss (cross_entropy_loss.h),
 // squared loss (squared_loss.h), hinge loss (hinge_loss.h), etc.
+// There are three important method in Loss, including Evalute(), Predict(),
+// and CalcGrad(). We can use the Loss class like this:
+//
+//   // Create a AbsLoss with linear score function, which
+//   // is usually used for linear regression.
+//   Loss* abs_loss = new AbsLoss();
+//   abs_loss->Initialize(linear_score);
+//
+//   // Then, we can perform gradient descent like this:
+//   DMatrix* matrix = NULL;
+//   for (int n = 0: n < epoch; ++n) {
+//     reader->Reset();
+//     while (reader->Samples(matrix)) {
+//       // Assume that the model and updater have been initialized
+//       abs_loss->CalcGrad(matrix, model, updater);
+//     }
+//   }
+//
+//   // After training, we can calculate the train loss
+//   real_t loss_val = 0;
+//   index_t count = 0;
+//   while (1) {
+//     int tmp = reader->Samples(matrix);
+//     if (tmp == 0) { break; }
+//     pred.resize(tmp);
+//     count += tmp;
+//     abs_loss->Predict(matrix, model, pred);
+//     loss_val += abs_loss->Evalute(pred, matrix->Y);
+//   }
+//   loss_val /= count;
 //------------------------------------------------------------------------------
 class Loss {
  public:
@@ -77,8 +107,8 @@ class Loss {
     return 1.0f / (1.0f + fastexp(-x));
   }
 
-  // The score function, e.g. Linear_Score,
-  // FM_Score, FFM_Score, etc.
+  // The score function, e.g. LinearScore,
+  // FMScore, FFMScore, etc.
   Score* score_func_;
 
  private:
@@ -90,16 +120,16 @@ class Loss {
 //------------------------------------------------------------------------------
 CLASS_REGISTER_DEFINE_REGISTRY(xLearn_loss_registry, Loss);
 
-#define REGISTER_LOSS(format_name, loss_name)             \
-  CLASS_REGISTER_OBJECT_CREATOR(                          \
-      xLearn_loss_registry,                               \
-      Loss,                                               \
-      format_name,                                        \
+#define REGISTER_LOSS(format_name, loss_name)               \
+  CLASS_REGISTER_OBJECT_CREATOR(                            \
+      xLearn_loss_registry,                                 \
+      Loss,                                                 \
+      format_name,                                          \
       loss_name)
 
-#define CREATE_LOSS(format_name)                          \
-  CLASS_REGISTER_CREATE_OBJECT(                           \
-      xLearn_loss_registry,                               \
+#define CREATE_LOSS(format_name)                            \
+  CLASS_REGISTER_CREATE_OBJECT(                             \
+      xLearn_loss_registry,                                 \
       format_name)
 
 } // namespace xLearn
