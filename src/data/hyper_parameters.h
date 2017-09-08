@@ -55,11 +55,11 @@ struct HyperParam {
   std::string updater_type = "sgd";   // 'sgd', 'adagrad', 'adadelta', 'adam',
                                       // 'rmsprop', 'nesterov', or 'momentum'
   /* decay_rate_1 for updater */
-  real_t decay_rate_1 = 0.05;         // The decay factor used by updater
+  real_t decay_rate_1 = 0.9;          // The decay factor used by updater
   /* decay_rate_2 for updater */
-  real_t decay_rate_2 = 0.05;         // The second decay factor used by updater
+  real_t decay_rate_2 = 0.5;          // The second decay factor used by updater
   /* lambda for regularizer */
-  real_t regu_lambda_ = 0.00002;      // xLearn uses sparse regularizer
+  real_t regu_lambda = 0.00002;       // xLearn uses sparse regularizer
   /* Number of epoch (iteration) */
   int num_epoch = 10;                 // Could be changed in early-stop
   /* Sample size for on-disk model */
