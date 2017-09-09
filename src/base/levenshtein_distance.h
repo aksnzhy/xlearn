@@ -43,17 +43,15 @@ namespace xLearn {
 //   bool bo;
 //
 //   bo = ss.Find(std::string("alex"), list);  /* return true */
-//   bo = ss.Find(std::string("zz"), list); /* return false */
+//   bo = ss.Find(std::string("zz"), list);    /* return false */
 //
 //   std::string similar;
-//   int distance = ss.FindSimilar(std::string("alexx"),
-//                                 list,
-//                                 result);
+//   int distance = ss.FindSimilar("alexx", list, result);
 //
 //   /* The distance will 1, which is the levenshtein distance
-//      between 'alexx' and 'alex'.
-//      And, the result will be 'alex', which is the most similar
-//      string in the list compared with 'alexx'. */
+//      between 'alexx' and 'alex'. Also, the result will be 'alex',
+//      which is the most similar string in the list compared
+//      with 'alexx'. */
 //------------------------------------------------------------------------------
 class StrSimilar {
  public:
