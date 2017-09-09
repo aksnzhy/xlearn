@@ -36,22 +36,21 @@ index_t K = 10;
 index_t Kfeat = 3;
 index_t kLength = Kfeat + Kfeat*K;
 
-class LinearScoreTest : public ::testing::Test {
+class FMScoreTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
     param.learning_rate = 0.1;
     param.regu_lambda = 0;
-    param.decay_rate_1 = 0.91;
     param.num_param = kLength;
     param.loss_func = "sqaured";
     param.score_func = "linear";
-    param.num_feature = 100;
+    param.num_feature = Kfeat;
     param.num_field = 3;
-    param.num_K = 10;
+    param.num_K = K;
   }
 };
 
-TEST_F(FM_TEST, calc_score) {
+TEST_F(FMScoreTest, calc_score) {
   SparseRow row(Kfeat);
   std::vector<real_t> w(kLength, 1.0);
   // Init SparseRow
@@ -59,18 +58,15 @@ TEST_F(FM_TEST, calc_score) {
     row.idx[i] = i;
     row.X[i] = 2.0;
   }
-  HyperParam hyper_param;
-  hyper_param.num_feature = Kfeat;
-  hyper_param.num_K = K;
   FMScore score;
-  score.Initialize(hyper_param.num_feature,
-                   hyper_param.num_K);
+  score.Initialize(param.num_feature,
+                   param.num_K);
   real_t val = score.CalcScore(&row, &w);
   // 6 + 10*4*3 = 126
   EXPECT_FLOAT_EQ(val, 126.0);
 }
 
-TEST_F(FM_TEST, calc_grad) {
+TEST_F(FMScoreTest, calc_grad) {
   // Reset hyper parameters
   K = 24;
   Kfeat = 100;
@@ -85,15 +81,14 @@ TEST_F(FM_TEST, calc_grad) {
   std::vector<real_t> w(kLength, 3.0);
   // Create updater
   Updater* updater = new Updater();
-  HyperParam hyper_param;
-  hyper_param.learning_rate = 0.1;
-  updater->Initialize(hyper_param);
+  updater->Initialize(param.learning_rate,
+                  param.regu_lambda,
+                  0,
+                  0,
+                  kLength);
   // Create score function
   FMScore score;
-  hyper_param.num_feature = Kfeat;
-  hyper_param.num_K = K;
-  score.Initialize(hyper_param.num_feature,
-                   hyper_param.num_K);
+  score.Initialize(Kfeat, K);
   score.CalcGrad(&row, w, 1.0, updater);
   // Test
   for (index_t i = 0; i < Kfeat; ++i) {

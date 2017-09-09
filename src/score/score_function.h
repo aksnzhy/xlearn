@@ -65,11 +65,12 @@ class Score {
                         real_t pg, /* partial gradient */
                         Updater* updater) = 0;
 
- private:
+ protected:
   index_t num_factor_;
   index_t num_feature_;
   index_t num_field_;
 
+ private:
   DISALLOW_COPY_AND_ASSIGN(Score);
 };
 

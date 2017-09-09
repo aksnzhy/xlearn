@@ -31,12 +31,27 @@ This file tests the FFMScore class.
 
 namespace xLearn {
 
+HyperParam param;
 index_t K = 24;
 index_t Kfeat = 3;
 index_t kfield = 3;
 index_t kLength = Kfeat + Kfeat*kfield*K;
 
-TEST(FFM_TEST, calc_score) {
+class FFMScoreTest : public ::testing::Test {
+ protected:
+  virtual void SetUp() {
+    param.learning_rate = 0.1;
+    param.regu_lambda = 0;
+    param.num_param = kLength;
+    param.loss_func = "sqaured";
+    param.score_func = "linear";
+    param.num_feature = Kfeat;
+    param.num_field = kfield;
+    param.num_K = K;
+  }
+};
+
+TEST_F(FFMScoreTest, calc_score) {
   SparseRow row(Kfeat, true);
   std::vector<real_t> w(kLength, 1.0);
   // Init SparseRow
@@ -45,20 +60,16 @@ TEST(FFM_TEST, calc_score) {
     row.field[i] = i;
     row.X[i] = 2.0;
   }
-  HyperParam hyper_param;
-  hyper_param.num_feature = Kfeat;
-  hyper_param.num_K = K;
-  hyper_param.num_field = kfield;
   FFMScore score;
-  score.Initialize(hyper_param.num_feature,
-                hyper_param.num_K,
-                hyper_param.num_field);
+  score.Initialize(param.num_feature,
+                param.num_K,
+                param.num_field);
   real_t val = score.CalcScore(&row, &w);
   // 6 + 24*4*3 = 294.0
   EXPECT_FLOAT_EQ(val, 294.0);
 }
 
-TEST(FFM_TEST, calc_grad) {
+TEST_F(FFMScoreTest, calc_grad) {
   // Reset hyper parameters
   K = 24;
   Kfeat = 100;
@@ -77,15 +88,19 @@ TEST(FFM_TEST, calc_grad) {
   Updater* updater = new Updater();
   HyperParam hyper_param;
   hyper_param.learning_rate = 0.1;
-  updater->Initialize(hyper_param);
+  updater->Initialize(param.learning_rate,
+                  param.regu_lambda,
+                  0,
+                  0,
+                  kLength);
   // Create score function
   FFMScore score;
-  hyper_param.num_feature = Kfeat;
-  hyper_param.num_K = K;
-  hyper_param.num_field = kfield;
-  score.Initialize(hyper_param.num_feature,
-                hyper_param.num_K,
-                hyper_param.num_field);
+  param.num_feature = Kfeat;
+  param.num_K = K;
+  param.num_field = kfield;
+  score.Initialize(param.num_feature,
+                param.num_K,
+                param.num_field);
   score.CalcGrad(&row, w, 1.0, updater);
   // Test
   for (index_t i = 0; i < Kfeat; ++i) {

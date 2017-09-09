@@ -33,24 +33,21 @@ This file tests the LinearScore class.
 namespace xLearn {
 
 HyperParam param;
-index_t kLength = 100;
+const int kLength = 100;
 
 class LinearScoreTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
     param.learning_rate = 0.1;
     param.regu_lambda = 0;
-    param.decay_rate_1 = 0.91;
     param.num_param = kLength;
     param.loss_func = "sqaured";
     param.score_func = "linear";
     param.num_feature = 100;
-    param.num_field = 10;
-    param.num_K = 8;
   }
 };
 
-TEST_F(LINEAR_TEST, calc_score) {
+TEST_F(LinearScoreTest, calc_score) {
   SparseRow row(kLength);
   std::vector<real_t> w(kLength, 3.0);
   // Init SparseRow
@@ -63,7 +60,7 @@ TEST_F(LINEAR_TEST, calc_score) {
   EXPECT_FLOAT_EQ(val, 600.0);
 }
 
-TEST_F(LINEAR_TEST, calc_grad) {
+TEST_F(LinearScoreTest, calc_grad) {
   // Create SparseRow
   SparseRow row(kLength);
   for (index_t i = 0; i < kLength; ++i) {
