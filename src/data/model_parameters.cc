@@ -35,7 +35,7 @@ namespace xLearn {
 
 // Hyper parameters for Gaussian distribution.
 static const real_t kInitMean = 0.0;
-static const real_t kInitStdev = 0.01;
+static const real_t kInitStdev = 0.1;
 
 // Basic contributor.
 void Model::Initialize(index_t num_param,
