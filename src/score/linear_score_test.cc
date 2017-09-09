@@ -32,9 +32,25 @@ This file tests the LinearScore class.
 
 namespace xLearn {
 
+HyperParam param;
 index_t kLength = 100;
 
-TEST(LINEAR_TEST, calc_score) {
+class LinearScoreTest : public ::testing::Test {
+ protected:
+  virtual void SetUp() {
+    param.learning_rate = 0.1;
+    param.regu_lambda = 0;
+    param.decay_rate_1 = 0.91;
+    param.num_param = kLength;
+    param.loss_func = "sqaured";
+    param.score_func = "linear";
+    param.num_feature = 100;
+    param.num_field = 10;
+    param.num_K = 8;
+  }
+};
+
+TEST_F(LINEAR_TEST, calc_score) {
   SparseRow row(kLength);
   std::vector<real_t> w(kLength, 3.0);
   // Init SparseRow
@@ -47,7 +63,7 @@ TEST(LINEAR_TEST, calc_score) {
   EXPECT_FLOAT_EQ(val, 600.0);
 }
 
-TEST(LINEAR_TEST, calc_grad) {
+TEST_F(LINEAR_TEST, calc_grad) {
   // Create SparseRow
   SparseRow row(kLength);
   for (index_t i = 0; i < kLength; ++i) {
@@ -58,9 +74,11 @@ TEST(LINEAR_TEST, calc_grad) {
   std::vector<real_t> w(kLength, 3.0);
   // Create updater
   Updater* updater = new Updater();
-  HyperParam hyper_param;
-  hyper_param.learning_rate = 0.1;
-  updater->Initialize(hyper_param);
+  updater->Initialize(param.learning_rate,
+                  param.regu_lambda,
+                  0,
+                  0,
+                  param.num_param);
   // Create score function
   LinearScore score;
   score.CalcGrad(&row, w, 1.0, updater);

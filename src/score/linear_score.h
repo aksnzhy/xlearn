@@ -37,7 +37,7 @@ class LinearScore : public Score {
   LinearScore() { }
   ~LinearScore() { }
 
-  // This function needs to be invoked before using this class.
+  // For now, we do nothing in Initialize() of linear score
   void Initialize(index_t num_feat = 0, int k = 0, int field = 0) {
     /* Do nothing */
     return;

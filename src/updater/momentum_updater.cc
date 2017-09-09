@@ -74,7 +74,7 @@ void Momentum::BatchUpdate(const std::vector<real_t>& value,
     __MX _cache = _MMX_LOAD_PS(cache_.data() + id);
     __MX _w = _MMX_LOAD_PS(param.data() + id);
     // [ cahce = decay_rate * cache + grad ]
-    // [ w -= learning_rate * cahce]
+    // [ w -= learning_rate * cahce ]
     _cache = _MMX_ADD_PS(
                _MMX_MUL_PS(_decay_rate, _cache),
                _grad);

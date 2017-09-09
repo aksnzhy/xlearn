@@ -31,11 +31,27 @@ This file tests the FMScore class.
 
 namespace xLearn {
 
+HyperParam param;
 index_t K = 10;
 index_t Kfeat = 3;
 index_t kLength = Kfeat + Kfeat*K;
 
-TEST(FM_TEST, calc_score) {
+class LinearScoreTest : public ::testing::Test {
+ protected:
+  virtual void SetUp() {
+    param.learning_rate = 0.1;
+    param.regu_lambda = 0;
+    param.decay_rate_1 = 0.91;
+    param.num_param = kLength;
+    param.loss_func = "sqaured";
+    param.score_func = "linear";
+    param.num_feature = 100;
+    param.num_field = 3;
+    param.num_K = 10;
+  }
+};
+
+TEST_F(FM_TEST, calc_score) {
   SparseRow row(Kfeat);
   std::vector<real_t> w(kLength, 1.0);
   // Init SparseRow
@@ -54,7 +70,7 @@ TEST(FM_TEST, calc_score) {
   EXPECT_FLOAT_EQ(val, 126.0);
 }
 
-TEST(FM_TEST, calc_grad) {
+TEST_F(FM_TEST, calc_grad) {
   // Reset hyper parameters
   K = 24;
   Kfeat = 100;
