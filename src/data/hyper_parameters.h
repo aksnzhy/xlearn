@@ -80,7 +80,7 @@ struct HyperParam {
   /* Filename for training set */
   std::string train_set_file;           // Must have value in training task
   /* Filename for test set */
-  std::string test_set_file;            // It can be empty
+  std::string test_set_file;            // This value can be empty
   /* Filename for inference set */
   std::string inference_file;           // Must have value in predict task
   /* Filename of model */
