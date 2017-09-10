@@ -222,7 +222,6 @@ static const double kVerySmallNumberDouble = 1e-15;
 #define SHOW_TIME()                                                    \
    printf("Time: %.2f sec", (float)(end-start) / CLOCKS_PER_SEC)       \
 
-
 //------------------------------------------------------------------------------
 // SSE and AVX for vectorization
 //------------------------------------------------------------------------------
