@@ -42,12 +42,23 @@ namespace xLearn {
 // Solver is entry class of xLearn, which can perform training or inference
 // tasks. There are three important functions in this class, including the
 // Initialize(), StartWork(), and Finalize() funtions.
+// We can use Solver class like this:
+//
+//  xLearn::Solver solver;
+//  solver.SetPredict();   // or solver.SetPredict()
+//  solver.Initialize(argc, argv);
+//  solver.StartWork();
+//  solver.Finalize();
 //------------------------------------------------------------------------------
 class Solver {
  public:
   // Constructor and Desstructor
   Solver() { }
   ~Solver() { }
+
+  // Ser train or predict
+  void SetTrain() { hyper_param_.is_train = true; }
+  void SetPredict() { hyper_param_.is_train = false; }
 
   // Initialize the xLearn environment, including checking
   // and parsing the arguments, reading problem (training data
@@ -58,38 +69,58 @@ class Solver {
   void StartWork();
 
   // Finalize the xLearn environment.
-  void Finalize();
+  void FinalizeWork();
 
  protected:
-  HyperParam hyper_param_;
-  Checker checker_;
-  std::vector<Reader*> reader_;
-  FileSpliter splitor_;
-  Parser* parser_;
-  Model* model_;
-  Updater* updater_;
-  Score* score_;
-  Loss* loss_;
+  // Main class used by Solver
+  xLearn::HyperParam hyper_param_;
+  xLearn::Checker checker_;
+  std::vector<xLearn::Reader*> reader_;
+  xLearn::FileSpliter splitor_;
+  xLearn::Parser* parser_;
+  xLearn::Model* model_;
+  xLearn::Updater* updater_;
+  xLearn::Score* score_;
+  xLearn::Loss* loss_;
 
-  Parser* create_parser();
-  Reader* create_reader();
-  Updater* create_updater();
-  Score* create_score();
-  Loss* create_loss();
+  // Create ovject by name
+  xLearn::Parser* create_parser();
+  xLearn::Reader* create_reader();
+  xLearn::Updater* create_updater();
+  xLearn::Score* create_score();
+  xLearn::Loss* create_loss();
+
+  // Initialize function
+  void init_train();
+  void init_predict();
+
+  // Used by start function
   void start_train_work();
   void start_inference_work();
+
+  // Used by finalize funcrion
   void finalize_train_work();
   void finalize_inference_work();
+
+  // Read problem and set feature and field
   index_t find_max_feature(DMatrix* matrix, int num_samples);
   index_t find_max_field(DMatrix* matrix, int num_samples);
+
+  // Get the file format
+  std::string get_file_format(const std::string& filename);
+
+  // Used by log file suffix
   std::string get_host_name();
   std::string get_user_name();
   std::string print_current_time();
   std::string get_log_file();
 
+  // xLearn command line logo
   void print_logo() const;
 
  private:
+  std::string splitor_ch_;
+
   DISALLOW_COPY_AND_ASSIGN(Solver);
 };
 

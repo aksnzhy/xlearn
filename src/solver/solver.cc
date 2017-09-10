@@ -31,6 +31,7 @@ This file is the implementation of the Solver class.
 #include <cstdio>
 
 #include "src/base/stringprintf.h"
+#include "src/base/split_string.h"
 
 namespace xLearn {
 
@@ -55,195 +56,233 @@ void Solver::print_logo() const {
                "/_/\\_\\_____/\\___|\\__,_|_|  |_| |_|\n\n"
                "   xLearn   -- 0.10 Version --\n"
 "----------------------------------------------------------------------------\n"
+"\n"
   );
 }
 
-// Initialize Trainer
+// Initialize Solver
 void Solver::Initialize(int argc, char* argv[]) {
-  //-------------------------------------------------------
-  // Step 1: Print logo
-  //-------------------------------------------------------
+  //  Print logo
   print_logo();
-  //-------------------------------------------------------
-  // Step 2: Check and parse command line arguments
-  //-------------------------------------------------------
-  checker_.Initialize(argc, argv);
+  // Check and parse command line arguments
+  checker_.Initialize(hyper_param_.is_train, argc, argv);
   if (!checker_.Check(hyper_param_)) {
     printf("Arguments error \n");
     exit(0);
   }
-  //-------------------------------------------------------
-  // Step 3: Init log file
-  //-------------------------------------------------------
+  // Initialize log file
   std::string prefix = get_log_file();
   if (hyper_param_.is_train) {
     prefix += "_train";
   } else {
-    prefix += "_infer";
+    prefix += "_predict";
   }
   InitializeLogger(StringPrintf("%s.INFO", prefix.c_str()),
-                   StringPrintf("%s.WARN", prefix.c_str()),
-                   StringPrintf("%s.ERROR", prefix.c_str()));
-
-  // For training
+                StringPrintf("%s.WARN", prefix.c_str()),
+                StringPrintf("%s.ERROR", prefix.c_str()));
+  // Init train or predict
   if (hyper_param_.is_train) {
-    //-------------------------------------------------------
-    // Step 4: Init Reader and read problem
-    //-------------------------------------------------------
-    printf("Read and parse data ... \n");
-    LOG(INFO) << "Start to init Reader";
-    // Split file if use -cv
-    if (hyper_param_.cross_validation) {
-      CHECK_GT(hyper_param_.num_folds, 0);
-      splitor_.split(hyper_param_.train_set_file,
-                     hyper_param_.num_folds);
-      LOG(INFO) << "Split file into "
-                << hyper_param_.num_folds
-                << " parts.";
+    init_train();
+  } else {
+    init_predict();
+  }
+}
+
+// Initialize training task
+void Solver::init_train() {
+  /*********************************************************
+   *  Step 1: Init Reader and read problem                 *
+   *********************************************************/
+  printf("Read and parse data ... \n");
+  LOG(INFO) << "Start to init Reader";
+  // Split file if use -cv
+  if (hyper_param_.cross_validation) {
+    CHECK_GT(hyper_param_.num_folds, 0);
+    splitor_.split(hyper_param_.train_set_file,
+                   hyper_param_.num_folds);
+    LOG(INFO) << "Split file into "
+              << hyper_param_.num_folds
+              << " parts.";
+  }
+  // Get number of Reader and path of Reader
+  int num_reader = 0;
+  std::vector<std::string> file_list;
+  if (hyper_param_.cross_validation) {
+    num_reader += hyper_param_.num_folds;
+    for (int i = 0; i < hyper_param_.num_folds; ++i) {
+      std::string filename = StringPrintf("%s_%d",
+                        hyper_param_.train_set_file.c_str(),
+                        i);
+      file_list.push_back(filename);
     }
-    // Init Reader
-    int num_reader = 0;
-    std::vector<std::string> file_list;
-    if (hyper_param_.cross_validation) {
-      num_reader += hyper_param_.num_folds;
-      for (int i = 0; i < hyper_param_.num_folds; ++i) {
-        std::string filename = StringPrintf("%s_%d",
-                          hyper_param_.train_set_file.c_str(),
-                          i);
-        file_list.push_back(filename);
-      }
-    } else { // do not use CV
+  } else { // do not use CV
+    num_reader += 1;
+    CHECK_NE(hyper_param_.train_set_file.empty(), true);
+    file_list.push_back(hyper_param_.train_set_file);
+    if (!hyper_param_.test_set_file.empty()) {
       num_reader += 1;
-      CHECK_NE(hyper_param_.train_set_file.empty(), true);
-      file_list.push_back(hyper_param_.train_set_file);
-      if (!hyper_param_.test_set_file.empty()) {
-        num_reader += 1;
-        file_list.push_back(hyper_param_.test_set_file);
+      file_list.push_back(hyper_param_.test_set_file);
+    }
+  }
+  LOG(INFO) << "Number of Reader: " << num_reader;
+  reader_.resize(num_reader, NULL);
+  // Get file format and create Parser
+  hyper_param_.file_format =
+       get_file_format(hyper_param_.train_set_file);
+  if ((hyper_param_.file_format == "libsvm" ||
+       hyper_param_.file_format == "csv") &&
+      hyper_param_.score_func == "ffm") {
+    printf("[Error] Please use libffm file format for FFM task \n");
+    exit(0);
+  }
+  parser_ = create_parser();
+  parser_->SetSplitor(splitor_ch_);
+  // Create Reader
+  for (int i = 0; i < num_reader; ++i) {
+    reader_[i] = create_reader();
+    reader_[i]->Initialize(file_list[i],
+                           hyper_param_.sample_size,
+                           parser_);
+    if (reader_[i] == NULL) {
+      printf("Cannot open the file %s\n",
+             file_list[i].c_str());
+      exit(0);
+    }
+    LOG(INFO) << "Init Reader: " << file_list[i];
+  }
+  // Read problem and init some hyper_param
+  DMatrix* matrix = NULL;
+  index_t max_feat = 0, max_field = 0;
+  for (int i = 0; i < num_reader; ++i) {
+    int num_samples = 0;
+    do {
+      num_samples = reader_[i]->Samples(matrix);
+      int tmp = find_max_feature(matrix, num_samples);
+      if (tmp > max_feat) {
+        max_feat = tmp;
       }
-    }
-    LOG(INFO) << "Number of Reader: " << num_reader;
-    reader_.resize(num_reader, NULL);
-    // Create Parser
-    parser_ = create_parser();
-    // Create Reader
-    for (int i = 0; i < num_reader; ++i) {
-      reader_[i] = create_reader();
-      reader_[i]->Initialize(file_list[i],
-                             hyper_param_.batch_size,
-                             parser_);
-      if (reader_[i] == NULL) {
-        printf("Cannot open the file %s\n",
-               file_list[i].c_str());
-        exit(0);
+      if (hyper_param_.score_func.compare("ffm") == 0) {
+        tmp = find_max_field(matrix, num_samples);
+        if (tmp > max_field) {
+          max_field = tmp;
+        }
       }
-      LOG(INFO) << "Init Reader: " << file_list[i];
-    }
-    // Read problem and init some hyper-parameters
-    DMatrix* matrix = NULL;
-    index_t max_feat = 0, max_field = 0;
-    for (int i = 0; i < num_reader; ++i) {
-      int num_samples = 0;
-      do {
-        num_samples = reader_[i]->Samples(matrix);
-        int tmp = find_max_feature(matrix, num_samples);
-        if (tmp > max_feat) {
-          max_feat = tmp;
-        }
-        if (hyper_param_.score_func.compare("ffm") == 0) {
-          tmp = find_max_field(matrix, num_samples);
-          if (tmp > max_field) {
-            max_field = tmp;
-          }
-        }
-      } while (num_samples != 0);
-      // return to the begining
-      reader_[i]->Reset();
-    }
-    hyper_param_.num_feature = max_feat+1;
-    LOG(INFO) << "Number of feature: " << hyper_param_.num_feature;
-    printf("  Number of Feature: %d \n", hyper_param_.num_feature);
-    if (hyper_param_.score_func.compare("ffm") == 0) {
-      hyper_param_.num_field = max_field+1;
-      LOG(INFO) << "Number of field: " << hyper_param_.num_field;
-      printf("  Number of Field: %d \n", hyper_param_.num_field);
-    }
-    //-------------------------------------------------------
-    // Step 5: Init model parameter
-    //-------------------------------------------------------
-    printf("Initialize model ...\n");
-    if (hyper_param_.score_func.compare("fm") == 0) {
-      hyper_param_.num_param = hyper_param_.num_feature +
-                               hyper_param_.num_feature * hyper_param_.num_K;
-    } else if (hyper_param_.score_func.compare("ffm") == 0) {
-      hyper_param_.num_param = hyper_param_.num_feature +
-                               hyper_param_.num_feature *
-                               hyper_param_.num_field * hyper_param_.num_K;
-    } else { // linear socre
-      hyper_param_.num_param = hyper_param_.num_feature;
-    }
-    LOG(INFO) << "Number parameters: " << hyper_param_.num_param;
-    printf("  Model size: %.2f MB\n",
-            (double) hyper_param_.num_param /
-            (1024.0 * 1024.0));
-    if (hyper_param_.score_func.compare("linear") == 0) {
-      // Initialize all parameters to zero
-      model_ = new Model(hyper_param_, false);
-      LOG(INFO) << "Initialize model to zero.";
-    } else {
-      // Initialize parameters using Gaussian distribution
-      model_ = new Model(hyper_param_, true);
-      LOG(INFO) << "Initialize model using Gaussian distribution.";
-    }
-    //-------------------------------------------------------
-    // Step 6: Init Updater
-    //-------------------------------------------------------
+    } while (num_samples != 0);
+    // return to the begining
+    reader_[i]->Reset();
+  }
+  hyper_param_.num_feature = max_feat + 1; // add bias
+  LOG(INFO) << "Number of feature: " << hyper_param_.num_feature;
+  printf("  Number of Feature: %d \n", hyper_param_.num_feature);
+  if (hyper_param_.score_func.compare("ffm") == 0) {
+    hyper_param_.num_field = max_field + 1;
+    LOG(INFO) << "Number of field: " << hyper_param_.num_field;
+    printf("  Number of Field: %d \n", hyper_param_.num_field);
+  }
+  /*********************************************************
+   *  Step 2: Init Model                                   *
+   *********************************************************/
+   printf("Initialize model ...\n");
+   if (hyper_param_.score_func.compare("fm") == 0) {
+     hyper_param_.num_param = hyper_param_.num_feature +
+                              hyper_param_.num_feature *
+                              hyper_param_.num_K;
+   } else if (hyper_param_.score_func.compare("ffm") == 0) {
+     hyper_param_.num_param = hyper_param_.num_feature +
+                              hyper_param_.num_feature *
+                              hyper_param_.num_field *
+                              hyper_param_.num_K;
+   } else { // linear socre
+     hyper_param_.num_param = hyper_param_.num_feature;
+   }
+   LOG(INFO) << "Number parameters: " << hyper_param_.num_param;
+   printf("  Model size: %.2f MB\n",
+           (double) hyper_param_.num_param /
+           (1024.0 * 1024.0));
+   if (hyper_param_.score_func.compare("linear") == 0) {
+     // Initialize all parameters to zero
+     model_ = new Model();
+     model_->Initialize(hyper_param_.num_param,
+                   hyper_param_.score_func,
+                   hyper_param_.loss_func,
+                   hyper_param_.num_feature,
+                   hyper_param_.num_field,
+                   hyper_param_.num_K,
+                   false);
+     LOG(INFO) << "Initialize model to zero.";
+   } else {
+     // Initialize parameters using Gaussian distribution
+     model_ = new Model();
+     model_->Initialize(hyper_param_.num_param,
+                   hyper_param_.score_func,
+                   hyper_param_.loss_func,
+                   hyper_param_.num_feature,
+                   hyper_param_.num_field,
+                   hyper_param_.num_K,
+                   true);
+     LOG(INFO) << "Initialize model using Gaussian distribution.";
+   }
+   /*********************************************************
+    *  Step 3: Init Updater method                          *
+    *********************************************************/
     updater_ = create_updater();
-    updater_->Initialize(hyper_param_);
+    updater_->Initialize(hyper_param_.learning_rate,
+                     hyper_param_.regu_lambda,
+                     hyper_param_.decay_rate_1,
+                     hyper_param_.decay_rate_2,
+                     hyper_param_.num_param);
     LOG(INFO) << "Initialize Updater.";
-    //-------------------------------------------------------
-    // Step 7: Init score function
-    //-------------------------------------------------------
-    score_ = create_score();
-    score_->Initialize(hyper_param_);
-    LOG(INFO) << "Initialize score function.";
-    //-------------------------------------------------------
-    // Step 8: Init loss function
-    //-------------------------------------------------------
-    loss_ = create_loss();
-    loss_->Initialize(score_);
-    LOG(INFO) << "Initialize loss function.";
-  } else {  // For inference
-    //-------------------------------------------------------
-    // Step 4: Init model parameter
-    //-------------------------------------------------------
-    model_ = new Model(hyper_param_.model_file);
-    hyper_param_.score_func = model_->GetScoreFunction();
-    if (hyper_param_.score_func.compare("ffm") == 0 &&
-        hyper_param_.file_format.compare("libsvm") == 0) {
-      printf("[Warning] FFM model cannot use the libsvm file. "
-             "Already Change it to libffm format.\n");
-      hyper_param_.file_format = "libffm";
+    /*********************************************************
+     *  Step 4: Init score function                          *
+     *********************************************************/
+     score_ = create_score();
+     score_->Initialize(hyper_param_.num_feature,
+                     hyper_param_.num_K,
+                     hyper_param_.num_field);
+     LOG(INFO) << "Initialize score function.";
+     /*********************************************************
+      *  Step 5: Init loss function                           *
+      *********************************************************/
+      loss_ = create_loss();
+      loss_->Initialize(score_);
+      LOG(INFO) << "Initialize loss function.";
+}
+
+// Initialize predict task
+void Solver::init_predict() {
+  /*********************************************************
+   *  Step 1: Read problem from model file                 *
+   *********************************************************/
+   model_ = new Model(hyper_param_.model_file);
+   hyper_param_.score_func = model_->GetScoreFunction();
+   hyper_param_.loss_func = model_->GetLossFunction();
+   hyper_param_.num_feature = model_->GetNumFeature();
+   if (hyper_param_.score_func.compare("fm") == 0 ||
+       hyper_param_.score_func.compare("ffm") == 0) {
+     hyper_param_.num_K = model_->GetNumK();
+   }
+   if (hyper_param_.score_func.compare("ffm") == 0) {
+     hyper_param_.num_field = model_->GetNumField();
+   }
+   LOG(INFO) << "Initialize model.";
+   /*********************************************************
+    *  Step 2: Init Reader and read problem                 *
+    *********************************************************/
+    // Get file format and create Parser
+    hyper_param_.file_format =
+         get_file_format(hyper_param_.inference_file);
+    if (hyper_param_.file_format == "libsvm" &&
+        hyper_param_.score_func == "ffm") {
+        printf("[Error] Cannot give a libsvm file to FFM task \n");
+        exit(0);
     }
-    hyper_param_.loss_func = model_->GetLossFunction();
-    hyper_param_.num_feature = model_->GetNumFeature();
-    if (hyper_param_.score_func.compare("fm") == 0 ||
-        hyper_param_.score_func.compare("ffm") == 0) {
-      hyper_param_.num_K = model_->GetNumK();
-    }
-    if (hyper_param_.score_func.compare("ffm") == 0) {
-      hyper_param_.num_field = model_->GetNumField();
-    }
-    LOG(INFO) << "Initialize model.";
-    //-------------------------------------------------------
-    // Step 5: Init Reader and reader problembal
-    //-------------------------------------------------------
-    // Create Parser
     parser_ = create_parser();
+    parser_->SetSplitor(splitor_ch_);
     // Create Reader
     reader_.resize(1, create_reader());
     CHECK_NE(hyper_param_.inference_file.empty(), true);
     reader_[0]->Initialize(hyper_param_.inference_file,
-                           hyper_param_.batch_size,
+                           hyper_param_.sample_size,
                            parser_);
     if (reader_[0] == NULL) {
       printf("Cannot open the file %s\n",
@@ -251,19 +290,20 @@ void Solver::Initialize(int argc, char* argv[]) {
       exit(0);
     }
     LOG(INFO) << "Initialize Parser ans Reader.";
-    //-------------------------------------------------------
-    // Step 6: Init score function
-    //-------------------------------------------------------
-    score_ = create_score();
-    score_->Initialize(hyper_param_);
-    LOG(INFO) << "Initialize score function.";
-    //-------------------------------------------------------
-    // Step 7: Init loss function
-    //-------------------------------------------------------
-    loss_ = create_loss();
-    loss_->Initialize(score_);
-    LOG(INFO) << "Initialize score function.";
-  }
+    /*********************************************************
+     *  Step 2: Init score function                          *
+     *********************************************************/
+     score_ = create_score();
+     score_->Initialize(hyper_param_.num_feature,
+                     hyper_param_.num_K,
+                     hyper_param_.num_field);
+     LOG(INFO) << "Initialize score function.";
+     /*********************************************************
+      *  Step 2: Init loss function                          *
+      *********************************************************/
+      loss_ = create_loss();
+      loss_->Initialize(score_);
+      LOG(INFO) << "Initialize score function.";
 }
 
 // Start training or inference
@@ -278,7 +318,7 @@ void Solver::StartWork() {
 }
 
 // Finalize xLearn
-void Solver::Finalize() {
+void Solver::FinalizeWork() {
   if (hyper_param_.is_train) {
     finalize_train_work();
   } else {
@@ -335,6 +375,45 @@ void Solver::start_inference_work() {
 
 void Solver::finalize_inference_work() {
   LOG(INFO) << "Finalize inference work.";
+}
+
+// Get the file format
+std::string Solver::get_file_format(const std::string& filename) {
+  FILE* file = OpenFileOrDie(StringPrintf("%s",
+                        filename.c_str()).c_str(), "r");
+  // get the first line of data
+  std::string data_line;
+  GetLine(file, data_line);
+  // check the splitor
+  if (data_line.find(" ")) {
+    splitor_ch_ = " ";
+  } else if (data_line.find("\t")) {
+    splitor_ch_ = "\t";
+  } else {
+    printf("[Error] The instance in %s must be divided by space or tab \n",
+          filename.c_str());
+    exit(0);
+  }
+  // file format
+  std::vector<std::string> str_list;
+  SplitStringUsing(data_line, splitor_ch_.c_str(), &str_list);
+  int count = 0;
+  for (int i = 0; i < str_list[1].size(); ++i) {
+    if (str_list[1][i] == ':') {
+      count++;
+    }
+  }
+  if (count == 0) {
+    return "csv";
+  } else if (count == 1) {
+    return "libsvm";
+  } else if (count == 2) {
+    return "libffm";
+  } else {
+    printf("[Error] Unknow file format \n");
+    exit(0);
+  }
+  Close(file);
 }
 
 // Create Parser by a given string

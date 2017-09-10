@@ -84,11 +84,11 @@ struct HyperParam {
   /* Filename for inference set */
   std::string inference_file;           // Must have value in predict task
   /* Filename of model */
-  std::string model_file = "./model/xlearn_model";
+  std::string model_file = "./xlearn_model";
   /* Filename of output result */
-  std::string output_file = "./out/xlearn_out";
+  std::string output_file = "./xlearn_out";
   /* Filename of log file */
-  std::string log_file = "./log/xlearn_log"; // This is not the final name
+  std::string log_file = "./xlearn_log"; // This is not the final name
 //------------------------------------------------------------------------------
 // Parameters for validation
 //------------------------------------------------------------------------------

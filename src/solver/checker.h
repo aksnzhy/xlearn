@@ -44,7 +44,7 @@ class Checker {
   ~Checker() { }
 
   // Initialize Checker
-  void Initialize(int argc, char* argv[]);
+  void Initialize(bool is_train, int argc, char* argv[]);
 
   // Check and parse arguments
   bool Check(HyperParam& hyper_param);
@@ -52,8 +52,12 @@ class Checker {
  private:
   StringList menu_;  // Store all the options
   StringList args_;  // User input command line
+  bool is_train_;    // train or predict
 
+  // Print the help menu
   std::string option_help() const;
+
+  // Check options for train and predict
   bool check_train_options(HyperParam& hyper_param);
   bool check_inference_options(HyperParam& hyper_param);
 
