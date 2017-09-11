@@ -121,4 +121,30 @@ TEST(DMATRIX_TEST, CopyFrom) {
   EXPECT_EQ(matrix.can_release, true);
 }
 
+TEST(DMATRIX_TEST, Serialize_Deserialize) {
+  DMatrix matrix(20);
+  matrix.InitSparseRow(true);
+  for (int i = 0; i < 20; ++i) {
+    SparseRow* row = matrix.row[i];
+    row->Resize(10);
+    for (int j = 0; j < 10; ++j) {
+      row->X[j] = j;
+      row->idx[j] = j;
+      row->field[j] = j;
+    }
+  }
+  matrix.Serialize("/tmp/matrx.bin");
+  DMatrix new_matrix;
+  new_matrix.Deserialize("/tmp/matrx.bin");
+  for (int i = 0; i < 20; ++i) {
+    SparseRow* row = new_matrix.row[i];
+    for (int j = 0; j < 10; ++j) {
+      EXPECT_FLOAT_EQ(row->X[j], j);
+      EXPECT_EQ(row->idx[j], j);
+      EXPECT_EQ(row->field[j], j);
+    }
+  }
+  RemoveFile("/tmp/matrx.bin");
+}
+
 } // namespace xLearn

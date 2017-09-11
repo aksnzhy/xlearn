@@ -28,6 +28,7 @@ This file defines the basic data structures used by xLearn.
 
 #include "src/base/common.h"
 #include "src/base/stl-util.h"
+#include "src/base/file_util.h"
 
 namespace xLearn {
 
@@ -63,8 +64,8 @@ struct SparseRow {
   // Resize current row.
   void Resize(size_t new_length) {
     CHECK_GE(new_length, 0);
-    // we invoke resize() when new_length > column_len
-    if (column_len < new_length) {
+    // we invoke resize() when new_length >= column_len
+    if (column_len <= new_length) {
       X.resize(new_length, 0.0);
       idx.resize(new_length, 0);
       if (if_has_field) {
@@ -164,6 +165,61 @@ struct DMatrix {
     if (can_release) {
       STLDeleteElementsAndClear(&row);
     }
+  }
+
+  // Serialize matrix to disk file
+  void Serialize(const std::string& filename) {
+    CHECK_NE(filename.empty(), true);
+    FILE* file = OpenFileOrDie(filename.c_str(), "w");
+    // has_field, row_len, can_release
+    WriteDataToDisk(file, (char*)(&has_field), sizeof(has_field));
+    WriteDataToDisk(file, (char*)(&row_len), sizeof(row_len));
+    WriteDataToDisk(file, (char*)(&can_release), sizeof(can_release));
+    // Y
+    WriteDataToDisk(file, (char*)Y.data(), sizeof(real_t)*Y.size());
+    // row
+    for (int i = 0; i < row.size(); ++i) {
+      int col = row[i]->column_len;
+      WriteDataToDisk(file, (char*)(&row[i]->column_len), sizeof(size_t));
+      WriteDataToDisk(file, (char*)(&row[i]->if_has_field), sizeof(bool));
+      WriteDataToDisk(file, (char*)row[i]->X.data(), sizeof(real_t)*col);
+      WriteDataToDisk(file, (char*)row[i]->idx.data(), sizeof(index_t)*col);
+      if (has_field) {
+        WriteDataToDisk(file, (char*)row[i]->field.data(), sizeof(index_t)*col);
+      }
+    }
+    Close(file);
+  }
+
+  // Deserialize matrix from disk file
+  void Deserialize(const std::string& filename) {
+    CHECK_NE(filename.empty(), true);
+    FILE* file = OpenFileOrDie(filename.c_str(), "r");
+    // has_field, row_len, can_release
+    ReadDataFromDisk(file, (char*)(&has_field), sizeof(has_field));
+    ReadDataFromDisk(file, (char*)(&row_len), sizeof(row_len));
+    ReadDataFromDisk(file, (char*)(&can_release), sizeof(can_release));
+    // Init row
+    this->Resize(row_len);
+    this->InitSparseRow(has_field);
+    // Y
+    ReadDataFromDisk(file, (char*)Y.data(), sizeof(real_t)*Y.size());
+    // row
+    for (int i = 0; i < row.size(); ++i) {
+      ReadDataFromDisk(file, (char*)(&row[i]->column_len), sizeof(size_t));
+      ReadDataFromDisk(file, (char*)(&row[i]->if_has_field), sizeof(bool));
+      // Init row
+      int col = row[i]->column_len;
+      row[i]->Resize(row[i]->column_len);
+      ReadDataFromDisk(file, (char*)row[i]->X.data(), sizeof(real_t)*col);
+      ReadDataFromDisk(file, (char*)row[i]->idx.data(), sizeof(index_t)*col);
+      if (has_field) {
+        ReadDataFromDisk(file,
+           (char*)row[i]->field.data(),
+           sizeof(index_t)*col);
+      }
+    }
+    Close(file);
   }
 
   // Storing SparseRows. Note that we use pointers here in order to

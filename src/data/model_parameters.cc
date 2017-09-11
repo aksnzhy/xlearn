@@ -83,8 +83,7 @@ Model::Model(const std::string& filename) {
 void Model::SaveModel(const std::string& filename) {
   static std::string data_line;
   CHECK_NE(filename.empty(), true);
-  FILE* file = OpenFileOrDie(StringPrintf("%s",
-                        filename.c_str()).c_str(), "w");
+  FILE* file = OpenFileOrDie(filename.c_str(), "w");
   // The 1st line: score function
   // The 2nd line: loss function
   // The 3nd line: feature num
@@ -113,8 +112,7 @@ void Model::SaveModel(const std::string& filename) {
 bool Model::LoadModel(const std::string& filename) {
   static std::string data_line;
   CHECK_NE(filename.empty(), true);
-  FILE* file = OpenFileOrDie(StringPrintf("%s",
-                        filename.c_str()).c_str(), "r");
+  FILE* file = OpenFileOrDie(filename.c_str(), "r");
   if (file == NULL) { return false; }
   // The 1st line: score function
   GetLine(file, score_func_);
