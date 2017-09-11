@@ -65,10 +65,15 @@ void Solver::Initialize(int argc, char* argv[]) {
   //  Print logo
   print_logo();
   // Check and parse command line arguments
-  checker_.Initialize(hyper_param_.is_train, argc, argv);
-  if (!checker_.Check(hyper_param_)) {
-    printf("Arguments error \n");
-    exit(0);
+  try {
+    checker_.Initialize(hyper_param_.is_train, argc, argv);
+    if (!checker_.Check(hyper_param_)) {
+      printf("Arguments error \n");
+      exit(0);
+    }
+  } catch (std::invalid_argument &e) {
+    printf("%s\n", e.what());
+    exit(1);
   }
   // Initialize log file
   std::string prefix = get_log_file();
@@ -90,6 +95,8 @@ void Solver::Initialize(int argc, char* argv[]) {
 
 // Initialize training task
 void Solver::init_train() {
+  clock_t start, end;
+  start = clock();
   /*********************************************************
    *  Step 1: Init Reader and read problem                 *
    *********************************************************/
@@ -136,7 +143,6 @@ void Solver::init_train() {
     exit(0);
   }
   parser_ = create_parser();
-  parser_->SetSplitor(splitor_ch_);
   // Create Reader
   for (int i = 0; i < num_reader; ++i) {
     reader_[i] = create_reader();
@@ -179,9 +185,13 @@ void Solver::init_train() {
     LOG(INFO) << "Number of field: " << hyper_param_.num_field;
     printf("  Number of Field: %d \n", hyper_param_.num_field);
   }
+  end = clock();
+  printf("  Time cost: %.2f sec \n",
+    (float)(end-start) / CLOCKS_PER_SEC);
   /*********************************************************
    *  Step 2: Init Model                                   *
    *********************************************************/
+   start = clock();
    printf("Initialize model ...\n");
    if (hyper_param_.score_func.compare("fm") == 0) {
      hyper_param_.num_param = hyper_param_.num_feature +
@@ -222,6 +232,9 @@ void Solver::init_train() {
                    true);
      LOG(INFO) << "Initialize model using Gaussian distribution.";
    }
+   end = clock();
+   printf("  Time cost: %.2f sec \n",
+     (float)(end-start) / CLOCKS_PER_SEC);
    /*********************************************************
     *  Step 3: Init Updater method                          *
     *********************************************************/
@@ -277,7 +290,6 @@ void Solver::init_predict() {
         exit(0);
     }
     parser_ = create_parser();
-    parser_->SetSplitor(splitor_ch_);
     // Create Reader
     reader_.resize(1, create_reader());
     CHECK_NE(hyper_param_.inference_file.empty(), true);
@@ -299,7 +311,7 @@ void Solver::init_predict() {
                      hyper_param_.num_field);
      LOG(INFO) << "Initialize score function.";
      /*********************************************************
-      *  Step 2: Init loss function                          *
+      *  Step 2: Init loss function                           *
       *********************************************************/
       loss_ = create_loss();
       loss_->Initialize(score_);
@@ -332,7 +344,7 @@ void Solver::start_train_work() {
   bool early_stop = hyper_param_.early_stop;
   if (hyper_param_.cross_validation) {
     Trainer trainer;
-    trainer.Initialize(reader_, /* reader list*/
+    trainer.Initialize(reader_, /* reader list */
                        epoch,
                        model_,
                        loss_,
@@ -384,19 +396,8 @@ std::string Solver::get_file_format(const std::string& filename) {
   // get the first line of data
   std::string data_line;
   GetLine(file, data_line);
-  // check the splitor
-  if (data_line.find(" ")) {
-    splitor_ch_ = " ";
-  } else if (data_line.find("\t")) {
-    splitor_ch_ = "\t";
-  } else {
-    printf("[Error] The instance in %s must be divided by space or tab \n",
-          filename.c_str());
-    exit(0);
-  }
-  // file format
   std::vector<std::string> str_list;
-  SplitStringUsing(data_line, splitor_ch_.c_str(), &str_list);
+  SplitStringUsing(data_line, " \t", &str_list);
   int count = 0;
   for (int i = 0; i < str_list[1].size(); ++i) {
     if (str_list[1][i] == ':') {

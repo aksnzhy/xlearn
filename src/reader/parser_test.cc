@@ -36,6 +36,8 @@ namespace xLearn {
 const string kStr = "0 1:0.123 2:0.123 3:0.123 4:0.123 5:0.123";
 const string kStrFFM = "1 1:1:0.123 2:2:0.123 3:3:0.123 4:4:0.123 5:5:0.123";
 const string kStrCSV = "0 1 2 3 4 5";
+const string kStr_infer = "1:0.123 2:0.123 3:0.123 4:0.123 5:0.123";
+const string kStrFFM_infer = "1:1:0.123 2:2:0.123 3:3:0.123 4:4:0.123 5:5:0.123";
 const index_t kNum_lines = 100000;
 const index_t kLen = 5;
 

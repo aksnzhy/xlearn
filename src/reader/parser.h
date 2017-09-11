@@ -44,19 +44,14 @@ typedef std::vector<std::string> StringList;
 class Parser {
  public:
   // Using " " as splitor by default.
-  Parser() { m_splitor = " "; }
+  Parser() { }
   virtual ~Parser() {  }
-
-  void SetSplitor(std::string splitor) { m_splitor = splitor; }
 
   virtual void Parse(const StringList& list, DMatrix& matrix) = 0;
 
   std::string Type() { return parser_type; }
 
  protected:
-  std::string m_splitor;        // Identify the spliting character
-  StringList m_items;           // To store items divided by the splitor
-  StringList m_single_item;     // To store every single item divided by ':'
   std::string parser_type;      // libsvm, libffm, or csv ?
 
  private:

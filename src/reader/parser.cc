@@ -46,22 +46,25 @@ void LibsvmParser::Parse(const StringList& list, DMatrix& matrix) {
   CHECK_GE(matrix.row_len, 0);
   size_t row_len = matrix.row_len;
   for (size_t i = 0; i < row_len; ++i) {
-    m_items.clear();
-    SplitStringUsing(list[i], m_splitor.c_str(), &m_items);
-    int len = m_items.size();
-    matrix.Y[i] = atof(m_items[0].c_str());
-    CHECK_NOTNULL(matrix.row[i]);
-    matrix.row[i]->Resize(len);
-    // add bias term.
-    matrix.row[i]->idx[0] = 0;
-    matrix.row[i]->X[0] = 1.0;
-    for (int j = 1; j < len; ++j) {
-      m_single_item.clear();
-      SplitStringUsing(m_items[j], ":", &m_single_item);
-      CHECK_EQ(m_single_item.size(), 2);
-      matrix.row[i]->idx[j] = atoi(m_single_item[0].c_str());
-      matrix.row[i]->X[j] = atof(m_single_item[1].c_str());
+    int col_len = 1;
+    // Add Y
+    char *y_char = strtok(const_cast<char*>(list[i].data()), " \t");
+    // Add bias
+    matrix.Y[i] = atof(y_char);
+    matrix.row[i]->idx.push_back(0);
+    matrix.row[i]->X.push_back(1.0);
+    // Add the other feature
+    for (;;) {
+      char *idx_char = strtok(nullptr, ":");
+      char *value_char = strtok(nullptr, " \t");
+      if(idx_char == NULL || *idx_char == '\n') {
+        break;
+      }
+      matrix.row[i]->idx.push_back(atoi(idx_char));
+      matrix.row[i]->X.push_back(atof(value_char));
+      ++col_len;
     }
+    matrix.row[i]->column_len = col_len;
   }
 }
 
@@ -75,24 +78,28 @@ void FFMParser::Parse(const StringList& list, DMatrix& matrix) {
   CHECK_GE(matrix.row_len, 0);
   size_t row_len = matrix.row_len;
   for (size_t i = 0; i < row_len; ++i) {
-    m_items.clear();
-    SplitStringUsing(list[i], m_splitor.c_str(), &m_items);
-    int len = m_items.size();
-    matrix.Y[i] = atof(m_items[0].c_str());
-    CHECK_NOTNULL(matrix.row[i]);
-    // add bias term
-    matrix.row[i]->Resize(len);
-    matrix.row[i]->field[0] = 0;
-    matrix.row[i]->idx[0] = 0;
-    matrix.row[i]->X[0] = 1.0;
-    for (int j = 1; j < len; ++j) {
-      m_single_item.clear();
-      SplitStringUsing(m_items[j], ":", &m_single_item);
-      CHECK_EQ(m_single_item.size(), 3);
-      matrix.row[i]->field[j] = atoi(m_single_item[0].c_str());
-      matrix.row[i]->idx[j] = atoi(m_single_item[1].c_str());;
-      matrix.row[i]->X[j] = atof(m_single_item[2].c_str());
+    int col_len = 1;
+    // Add Y
+    char *y_char = strtok(const_cast<char*>(list[i].data()), " \t");
+    // Add bias
+    matrix.Y[i] = atof(y_char);
+    matrix.row[i]->field.push_back(0);
+    matrix.row[i]->idx.push_back(0);
+    matrix.row[i]->X.push_back(1.0);
+    // Add the other feature
+    for (;;) {
+      char *field_char = strtok(nullptr, ":");
+      char *idx_char = strtok(nullptr, ":");
+      char *value_char = strtok(nullptr, " \t");
+      if(field_char == NULL || *field_char == '\n') {
+        break;
+      }
+      matrix.row[i]->field.push_back(atoi(field_char));
+      matrix.row[i]->idx.push_back(atoi(idx_char));
+      matrix.row[i]->X.push_back(atof(value_char));
+      ++col_len;
     }
+    matrix.row[i]->column_len = col_len;
   }
 }
 
@@ -102,12 +109,14 @@ void FFMParser::Parse(const StringList& list, DMatrix& matrix) {
 // [y2 value value value ...]
 //------------------------------------------------------------------------------
 void CSVParser::Parse(const StringList& list, DMatrix& matrix) {
+  static StringList m_items;
+  static StringList m_single_item;
   CHECK_GE(list.size(), 0);
   CHECK_GE(matrix.row_len, 0);
   size_t row_len = matrix.row_len;
   for (size_t i = 0; i < row_len; ++i) {
     m_items.clear();
-    SplitStringUsing(list[i], m_splitor.c_str(), &m_items);
+    SplitStringUsing(list[i], " \t", &m_items);
     matrix.Y[i] = atof(m_items[0].c_str());
     // Get real length of current row
     int len = 0;

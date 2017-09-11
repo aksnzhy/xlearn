@@ -344,12 +344,12 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
   }
   if (!bo) { return false; }
   /*********************************************************
-   *  Step 4: Check some warnings                          *
+   *  Step 4: Check some warnings and conflict             *
    *********************************************************/
   if (hyper_param.cross_validation &&
      !hyper_param.test_set_file.empty()) {
-    printf("[Warning] -cv has be set, and xLearn will ignore the "
-           "test file: %s \n",
+    printf("[Warning] -cv has be set, and xLearn will "
+           "ignore the test file: %s \n",
            hyper_param.test_set_file.c_str());
   }
   if (hyper_param.num_K > 32) {
@@ -371,6 +371,13 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
   if (hyper_param.num_epoch > 1000) {
     printf("[Warning] -epc is too large: %d \n",
            hyper_param.num_epoch);
+  }
+  if (hyper_param.early_stop &&
+      hyper_param.test_set_file.empty() &&
+     !hyper_param.cross_validation) {
+    printf("[Error] To use early-stop, you need to "
+           "assign a test set via '-te' option \n");
+    exit(0);
   }
 
   return true;

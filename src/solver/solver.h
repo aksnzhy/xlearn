@@ -119,8 +119,6 @@ class Solver {
   void print_logo() const;
 
  private:
-  std::string splitor_ch_;
-
   DISALLOW_COPY_AND_ASSIGN(Solver);
 };
 
