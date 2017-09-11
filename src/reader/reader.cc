@@ -124,6 +124,27 @@ bool InmemReader::Initialize(const std::string& filename,
   return true;
 }
 
+// In-memory Reader can be initialized from binary file
+bool InmemReader::InitFromBinary(const std::string& filename,
+                                 int num_samples) {
+  CHECK_NE(filename.empty(), true);
+  CHECK_GT(num_samples, 0);
+  filename_ = filename;
+  num_samples_ = num_samples;
+  parser_ = NULL;
+  file_ptr_ = OpenFileOrDie(filename_.c_str(), "r");
+  if (file_ptr_ == NULL) { return false; }
+  data_buf_.Deserialize(filename);
+  data_samples_.Resize(num_samples);
+  order_.resize(data_buf_.row_len);
+  return true;
+}
+
+// Serialize DMatrix to a binary file
+void InmemReader::SaveBufferToBinary(const std::string& filename) {
+  data_buf_.Serialize(filename);
+}
+
 // Read one line of data from the memory buffer
 uint64 InmemReader::ReadLineFromMemory(char* line,
                                        char* buf,

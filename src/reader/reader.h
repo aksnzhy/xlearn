@@ -104,6 +104,13 @@ class InmemReader : public Reader {
                           int num_samples,
                           Parser* parser);
 
+  // In-memory Reader can be initialized from binary file
+  virtual bool InitFromBinary(const std::string& filename,
+                              int num_samples);
+
+  // Serialize DMatrix to a binary file
+  virtual void SaveBufferToBinary(const std::string& filename);
+
   // Sample data from memory buffer.
   virtual int Samples(DMatrix* &matrix);
 

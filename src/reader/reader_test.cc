@@ -181,6 +181,30 @@ TEST_F(ReaderTest, SampleFromMemory) {
   }
 }
 
+TEST_F(ReaderTest, ReadFromBinary) {
+  string lr_file = kTestfilename + "_LR.txt";
+  // libsvm
+  InmemReader reader_lr;
+  reader_lr.Initialize(lr_file, kNumSamples, parser_lr);
+  // Serialize
+  reader_lr.SaveBufferToBinary("/tmp/matrix.bin");
+  InmemReader new_reader;
+  new_reader.InitFromBinary("/tmp/matrix.bin", kNumSamples);
+  DMatrix* matrix = NULL;
+  int i = 0;
+  for (; i < iteration_num; ++i) {
+    int record_num = new_reader.Samples(matrix);
+    if (record_num == 0) {
+      --i;
+      new_reader.Reset();
+      continue;
+    }
+    EXPECT_EQ(record_num, kNumSamples);
+    CheckLR(matrix);
+  }
+  EXPECT_EQ(i, iteration_num);
+}
+
 TEST_F(ReaderTest, SampleFromDisk) {
   string lr_file = kTestfilename + "_LR.txt";
   string ffm_file = kTestfilename + "_ffm.txt";
