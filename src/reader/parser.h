@@ -47,7 +47,11 @@ class Parser {
   Parser() { }
   virtual ~Parser() {  }
 
-  virtual void Parse(const StringList& list, DMatrix& matrix) = 0;
+  virtual void Parse(const StringList& list,
+                     DMatrix& matrix) = 0;
+
+  virtual void ParseBinary(const StringList& list,
+                           DMatrix& matrix) = 0;
 
   std::string Type() { return parser_type; }
 
@@ -68,7 +72,8 @@ class LibsvmParser : public Parser {
   LibsvmParser() { parser_type = "libsvm"; }
   ~LibsvmParser() {  }
 
-  virtual void Parse(const StringList& list, DMatrix& matrix);
+  virtual void Parse(const StringList& list,
+                     DMatrix& matrix);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(LibsvmParser);
@@ -84,7 +89,8 @@ class FFMParser : public Parser {
   FFMParser() { parser_type = "libffm"; }
   ~FFMParser() {  }
 
-  virtual void Parse(const StringList& list, DMatrix& matrix);
+  virtual void Parse(const StringList& list,
+                     DMatrix& matrix);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(FFMParser);
@@ -100,7 +106,8 @@ class CSVParser : public Parser {
   CSVParser() { parser_type = "csv"; }
   ~CSVParser() { }
 
-  virtual void Parse(const StringList& list, DMatrix& matrix);
+  virtual void Parse(const StringList& list,
+                     DMatrix& matrix);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(CSVParser);
