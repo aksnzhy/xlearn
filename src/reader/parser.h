@@ -50,9 +50,6 @@ class Parser {
   virtual void Parse(const StringList& list,
                      DMatrix& matrix) = 0;
 
-  virtual void ParseBinary(const StringList& list,
-                           DMatrix& matrix) = 0;
-
   std::string Type() { return parser_type; }
 
  protected:
