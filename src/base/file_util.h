@@ -81,9 +81,9 @@ inline uint64 GetFileSize(FILE* file) {
 // Get one line of data from the file
 inline void GetLine(FILE* file, std::string& str_line) {
   CHECK_NOTNULL(file);
-  static scoped_array<char> line(new char[kMaxLineSize]);
-  fgets(line.get(), kMaxLineSize, file);
-  int read_len = strlen(line.get());
+  static char* line = new char[kMaxLineSize];
+  fgets(line, kMaxLineSize, file);
+  int read_len = strlen(line);
   if (line[read_len - 1] != '\n') {
     LOG(FATAL) << "Encountered a too-long line.     \
                    Please check the data.";
@@ -94,7 +94,7 @@ inline void GetLine(FILE* file, std::string& str_line) {
       line[read_len - 2] = '\0';
     }
   }
-  str_line.assign(line.get());
+  str_line.assign(line);
 }
 
 // Write data from a buffer to disk file
@@ -182,6 +182,7 @@ void WriteVectorToFile(FILE* file_ptr, const std::vector<T>& vec) {
   char* buf = nullptr;
   size_t buf_len = serialize_vector(vec, &buf);
   WriteDataToDisk(file_ptr, buf, buf_len);
+  delete [] buf;
 }
 
 // Read a std::vector from disk file
@@ -199,6 +200,7 @@ void ReadVectorFromFile(FILE* file_ptr, std::vector<T>& vec) {
       buf + sizeof(size_t),
       buf_len - sizeof(size_t));
   deserialize_vector(buf, buf_len, vec);
+  delete [] buf;
 }
 
 #endif  // XLEARN_BASE_FILE_UTIL_H_
