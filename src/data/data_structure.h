@@ -44,57 +44,35 @@ typedef float real_t;
 typedef uint32 index_t;
 
 //------------------------------------------------------------------------------
-// SparseRow is used to store one line of the training data.
-// Note that we do not use map<int, float> to store sparse entry because of
-// its poor performance. Instead, we use double-vector, where the feature value
-// and its coresponding index are stored in two vectors. For the FFM task, we
-// also need another vector to store the field entry.
+// Node is used to store information for each feature.
+// For tasks like lr and fm, we just need to store the feature id
+// and feature value, while we also need to store the field id for
+// the ffm task.
+//------------------------------------------------------------------------------
+struct Node {
+  index_t field_id;  /* Start from 0 */
+  index_t feat_id;   /* Start from 0, which is the bias term */
+  real_t feat_val;   /* Can be numeric or catagorical feature */
+}
+
+//------------------------------------------------------------------------------
+// SparseRow is used to store one line of the training data, which
+// is a vector of the Node.
 //------------------------------------------------------------------------------
 struct SparseRow {
-  // On default the 'field' vector is empty.
-  explicit SparseRow(size_t length, bool has_field = false)
-    : X(length, 0.0), idx(length, 0), if_has_field(has_field) {
-    // for ffm task
-    if (if_has_field) {
-      field.resize(length, 0);
-    }
-    column_len = length;
-  }
+  std::vector<Node> X;  /* Store the one line of feature */
+  index_t node_len;     /* Store the size of current row */
 
-  // Resize current row.
-  void Resize(size_t new_length) {
-    CHECK_GE(new_length, 0);
-    // we invoke resize() when new_length >= column_len
-    if (column_len <= new_length) {
-      X.resize(new_length, 0.0);
-      idx.resize(new_length, 0);
-      if (if_has_field) {
-        field.resize(new_length, 0);
-      }
-    }
-    column_len = new_length;
+  // Serialize SparseRow to disk file
+  void serialize_row(FILE* file) {
+    CHECK_NOTNULL(file);
+    WriteVectorToFile(file, this->X);
   }
-
-  // Copy data from one SparseRow to another.
-  void CopyFrom(SparseRow* row) {
-    CHECK_NOTNULL(row);
-    if_has_field = row->if_has_field;
-    Resize(row->column_len);
-    std::copy(row->X.begin(), row->X.end(),
-              this->X.begin());
-    std::copy(row->idx.begin(), row->idx.end(),
-              this->idx.begin());
-    if (if_has_field) {
-      std::copy(row->field.begin(), row->field.end(),
-                this->field.begin());
-    }
+  // Deserialize SparseRow from disk file
+  void deserialize_row(FILE* file) {
+    CHECK_NOTNULL(file);
+    ReadVectorFromFile(file, this->X);
   }
-
-  std::vector<real_t> X;       // Storing the feature value.
-  std::vector<index_t> idx;    // Stroing the index of each feature.
-  std::vector<index_t> field;  // Storing the field value.
-  size_t column_len;           // Storing the size of current row.
-  bool if_has_field;           // for ffm ?
 };
 
 //------------------------------------------------------------------------------

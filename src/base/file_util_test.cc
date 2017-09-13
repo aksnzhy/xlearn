@@ -35,7 +35,7 @@ TEST(FileTest, Serialize_and_Deserialize_buffer) {
     array.push_back(i);
   }
   char* buffer = nullptr;
-  serialize_vector(array, buffer);
+  serialize_vector(array, &buffer);
   size_t len = sizeof(size_t) + sizeof(int) * array.size();
   array.clear();
   deserialize_vector(buffer, len, array);
