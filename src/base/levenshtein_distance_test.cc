@@ -68,4 +68,4 @@ TEST(LDISTANCE_TEST, FindSimilar) {
   EXPECT_EQ(result, std::string("mac"));
 }
 
-} // namespace xLearn
+}  // namespace xLearn

@@ -95,7 +95,7 @@ class Logger {
 // destructor only causes the lose of the last message body; while the
 // message head will be there.
 //-----------------------------------------------------------------------------
-#define LOG(severity)                                                   \
+#define LOG(severity)                                                       \
   Logger(severity).Start(severity, __FILE__, __LINE__, __FUNCTION__)
 
-#endif // XLEARN_BASE_LOGGING_H_
+#endif   // XLEARN_BASE_LOGGING_H_

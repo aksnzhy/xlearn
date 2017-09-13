@@ -66,6 +66,8 @@ class Updater {
                            const index_t start_id,
                            std::vector<real_t>& param);
 
+  virtual void BatchUpdate(__MX w_k, __MX grad, real_t* w);
+
  protected:
   real_t learning_rate_;
   real_t regu_lambda_;

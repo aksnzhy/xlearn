@@ -61,6 +61,8 @@ real_t FFMScore::CalcScore(const SparseRow* row,
     index_t pos = row->idx[i];
     score += (*w)[pos] * row->X[i];
   }
+  const real_t* data = (&((*w)[0])) + num_feature_;
+  __MX _sum = _MMX_SETZERO_PS();
   // latent factor
   for (index_t i = 0; i < col_len; ++i) {
     real_t val_i = row->X[i];
@@ -68,35 +70,30 @@ real_t FFMScore::CalcScore(const SparseRow* row,
     index_t field_i = row->field[i];
     index_t mat_mul_pos_i = matrix_size * idx_i;
     index_t field_i_mul_fac = field_i * num_factor_;
-    const real_t* data = (&((*w)[0])) + num_feature_;
     for (index_t j = i+1; j < col_len; ++j) {
       real_t val_j = row->X[j];
       index_t idx_j = row->idx[j];
       index_t field_j = row->field[j];
-      __MX _accu = _MMX_SET1_PS(0);
+      const real_t* w_j = data + mat_mul_pos_i + num_factor_ * field_j;
+      const real_t* w_i = data + matrix_size * idx_j + field_i_mul_fac;
+      __MX _v = _MMX_SET1_PS(val_j*val_i);
       for (index_t k = 0; k < num_factor_; k += _MMX_INCREMENT) {
-        __MX _kj = _MMX_LOAD_PS(data + mat_mul_pos_i
-                                     + field_j
-                                     * num_factor_);
-        __MX _ki = _MMX_LOAD_PS(data + matrix_size
-                                     * idx_j
-                                     + field_i_mul_fac);
-        __MX _tmp = _MMX_MUL_PS(_ki, _kj);
-        _accu = _MMX_ADD_PS(_accu, _tmp);
+        __MX _kj = _MMX_LOAD_PS(w_j + k);
+        __MX _ki = _MMX_LOAD_PS(w_i + k);
+        _sum = _MMX_ADD_PS(_sum,
+               _MMX_MUL_PS(_MMX_MUL_PS(_kj, _ki), _v));
       }
-      // accumulate _accu to sum
-      real_t sum = 0.0;
-#ifdef __AVX__
-      sum += sum8(_accu);
-#else // SSE
-      _accu = _mm_hadd_ps(_accu, _accu);
-      _accu = _mm_hadd_ps(_accu, _accu);
-      _mm_store_ss(&sum, _accu);
-#endif
-      sum *= val_i * val_j;
-      score += sum;
     }
   }
+  real_t sum = 0;
+#ifdef __AVX__
+  sum += sum8(_sum);
+#else // SSE
+  _sum = _mm_hadd_ps(_sum, _sum);
+  _sum = _mm_hadd_ps(_sum, _sum);
+  _mm_store_ss(&sum, _sum);
+#endif
+  score += sum;
   return score;
 }
 
@@ -106,11 +103,7 @@ void FFMScore::CalcGrad(const SparseRow* row,
                         std::vector<real_t>& param,
                         real_t pg, /* partial gradient */
                         Updater* updater) {
-  static std::vector<real_t> tmp_vec_1(num_factor_);
-  static std::vector<real_t> tmp_vec_2(num_factor_);
   static size_t matrix_size = num_factor_ * num_field_;
-  real_t* p_i = tmp_vec_1.data();
-  real_t* p_j = tmp_vec_2.data();
   size_t col_len = row->column_len;
   // for linear term
   for (size_t i = 0; i < col_len; ++i) {
@@ -118,40 +111,44 @@ void FFMScore::CalcGrad(const SparseRow* row,
     updater->Update(row->idx[i], gradient, param);
   }
   // for latent factor
-  const real_t* array = &(param[0]);
+  const real_t* data = &(param[0]) + num_feature_;
   for (size_t i = 0; i < col_len; ++i) {
     //------------------------- feat_i --------------------//
     real_t x_i = row->X[i];
     index_t idx_i = row->idx[i];
     index_t field_i = row->field[i];
     //------------------------- tmp ----------------------//
-    index_t tmp_1 = num_feature_ + idx_i * matrix_size;
-    index_t tmp_2 = num_feature_ + field_i * num_factor_;
-    real_t tmp_3 = x_i * pg;
+    index_t mat_mul_pos_i = matrix_size * idx_i;
+    index_t field_i_mul_fac = field_i * num_factor_;
+    real_t tmp = x_i * pg;
     for (size_t j = i+1; j < col_len; ++j) {
       //--------------------- feat_j ------------------------//
       real_t x_j = row->X[j];
       index_t idx_j = row->idx[j];
       index_t field_j = row->field[j];
-      //----------------- pos_i and pos_j -------------------//
-      index_t pos_i = tmp_1 + field_j * num_factor_;
-      index_t pos_j = tmp_2 + idx_j * matrix_size;
-      real_t tmp_4 = x_j * tmp_3;
-      __MX val_tmp = _MMX_SET1_PS(tmp_4);
-      const real_t* array_i = array + pos_i;
-      const real_t* array_j = array + pos_j;
+      const real_t* w_j = data + mat_mul_pos_i + num_factor_ * field_j;
+      const real_t* w_i = data + matrix_size * idx_j + field_i_mul_fac;
+      __MX _v = _MMX_SET1_PS(x_j*tmp);
       for (size_t k = 0; k < num_factor_; k += _MMX_INCREMENT) {
         //----------- gradient_i and gradient_j -------------//
+        /*
         _MMX_STORE_PS(p_i+k,
                       _MMX_MUL_PS(val_tmp,
                       _MMX_LOAD_PS(array_i + k)));
         _MMX_STORE_PS(p_j+k,
                       _MMX_MUL_PS(val_tmp,
-                      _MMX_LOAD_PS(array_j + k)));
+                      _MMX_LOAD_PS(array_j + k)));*/
+        real_t* w_i_k = const_cast<real_t*>(w_i + k);
+        real_t* w_j_k = const_cast<real_t*>(w_j + k);
+        __MX _kj = _MMX_LOAD_PS(w_j_k);
+        __MX _ki = _MMX_LOAD_PS(w_i_k);
+        __MX _gj = _MMX_MUL_PS(_v, _ki);
+        __MX _gi = _MMX_MUL_PS(_v, _kj);
+        updater->BatchUpdate(_kj, _gj, w_j_k);
+        updater->BatchUpdate(_ki, _gi, w_i_k);
+        //_MMX_STORE_PS(w_j_k, _MMX_SUB_PS(_kj, _MMX_MUL_PS(_gj, _lr)));
+        //_MMX_STORE_PS(w_i_k, _MMX_SUB_PS(_ki, _MMX_MUL_PS(_gi, _lr)));
       }
-      // Batch update
-      updater->BatchUpdate(tmp_vec_1, pos_i, param);
-      updater->BatchUpdate(tmp_vec_2, pos_j, param);
     }
   }
 }

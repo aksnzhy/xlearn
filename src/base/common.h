@@ -30,11 +30,11 @@ programming convenient.
 #ifndef _MSC_VER
 #include <stdint.h>  // Linux, MacOSX and Cygwin has this standard header.
 #else
-#include "base/stdint_msvc.h"           // Visual C++ use this header.
+#include "base/stdint_msvc.h"  // Visual C++ use this header.
 #endif
 
-#include <pmmintrin.h> // for SSE instructions
-#include <x86intrin.h> // for AVX instructions
+#include <pmmintrin.h>  // for SSE instructions
+#include <x86intrin.h>  // for AVX instructions
 #include <limits>
 
 #include "src/base/logging.h"
@@ -155,8 +155,8 @@ programming convenient.
 // };
 //------------------------------------------------------------------------------
 
-#define DISALLOW_COPY_AND_ASSIGN(TypeName)      \
-  TypeName(const TypeName&);                    \
+#define DISALLOW_COPY_AND_ASSIGN(TypeName)              \
+  TypeName(const TypeName&);                            \
   void operator=(const TypeName&)
 
 //------------------------------------------------------------------------------
@@ -212,15 +212,16 @@ static const double kVerySmallNumberDouble = 1e-15;
 //  SHOW_TIME();
 //------------------------------------------------------------------------------
 
-#define TIME_START()                                                   \
-   clock_t start, end;                                                 \
-   start = clock()                                                     \
+#define TIME_START()                                    \
+   clock_t start, end;                                  \
+   start = clock()                                      \
 
-#define TIME_END()                                                     \
+#define TIME_END()                                      \
    end = clock()
 
-#define SHOW_TIME()                                                    \
-   printf("Time: %.2f sec", (float)(end-start) / CLOCKS_PER_SEC)       \
+#define SHOW_TIME()                                     \
+   printf("Time: %.2f sec",                             \
+     (float)(end-start) / CLOCKS_PER_SEC)               \
 
 //------------------------------------------------------------------------------
 // SSE and AVX for vectorization
@@ -228,36 +229,36 @@ static const double kVerySmallNumberDouble = 1e-15;
 
 #ifdef __AVX__
 
-#define __MX __m256
-#define _MMX_LOAD_PS _mm256_load_ps
-#define _MMX_STORE_PS _mm256_store_ps
-#define _MMX_SETZERO_PS _mm256_setzero_ps
-#define _MMX_SET1_PS _mm256_set1_ps
-#define _MMX_ADD_PS _mm256_add_ps
-#define _MMX_DIV_PS _mm256_div_ps
-#define _MMX_SUB_PS _mm256_sub_ps
-#define _MMX_MUL_PS _mm256_mul_ps
-#define _MMX_RSQRT_PS _mm256_rsqrt_ps
-#define _MMX_HADD_PS _mm256_hadd_ps
-#define _MMX_STORE_SS _mm256_storeu_ps
-#define _MMX_INCREMENT 8
+#define __MX             __m256
+#define _MMX_LOAD_PS     _mm256_load_ps
+#define _MMX_STORE_PS    _mm256_store_ps
+#define _MMX_SETZERO_PS  _mm256_setzero_ps
+#define _MMX_SET1_PS     _mm256_set1_ps
+#define _MMX_ADD_PS      _mm256_add_ps
+#define _MMX_DIV_PS      _mm256_div_ps
+#define _MMX_SUB_PS      _mm256_sub_ps
+#define _MMX_MUL_PS      _mm256_mul_ps
+#define _MMX_RSQRT_PS    _mm256_rsqrt_ps
+#define _MMX_HADD_PS     _mm256_hadd_ps
+#define _MMX_STORE_SS    _mm256_storeu_ps
+#define _MMX_INCREMENT   8
 
 #else // SSE
 
-#define __MX __m128
-#define _MMX_LOAD_PS _mm_load_ps
-#define _MMX_STORE_PS _mm_store_ps
-#define _MMX_SETZERO_PS _mm_setzero_ps
-#define _MMX_SET1_PS _mm_set1_ps
-#define _MMX_ADD_PS _mm_add_ps
-#define _MMX_SUB_PS _mm_sub_ps
-#define _MMX_MUL_PS _mm_mul_ps
-#define _MMX_DIV_PS _mm_div_ps
-#define _MMX_RSQRT_PS _mm_rsqrt_ps
-#define _MMX_HADD_PS _mm_hadd_ps
-#define _MMX_STORE_SS _mm_store_ss
-#define _MMX_INCREMENT 4
+#define __MX             __m128
+#define _MMX_LOAD_PS     _mm_load_ps
+#define _MMX_STORE_PS    _mm_store_ps
+#define _MMX_SETZERO_PS  _mm_setzero_ps
+#define _MMX_SET1_PS     _mm_set1_ps
+#define _MMX_ADD_PS      _mm_add_ps
+#define _MMX_SUB_PS      _mm_sub_ps
+#define _MMX_MUL_PS      _mm_mul_ps
+#define _MMX_DIV_PS      _mm_div_ps
+#define _MMX_RSQRT_PS    _mm_rsqrt_ps
+#define _MMX_HADD_PS     _mm_hadd_ps
+#define _MMX_STORE_SS    _mm_store_ss
+#define _MMX_INCREMENT   4
 
 #endif
 
-#endif // XLEARN_BASE_COMMON_H_
+#endif  // XLEARN_BASE_COMMON_H_

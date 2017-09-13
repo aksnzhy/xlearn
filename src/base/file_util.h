@@ -17,7 +17,7 @@
 /*
 Author: Chao Ma (mctt90@gmail.com)
 
-This file contains facilitlies controlling file I/O.
+This file contains facilitlies controlling file.
 */
 
 #ifndef XLEARN_BASE_FILE_UTIL_H_
@@ -25,7 +25,7 @@ This file contains facilitlies controlling file I/O.
 
 #include <unistd.h>
 #include <fcntl.h>
-#include <stdio.h> // for remove()
+#include <stdio.h>  // for remove()
 
 #include "src/base/common.h"
 #include "src/base/scoped_ptr.h"
@@ -34,10 +34,10 @@ This file contains facilitlies controlling file I/O.
 // Basic operations for a file
 //------------------------------------------------------------------------------
 
-// 100 KB for one line of data
+// 100 KB for one line of txt data
 static const uint32 kMaxLineSize = 100 * 1024;
 
-// Check a file if it exists.
+// Check whether the file exists
 inline bool FileExist(const char* filename) {
   if (access(filename, F_OK) != -1) {
     return true;
@@ -45,49 +45,51 @@ inline bool FileExist(const char* filename) {
   return false;
 }
 
-// Open file using fopen.
-// Return the file pointer.
+// Open file using fopen() and return the file pointer
+// model :
+//  "w" for write
+//  "r" for read
 inline FILE* OpenFileOrDie(const char* filename, const char* mode) {
   FILE* input_stream = fopen(filename, mode);
   if (input_stream == nullptr) {
-    LOG(ERROR) << "Cannot open file: " << filename
+    LOG(FATAL) << "Cannot open file: " << filename
                << " with mode: " << mode;
   }
   return input_stream;
 }
 
-// Close file using fclose.
+// Close file using fclose()
 inline void Close(FILE *file) {
   if (fclose(file) == -1) {
-    LOG(ERROR) << "Error invoke fclose().";
+    LOG(FATAL) << "Error invoke fclose().";
   }
 }
 
-// Get the size of a targte file.
-// Return the size. Note that here we need use uint64 for large files.
+// Return the size (byte) of a target file
 inline uint64 GetFileSize(FILE* file) {
   if (fseek(file, 0L, SEEK_END) != 0) {
-    LOG(ERROR) << "Error: invoke fseek().";
+    LOG(FATAL) << "Error: invoke fseek().";
   }
   uint64 total_size = ftell(file);
   if (total_size == -1) {
-    LOG(ERROR) << "Error: invoke ftell().";
+    LOG(FATAL) << "Error: invoke ftell().";
   }
-  rewind(file);
+  rewind(file);  /* Return to the head */
   return total_size;
 }
 
-// Get one line of data
+// Get one line of data from the file
 inline void GetLine(FILE* file, std::string& str_line) {
+  CHECK_NOTNULL(file);
   static scoped_array<char> line(new char[kMaxLineSize]);
   fgets(line.get(), kMaxLineSize, file);
   int read_len = strlen(line.get());
   if (line[read_len - 1] != '\n') {
-    LOG(FATAL) << "Encountered a too-long line.   \
+    LOG(FATAL) << "Encountered a too-long line.     \
                    Please check the data.";
   } else {
     line[read_len - 1] = '\0';
-    // Handle the txt format in DOS and windows.
+    // Handle the format in DOS and windows
     if (read_len > 1 && line[read_len - 2] == '\r') {
       line[read_len - 2] = '\0';
     }
@@ -95,109 +97,110 @@ inline void GetLine(FILE* file, std::string& str_line) {
   str_line.assign(line.get());
 }
 
-// Write data from a buffer to target file.
-// Return the size we write.
+// Write data from a buffer to disk file
+// Return the size of data we have written
 inline size_t WriteDataToDisk(FILE* file, const char* buf, size_t len) {
+  CHECK_NOTNULL(file);
+  CHECK_NOTNULL(buf);
+  CHECK_GE(len, 0);
   size_t write_len = fwrite(buf, 1, len, file);
   if (write_len != len) {
-    LOG(ERROR) << "Error: invoke fwrite().";
+    LOG(FATAL) << "Error: invoke fwrite().";
   }
   return write_len;
 }
 
-// Read data from target file to a buffer.
-// Return the data size we read.
-// If reach the end of the file, return 0.
-inline size_t ReadDataFromDisk(FILE* file, char* buf, size_t max_len) {
-  CHECK_GT(max_len, 0);
+// Read data from disk file to a buffer
+// Return the data size we have read
+// If we reach the end of the file, return 0
+inline size_t ReadDataFromDisk(FILE* file, char* buf, size_t len) {
+  CHECK_NOTNULL(file);
+  CHECK_NOTNULL(buf);
+  CHECK_GE(len, 0);
+  /* Reach the end of the file */
   if (feof(file)) {
     return 0;
   }
-  size_t read_len = fread(buf, 1, max_len, file);
-  return read_len;
+  size_t ret = fread(buf, 1, len, file);
+  if (ret > len) {
+    LOG(FATAL) << "Error: invoke fread().";
+  }
+  return ret;
 }
 
-// Delete target file from disk.
+// Delete target file from disk
 inline void RemoveFile(const char* filename) {
+  CHECK_NOTNULL(filename);
   if (remove(filename) == -1) {
-    LOG(ERROR) << "Error: invoke remove().";
+    LOG(FATAL) << "Error: invoke remove().";
   }
 }
 
 //------------------------------------------------------------------------------
-// Serialize and Deserialize a vector to disk file.
+// Serialize or Deserialize a std::vector to disk file
 //------------------------------------------------------------------------------
 
-// Serialize a vector to a buffer. Return the buffer size.
+// Serialize a std::vector to a buffer
+// Return the size (byte) of the data been Serialized
 template <typename T>
 size_t serialize_vector(const std::vector<T>& vec, char* &buf) {
-  static size_t elem_size = sizeof(T);
-  static size_t len_size = sizeof(size_t);
-  CHECK_GT(vec.size(), 0);
-  // The first element is the length of vector
-  size_t buffer_size = elem_size * vec.size() + len_size;
-  buf = new char[buffer_size];
-  size_t vec_len = vec.size();
-  memcpy(buf, reinterpret_cast<char*>(&vec_len), len_size);
-  // The vector elements
-  size_t total_size = len_size;
-  T* p = (T*)vec.data();
-  for (size_t i = 0; i < vec.size(); ++i) {
-    memcpy(buf + total_size,
-           reinterpret_cast<char*>(p+i),
-           elem_size);
-    total_size += elem_size;
-  }
-
-  return total_size;
+  // We do not allow Serialize an empty vector
+  CHECK(!vec.empty());
+  // Init a new buffer
+  size_t size = vec.size();
+  size_t buf_size = size * sizeof(T) + sizeof(size_t);
+  buf = new char[buf_size];
+  // First, write the size of vector
+  memcpy(buf, &size, sizeof(size_t));
+  // Then, write the data()
+  memcpy(buf + sizeof(size_t), vec.data(), size * sizeof(T));
+  // Do not delete buf here
+  return buf_size;
 }
 
-// Deserialize a vector from a buffer.
+// Deserialize a std::vector from a buffer
 template <typename T>
-void deserialize_vector(char* buf, size_t buf_len, std::vector<T>& vec) {
-  static size_t elem_size = sizeof(T);
-  static size_t len_size = sizeof(size_t);
+void deserialize_vector(const char* buf, size_t len, std::vector<T>& vec) {
   CHECK_NOTNULL(buf);
+  CHECK_GT(len, 0);
   // Parse the first length
-  size_t vec_len = 0;
-  memcpy(&vec_len, buf, len_size);
-  CHECK_GT(vec_len, 0);
-  vec.resize(vec_len);
+  size_t size = 0;
+  memcpy(&size, buf, sizeof(size_t));
+  // We do not allow Serialize an empty vector
+  CHECK_GT(size, 0);
   // Parse the last elements
-  size_t index = 0;
-  for (size_t i = len_size; i < buf_len; i += elem_size) {
-    T* value = reinterpret_cast<T*>(buf + i);
-    vec[index++] = *value;
-  }
-  CHECK_EQ(index, vec.size());
+  vec.resize(size);
+  memcpy(vec.data(), buf + sizeof(size_t), size * sizeof(T));
 }
 
-// Write a vector of data to disk file.
+// Write a std::vector to disk file
 template <typename T>
 void WriteVectorToFile(FILE* file_ptr, const std::vector<T>& vec) {
+  CHECK_NOTNULL(file_ptr);
+  // We do not allow Serialize an empty vector
+  CHECK(!vec.empty());
   char* buf = nullptr;
   size_t buf_len = serialize_vector(vec, buf);
-  CHECK_EQ(WriteDataToDisk(file_ptr, buf, buf_len), buf_len);
+  WriteDataToDisk(file_ptr, buf, buf_len);
   delete [] buf;
 }
 
-// Read a vector of data from disk file.
+// Read a std::vector from disk file
 template <typename T>
 void ReadVectorFromFile(FILE* file_ptr, std::vector<T>& vec) {
-  static size_t len_size = sizeof(size_t);
-  // Read the size of vector
+  CHECK_NOTNULL(file_ptr);
+  // First, read the size of vector
   size_t vec_len = 0;
-  CHECK_GT(fread(reinterpret_cast<char*>(&vec_len),
-                 1,
-                 len_size,
-                 file_ptr), 0);
-  // Read the last elements
-  size_t buf_len = sizeof(T) * vec_len + len_size;
+  ReadDataFromDisk(file_ptr, (char*)(&vec_len), sizeof(size_t));
+  // Then, read the data()
+  size_t buf_len = sizeof(T) * vec_len + sizeof(size_t);
   char* buf = new char[buf_len];
-  memcpy(buf, reinterpret_cast<char*>(&vec_len), len_size);
-  ReadDataFromDisk(file_ptr, buf+len_size, buf_len-len_size);
+  memcpy(buf, &vec_len, sizeof(size_t));
+  ReadDataFromDisk(file_ptr,
+      buf + sizeof(size_t),
+      buf_len - sizeof(size_t));
   deserialize_vector(buf, buf_len, vec);
   delete [] buf;
 }
 
-#endif // XLEARN_BASE_FILE_UTIL_H_
+#endif  // XLEARN_BASE_FILE_UTIL_H_

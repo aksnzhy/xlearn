@@ -77,6 +77,6 @@ class StrSimilar {
   DISALLOW_COPY_AND_ASSIGN(StrSimilar);
 };
 
-} // namespace xLearn
+}  // namespace xLearn
 
-#endif // XLEARN_BASE_LEVEN_SHTEIN_DISTANCE_H_
+#endif  // XLEARN_BASE_LEVEN_SHTEIN_DISTANCE_H_

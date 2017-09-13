@@ -123,4 +123,4 @@ void SplitStringToIteratorUsing(const StringType& full,
   }
 }
 
-#endif // XLEARN_BASE_SPLIT_STRING_H_
+#endif   // XLEARN_BASE_SPLIT_STRING_H_

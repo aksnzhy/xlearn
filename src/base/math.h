@@ -207,4 +207,4 @@ static inline real_t InvSqrt(real_t x) {
    return x;
 }
 
-#endif // XLEARN_BASE_MATH_H_
+#endif   // XLEARN_BASE_MATH_H_

@@ -93,4 +93,4 @@ int StrSimilar::ldistance(const std::string& source,
   return matrix[n][m];
 }
 
-} // namespace xLearn
+}  // namespace xLearn

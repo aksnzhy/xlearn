@@ -86,4 +86,9 @@ void Updater::BatchUpdate(const std::vector<real_t>& value,
   }
 }
 
+void Updater::BatchUpdate(__MX w_k, __MX grad,  real_t* w) {
+  grad = _MMX_ADD_PS(_MMX_MUL_PS(_lr, grad), _MMX_MUL_PS(_lambda, w_k));
+  _MMX_STORE_PS(w, _MMX_SUB_PS(w_k, grad));
+}
+
 } // namespace xLearn
