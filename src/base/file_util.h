@@ -28,7 +28,6 @@ This file contains facilitlies controlling file.
 #include <stdio.h>  // for remove()
 
 #include "src/base/common.h"
-#include "src/base/scoped_ptr.h"
 
 //------------------------------------------------------------------------------
 // Basic operations for a file
