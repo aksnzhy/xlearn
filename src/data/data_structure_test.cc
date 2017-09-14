@@ -26,125 +26,47 @@ This file tests data_structure.h
 
 namespace xLearn {
 
-TEST(SPARSE_ROW_TEST, Init) {
-  SparseRow row(10, true);
-  EXPECT_EQ(row.column_len, 10);
-  EXPECT_EQ(row.X.size(), 10);
-  EXPECT_EQ(row.idx.size(), 10);
-  EXPECT_EQ(row.field.size(), 10);
-  EXPECT_EQ(row.if_has_field, true);
-}
-
-TEST(SPARSE_ROW_TEST, Resize) {
-  SparseRow row(10, true);
-  row.Resize(20);
-  EXPECT_EQ(row.column_len, 20);
-  EXPECT_EQ(row.X.size(), 20);
-  EXPECT_EQ(row.idx.size(), 20);
-  EXPECT_EQ(row.field.size(), 20);
-  EXPECT_EQ(row.if_has_field, true);
-  row.Resize(10);
-  EXPECT_EQ(row.column_len, 10);
-  EXPECT_EQ(row.X.size(), 20);
-  EXPECT_EQ(row.idx.size(), 20);
-  EXPECT_EQ(row.field.size(), 20);
-  EXPECT_EQ(row.if_has_field, true);
-}
-
-TEST(SPARSE_ROW_TEST, CopyFrom) {
-  SparseRow row(10, true);
-  for (size_t i = 0; i < 10; ++i) {
-    row.X[i] = 3;
-    row.idx[i] = i;
-    row.field[i] = i;
+TEST(DMATRIX_TEST, Resize_and_Release) {
+  DMatrix matrix;
+  matrix.ResetMatrix(10);
+  for (int i = 0; i < 10; ++i) {
+    EXPECT_EQ(matrix.row[i], nullptr);
+    EXPECT_EQ(matrix.Y[i], 0);
   }
-  SparseRow row_2(5, true);
-  EXPECT_EQ(row_2.column_len, 5);
-  EXPECT_EQ(row_2.X.size(), 5);
-  EXPECT_EQ(row_2.idx.size(), 5);
-  EXPECT_EQ(row_2.field.size(), 5);
-  EXPECT_EQ(row.if_has_field, true);
-  row_2.CopyFrom(&row);
-  EXPECT_EQ(row_2.column_len, 10);
-  EXPECT_EQ(row_2.X.size(), 10);
-  EXPECT_EQ(row_2.idx.size(), 10);
-  EXPECT_EQ(row_2.field.size(), 10);
-  EXPECT_EQ(row.if_has_field, true);
-  for (size_t i = 0; i < 10; ++i) {
-    EXPECT_EQ(row_2.X[i], 3);
-    EXPECT_EQ(row_2.idx[i], i);
-    EXPECT_EQ(row_2.field[i], i);
+  matrix.Release();
+  for (int i = 0; i < 10; ++i) {
+    EXPECT_EQ(matrix.row.empty(), true);
+    EXPECT_EQ(matrix.Y.empty(), true);
   }
 }
 
-TEST(DMATRIX_TEST, Init) {
-  DMatrix matrix(10);
-  EXPECT_EQ(matrix.row.size(), 10);
-  EXPECT_EQ(matrix.Y.size(), 10);
-  EXPECT_EQ(matrix.row_len, 10);
-  EXPECT_EQ(matrix.can_release, false);
-}
-
-TEST(DMATRIX_TEST, Resize) {
-  DMatrix matrix(10);
-  matrix.Resize(20);
-  EXPECT_EQ(matrix.row.size(), 20);
-  EXPECT_EQ(matrix.Y.size(), 20);
-  EXPECT_EQ(matrix.row_len, 20);
-  EXPECT_EQ(matrix.can_release, false);
-  matrix.Resize(15);
-  EXPECT_EQ(matrix.row.size(), 15);
-  EXPECT_EQ(matrix.Y.size(), 15);
-  EXPECT_EQ(matrix.row_len, 15);
-  EXPECT_EQ(matrix.can_release, false);
-}
-
-TEST(DMATRIX_TEST, InitSparseRow) {
-  DMatrix matrix(10);
-  matrix.Resize(20);
-  matrix.InitSparseRow(true);
-  EXPECT_EQ(matrix.row.size(), 20);
-  EXPECT_EQ(matrix.Y.size(), 20);
-  EXPECT_EQ(matrix.row_len, 20);
-  EXPECT_EQ(matrix.can_release, true);
-}
-
-TEST(DMATRIX_TEST, CopyFrom) {
-  DMatrix matrix(20);
-  matrix.InitSparseRow(true);
-  DMatrix matrix_2(15);
-  matrix_2.InitSparseRow(true);
-  matrix.CopyFrom(matrix_2);
-  EXPECT_EQ(matrix.row.size(), 15);
-  EXPECT_EQ(matrix.Y.size(), 15);
-  EXPECT_EQ(matrix.row_len, 15);
-  EXPECT_EQ(matrix.can_release, true);
-}
-
-TEST(DMATRIX_TEST, Serialize_Deserialize) {
-  DMatrix matrix(20);
-  matrix.InitSparseRow(true);
-  for (int i = 0; i < 20; ++i) {
-    SparseRow* row = matrix.row[i];
-    row->Resize(10);
-    for (int j = 0; j < 10; ++j) {
-      row->X[j] = j;
-      row->idx[j] = j;
-      row->field[j] = j;
-    }
+TEST(DMATRIX_TEST, Serialize_and_Deserialize) {
+  DMatrix matrix;
+  matrix.ResetMatrix(10);
+  for (int i = 0; i < 10; ++i) {
+    matrix.row[i] = new SparseRow;
+    Node node_1;
+    node_1.field_id = i;
+    node_1.feat_id = i;
+    node_1.feat_val = 2.5;
+    matrix.row[i]->push_back(node_1);
+    matrix.Y[i] = i;
   }
-  matrix.Serialize("/tmp/matrx.bin");
+  matrix.Serialize("/tmp/test.bin");
   DMatrix new_matrix;
-  new_matrix.Deserialize("/tmp/matrx.bin");
-  for (int i = 0; i < 20; ++i) {
-    SparseRow* row = new_matrix.row[i];
-    for (int j = 0; j < 10; ++j) {
-      EXPECT_FLOAT_EQ(row->X[j], j);
-      EXPECT_EQ(row->idx[j], j);
-      EXPECT_EQ(row->field[j], j);
+  new_matrix.Deserialize("/tmp/test.bin");
+  EXPECT_EQ(new_matrix.row_length, 10);
+  for (int i = 0; i < 10; ++i) {
+    EXPECT_EQ(matrix.Y[i], i);
+    SparseRow *row = matrix.row[i];
+    for (typename SparseRow::iterator iter = row->begin();
+         iter != row->end(); ++iter) {
+      EXPECT_EQ(iter->field_id, i);
+      EXPECT_EQ(iter->feat_id, i);
+      EXPECT_FLOAT_EQ(iter->feat_val, 2.5);
     }
   }
-  RemoveFile("/tmp/matrx.bin");
+  RemoveFile("/tmp/test.bin");
 }
 
 } // namespace xLearn
