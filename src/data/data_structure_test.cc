@@ -45,21 +45,17 @@ TEST(DMATRIX_TEST, Serialize_and_Deserialize) {
   matrix.ResetMatrix(10);
   for (int i = 0; i < 10; ++i) {
     matrix.row[i] = new SparseRow;
-    Node node_1;
-    node_1.field_id = i;
-    node_1.feat_id = i;
-    node_1.feat_val = 2.5;
-    matrix.row[i]->push_back(node_1);
+    matrix.AddNode(i, i, 2.5, i);
     matrix.Y[i] = i;
   }
   matrix.Serialize("/tmp/test.bin");
-  DMatrix new_matrix;
-  new_matrix.Deserialize("/tmp/test.bin");
-  EXPECT_EQ(new_matrix.row_length, 10);
+  matrix.Release();
+  matrix.Deserialize("/tmp/test.bin");
+  EXPECT_EQ(matrix.row_length, 10);
   for (int i = 0; i < 10; ++i) {
     EXPECT_EQ(matrix.Y[i], i);
     SparseRow *row = matrix.row[i];
-    for (typename SparseRow::iterator iter = row->begin();
+    for (SparseRow::iterator iter = row->begin();
          iter != row->end(); ++iter) {
       EXPECT_EQ(iter->field_id, i);
       EXPECT_EQ(iter->feat_id, i);

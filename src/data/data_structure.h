@@ -67,6 +67,30 @@ typedef std::vector<Node> SparseRow;
 // set in on-disk training, because for many large-scale ML problems, we
 // cannot load all the training data into memory at once. So we can load a
 // small batch of dataset into the DMatrix at each iteration.
+// We can use the DMatrix like this:
+//
+//    DMatrix matrix;
+//    matrix.ResetMatrix(10);   /* Init 10 rows */
+//    for (int i = 0; i < 10; ++i) {
+//      matrix.Y[i] = ...  /* set y */
+//      matrix.row[i] = new SparseRow;
+//      matrix.AddNode(i, feat_id, feat_val, field_id);
+//    }
+//    matrix.Serialize("/tmp/test.bin");    /* Serialize matrix to file */
+//    matrix.Release();
+//    matrix.Deserialize("/tmp/test.bin");  /* Deserialize matrix from file */
+//
+//    /* We can access the matrix like this */
+//    for (int i = 0; i < matrix.row_length; ++i) {
+//      ... matrix.Y[i] ..   /* access y */
+//      SparseRow *row = matrix.row[i];
+//      for (SparseRow::iterator iter = row->begin();
+//           iter != row->end(); ++iter) {
+//        ... iter->field_id ...   /* access field_id */
+//        ... iter->feat_id ...    /* access feat_id */
+//        ... iter->feat_val ...   /* access feat_val */
+//      }
+//    }
 //------------------------------------------------------------------------------
 struct DMatrix {
   // Constructor and Destructor
@@ -94,6 +118,18 @@ struct DMatrix {
     std::vector<real_t>().swap(Y);
     STLDeleteElementsAndClear(&row);
     std::vector<SparseRow*>().swap(row);
+  }
+
+  // Add node to matrix
+  void AddNode(index_t row_id,  index_t feat_id,
+               real_t feat_val, index_t field_id = 0) {
+    CHECK_GT(row_length, row_id);
+    CHECK_NOTNULL(row[row_id]);
+    Node node;
+    node.field_id = field_id;
+    node.feat_id = feat_id;
+    node.feat_val = feat_val;
+    row[row_id]->push_back(node);
   }
 
   // Serialize current DMatrix to disk file

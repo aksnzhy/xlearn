@@ -88,7 +88,7 @@ struct HyperParam {
   /* Filename of output result */
   std::string output_file = "./xlearn_out";
   /* Filename of log file */
-  std::string log_file = "./xlearn_log"; // This is not the final name
+  std::string log_file = "./xlearn_log";  // This is not the final name
 //------------------------------------------------------------------------------
 // Parameters for validation
 //------------------------------------------------------------------------------
@@ -100,6 +100,6 @@ struct HyperParam {
   bool early_stop = false;        // True for using early-stop
 };
 
-} // namespace XLEARN
+}  // namespace XLEARN
 
-#endif // XLEARN_DATA_HYPER_PARAMETER_H_
+#endif  // XLEARN_DATA_HYPER_PARAMETER_H_

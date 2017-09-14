@@ -84,8 +84,8 @@ class Model {
                   const std::string& score_func,
                   const std::string& loss_func,
                   index_t num_feature,
-                  int num_field,
-                  int num_K,
+                  index_t num_field,
+                  index_t num_K,
                   bool gaussian = true);
 
   // Serialize model to a checkpoint file.
@@ -126,8 +126,8 @@ class Model {
   std::string         score_func_;       // Score function
   std::string         loss_func_;        // Loss function
   index_t             num_feat_;         // Number of feature
-  int                 num_field_;        // Number of field (used in ffm)
-  int                 num_K_;            // Number of K (used in fm and ffm)
+  index_t             num_field_;        // Number of field (used in ffm)
+  index_t             num_K_;            // Number of K (used in fm and ffm)
 
   // Initialize model using Gaussian distribution.
   void InitModelUsingGaussian();
