@@ -179,7 +179,8 @@ static inline real_t InvSqrt(real_t x) {
 //------------------------------------------------------------------------------
 // Random distribution
 //------------------------------------------------------------------------------
-static inline void RandDistribution(std::vector<real_t>& array,
+static inline void RandDistribution(real_t* array,
+                                    index_t array_len,
                                     real_t down,
                                     real_t up,
                                     real_t coef = 1.0) {
@@ -189,7 +190,7 @@ static inline void RandDistribution(std::vector<real_t>& array,
   // Standard mersenne_twister_engine seeded with rd()
   std::mt19937 gen(rd());
   std::uniform_real_distribution<real_t> dis(down+kVerySmallNumber, up);
-  for (int i = 0; i < array.size(); ++i) {
+  for (int i = 0; i < array_len; ++i) {
       // Use dis to transform the random unsigned int generated
       // by gen into a float in (down, up) * coef
       array[i] = dis(gen) * coef;
