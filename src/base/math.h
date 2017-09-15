@@ -164,38 +164,6 @@ static inline real_t fastersigmoid(real_t x) {
 }
 
 //------------------------------------------------------------------------------
-// Random Gaussion Distribution
-// The implementation of Gaussion distribution is copied from Libfm:
-// Dir: src/util/random.h
-//------------------------------------------------------------------------------
-static inline real_t ran_uniform() {
-  return rand() / ((real_t) RAND_MAX + 1);
-}
-
-static inline real_t ran_gaussion() {
-  real_t u,v,x,y,Q;
-  do {
-    do {
-      u = ran_uniform();
-    } while (u == 0.0);
-    v = 1.7156 * (ran_uniform() - 0.5);
-    x = u - 0.449871;
-    y = std::abs(v) + 0.386595;
-    Q = x*x + y*(0.19600*y-0.25472*x);
-    if (Q < 0.27597) { break; }
-  } while ((Q > 0.27846) || ((v*v) > (-4.0*u*u*std::log(u))));
-  return v / u;
-}
-
-static inline real_t ran_gaussion(real_t mean, real_t stdev) {
-  if ((stdev == 0.0 || (std::isnan(stdev)))) {
-    return mean;
-  } else {
-    return mean + stdev * ran_gaussion();
-  }
-}
-
-//------------------------------------------------------------------------------
 // 1 / sqrt() Magic function !!
 //------------------------------------------------------------------------------
 static inline real_t InvSqrt(real_t x) {
@@ -206,5 +174,26 @@ static inline real_t InvSqrt(real_t x) {
    x = x*(1.5f-xhalf*x*x);  // Newton step, repeating increases accuracy
    return x;
 }
+
+//------------------------------------------------------------------------------
+// Random distribution
+//------------------------------------------------------------------------------
+static inline void RandDistribution(std::vector<real_t>& array,
+                                    real_t down,
+                                    real_t up,
+                                    real_t coef = 1.0) {
+  // Will be used to obtain a seed for the
+  // random number engine
+  std::random_device rd;
+  //Standard mersenne_twister_engine seeded with rd()
+  std::mt19937 gen(rd());
+  std::uniform_real_distribution<real_t> dis(down+kVerySmallNumber, up);
+  for (int i = 0; i < array.size(); ++i) {
+      //Use dis to transform the random unsigned int generated
+      // by gen into a float in (down, up) * coef
+      array[i] = dis(gen) * coef;
+  }
+}
+
 
 #endif   // XLEARN_BASE_MATH_H_
