@@ -33,144 +33,101 @@ namespace xLearn {
 // The Model class
 //------------------------------------------------------------------------------
 
-// Hyper parameters for Gaussian distribution.
-static const real_t kInitMean = 0.0;
-static const real_t kInitStdev = 0.01;
-
 // Basic contributor.
-void Model::Initialize(index_t num_param,
-                       const std::string& score_func,
-                       const std::string& loss_func,
-                       index_t num_feature,
-                       int num_field,
-                       int num_K,
-                       bool gaussian) {
-  CHECK_GT(num_param, 0);
-  CHECK_NE(score_func.empty(), true);
-  CHECK_NE(loss_func.empty(), true);
+void Model::Initialize(const std::string& score_func,
+                  const std::string& loss_func,
+                  index_t num_feature,
+                  index_t num_field,
+                  index_t num_K) {
+  CHECK(!score_func.empty());
+  CHECK(!loss_func.empty());
   CHECK_GT(num_feature, 0);
   CHECK_GE(num_field, 0);
   CHECK_GE(num_K, 0);
-  parameters_num_ = num_param;
+  if (score_func == "linear") {
+    param_num_ = num_feature;
+  } else if (score_func == "fm") {
+    param_num_ = num_feature + num_feature * num_K;
+  } else if (score_func == "ffm") {
+    param_num_ = num_feature + num_feature * num_K * num_field;
+  } else {
+    LOG(FATAL) << "Unknow score function: " << score_func;
+  }
   score_func_ = score_func;
   loss_func_ = loss_func;
   num_feat_ = num_feature;
   num_field_ = num_field;
   num_K_ = num_K;
   try {
-    parameters_.resize(parameters_num_, 0.0);
-    if (gaussian) {
-      InitModelUsingGaussian();
-    }
+    parameters_.resize(param_num_, 0.0);
   } catch (std::bad_alloc&) {
     LOG(FATAL) << "Cannot allocate enough memory for current  \
                    model parameters. Parameter size: "
-               << parameters_num_;
+               << param_num_;
+  }
+  // Initialize model using random Gaussian distribution
+  if (score_func_ == "fm" || score_func_ == "ffm") {
+    real_t coef = 1.0f / sqrt(num_K_);
+    RandDistribution(this->parameters_, 0.0, 1.0, coef);
+    for (index_t i = 0; i < num_feat_; ++i) {
+      // Reset 0.0 for linear term
+      this->parameters_[i] = 0.0;
+    }
   }
 }
 
-// Initialize model from a checkpoint file.
+// Initialize model from a checkpoint file
 Model::Model(const std::string& filename) {
   CHECK_NE(filename.empty(), true);
-  if (this->LoadModel(filename) == false) {
+  if (this->Deserialize(filename) == false) {
     printf("Cannot Load model from the file: %s\n",
            filename.c_str());
     exit(0);
   }
 }
 
-// Serialize current model to a checkpoint file.
-void Model::SaveModel(const std::string& filename) {
-  static std::string data_line;
+// Serialize current model to a disk file
+void Model::Serialize(const std::string& filename) {
   CHECK_NE(filename.empty(), true);
   FILE* file = OpenFileOrDie(filename.c_str(), "w");
-  // The 1st line: score function
-  // The 2nd line: loss function
-  // The 3nd line: feature num
-  data_line = StringPrintf("%s\n%s\n%d\n",
-                    score_func_.c_str(),
-                    loss_func_.c_str(),
-                    num_feat_);
-  // The 4th line: number of K (used in fm and ffm)
-  if (score_func_.compare("fm") == 0 ||
-      score_func_.compare("ffm") == 0) {
-    data_line = StringPrintf("%s%d\n",
-                      data_line.c_str(), num_K_);
-  }
-  // The 5th line: number of field (used in ffm)
-  if (score_func_.compare("ffm") == 0) {
-    data_line = StringPrintf("%s%d\n",
-                      data_line.c_str(), num_field_);
-  }
-  WriteDataToDisk(file, data_line.c_str(), data_line.size());
-  // Then, write param
-  WriteVectorToFile<real_t>(file, this->parameters_);
+  // Write score function
+  WriteStringToFile(file, score_func_);
+  // Write loss function
+  WriteStringToFile(file, loss_func_);
+  // Write feature num
+  WriteDataToDisk(file, (char*)&num_feat_, sizeof(num_feat_));
+  // Write field num
+  WriteDataToDisk(file, (char*)&num_field_, sizeof(num_field_));
+  // Write K
+  WriteDataToDisk(file, (char*)&num_K_, sizeof(num_K_));
+  // Write parameter num
+  WriteDataToDisk(file, (char*)&param_num_, sizeof(param_num_));
+  // Write parameter data
+  WriteVectorToFile(file, this->parameters_);
   Close(file);
 }
 
 // Deserialize model from a checkpoint file.
-bool Model::LoadModel(const std::string& filename) {
-  static std::string data_line;
+bool Model::Deserialize(const std::string& filename) {
   CHECK_NE(filename.empty(), true);
   FILE* file = OpenFileOrDie(filename.c_str(), "r");
   if (file == NULL) { return false; }
-  // The 1st line: score function
-  GetLine(file, score_func_);
-  // The 2nd line: loss function
-  GetLine(file, loss_func_);
-  // The 3nd line: feature num
-  GetLine(file, data_line);
-  num_feat_ = atoi(data_line.c_str());
-  data_line.clear();
-  // The 4nd line: number of K (used in fm and ffm)
-  if (score_func_.compare("fm") == 0 ||
-      score_func_.compare("ffm") == 0) {
-    GetLine(file, data_line);
-    num_K_ = atoi(data_line.c_str());
-    data_line.clear();
-  }
-  // The 5th line: number of field (used in ffm)
-  if (score_func_.compare("ffm") == 0) {
-    GetLine(file, data_line);
-    num_field_ = atoi(data_line.c_str());
-    data_line.clear();
-  }
-  // Load param
-  ReadVectorFromFile<real_t>(file, this->parameters_);
-  parameters_num_ = parameters_.size();
+  // Read score function
+  ReadStringFromFile(file, score_func_);
+  // Read loss function
+  ReadStringFromFile(file, loss_func_);
+  // Read feature num
+  ReadDataFromDisk(file, (char*)&num_feat_, sizeof(num_feat_));
+  // Read field num
+  ReadDataFromDisk(file, (char*)&num_field_, sizeof(num_field_));
+  // Read K
+  ReadDataFromDisk(file, (char*)&num_K_, sizeof(num_K_));
+  // Read param_num_
+  ReadDataFromDisk(file, (char*)&param_num_, sizeof(param_num_));
+  // Read parameter data
+  ReadVectorFromFile(file, this->parameters_);
   Close(file);
   return true;
 }
 
-// Reset current model to init state.
-void Model::Reset(bool gaussian) {
-  if (gaussian) {
-    InitModelUsingGaussian();
-  } else {
-    for (size_t i = 0; i < parameters_num_; ++i) {
-      parameters_[i] = 0.0;
-    }
-  }
-}
-
-// Save model parameters to a tmp vector
-void Model::Saveweight(std::vector<real_t>& vec) {
-  CHECK_EQ(parameters_num_, vec.size());
-  copy(parameters_.begin(), parameters_.end(), vec.begin());
-}
-
-// Load model parameters from a temp vector
-void Model::Loadweight(const std::vector<real_t>& vec) {
-  CHECK_EQ(parameters_num_, vec.size());
-  copy(vec.begin(), vec.end(), parameters_.begin());
-}
-
-// Initialize model parameters using Gaussian distribution.
-void Model::InitModelUsingGaussian() {
-  CHECK_EQ(parameters_num_, parameters_.size());
-  for (size_t i = 0; i < parameters_num_; ++i) {
-    parameters_[i] = ran_gaussion(kInitMean, kInitStdev);
-  }
-}
-
-} // namespace xLearn
+}  // namespace xLearn

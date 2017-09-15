@@ -37,10 +37,10 @@ namespace xLearn {
 
 //------------------------------------------------------------------------------
 // The Model class is responsible for storing global model prameters, which
-// will be represented in a flat way, that is, no matter what model method we
-// use, such as LR, FM, or FFM, we store the model parameters in a big array.
-// We can make a checkpoint for current model, and we can also load a model
-// checkpoint from disk file.
+// will be represented in a flatten way, that is, no matter what model method
+// we use, such as LR, FM, or FFM, we store the model parameters in a big
+// array. We can make a checkpoint for current model, and we can also load
+// a model checkpoint from disk file.
 // A model can be initialized by Initialize() function or from a
 // checkpoint file. We can use the Model class like this:
 //
@@ -50,23 +50,21 @@ namespace xLearn {
 //    hyper_param.num_feature = 10;
 //    hyper_param.num_K = 8;
 //    hyper_param.num_field = 10;
-//    hyper_param.num_param = kParameter_num;
 //
 //    Model model;
-//    model_ffm.Initialize(hyper_param.num_param,
-//                     hyper_param.score_func,
+//    model_ffm.Initialize(hyper_param.score_func,
 //                     hyper_param.loss_func,
 //                     hyper_param.num_feature,
 //                     hyper_param.num_field,
 //                     hyper_param.num_K);
 //
-//    // Then, we can save model to a disk file.
-//    model.SaveModel("/tmp/model.txt");
-//
-//    // We can get the model parameter vector:
+//    /* We can get the model parameter vector: */
 //    vector<real_t>* param = model.GetParameter();
 //
-//    // Also, we can load model from this file.
+//    /* We can save model to a disk file: */
+//    model.SaveModel("/tmp/model.txt");
+//
+//    /* Also, we can load model from this file. */
 //    Model new_model("/tmp/model.txt");
 //------------------------------------------------------------------------------
 class Model {
@@ -78,64 +76,54 @@ class Model {
   // Initialize model from a checkpoint file.
   explicit Model(const std::string& filename);
 
-  // Initialize model to zero or using
-  // Gaussian distribution (by default)
-  void Initialize(index_t num_param,
-                  const std::string& score_func,
-                  const std::string& loss_func,
-                  index_t num_feature,
-                  index_t num_field,
-                  index_t num_K,
-                  bool gaussian = true);
+  // Initialize model parameters to zero or using
+  // the Gaussian distribution
+  void Initialize(const std::string& score_func,
+              const std::string& loss_func,
+              index_t num_feature,
+              index_t num_field,
+              index_t num_K);
 
   // Serialize model to a checkpoint file.
-  void SaveModel(const std::string& filename);
+  void Serialize(const std::string& filename);
 
   // Deserialize model from a checkpoint file.
-  bool LoadModel(const std::string& filename);
+  bool Deserialize(const std::string& filename);
 
   // Get the pointer of current model parameters.
   std::vector<real_t>* GetParameter() { return &parameters_; }
 
-  // Reset current model to init state.
-  // We use the Gaussian distribution by default.
-  void Reset(bool gaussion = true);
-
-  // Save model parameters to a temp vector.
-  void Saveweight(std::vector<real_t>& vec);
-
-  // Load model parameters from a temp vector.
-  void Loadweight(const std::vector<real_t>& vec);
-
-  // Delete the model file and cache file.
-  static void RemoveModelFile(const std::string& filename) {
-    RemoveFile(StringPrintf("%s", filename.c_str()).c_str());
-  }
-
   // Get functions
-  size_t GetNumParameter() { return parameters_num_; }
+  size_t GetNumParameter() { return param_num_; }
   std::string GetScoreFunction() { return score_func_; }
   std::string GetLossFunction() { return loss_func_; }
   index_t GetNumFeature() { return num_feat_; }
   index_t GetNumField() { return num_field_; }
-  int GetNumK() { return num_K_; }
+  index_t GetNumK() { return num_K_; }
 
  protected:
-  std::vector<real_t> parameters_;       // Storing the model parameters.
-  index_t             parameters_num_;   // Number of model parameters.
-  std::string         score_func_;       // Score function
-  std::string         loss_func_;        // Loss function
-  index_t             num_feat_;         // Number of feature
-  index_t             num_field_;        // Number of field (used in ffm)
-  index_t             num_K_;            // Number of K (used in fm and ffm)
-
-  // Initialize model using Gaussian distribution.
-  void InitModelUsingGaussian();
+  /* Number of model parameters.
+   For linear socre, param_num =  num_feat
+   For fm, param_num = num_feat + num_feat * num_K
+   For ffm, param_num = num_feat + num_feat * num_field * num_K */
+  index_t  param_num_;
+  /* Score function: 'linear', 'fm', or 'ffm' */
+  std::string  score_func_;
+  /* Loss function: 'squared', 'cross-entropy', etc */
+  std::string  loss_func_;
+  /* Number of feature (from 0, include bias) */
+  index_t  num_feat_;
+  /* Number of field (used in ffm, from 0) */
+  index_t  num_field_;
+  /* Number of K (used in fm and ffm) */
+  index_t  num_K_;
+  /* Storing the model parameters */
+  std::vector<real_t> parameters_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Model);
 };
 
-} // namespace xLearn
+}  // namespace xLearn
 
-#endif // XLEARN_DATA_MODEL_PARAMETERS_H_
+#endif  // XLEARN_DATA_MODEL_PARAMETERS_H_

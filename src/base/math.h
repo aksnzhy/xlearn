@@ -28,6 +28,7 @@ mathmatic methods.
 #include <stdint.h>
 
 #include <cmath>
+#include <random>
 
 #include "src/base/common.h"
 

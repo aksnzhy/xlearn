@@ -29,25 +29,31 @@ This file tests file_util.h
 
 namespace xLearn {
 
-TEST(FileTest, Serialize_and_Deserialize_buffer) {
-  std::vector<int> array;
-  for (int i = 0; i < 5; ++i) {
-    array.push_back(i);
-  }
-  char* buffer = nullptr;
-  serialize_vector(array, &buffer);
-  size_t len = sizeof(size_t) + sizeof(int) * array.size();
-  array.clear();
-  deserialize_vector(buffer, len, array);
-  for (int i = 0; i < 5; ++i) {
-    EXPECT_EQ(array[i], i);
-  }
+TEST(FileTest, Serialize_and_Deserialize_string) {
+  std::string filename = "/tmp/test.bin";
+  FILE* file = OpenFileOrDie(filename.c_str(), "w");
+  // Serialize
+  std::string str_1("apple");
+  std::string str_2("love");
+  WriteStringToFile(file, str_1);
+  WriteStringToFile(file, str_2);
+  Close(file);
+  str_1.clear();
+  str_2.clear();
+  // Deserialize
+  file = OpenFileOrDie(filename.c_str(), "r");
+  ReadStringFromFile(file, str_1);
+  ReadStringFromFile(file, str_2);
+  EXPECT_EQ(str_1, "apple");
+  EXPECT_EQ(str_2, "love");
+  Close(file);
+  RemoveFile(filename.c_str());
 }
 
 TEST(FileTest, Serialize_and_Deserialize_file) {
    std::string filename = "/tmp/test.bin";
-   // Serialize
    FILE* file = OpenFileOrDie(filename.c_str(), "w");
+   // Serialize
    std::vector<int> array;
    for (int i = 0; i < 10; ++i) {
      array.push_back(i);

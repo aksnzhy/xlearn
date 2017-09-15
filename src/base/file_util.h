@@ -136,41 +136,8 @@ inline void RemoveFile(const char* filename) {
 }
 
 //------------------------------------------------------------------------------
-// Serialize or Deserialize a std::vector to disk file
+// Serialize or Deserialize for std::vector and std::string
 //------------------------------------------------------------------------------
-
-// Serialize a std::vector to a buffer
-// Return the size (byte) of the data been Serialized
-template <typename T>
-size_t serialize_vector(const std::vector<T>& vec, char **buf) {
-  // We do not allow Serialize an empty vector
-  CHECK(!vec.empty());
-  // Init a new buffer
-  size_t size = vec.size();
-  size_t buf_size = size * sizeof(T) + sizeof(size_t);
-  *buf = new char[buf_size];
-  // First, write the size of vector
-  memcpy(*buf, &size, sizeof(size_t));
-  // Then, write the data()
-  memcpy(*buf + sizeof(size_t), vec.data(), size * sizeof(T));
-  // Do not delete buf here
-  return buf_size;
-}
-
-// Deserialize a std::vector from a buffer
-template <typename T>
-void deserialize_vector(const char* buf, size_t len, std::vector<T>& vec) {
-  CHECK_NOTNULL(buf);
-  CHECK_GT(len, 0);
-  // Parse the first length
-  size_t size = 0;
-  memcpy(&size, buf, sizeof(size_t));
-  // We do not allow Serialize an empty vector
-  CHECK_GT(size, 0);
-  // Parse the last elements
-  vec.resize(size);
-  memcpy(vec.data(), buf + sizeof(size_t), size * sizeof(T));
-}
 
 // Write a std::vector to disk file
 template <typename T>
@@ -178,10 +145,9 @@ void WriteVectorToFile(FILE* file_ptr, const std::vector<T>& vec) {
   CHECK_NOTNULL(file_ptr);
   // We do not allow Serialize an empty vector
   CHECK(!vec.empty());
-  char* buf = nullptr;
-  size_t buf_len = serialize_vector(vec, &buf);
-  WriteDataToDisk(file_ptr, buf, buf_len);
-  delete [] buf;
+  size_t len = vec.size();
+  WriteDataToDisk(file_ptr, (char*)&len, sizeof(len));
+  WriteDataToDisk(file_ptr, (char*)vec.data(), sizeof(T)*len);
 }
 
 // Read a std::vector from disk file
@@ -189,17 +155,32 @@ template <typename T>
 void ReadVectorFromFile(FILE* file_ptr, std::vector<T>& vec) {
   CHECK_NOTNULL(file_ptr);
   // First, read the size of vector
-  size_t vec_len = 0;
-  ReadDataFromDisk(file_ptr, (char*)(&vec_len), sizeof(size_t));
-  // Then, read the data()
-  size_t buf_len = sizeof(T) * vec_len + sizeof(size_t);
-  char *buf = new char[buf_len];
-  memcpy(buf, &vec_len, sizeof(size_t));
-  ReadDataFromDisk(file_ptr,
-      buf + sizeof(size_t),
-      buf_len - sizeof(size_t));
-  deserialize_vector(buf, buf_len, vec);
-  delete [] buf;
+  size_t len = 0;
+  ReadDataFromDisk(file_ptr, (char*)(&len), sizeof(len));
+  CHECK_GT(len, 0);
+  vec.resize(len);
+  ReadDataFromDisk(file_ptr, (char*)vec.data(), sizeof(T)*len);
+}
+
+// Write string to disk file
+inline void WriteStringToFile(FILE* file_ptr, const std::string& str) {
+  CHECK_NOTNULL(file_ptr);
+  // We do not allow Serialize an empty string
+  CHECK(!str.empty());
+  size_t len = str.size();
+  WriteDataToDisk(file_ptr, (char*)&len, sizeof(len));
+  WriteDataToDisk(file_ptr, (char*)str.data(), len);
+}
+
+// Read string from disk file
+inline void ReadStringFromFile(FILE* file_ptr, std::string& str) {
+  CHECK_NOTNULL(file_ptr);
+  // First, read the size of vector
+  size_t len = 0;
+  ReadDataFromDisk(file_ptr, (char*)(&len), sizeof(len));
+  CHECK_GT(len, 0);
+  str.resize(len);
+  ReadDataFromDisk(file_ptr, (char*)str.data(), len);
 }
 
 #endif  // XLEARN_BASE_FILE_UTIL_H_

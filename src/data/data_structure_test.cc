@@ -65,4 +65,4 @@ TEST(DMATRIX_TEST, Serialize_and_Deserialize) {
   RemoveFile("/tmp/test.bin");
 }
 
-} // namespace xLearn
+}  // namespace xLearn
