@@ -92,4 +92,23 @@ TEST(FileTest, Serialize_and_Deserialize_file) {
    RemoveFile(filename.c_str());
 }
 
+TEST(FileTest, HashFile) {
+  FILE* file_1 = OpenFileOrDie("./tmp_1", "w");
+  FILE* file_2 = OpenFileOrDie("./tmp_2", "w");
+  FILE* file_3 = OpenFileOrDie("./tmp_3", "w");
+  std::string str_1("affadada32sfsfsdse23");
+  std::string str_2("jnfdj3278hjsldjksjd88ds");
+  WriteStringToFile(file_1, str_1);
+  WriteStringToFile(file_2, str_1);
+  WriteStringToFile(file_3, str_2);
+  Close(file_1);
+  Close(file_2);
+  Close(file_3);
+  EXPECT_EQ(HashFile("./tmp_1"), HashFile("./tmp_2"));
+  EXPECT_NE(HashFile("./tmp_2"), HashFile("./tmp_3"));
+  RemoveFile("./tmp_1");
+  RemoveFile("./tmp_2");
+  RemoveFile("./tmp_3");
+}
+
 }  // namespace xLearn

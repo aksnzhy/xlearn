@@ -35,6 +35,7 @@ This file contains facilitlies controlling file.
 
 // 100 KB for one line of txt data
 static const uint32 kMaxLineSize = 100 * 1024;
+static const int kCHUNK_SIZE = 10000000;
 
 // Check whether the file exists
 inline bool FileExist(const char* filename) {
@@ -182,5 +183,42 @@ inline void ReadStringFromFile(FILE* file_ptr, std::string& str) {
   str.resize(len);
   ReadDataFromDisk(file_ptr, (char*)str.data(), len);
 }
+
+//------------------------------------------------------------------------------
+// File Hash
+//------------------------------------------------------------------------------
+inline uint64_t HashFile(const std::string& filename, bool one_block=false) {
+  std::ifstream f(filename, std::ios::ate | std::ios::binary);
+  if(f.bad()) { return 0; }
+
+  long end = (long) f.tellg();
+  f.seekg(0, std::ios::beg);
+  CHECK_EQ(static_cast<int>(f.tellg()), 0);
+
+  uint64_t magic = 90359;
+  for(long pos = 0; pos < end; ) {
+    long next_pos = std::min(pos + kCHUNK_SIZE, end);
+    long size = next_pos - pos;
+    std::vector<char> buffer(kCHUNK_SIZE);
+    f.read(buffer.data(), size);
+
+    int i = 0;
+    while(i < size - 8) {
+      uint64_t x = *reinterpret_cast<uint64_t*>(buffer.data() + i);
+      magic = ( (magic + x) * (magic + x + 1) >> 1) + x;
+      i += 8;
+    }
+    for(; i < size; i++) {
+      char x = buffer[i];
+      magic = ( (magic + x) * (magic + x + 1) >> 1) + x;
+    }
+
+    pos = next_pos;
+    if(one_block) { break; }
+  }
+
+  return magic;
+}
+
 
 #endif  // XLEARN_BASE_FILE_UTIL_H_
