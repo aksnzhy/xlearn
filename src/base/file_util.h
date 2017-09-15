@@ -33,6 +33,10 @@ This file contains facilitlies controlling file.
 // Basic operations for a file
 //------------------------------------------------------------------------------
 
+const size_t KB = 1024.0;
+const size_t MB = 1024.0 * 1024.0;
+const size_t GB = 1024.0 * 1024.0 * 1024.0;
+
 // 100 KB for one line of txt data
 static const uint32 kMaxLineSize = 100 * 1024;
 static const int kCHUNK_SIZE = 10000000;
@@ -187,6 +191,7 @@ inline void ReadStringFromFile(FILE* file_ptr, std::string& str) {
 //------------------------------------------------------------------------------
 // File Hash
 //------------------------------------------------------------------------------
+
 inline uint64_t HashFile(const std::string& filename, bool one_block=false) {
   std::ifstream f(filename, std::ios::ate | std::ios::binary);
   if(f.bad()) { return 0; }
@@ -219,6 +224,5 @@ inline uint64_t HashFile(const std::string& filename, bool one_block=false) {
 
   return magic;
 }
-
 
 #endif  // XLEARN_BASE_FILE_UTIL_H_
