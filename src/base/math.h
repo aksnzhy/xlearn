@@ -33,6 +33,7 @@ mathmatic methods.
 #include "src/base/common.h"
 
 typedef float real_t;
+typedef uint32 index_t;
 
 /*=====================================================================*
  *                   Copyright (C) 2011 Paul Mineiro                   *

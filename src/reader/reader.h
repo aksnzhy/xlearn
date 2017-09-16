@@ -44,47 +44,57 @@ namespace xLearn {
 //
 //   #include "reader.h"
 //
+//   /* or new InmemReader() */
 //   Reader* reader = new OndiskReader();
 //
-//   reader->Initialize(filename = "/tmp/testdata",  // the data path
-//                      num_samples = 200,           // return N samples
-//                      parser = libsvm_parser)      // data format
+//   reader->Initialize(filename = "/tmp/testdata",  /* the data path */
+//                      num_samples = 200)           /* return 200 examples */
 //
 //   Loop {
 //
 //      int num_samples = reader->Sample(DMatrix);
 //
-//      // use data samples to train model ...
+//      /* The reader will return 0 when reaching the end of
+//       data source, and then we can invoke Reset() to return
+//       to the begining of data */
+//
+//      if (num_samples == 0) {
+//        reader->Reset()
+//      }
+//
+//      /* use data samples ... */
 //
 //   }
-//
-// The reader will return 0 when reaching the end of data source, and then
-// we can invoke Reset() to return to the begining of data.
 //------------------------------------------------------------------------------
 class Reader {
  public:
   Reader() {  }
   virtual ~Reader() {  }
 
-  // We need to invoke this method before we sample data.
+  // We need to invoke the Initialize() function before
+  // we start to sample data
   virtual bool Initialize(const std::string& filename,
-                          int num_samples,
-                          Parser* parser) = 0;
+                          int num_samples) = 0;
 
-  // Sample data from disk or from memory buffer.
-  // Return the number of record in each samplling.
-  // Samples() return 0 when reaching end of the data.
+  // Sample data from disk or from memory buffer
+  // Return the number of record in each samplling
+  // Samples() return 0 when reaching end of the data
   virtual int Samples(DMatrix* &matrix) = 0;
 
   // Return to the begining of the data.
   virtual void Reset() = 0;
 
  protected:
-  std::string filename_;    // Indicate the input file
-  int num_samples_;         // Number of data samples in each samplling
-  FILE* file_ptr_;          // Maintain current file pointer
-  DMatrix data_samples_;    // Data sample
-  Parser* parser_;          // Parse StringList to DMatrix
+  /* Indicate the input file */
+  std::string filename_;
+  /* Number of data samples at each sample */
+  int num_samples_;
+  /* Maintain current file pointer */
+  FILE* file_ptr_;
+  /* Data sample */
+  DMatrix data_samples_;
+  /* Parse txt to binary data */
+  Parser* parser_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Reader);
@@ -92,35 +102,32 @@ class Reader {
 
 //------------------------------------------------------------------------------
 // Sampling data from memory buffer.
-// At each begining of sample we random shuffle the data.
+// For in-memory smaplling, the Reader will automatically convert
+// txt data to binary data, and use this binary data in the next time.
+// Reader will randomly shuffle the data during samplling.
 //------------------------------------------------------------------------------
 class InmemReader : public Reader {
  public:
   InmemReader() { pos_ = 0; }
   ~InmemReader();
 
-  // Pre-load all the data into memory buffer.
+  // Pre-load all the data into memory buffer
   virtual bool Initialize(const std::string& filename,
-                          int num_samples,
-                          Parser* parser);
+                          int num_samples);
 
-  // In-memory Reader can be initialized from binary file
-  virtual bool InitFromBinary(const std::string& filename,
-                              int num_samples);
-
-  // Serialize DMatrix to a binary file
-  virtual void SaveBufferToBinary(const std::string& filename);
-
-  // Sample data from memory buffer.
+  // Sample data from memory buffer
   virtual int Samples(DMatrix* &matrix);
 
-  // Return to the begining of the data.
+  // Return to the begining of the data
   virtual void Reset();
 
  protected:
-  DMatrix data_buf_;             // Data buffer
-  int pos_;                      // Position for samplling
-  std::vector<index_t> order_;   // For shufflling
+  /* We load all the data into this buffer */
+  DMatrix data_buf_;
+  /* Position for samplling */
+  index_t pos_;
+  /* For shuffle */
+  std::vector<index_t> order_;
 
  private:
   // Counting the '\n' character
@@ -137,6 +144,9 @@ class InmemReader : public Reader {
 
 //------------------------------------------------------------------------------
 // Samplling data from disk file.
+// OndiskReader is used to train very big data, which cannot be loaded
+// into main memory of current machine.
+// We use multiple
 //------------------------------------------------------------------------------
 class OndiskReader : public Reader {
  public:
@@ -144,8 +154,7 @@ class OndiskReader : public Reader {
   ~OndiskReader();
 
   virtual bool Initialize(const std::string& filename,
-                          int num_samples,
-                          Parser* parser);
+                          int num_samples);
 
   // Sample data from disk file.
   virtual int Samples(DMatrix* &matrix);

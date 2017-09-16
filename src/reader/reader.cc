@@ -40,21 +40,16 @@ REGISTER_READER("disk", OndiskReader);
 // Implementation of InmemReader
 //------------------------------------------------------------------------------
 
-const size_t KB = 1024.0;
-const size_t MB = 1024.0 * 1024.0;
-const size_t GB = 1024.0 * 1024.0 * 1024.0;
-
 InmemReader::~InmemReader() {
   if (file_ptr_ != nullptr) {
     Close(file_ptr_);
   }
-  data_buf_.Release(); // Release the in-memory buffer
+  data_buf_.Release();  // Release the in-memory buffer
 }
 
 // Pre-load all the data into memory buffer.
 bool InmemReader::Initialize(const std::string& filename,
-                             int num_samples,
-                             Parser* parser) {
+                             int num_samples) {
   CHECK_NE(filename.empty(), true)
   CHECK_GT(num_samples, 0);
   CHECK_NOTNULL(parser);

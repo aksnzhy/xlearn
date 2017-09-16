@@ -36,10 +36,8 @@ used by xLearn.
 namespace xLearn {
 
 //------------------------------------------------------------------------------
-// The Model class is responsible for storing global model prameters, which
-// will be represented in a flatten way, that is, no matter what model method
-// we use, such as LR, FM, or FFM, we store the model parameters in a big
-// array. We can make a checkpoint for current model, and we can also load
+// The Model class is responsible for storing global model prameters.
+// We can make a checkpoint for current model, and we can also load
 // a model checkpoint from disk file.
 // A model can be initialized by Initialize() function or from a
 // checkpoint file. We can use the Model class like this:
@@ -59,7 +57,17 @@ namespace xLearn {
 //                     hyper_param.num_K);
 //
 //    /* We can get the model parameter vector: */
-//    vector<real_t>* param = model.GetParameter();
+//    real_t* w = model.GetParameter_w();
+//    index_t w_len = model.GetNumParameter_w();
+//    for (index_t i = 0; i < w_len; ++i) {
+//      /* access w[i] ... */
+//    }
+//
+//    real_t* v = model.GetParameter_v();
+//    index_t v_len = model.GetNumParameter_v();
+//    for (index_t i = 0; i < v_len; ++i) {
+//      /* access v[i] ... */
+//    }
 //
 //    /* We can save model to a disk file: */
 //    model.SaveModel("/tmp/model.txt");
@@ -84,17 +92,21 @@ class Model {
               index_t num_field,
               index_t num_K);
 
-  // Serialize model to a checkpoint file.
+  // Serialize model to a checkpoint file
   void Serialize(const std::string& filename);
 
-  // Deserialize model from a checkpoint file.
+  // Deserialize model from a checkpoint file
   bool Deserialize(const std::string& filename);
 
-  // Get the pointer of current model parameters.
-  std::vector<real_t>* GetParameter() { return &parameters_; }
+  // Get the pointer of linear term parameters
+  real_t* GetParameter_w() { return param_w_; }
 
-  // Get functions
-  size_t GetNumParameter() { return param_num_; }
+  // Get the pointer of latent factor parameters
+  real_t* GetParameter_v() { return param_v_; }
+
+  // Other Get functions
+  index_t GetNumParameter_w() { return param_num_w_; }
+  index_t GetNumParameter_v() { return param_num_v_; }
   std::string GetScoreFunction() { return score_func_; }
   std::string GetLossFunction() { return loss_func_; }
   index_t GetNumFeature() { return num_feat_; }
@@ -106,7 +118,8 @@ class Model {
    For linear socre, param_num =  num_feat
    For fm, param_num = num_feat + num_feat * num_K
    For ffm, param_num = num_feat + num_feat * num_field * num_K */
-  index_t  param_num_;
+  index_t  param_num_w_;
+  index_t  param_num_v_;
   /* Score function: 'linear', 'fm', or 'ffm' */
   std::string  score_func_;
   /* Loss function: 'squared', 'cross-entropy', etc */
@@ -118,7 +131,15 @@ class Model {
   /* Number of K (used in fm and ffm) */
   index_t  num_K_;
   /* Storing the model parameters */
-  std::vector<real_t> parameters_;
+  real_t*  param_w_;   // parameters for linear term
+  real_t*  param_v_;   // parameters for latent factor
+
+  // Initialize model parameters
+  void Initialize_w_and_v(bool set_value = false);
+
+  // Serialize and Deserialize w and v
+  void serialize_w_v(FILE* file);
+  void deserialize_w_v(FILE* file);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Model);

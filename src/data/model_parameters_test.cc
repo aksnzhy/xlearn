@@ -51,13 +51,16 @@ TEST(MODEL_TEST, Init) {
                     hyper_param.num_feature,
                     hyper_param.num_field,
                     hyper_param.num_K);
-  std::vector<real_t>* para = model_ffm.GetParameter();
-  index_t param_num = hyper_param.num_feature +
-                      hyper_param.num_feature *
+  real_t* w = model_ffm.GetParameter_w();
+  index_t param_num_w = hyper_param.num_feature;
+  index_t param_num_v = hyper_param.num_feature *
                       hyper_param.num_field *
                       hyper_param.num_K;
-  EXPECT_EQ(para->size(), param_num);
-  EXPECT_EQ(model_ffm.GetNumParameter(), param_num);
+  EXPECT_EQ(param_num_w, model_ffm.GetNumParameter_w());
+  EXPECT_EQ(param_num_v, model_ffm.GetNumParameter_v());
+  for (index_t i = 0; i < param_num_w; ++i) {
+    EXPECT_FLOAT_EQ(w[i], 0.0);
+  }
 }
 
 TEST(MODEL_TEST, Save_and_Load) {
@@ -69,17 +72,40 @@ TEST(MODEL_TEST, Save_and_Load) {
                     hyper_param.num_feature,
                     hyper_param.num_field,
                     hyper_param.num_K);
+  real_t* w = model_ffm.GetParameter_w();
+  real_t* v = model_ffm.GetParameter_v();
+  index_t w_len = model_ffm.GetNumParameter_w();
+  index_t v_len = model_ffm.GetNumParameter_v();
+  for (int i = 0; i < w_len; ++i) {
+    w[i] = 2.5;
+  }
+  for (int i = 0; i < v_len; ++i) {
+    v[i] = 3.5;
+  }
   model_ffm.Serialize(hyper_param.model_file);
   Model new_model(hyper_param.model_file);
-  index_t param_num = hyper_param.num_feature +
-                      hyper_param.num_feature *
+  w = new_model.GetParameter_w();
+  v = new_model.GetParameter_v();
+  w_len = new_model.GetNumParameter_w();
+  v_len = new_model.GetNumParameter_v();
+  index_t param_num_w = hyper_param.num_feature;
+  index_t param_num_v = hyper_param.num_feature *
                       hyper_param.num_field *
                       hyper_param.num_K;
-  std::vector<real_t>* para = new_model.GetParameter();
-  EXPECT_EQ(para->size(), param_num);
-  EXPECT_EQ(new_model.GetNumParameter(), param_num);
-  EXPECT_EQ(new_model.GetNumField(), hyper_param.num_field);
-  EXPECT_EQ(new_model.GetNumK(), hyper_param.num_K);
+  EXPECT_EQ(w_len, param_num_w);
+  EXPECT_EQ(v_len, param_num_v);
+  EXPECT_EQ(hyper_param.score_func, new_model.GetScoreFunction());
+  EXPECT_EQ(hyper_param.loss_func, new_model.GetLossFunction());
+  EXPECT_EQ(hyper_param.num_K, new_model.GetNumK());
+  EXPECT_EQ(hyper_param.num_feature, new_model.GetNumFeature());
+  EXPECT_EQ(hyper_param.num_field, new_model.GetNumField());
+
+  for (int i = 0; i < w_len; ++i) {
+    EXPECT_FLOAT_EQ(w[i], 2.5);
+  }
+  for (int i = 0; i < v_len; ++i) {
+    EXPECT_FLOAT_EQ(v[i], 3.5);
+  }
 }
 
 }   // namespace xLearn
