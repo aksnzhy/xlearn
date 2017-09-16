@@ -50,7 +50,7 @@ TEST(FileTest, Serialize_and_Deserialize_string) {
   RemoveFile(filename.c_str());
 }
 
-TEST(FileTest, Serialize_and_Deserialize_file) {
+TEST(FileTest, Serialize_and_Deserialize_vector) {
    std::string filename = "/tmp/test.bin";
    FILE* file = OpenFileOrDie(filename.c_str(), "w");
    // Serialize
@@ -109,6 +109,18 @@ TEST(FileTest, HashFile) {
   RemoveFile("./tmp_1");
   RemoveFile("./tmp_2");
   RemoveFile("./tmp_3");
+}
+
+TEST(FileTest, ReadFile) {
+  FILE* file = OpenFileOrDie("./tmp.bin", "w");
+  int num = 999;
+  WriteDataToDisk(file, (char*)&num, sizeof(num));
+  Close(file);
+  char* ch_num = nullptr;
+  uint64 len = ReadFileToMemory("./tmp.bin", &ch_num);
+  EXPECT_EQ(len, sizeof(num));
+  EXPECT_EQ((*(int*)ch_num), 999);
+  RemoveFile("./tmp.bin");
 }
 
 }  // namespace xLearn

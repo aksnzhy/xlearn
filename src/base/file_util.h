@@ -23,11 +23,13 @@ This file contains facilitlies controlling file.
 #ifndef XLEARN_BASE_FILE_UTIL_H_
 #define XLEARN_BASE_FILE_UTIL_H_
 
+#include <sys/mman.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdio.h>  // for remove()
 
 #include "src/base/common.h"
+#include "src/base/stringprintf.h"
 
 //------------------------------------------------------------------------------
 // Basic operations for a file
@@ -140,6 +142,22 @@ inline void RemoveFile(const char* filename) {
   }
 }
 
+// Print file size
+inline std::string PrintSize(uint64 file_size) {
+  std::string res;
+  if (file_size > GB) {
+    SStringPrintf(&res, "File size: %.2f GB",
+            (double) file_size / GB);
+  } else if (file_size > MB) {
+    SStringPrintf(&res, "File size: %.2f MB\n",
+            (double) file_size / MB);
+  } else {
+    SStringPrintf(&res, "File size: %.2f KB\n",
+            (double) file_size / KB);
+  }
+  return res;
+}
+
 //------------------------------------------------------------------------------
 // Serialize or Deserialize for std::vector and std::string
 //------------------------------------------------------------------------------
@@ -167,7 +185,7 @@ void ReadVectorFromFile(FILE* file_ptr, std::vector<T>& vec) {
   ReadDataFromDisk(file_ptr, (char*)vec.data(), sizeof(T)*len);
 }
 
-// Write string to disk file
+// Write a string to disk file
 inline void WriteStringToFile(FILE* file_ptr, const std::string& str) {
   CHECK_NOTNULL(file_ptr);
   // We do not allow Serialize an empty string
@@ -177,7 +195,7 @@ inline void WriteStringToFile(FILE* file_ptr, const std::string& str) {
   WriteDataToDisk(file_ptr, (char*)str.data(), len);
 }
 
-// Read string from disk file
+// Read a string from disk file
 inline void ReadStringFromFile(FILE* file_ptr, std::string& str) {
   CHECK_NOTNULL(file_ptr);
   // First, read the size of vector
@@ -189,9 +207,12 @@ inline void ReadStringFromFile(FILE* file_ptr, std::string& str) {
 }
 
 //------------------------------------------------------------------------------
-// File Hash
+// Some tool functions used by Reader
 //------------------------------------------------------------------------------
 
+// Calculate the hash value of current txt file
+// If one_block == true, we just read a smalle chunk of data
+// If one_block == false, we read all the data from the file
 inline uint64_t HashFile(const std::string& filename, bool one_block=false) {
   std::ifstream f(filename, std::ios::ate | std::ios::binary);
   if(f.bad()) { return 0; }
@@ -223,6 +244,35 @@ inline uint64_t HashFile(const std::string& filename, bool one_block=false) {
   }
 
   return magic;
+}
+
+// Read the whole file to a memory buffer and Return size of current file
+// We use mmap to speedup the reading on Unix-like system
+inline uint64 ReadFileToMemory(const std::string& filename, char **buf) {
+  CHECK(!filename.empty());
+#ifdef _WIN32
+  FILE* file = OpenFileOrDie(filename, "r");
+  uint64 len = GetFileSize(file);
+  try {
+    *buf = new char[len];
+  } catch (std::bad_alloc&) {
+    LOG(FATAL) << "Cannot allocate enough memory for Reader.";
+  }
+  uint64 read_size = fread(*buf, 1, len, file);
+  CHECK_EQ(read_size, len);
+  return len;
+  Close(file);
+#else
+  int fd = open(filename.c_str(), O_RDONLY);
+  uint64 len = lseek(fd, 0, SEEK_END);
+  try {
+    *buf = (char *) mmap(nullptr, len, PROT_READ, MAP_PRIVATE, fd, 0);
+  } catch (std::bad_alloc&) {
+    LOG(FATAL) << "Cannot allocate enough memory for Reader.";
+  }
+  close(fd);
+  return len;
+#endif
 }
 
 #endif  // XLEARN_BASE_FILE_UTIL_H_
