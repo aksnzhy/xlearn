@@ -65,6 +65,8 @@ void Model::Initialize(const std::string& score_func,
 
 // To get the best performance for SSE and AVX, we need
 // to allocate memory for the model parameters in aligned way
+// For AVX, the align number should be 32
+// For SSE, the align number should be 16
 void Model::Initialize_w_and_v(bool set_value) {
   try {
     // Init linear term
