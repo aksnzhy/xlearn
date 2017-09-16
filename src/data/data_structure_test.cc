@@ -52,6 +52,8 @@ TEST(DMATRIX_TEST, Serialize_and_Deserialize) {
   matrix.Release();
   matrix.Deserialize("/tmp/test.bin");
   EXPECT_EQ(matrix.row_length, 10);
+  EXPECT_EQ(matrix.hash_value_1, 0);
+  EXPECT_EQ(matrix.hash_value_2, 0);
   for (int i = 0; i < 10; ++i) {
     EXPECT_EQ(matrix.Y[i], i);
     SparseRow *row = matrix.row[i];
