@@ -44,13 +44,10 @@ void Model::Initialize(const std::string& score_func,
   CHECK_GT(num_feature, 0);
   CHECK_GE(num_field, 0);
   CHECK_GE(num_K, 0);
-  if (score_func == "linear") {
-    param_num_w_ = num_feature;
-  } else if (score_func == "fm") {
-    param_num_w_ = num_feature;
+  param_num_w_ = num_feature;
+  if (score_func == "fm") {
     param_num_v_ = num_feature * num_K;
   } else if (score_func == "ffm") {
-    param_num_w_ = num_feature;
     param_num_v_ = num_feature * num_K * num_field;
   } else {
     LOG(FATAL) << "Unknow score function: " << score_func;
@@ -65,8 +62,8 @@ void Model::Initialize(const std::string& score_func,
 
 // To get the best performance for SSE and AVX, we need
 // to allocate memory for the model parameters in aligned way
-// For AVX, the align number should be 32
-// For SSE, the align number should be 16
+// For AVX, the align number should be 32, and for SSE, the
+// align number should be 16
 void Model::Initialize_w_and_v(bool set_value) {
   try {
     // Init linear term
