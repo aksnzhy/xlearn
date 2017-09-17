@@ -105,8 +105,6 @@ struct DMatrix {
   void ResetMatrix(index_t length) {
     CHECK_GE(length, 0);
     this->Release();
-    hash_value_1 = 0;
-    hash_value_2 = 0;
     row_length = length;
     row.resize(length, nullptr);
     Y.resize(length, 0);
@@ -117,8 +115,13 @@ struct DMatrix {
   // reallocation is to use swap(), instead of using clear()
   void Release() {
     row_length = 0;
+    // Delete Y
     std::vector<real_t>().swap(Y);
-    STLDeleteElementsAndClear(&row);
+    for (int i = 0; i < row.size(); ++i) {
+      // Delete Node
+      std::vector<Node>().swap(*row[i]);
+    }
+    // Delete row
     std::vector<SparseRow*>().swap(row);
   }
 
