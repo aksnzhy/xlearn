@@ -321,11 +321,9 @@ inline uint64_t HashFile(const std::string& filename, bool one_block=false) {
 }
 
 // Read the whole file to a memory buffer and Return size of current file
-// We use mmap to speedup the reading on Unix-like system
 inline uint64 ReadFileToMemory(const std::string& filename, char **buf) {
   CHECK(!filename.empty());
-#ifdef _WIN32
-  FILE* file = OpenFileOrDie(filename, "r");
+  FILE* file = OpenFileOrDie(filename.c_str(), "r");
   uint64 len = GetFileSize(file);
   try {
     *buf = new char[len];
@@ -336,17 +334,6 @@ inline uint64 ReadFileToMemory(const std::string& filename, char **buf) {
   CHECK_EQ(read_size, len);
   Close(file);
   return len;
-#else
-  int fd = open(filename.c_str(), O_RDONLY);
-  uint64 len = lseek(fd, 0, SEEK_END);
-  try {
-    *buf = (char *) mmap(nullptr, len, PROT_READ, MAP_PRIVATE, fd, 0);
-  } catch (std::bad_alloc&) {
-    LOG(FATAL) << "Cannot allocate enough memory for Reader.";
-  }
-  close(fd);
-  return len;
-#endif
 }
 
 #endif  // XLEARN_BASE_FILE_UTIL_H_
