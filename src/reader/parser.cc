@@ -24,8 +24,6 @@ This file is the implementation of Parser.
 
 #include <stdlib.h>
 
-#include "src/base/split_string.h"
-
 namespace xLearn {
 
 //------------------------------------------------------------------------------
@@ -34,37 +32,70 @@ namespace xLearn {
 CLASS_REGISTER_IMPLEMENT_REGISTRY(xLearn_parser_registry, Parser);
 REGISTER_PARSER("libsvm", LibsvmParser);
 REGISTER_PARSER("libffm", FFMParser);
-REGISTER_PARSER("csv", CSVParser);
+
+// How many lines are there in current memory buffer
+index_t Parser::get_line_number(char* buf, uint64 buf_size) {
+  index_t num = 0;
+  for (uint64 i = 0; i < buf_size; ++i) {
+    if (buf[i] == '\n') num++;
+  }
+  return num;
+}
+
+// Get one line from memory buffer
+uint64 Parser::get_line_from_buffer(char* line,
+                               char* buf,
+                               uint64 pos,
+                               uint64 size) {
+  if (pos > size) { return 0; }
+  uint64 end_pos = pos;
+  while (buf[end_pos] != '\n') { end_pos++; }
+  uint64 read_size = end_pos - pos + 1;
+  if (read_size > kMaxLineSize) {
+    LOG(FATAL) << "Encountered a too-long line.    \
+                   Please check the data.";
+  }
+  memcpy(line, buf+pos, read_size);
+  line[read_size - 1] = '\0';
+  if (read_size > 1 && line[read_size - 2] == '\r') {
+      // Handle some txt format in windows or DOS.
+      line[read_size - 2] = '\0';
+  }
+  return read_size;
+}
 
 //------------------------------------------------------------------------------
 // LibsvmParser parses the following data format:
 // [y1 idx:value idx:value ...]
 // [y2 idx:value idx:value ...]
 //------------------------------------------------------------------------------
-void LibsvmParser::Parse(const StringList& list, DMatrix& matrix) {
-  CHECK_GE(list.size(), 0);
-  CHECK_GE(matrix.row_len, 0);
-  size_t row_len = matrix.row_len;
-  for (size_t i = 0; i < row_len; ++i) {
-    int col_len = 1;
+void LibsvmParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
+  CHECK_NOTNULL(buf);
+  CHECK_GT(size, 0);
+  index_t line_num = get_line_number(buf, size);
+  matrix.ResetMatrix(line_num);
+  static char* line_buf = new char[kMaxLineSize];
+  // Parse every line
+  uint64 pos = 0;
+  for (index_t i = 0; i < line_num; ++i) {
+    pos += get_line_from_buffer(line_buf, buf, pos, size);
+    matrix.row[i] = new SparseRow();
     // Add Y
-    char *y_char = strtok(const_cast<char*>(list[i].data()), " \t");
-    // Add bias
+    char *y_char = strtok(line_buf, " \t");
     matrix.Y[i] = atof(y_char);
-    matrix.row[i]->idx.push_back(0);
-    matrix.row[i]->X.push_back(1.0);
-    // Add the other feature
+    // Add bias
+    matrix.AddNode(i, 0, 1.0);
+    // Add other features
     for (;;) {
       char *idx_char = strtok(nullptr, ":");
       char *value_char = strtok(nullptr, " \t");
-      if(idx_char == NULL || *idx_char == '\n') {
+      if(idx_char == nullptr || *idx_char == '\n') {
         break;
       }
-      matrix.row[i]->idx.push_back(atoi(idx_char));
-      matrix.row[i]->X.push_back(atof(value_char));
-      ++col_len;
+      matrix.AddNode(i,
+        atoi(idx_char),
+        atof(value_char));
     }
-    matrix.row[i]->column_len = col_len;
   }
 }
 
@@ -73,70 +104,34 @@ void LibsvmParser::Parse(const StringList& list, DMatrix& matrix) {
 // [y1 field:idx:value field:idx:value ...]
 // [y2 field:idx:value field:idx:value ...]
 //------------------------------------------------------------------------------
-void FFMParser::Parse(const StringList& list, DMatrix& matrix) {
-  CHECK_GE(list.size(), 0);
-  CHECK_GE(matrix.row_len, 0);
-  size_t row_len = matrix.row_len;
-  for (size_t i = 0; i < row_len; ++i) {
-    int col_len = 1;
+void FFMParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
+  CHECK_NOTNULL(buf);
+  CHECK_GT(size, 0);
+  index_t line_num = get_line_number(buf, size);
+  matrix.ResetMatrix(line_num);
+  static char* line_buf = new char[kMaxLineSize];
+  // Parse every line
+  uint64 pos = 0;
+  for (index_t i = 0; i < line_num; ++i) {
+    get_line_from_buffer(line_buf, buf, pos, size);
+    matrix.row[i] = new SparseRow();
     // Add Y
-    char *y_char = strtok(const_cast<char*>(list[i].data()), " \t");
-    // Add bias
+    char *y_char = strtok(line_buf, " \t");
     matrix.Y[i] = atof(y_char);
-    matrix.row[i]->field.push_back(0);
-    matrix.row[i]->idx.push_back(0);
-    matrix.row[i]->X.push_back(1.0);
-    // Add the other feature
+    // Add bias
+    matrix.AddNode(i, 0, 1.0, 0);
+    // Add other features
     for (;;) {
       char *field_char = strtok(nullptr, ":");
       char *idx_char = strtok(nullptr, ":");
       char *value_char = strtok(nullptr, " \t");
-      if(field_char == NULL || *field_char == '\n') {
+      if(field_char == nullptr || *field_char == '\n') {
         break;
       }
-      matrix.row[i]->field.push_back(atoi(field_char));
-      matrix.row[i]->idx.push_back(atoi(idx_char));
-      matrix.row[i]->X.push_back(atof(value_char));
-      ++col_len;
-    }
-    matrix.row[i]->column_len = col_len;
-  }
-}
-
-//------------------------------------------------------------------------------
-// CSVParser parses the following data format:
-// [y1 value value value ...]
-// [y2 value value value ...]
-//------------------------------------------------------------------------------
-void CSVParser::Parse(const StringList& list, DMatrix& matrix) {
-  static StringList m_items;
-  static StringList m_single_item;
-  CHECK_GE(list.size(), 0);
-  CHECK_GE(matrix.row_len, 0);
-  size_t row_len = matrix.row_len;
-  for (size_t i = 0; i < row_len; ++i) {
-    m_items.clear();
-    SplitStringUsing(list[i], " \t", &m_items);
-    matrix.Y[i] = atof(m_items[0].c_str());
-    // Get real length of current row
-    int len = 0;
-    for (int j = 1; j < m_items.size(); ++j) {
-      if (atof(m_items[j].c_str()) != 0) {
-        ++len;
-      }
-    }
-    CHECK_NOTNULL(matrix.row[i]);
-    matrix.row[i]->Resize(len+1); // add a bias
-    matrix.row[i]->idx[0] = 0;
-    matrix.row[i]->X[0] = 1.0;
-    int k = 1;
-    for (int j = 1; j < m_items.size(); ++j) {
-      real_t value = atof(m_items[j].c_str());
-      if (value != 0) {
-        matrix.row[i]->idx[k] = j;
-        matrix.row[i]->X[k] = value;
-        ++k;
-      }
+      matrix.AddNode(i,
+        atoi(idx_char),
+        atof(value_char),
+        atoi(field_char));
     }
   }
 }

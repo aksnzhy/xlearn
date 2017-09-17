@@ -65,6 +65,9 @@ namespace xLearn {
 //      /* use data samples ... */
 //
 //   }
+//
+// For now, the Reader can parse two kinds of file format, including
+// libsvm format and libffm format.
 //------------------------------------------------------------------------------
 class Reader {
  public:
@@ -73,7 +76,7 @@ class Reader {
 
   // We need to invoke the Initialize() function before
   // we start to sample data
-  virtual bool Initialize(const std::string& filename,
+  virtual void Initialize(const std::string& filename,
                           int num_samples) = 0;
 
   // Sample data from disk or from memory buffer
@@ -87,14 +90,23 @@ class Reader {
  protected:
   /* Indicate the input file */
   std::string filename_;
-  /* Number of data samples at each sample */
+  /* Number of data samples in working set */
   int num_samples_;
   /* Maintain current file pointer */
   FILE* file_ptr_;
   /* Data sample */
   DMatrix data_samples_;
-  /* Parse txt to binary data */
+  /* Parse txt file to binary data */
   Parser* parser_;
+
+  // Check current file format and return
+  // "libsvm" or "libfm". Program crashes for unknow format
+  std::string CheckFileFormat();
+
+  // Create parser for different file format
+  Parser* CreateParser(const char* format_name) {
+    return CREATE_PARSER(format_name);
+  }
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Reader);
@@ -112,7 +124,7 @@ class InmemReader : public Reader {
   ~InmemReader();
 
   // Pre-load all the data into memory buffer
-  virtual bool Initialize(const std::string& filename,
+  virtual void Initialize(const std::string& filename,
                           int num_samples);
 
   // Sample data from memory buffer
@@ -128,17 +140,24 @@ class InmemReader : public Reader {
   index_t pos_;
   /* For shuffle */
   std::vector<index_t> order_;
+  /* These two values are used to check whether
+   we can use binary file to speedup data reading */
+  uint64 hash_value_1_;
+  uint64 hash_value_2_;
+
+  // Check wheter current path has a binary file
+  bool hash_binary(const std::string& filename);
+
+  // Initialize Reader from binary file
+  bool init_from_binary();
+
+  // Initialize Reader from txt file
+  bool init_from_txt();
+
+  // Serialize in-memory buffer to disk file
+  void serialize_buffer(const std::string& filename);
 
  private:
-  // Counting the '\n' character
-  int GetLineNumber(const char* buf, uint64 buf_size);
-
-  // Read every line from memory buffer
-  uint64 ReadLineFromMemory(char* line,
-                            char* buf,
-                            uint64 start_pos,
-                            uint64 total_len);
-
   DISALLOW_COPY_AND_ASSIGN(InmemReader);
 };
 
@@ -146,7 +165,7 @@ class InmemReader : public Reader {
 // Samplling data from disk file.
 // OndiskReader is used to train very big data, which cannot be loaded
 // into main memory of current machine.
-// We use multiple
+// We use multi-thread to support data pipeline reading
 //------------------------------------------------------------------------------
 class OndiskReader : public Reader {
  public:

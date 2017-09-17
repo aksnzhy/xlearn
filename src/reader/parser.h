@@ -33,28 +33,42 @@ to the DMatrix.
 
 namespace xLearn {
 
-typedef std::vector<std::string> StringList;
-
 //------------------------------------------------------------------------------
-// Given a StringList, parse it to the DMatrix format.
+// Given a memory buffer, parse it to the DMatrix format.
 // Parser is an abstract class, which can be implemented by real Parser
-// such as the LibsvmParser, the FFMParser, as well as the CSVParser.
-// Note that the Parser will add a bias (i.e., 1.0) term in each row.
+// such as the LibsvmParser and the FFMParser. Note that the Parser will add
+// a bias term for each SparseRow. We can use the Parse class like this:
+//
+//   std::string filename = "/tmp/train.txt";
+//   std::string format = CheckFileFormat(filename);
+//   Parser* parser = nullptr;
+//   if (format == "libsvm") {
+//     parser = new LibsvmParser();
+//   } else {
+//     parser = new FFMParser();
+//   }
+//   char* buffer = nullptr;
+//   uint64 size = ReadFileToMemory(filename, buffer);
+//   DMatrix matrix;
+//   parser->Parse(buffer, size, matrix);
 //------------------------------------------------------------------------------
 class Parser {
  public:
-  // Using " " as splitor by default.
   Parser() { }
   virtual ~Parser() {  }
 
-  virtual void Parse(const StringList& list,
-                     DMatrix& matrix) = 0;
-
-  std::string Type() { return parser_type; }
+  virtual void Parse(char* buf, uint64 size, DMatrix& matrix) = 0;
 
  protected:
-  std::string parser_type;      // libsvm, libffm, or csv ?
+   // Get how many lines in current memory buffer
+   index_t get_line_number(char* buf, uint64 size);
 
+   // Get one line from memory buffer
+   uint64 get_line_from_buffer(char* line,
+                         char* buf,
+                         uint64 pos,
+                         uint64 size);
+                         
  private:
   DISALLOW_COPY_AND_ASSIGN(Parser);
 };
@@ -66,11 +80,10 @@ class Parser {
 //------------------------------------------------------------------------------
 class LibsvmParser : public Parser {
  public:
-  LibsvmParser() { parser_type = "libsvm"; }
+  LibsvmParser() { }
   ~LibsvmParser() {  }
 
-  virtual void Parse(const StringList& list,
-                     DMatrix& matrix);
+  void Parse(char* buf, uint64 size, DMatrix& matrix);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(LibsvmParser);
@@ -83,31 +96,13 @@ class LibsvmParser : public Parser {
 //------------------------------------------------------------------------------
 class FFMParser : public Parser {
  public:
-  FFMParser() { parser_type = "libffm"; }
+  FFMParser() { }
   ~FFMParser() {  }
 
-  virtual void Parse(const StringList& list,
-                     DMatrix& matrix);
+  void Parse(char* buf, uint64 size, DMatrix& matrix);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(FFMParser);
-};
-
-//------------------------------------------------------------------------------
-// CSVParser parses the following data format:
-// [y1 value value value ...]
-// [y2 value value value ...]
-//------------------------------------------------------------------------------
-class CSVParser : public Parser {
- public:
-  CSVParser() { parser_type = "csv"; }
-  ~CSVParser() { }
-
-  virtual void Parse(const StringList& list,
-                     DMatrix& matrix);
-
- private:
-  DISALLOW_COPY_AND_ASSIGN(CSVParser);
 };
 
 //------------------------------------------------------------------------------

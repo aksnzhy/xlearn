@@ -47,126 +47,116 @@ InmemReader::~InmemReader() {
   data_buf_.Release();  // Release the in-memory buffer
 }
 
-// Pre-load all the data into memory buffer.
+// Pre-load all the data into memory buffer (data_buf)
+// Note that this funtion will first check whether we can use
+// the binary file. If not, reader will generate one automatically
 bool InmemReader::Initialize(const std::string& filename,
                              int num_samples) {
   CHECK_NE(filename.empty(), true)
   CHECK_GT(num_samples, 0);
-  CHECK_NOTNULL(parser);
   filename_ = filename;
   num_samples_ = num_samples;
-  parser_ = parser;
-  file_ptr_ = OpenFileOrDie(filename_.c_str(), "r");
-  if (file_ptr_ == NULL) { return false; }
-  data_samples_.Resize(num_samples);
-  uint64 file_size = GetFileSize(file_ptr_);
-  LOG(INFO) << "Data file size: " << file_size << " bytes.";
-  if (file_size > GB) {
-    printf("  Filename: %s  Size: %.2f GB\n",
-            filename.c_str(),
-            (double) file_size / GB);
-  } else if (file_size > MB) {
-    printf("  Filename: %s  Size: %.2f MB\n",
-            filename.c_str(),
-            (double) file_size / MB);
+  printf("First check if the text file has already "
+         "converted to binary format \n");
+  // HashBinary() will read the first two hash value
+  // and then check it whether equal to the hash value generated
+  // by HashFile() function from current txt file
+  if (HashBinary(filename)) {
+    printf("Binary file found. Skip converting text to binary \n");
+    filename_ += ".bin";
+    return InitFromBinary();
   } else {
-    printf("  Filename: %s  Size: %.2f KB\n",
-            filename.c_str(),
-            (double) file_size / KB);
+    printf("Binary file NOT found. Convert text "
+           "file to binary file \n");
+    return InitFromTxt();
   }
-  scoped_array<char> buffer;
-  try {
-    buffer.reset(new char[file_size]);
-  } catch (std::bad_alloc&) {
-    LOG(FATAL) << "Cannot allocate enough memory for Reader.";
+}
+
+// Check wheter current path has a binary file
+// We use double check here. We first check a the hash value
+// of a small data block, then check the all file.
+bool InmemReader::HashBinary(const std::string& filename) {
+  std::string bin_file = filename + ".bin";
+  // If the ".bin" file does not exists, return false
+  if (!FileExist(bin_file.c_str())) { return false; }
+  FILE* file_bin = OpenFileOrDie(bin_file.c_str(), "r");
+  // Check the first hash value
+  uint64 hash_1 = 0;
+  ReadDataFromDisk(bin_file, (char*)&hash_1, sizeof(hash_1));
+  this->hash_value_1_ = HashFile(filename, true);
+  if (hash_1 != this->hash_value_1_) {
+    return false;
   }
-  // Read all the data from file
-  uint64 read_size = fread(buffer.get(),
-                           1,
-                           file_size,
-                           file_ptr_);
-  CHECK_EQ(read_size, file_size);
-  // Initialize the DMatrix buffer
-  int num_lines = GetLineNumber(buffer.get(), read_size);
-  bool has_field = parser_->Type() == "libffm" ? true : false;
-  data_buf_.Resize(num_lines);
-  data_buf_.InitSparseRow(has_field);
-  // Initialize order
-  order_.resize(num_lines);
-  for (int i = 0; i < num_lines; ++i) {
-    order_[i] = i;
+  // Check the second hash value
+  uint64 hash_2 = 0;
+  ReadDataFromDisk(bin_file, (char*)&hash_2, sizeof(hash_2));
+  this->hash_value_2_ = HashFile(filename, false);
+  if (hash_2 != this->hash_value_2_) {
+    return false;
   }
-  // Parse each line of data from the buffer
-  StringList list(num_lines);
-  scoped_array<char> line(new char[kMaxLineSize]);
-  uint64 start_pos = 0;
-  for (int i = 0; i < num_lines; ++i) {
-    uint32 line_size = ReadLineFromMemory(line.get(),
-                                          buffer.get(),
-                                          start_pos,
-                                          file_size);
-    CHECK_NE(line_size, 0);
-    start_pos += line_size;
-    line[line_size - 1] = '\0';
-    if (line_size > 1 && line[line_size - 2] == '\r') {
-      // Handle some txt format in windows or DOS.
-      line[line_size - 2] = '\0';
-    }
-    list[i].assign(line.get());
-  }
-  // Parse StringList to DMatrix.
-  parser_->Parse(list, data_buf_);
   return true;
 }
 
 // In-memory Reader can be initialized from binary file
-bool InmemReader::InitFromBinary(const std::string& filename,
-                                 int num_samples) {
-  CHECK_NE(filename.empty(), true);
-  CHECK_GT(num_samples, 0);
-  filename_ = filename;
-  num_samples_ = num_samples;
-  parser_ = NULL;
-  file_ptr_ = OpenFileOrDie(filename_.c_str(), "r");
-  if (file_ptr_ == NULL) { return false; }
+bool InmemReader::InitFromBinary() {
+  /*********************************************************
+   *  Step 1: Init data_samples_                           *
+   *********************************************************/
+  data_samples_.ResetMatrix(num_samples_);
+  /*********************************************************
+   *  Step 2: Init data_buf_                               *
+   *********************************************************/
   data_buf_.Deserialize(filename);
-  data_samples_.Resize(num_samples);
+  /*********************************************************
+   *  Step 3: Init order_                                  *
+   *********************************************************/
   order_.resize(data_buf_.row_len);
+  for (int i = 0; i < order_.size(); ++i) {
+    order_[i] = i;
+  }
+  /*********************************************************
+   *  Step 4: Finalize                                     *
+   *********************************************************/
+  Close(file_ptr_);
   return true;
 }
 
-// Serialize DMatrix to a binary file
-void InmemReader::SaveBufferToBinary(const std::string& filename) {
-  data_buf_.Serialize(filename);
-}
-
-// Read one line of data from the memory buffer
-uint64 InmemReader::ReadLineFromMemory(char* line,
-                                       char* buf,
-                                       uint64 start_pos,
-                                       uint64 total_len) {
-  // End of file
-  if (start_pos >= total_len) {
-    return 0;
+// Pre-load all the data to memory buffer from txt file
+bool InmemReader::InitFromTxt() {
+  /*********************************************************
+   *  Step 1: Init data_samples_                           *
+   *********************************************************/
+  data_samples_.ResetMatrix(num_samples_);
+  /*********************************************************
+   *  Step 2: Init parser_                                 *
+   *********************************************************/
+  parser_ = create_parser(CheckFileFormat().c_str());
+  /*********************************************************
+   *  Step 3: Init data_buf_                               *
+   *********************************************************/
+  char* buffer = nullptr;
+  uint64 file_size = ReadFileToMemory(&buffer);
+  printf("Data size: %s", PrintSize(file_size).c_str());
+  parser_->parse(buffer, file_size, data_buf_);
+  data_buf_.SetHash(hash_value_1_, hash_value_2_);
+  /*********************************************************
+   *  Step 4: order_                                       *
+   *********************************************************/
+  order_.resize(data_buf_.row_len);
+  for (int i = 0; i < order_.size(); ++i) {
+    order_[i] = i;
   }
-  uint64 end_pos = start_pos;
-  while (*(buf + end_pos) != '\n') { ++end_pos; }
-  uint64 read_size = end_pos - start_pos + 1;
-  if (read_size > kMaxLineSize) {
-    LOG(FATAL) << "Encountered a too-long line.    \
-                   Please check the data.";
-  }
-  memcpy(line, buf + start_pos, read_size);
-  return read_size;
-}
-
-// How many lines are there in current memory buffer?
-int InmemReader::GetLineNumber(const char* buf, uint64 buf_size) {
-  int num = 0;
-  for (uint64 i = 0; i < buf_size; ++i) {
-    if (buf[i] == '\n') num++;
-  }
-  return num;
+  /*********************************************************
+   *  Step 5: Deserialize in-memory buffer to disk file    *
+   *********************************************************/
+  std::string bin_file = filename + ".bin";
+  this->SaveBufferToBinary(bin_file);
+  /*********************************************************
+   *  Step 6: Finalize                                     *
+   *********************************************************/
+  Close(file_ptr_);
+  delete [] buffer;
+  return true;
 }
 
 // Smaple data from memory buffer.
@@ -200,6 +190,11 @@ int InmemReader::Samples(DMatrix* &matrix) {
 void InmemReader::Reset() {
   pos_ = 0;
   data_samples_.Setlength(num_samples_);
+}
+
+// Serialize DMatrix to a binary file
+void InmemReader::SaveBufferToBinary(const std::string& filename) {
+  data_buf_.Serialize(filename);
 }
 
 //------------------------------------------------------------------------------
@@ -273,4 +268,4 @@ void OndiskReader::Reset() {
   data_samples_.Setlength(num_samples_);
 }
 
-} // namespace xLearn
+}  // namespace xLearn
