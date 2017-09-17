@@ -137,8 +137,10 @@ class Model {
   // Initialize model parameters
   void Initialize_w_and_v(bool set_value = false);
 
-  // Serialize and Deserialize w and v
+  // Serialize w and v to disk file
   void serialize_w_v(FILE* file);
+
+  // Deserialize w and v from disk file
   void deserialize_w_v(FILE* file);
 
  private:
