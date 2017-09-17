@@ -92,8 +92,6 @@ class Reader {
   std::string filename_;
   /* Number of data samples in working set */
   int num_samples_;
-  /* Maintain current file pointer */
-  FILE* file_ptr_;
   /* Data sample */
   DMatrix data_samples_;
   /* Parse txt file to binary data */
@@ -101,7 +99,7 @@ class Reader {
 
   // Check current file format and return
   // "libsvm" or "libfm". Program crashes for unknow format
-  std::string CheckFileFormat();
+  std::string check_file_format();
 
   // Create parser for different file format
   Parser* CreateParser(const char* format_name) {
@@ -121,7 +119,7 @@ class Reader {
 class InmemReader : public Reader {
  public:
   InmemReader() { pos_ = 0; }
-  ~InmemReader();
+  ~InmemReader() { }
 
   // Pre-load all the data into memory buffer
   virtual void Initialize(const std::string& filename,
@@ -140,19 +138,15 @@ class InmemReader : public Reader {
   index_t pos_;
   /* For shuffle */
   std::vector<index_t> order_;
-  /* These two values are used to check whether
-   we can use binary file to speedup data reading */
-  uint64 hash_value_1_;
-  uint64 hash_value_2_;
 
   // Check wheter current path has a binary file
   bool hash_binary(const std::string& filename);
 
   // Initialize Reader from binary file
-  bool init_from_binary();
+  void init_from_binary();
 
   // Initialize Reader from txt file
-  bool init_from_txt();
+  void init_from_txt();
 
   // Serialize in-memory buffer to disk file
   void serialize_buffer(const std::string& filename);
@@ -163,16 +157,16 @@ class InmemReader : public Reader {
 
 //------------------------------------------------------------------------------
 // Samplling data from disk file.
-// OndiskReader is used to train very big data, which cannot be loaded
-// into main memory of current machine.
+// OndiskReader is used to train very big data, which cannot be
+// loaded into main memory of current machine.
 // We use multi-thread to support data pipeline reading
 //------------------------------------------------------------------------------
 class OndiskReader : public Reader {
  public:
   OndiskReader() {  }
-  ~OndiskReader();
+  ~OndiskReader() { }
 
-  virtual bool Initialize(const std::string& filename,
+  virtual void Initialize(const std::string& filename,
                           int num_samples);
 
   // Sample data from disk file.

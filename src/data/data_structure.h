@@ -117,7 +117,7 @@ struct DMatrix {
     row_length = 0;
     // Delete Y
     std::vector<real_t>().swap(Y);
-    for (int i = 0; i < row.size(); ++i) {
+    for (int i = 0; i < row_length; ++i) {
       // Delete Node
       std::vector<Node>().swap(*row[i]);
     }
