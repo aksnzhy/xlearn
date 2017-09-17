@@ -50,12 +50,12 @@ struct HyperParam {
 // Parameters for optimization method.
 //------------------------------------------------------------------------------
   /* Learning rate */
-  real_t learning_rate = 0.01;        // Control the learning setp
+  real_t learning_rate = 0.0005;      // Control the learning setp
   /* Update function */
   std::string updater_type = "sgd";   // 'sgd', 'adagrad', 'adadelta', 'adam',
                                       // 'rmsprop', 'nesterov', or 'momentum'
   /* decay_rate_1 for updater */
-  real_t decay_rate_1 = 0.9;          // The decay factor used by updater
+  real_t decay_rate_1 = 0.5;          // The decay factor used by updater
   /* decay_rate_2 for updater */
   real_t decay_rate_2 = 0.5;          // The second decay factor used by updater
   /* lambda for regularizer */
