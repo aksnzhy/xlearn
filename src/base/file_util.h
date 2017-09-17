@@ -32,6 +32,79 @@ This file contains facilitlies controlling file.
 #include "src/base/stringprintf.h"
 
 //------------------------------------------------------------------------------
+// Useage:
+//
+//    std::string filename = "test_file";
+//
+//    /* (1) Check whether a file exists */
+//    bool bo = FileExist(filename.c_str());
+//
+//    /* (2) Open file : 'r' for read, 'w' for write */
+//    FILE* file_r = OpenFileOrDie(filename.c_str(), "r");
+//    FILE* file_w = OpenFileOrDie(filename.c_str(), "w");
+//
+//    /* (3) Close file */
+//    Close(file_r);
+//    Close(file_w);
+//
+//    /* (4) Get file size */
+//    uint64 size = GetFileSize(filename.c_str());
+//
+//    /* (5) Get one line from file */
+//    FILE* file_r = OpenFileOrDie(filename.c_str(), "r");
+//    std::string str_line;
+//    GetLine(file_r, str_line);
+//
+//    /* (6) Write data to disk file */
+//    FILE* file_w = OpenFileOrDie(filename.c_str(), "w");
+//    int number = 999;
+//    WriteDataToDisk(file_w, (char*)&number, sizeof(number));
+//    Close(file_w);
+//
+//    /* (7) Read binary data from disk file */
+//    FILE* file_r = OpenFileOrDie(filename.c_str(), "r");
+//    int number = 0;
+//    ReadDataFromDisk(file_r, (char*)&number, sizeof(number));
+//    CHECK_EQ(number, 999);
+//    Close(file_r);
+//
+//    /* (8) Delete file from disk */
+//    RemoveFile(filename.c_str());
+//
+//    /* (9) Print file size */
+//    uint64 size = GetFileSize(filename.c_str());
+//    cout << PrintSize(size) << endl;
+//
+//    /* (10) Write std::vector to disk file */
+//    FILE* file_w = OpenFileOrDie(filename.c_str(), "w");
+//    std::vector<int> vec(10, 100);
+//    WriteVectorToFile(file_w, vec);
+//
+//    /* (11) Read std::vector from disk file */
+//    FILE* file_r = OpenFileOrDie(filename.c_str(), "r");
+//    std::vector<int> vec;
+//    ReadVectorFromFile(file_r, vec);
+//
+//    /* (12) Write std::string to disk file */
+//    FILE* file_w = OpenFileOrDie(filename.c_str(), "w");
+//    std::string str("apple");
+//    WriteStringToFile(file_w, str);
+//
+//    /* (13) Read std::string from disk file */
+//    FILE* file_r = OpenFileOrDie(filename.c_str(), "r");
+//    std::string str;
+//    ReadStringFromFile(file_r, str);
+//
+//    /* (14) Generate hash value for file  */
+//    uint64 hash_1 = HashFile(filename, true);   /* for one block */
+//    uint64 hash_2 = HashFile(filename, false);  /* for the whole file */
+//
+//    /* (15) Read the whole file into in-memory buffer */
+//    char *buffer = nullptr;
+//    uint64 file_size = ReadFileToMemory(filename, &buffer);
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
 // Basic operations for a file
 //------------------------------------------------------------------------------
 
@@ -41,7 +114,8 @@ const size_t GB = 1024.0 * 1024.0 * 1024.0;
 
 // 100 KB for one line of txt data
 static const uint32 kMaxLineSize = 100 * 1024;
-static const int kCHUNK_SIZE = 10000000;
+// Chunk szie for hash
+static const int kChunkSize = 10000000;
 
 // Check whether the file exists
 inline bool FileExist(const char* filename) {
@@ -223,9 +297,9 @@ inline uint64_t HashFile(const std::string& filename, bool one_block=false) {
 
   uint64_t magic = 90359;
   for(long pos = 0; pos < end; ) {
-    long next_pos = std::min(pos + kCHUNK_SIZE, end);
+    long next_pos = std::min(pos + kChunkSize, end);
     long size = next_pos - pos;
-    std::vector<char> buffer(kCHUNK_SIZE);
+    std::vector<char> buffer(kChunkSize);
     f.read(buffer.data(), size);
 
     int i = 0;
@@ -260,8 +334,8 @@ inline uint64 ReadFileToMemory(const std::string& filename, char **buf) {
   }
   uint64 read_size = fread(*buf, 1, len, file);
   CHECK_EQ(read_size, len);
-  return len;
   Close(file);
+  return len;
 #else
   int fd = open(filename.c_str(), O_RDONLY);
   uint64 len = lseek(fd, 0, SEEK_END);
