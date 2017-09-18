@@ -81,7 +81,7 @@ class Model {
   Model() { }
   ~Model() { }
 
-  // Initialize model from a checkpoint file.
+  // Initialize model from a checkpoint file
   explicit Model(const std::string& filename);
 
   // Initialize model parameters to zero or using
@@ -101,12 +101,8 @@ class Model {
   // Get the pointer of linear term parameters
   real_t* GetParameter_w() { return param_w_; }
 
-  // Get the pointer of latent factor parameters
-  real_t* GetParameter_v() { return param_v_; }
-
   // Other Get functions
   index_t GetNumParameter_w() { return param_num_w_; }
-  index_t GetNumParameter_v() { return param_num_v_; }
   std::string GetScoreFunction() { return score_func_; }
   std::string GetLossFunction() { return loss_func_; }
   index_t GetNumFeature() { return num_feat_; }
@@ -119,7 +115,6 @@ class Model {
    For fm, param_num = num_feat + num_feat * num_K
    For ffm, param_num = num_feat + num_feat * num_field * num_K */
   index_t  param_num_w_;
-  index_t  param_num_v_;
   /* Score function: 'linear', 'fm', or 'ffm' */
   std::string  score_func_;
   /* Loss function: 'squared', 'cross-entropy', etc */
@@ -131,17 +126,16 @@ class Model {
   /* Number of K (used in fm and ffm) */
   index_t  num_K_;
   /* Storing the model parameters */
-  real_t*  param_w_;   // parameters for linear term
-  real_t*  param_v_;   // parameters for latent factor
+  real_t*  param_w_;
 
   // Initialize model parameters
-  void Initialize_w_and_v(bool set_value = false);
+  void Initialize_w(bool set_value = false);
 
   // Serialize w and v to disk file
-  void serialize_w_v(FILE* file);
+  void serialize_w(FILE* file);
 
   // Deserialize w and v from disk file
-  void deserialize_w_v(FILE* file);
+  void deserialize_w(FILE* file);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Model);

@@ -44,11 +44,14 @@ void Model::Initialize(const std::string& score_func,
   CHECK_GT(num_feature, 0);
   CHECK_GE(num_field, 0);
   CHECK_GE(num_K, 0);
-  param_num_w_ = num_feature;
-  if (score_func == "fm") {
-    param_num_v_ = num_feature * num_K;
+  if (score_func == "linear") {
+    param_num_w_ = num_feature;
+  } else if (score_func == "fm") {
+    param_num_w_ = num_feature +
+                   num_feature * num_K;
   } else if (score_func == "ffm") {
-    param_num_v_ = num_feature * num_K * num_field;
+    param_num_w_ = num_feature +
+            num_feature * num_K * num_field;
   } else {
     LOG(FATAL) << "Unknow score function: " << score_func;
   }
@@ -57,43 +60,36 @@ void Model::Initialize(const std::string& score_func,
   num_feat_ = num_feature;
   num_field_ = num_field;
   num_K_ = num_K;
-  Initialize_w_and_v();
+  Initialize_w();
 }
 
 // To get the best performance for SSE and AVX, we need
 // to allocate memory for the model parameters in aligned way
 // For AVX, the align number should be 32, and for SSE, the
 // align number should be 16
-void Model::Initialize_w_and_v(bool set_value) {
+void Model::Initialize_w(bool set_value) {
   try {
-    // Init linear term
+    // Only used in Unix-like systems
   #ifdef __AVX__
     posix_memalign((void**)&param_w_, 32, param_num_w_ * sizeof(real_t));
   #else // SSE
     posix_memalign((void**)&param_w_, 16, param_num_w_ * sizeof(real_t));
   #endif
-    if (set_value) {
-      for (index_t i = 0; i < param_num_w_; ++i) {
-        param_w_[i] = 0.0;
-      }
-    }
-    if (score_func_ == "fm" || score_func_ == "ffm") {
-      // Init latent factor
-    #ifdef __AVX__
-      posix_memalign((void**)&param_v_, 32, param_num_v_ * sizeof(real_t));
-    #else // SSE
-      posix_memalign((void**)&param_v_, 16, param_num_v_ * sizeof(real_t));
-    #endif
-      if (set_value) {
-        real_t coef = 1.0f / sqrt(num_K_);
-        RandDistribution(param_v_, param_num_v_, 0.0, 1.0, coef);
-      }
-    }
   } catch (std::bad_alloc&) {
     LOG(FATAL) << "Cannot allocate enough memory for current  \
                    model parameters. Parameter size: [w] "
-               << param_num_w_ << " [v]: "
-               << param_num_v_;
+               << param_num_w_;
+  }
+  if (set_value) {
+    // Set linear term to zero
+    for (index_t i = 0; i < num_feat_; ++i) {
+      param_w_[i] = 0.0;
+    }
+    // Init latent factor using RandDistribution()
+    real_t coef = 1.0f / sqrt(num_K_);
+    RandDistribution(param_w_ + num_feat_,
+        param_num_w_ - num_feat_,
+        0.0, 1.0, coef);
   }
 }
 
@@ -121,8 +117,8 @@ void Model::Serialize(const std::string& filename) {
   WriteDataToDisk(file, (char*)&num_field_, sizeof(num_field_));
   // Write K
   WriteDataToDisk(file, (char*)&num_K_, sizeof(num_K_));
-  // Write w and v
-  this->serialize_w_v(file);
+  // Write w
+  this->serialize_w(file);
   Close(file);
 }
 
@@ -141,40 +137,28 @@ bool Model::Deserialize(const std::string& filename) {
   ReadDataFromDisk(file, (char*)&num_field_, sizeof(num_field_));
   // Read K
   ReadDataFromDisk(file, (char*)&num_K_, sizeof(num_K_));
-  // Read w and v
-  this->deserialize_w_v(file);
+  // Read w
+  this->deserialize_w(file);
   Close(file);
   return true;
 }
 
-// Serialize w and v
-void Model::serialize_w_v(FILE* file) {
+// Serialize w
+void Model::serialize_w(FILE* file) {
   // Write size
   WriteDataToDisk(file, (char*)&param_num_w_, sizeof(param_num_w_));
-  if (score_func_ == "fm" || score_func_ == "ffm") {
-    WriteDataToDisk(file, (char*)&param_num_v_, sizeof(param_num_v_));
-  }
   // Write data
   WriteDataToDisk(file, (char*)param_w_, sizeof(real_t)*param_num_w_);
-  if (score_func_ == "fm" || score_func_ == "ffm") {
-    WriteDataToDisk(file, (char*)param_v_, sizeof(real_t)*param_num_v_);
-  }
 }
 
 // Deserialize w and v
-void Model::deserialize_w_v(FILE* file) {
+void Model::deserialize_w(FILE* file) {
   // Read size
   ReadDataFromDisk(file, (char*)&param_num_w_, sizeof(param_num_w_));
-  if (score_func_ == "fm" || score_func_ == "ffm") {
-    ReadDataFromDisk(file, (char*)&param_num_v_, sizeof(param_num_v_));
-  }
   // Allocate memory
-  Initialize_w_and_v(false);  /* do not set value */
+  Initialize_w(false);  /* do not set value */
   // Read data
   ReadDataFromDisk(file, (char*)param_w_, sizeof(real_t)*param_num_w_);
-  if (score_func_ == "fm" || score_func_ == "ffm") {
-    ReadDataFromDisk(file, (char*)param_v_, sizeof(real_t)*param_num_v_);
-  }
 }
 
 }  // namespace xLearn
