@@ -113,6 +113,7 @@ bool InmemReader::hash_binary(const std::string& filename) {
     Close(file);
     return false;
   }
+  Close(file);
   return true;
 }
 
