@@ -71,9 +71,11 @@ void Model::Initialize_w(bool set_value) {
   try {
     // Only used in Unix-like systems
   #ifdef __AVX__
-    posix_memalign((void**)&param_w_, 32, param_num_w_ * sizeof(real_t));
+    posix_memalign((void**)&param_w_, 32,
+       param_num_w_ * sizeof(real_t));
   #else // SSE
-    posix_memalign((void**)&param_w_, 16, param_num_w_ * sizeof(real_t));
+    posix_memalign((void**)&param_w_, 16,
+       param_num_w_ * sizeof(real_t));
   #endif
   } catch (std::bad_alloc&) {
     LOG(FATAL) << "Cannot allocate enough memory for current  \
