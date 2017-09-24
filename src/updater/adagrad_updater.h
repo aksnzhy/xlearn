@@ -46,26 +46,25 @@ class AdaGrad : public Updater {
   AdaGrad() {  }
   ~AdaGrad() {  }
 
-  // This function neede to be invoked before using this class.
+  // This function neede to be invoked before using this class
   void Initialize(real_t learning_rate,
-                  real_t regu_lambda,
-                  real_t decay_rate_1,
-                  real_t decay_rate_2,
-                  index_t num_param);
+               real_t regu_lambda,
+               real_t decay_rate = 0,
+               index_t num_param_w = 0);
 
   // AdaGrad updater
-  void Update(const index_t id,
+  void Update(const index_t idx,
               const real_t grad,
-              std::vector<real_t>& param);
+              real_t* w);
 
-  // Update a continous space of model parameters using sse/avx.
-  void BatchUpdate(const std::vector<real_t>& value,
-                   const index_t start_id,
-                   std::vector<real_t>& param);
+  // Update a continous space of model using SSE/AVX
+  void BatchUpdate(__MX _w,
+                   __MX _grad,
+                   index_t idx,
+                   real_t* w);
 
  protected:
-  std::vector<real_t> cache_;
-  __MX _small_num;
+  real_t* cache_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(AdaGrad);

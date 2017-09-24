@@ -45,28 +45,27 @@ class AdaDelta : public Updater {
   AdaDelta() {  }
   ~AdaDelta() {  }
 
-  // This function needs to be invoked before update.
+  // This function needs to be invoked before update
   void Initialize(real_t learning_rate,
-                  real_t regu_lambda,
-                  real_t decay_rate_1,
-                  real_t decay_rate_2,
-                  index_t num_param);
+              real_t regu_lambda,
+              real_t decay_rate,
+              index_t param_num_w);
 
   // AdaDelta update
-  void Update(const index_t id,
+  void Update(const index_t idx,
               const real_t grad,
-              std::vector<real_t>& param);
+              real_t* w);
 
-  // Update a continous space of model parameters using sse/avx.
-  void BatchUpdate(const std::vector<real_t>& value,
-                   const index_t start_id,
-                   std::vector<real_t>& param);
+  // Update a continous space of model using sse/avx
+  void BatchUpdate(__MX _w,
+                   __MX _grad,
+                   index_t idx,
+                   real_t* w);
 
  protected:
-  std::vector<real_t> cache_;
-  real_t decay_rate_;
+  real_t* cache_;
+  real_t  decay_rate_;
   __MX _decay_rate;
-  __MX _small_num;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(AdaDelta);

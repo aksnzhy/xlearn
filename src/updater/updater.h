@@ -17,8 +17,8 @@
 /*
 Author: Yuze Liao and Chao Ma (mctt90@gmail.com)
 
-This file defines the Updater class that is responsible for updating
-current model parameters.
+This file defines the Updater class that is responsible for
+updating current model parameters.
 */
 
 #ifndef XLEARN_UPDATER_UPDATER_H_
@@ -45,28 +45,26 @@ namespace xLearn {
 //------------------------------------------------------------------------------
 class Updater {
  public:
-  // Constructor and Destructor.
+  // Constructor and Destructor
   Updater() {  }
   virtual ~Updater() {  }
 
-  // This function needs to be invoked before using this class.
+  // This function needs to be invoked before using this class
   virtual void Initialize(real_t learning_rate,
-                          real_t regu_lambda,
-                          real_t decay_rate_1,
-                          real_t decay_rate_2,
-                          index_t num_param);
+                      real_t regu_lambda,
+                      real_t decay_rate = 0,
+                      index_t num_param_w = 0);
 
-  // Using naive SGD updater by default.
-  virtual void Update(const index_t id,
+  // Using naive SGD updater by default
+  virtual void Update(const index_t idx,
                       const real_t grad,
-                      std::vector<real_t>& param);
+                      real_t* w);
 
-  // Update a continuous space of model parameters using SSE/AVX.
-  virtual void BatchUpdate(const std::vector<real_t>& value,
-                           const index_t start_id,
-                           std::vector<real_t>& param);
-
-  virtual void BatchUpdate(__MX w_k, __MX grad, real_t* w);
+  // Update a continuous space of model using SSE/AVX
+  virtual void BatchUpdate(__MX _w,
+                           __MX _grad,
+                           index_t idx,
+                           real_t* w);
 
  protected:
   real_t learning_rate_;

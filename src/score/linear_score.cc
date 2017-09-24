@@ -26,24 +26,27 @@ namespace xLearn {
 
 // y = wTx (bias is added in w and x automitically)
 real_t LinearScore::CalcScore(const SparseRow* row,
-                              const std::vector<real_t>* w) {
+                              const Model& model) {
+  real_t* w = model.GetParameter_w();
   real_t score = 0.0;
-  for (index_t j = 0; j < row->column_len; ++j) {
-    index_t idx = row->idx[j];
-    score += (*w)[idx] * row->X[j];
+  for (SparseRow::iterator iter = row->begin();
+       iter != row->end(); ++iter) {
+    index_t idx = iter->feat_id;
+    score += w[idx] * iter->feat_val;
   }
   return score;
 }
 
-// Calculate gradient and update current model parameters.
+// Calculate gradient and update current model
 void LinearScore::CalcGrad(const SparseRow* row,
-                           std::vector<real_t>& param,
-                           real_t pg, /* partial gradient */
+                           Model& model,
+                           real_t pg,  /* partial gradient */
                            Updater* updater) {
-  index_t col_len = row->column_len;
-  for (size_t i = 0; i < col_len; ++i) {
-    real_t gradient = pg * row->X[i];
-    updater->Update(row->idx[i], gradient, param);
+  real_t* w = model.GetParameter_w();
+  for (SparseRow::iterator iter = row->begin();
+       iter != row->end(); ++iter) {
+    real_t gradient = pg * iter->feat_val;
+    updater->Update(iter->feat_id, gradient, w)
   }
 }
 

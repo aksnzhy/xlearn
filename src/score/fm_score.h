@@ -37,21 +37,14 @@ class FMScore : public Score {
   FMScore() { }
   ~FMScore() { }
 
-  // This function needs to be invoked before using this class.
-  void Initialize(index_t num_feat, int k, int field = 0) {
-    CHECK_GT(k, 0);
-    CHECK_GT(num_feat, 0);
-    num_factor_ = k;
-    num_feature_ = num_feat;
-  }
-
-  // Given one exmaple and current model, return the score.
+  // Given one exmaple and current model, and
+  // return the score
   real_t CalcScore(const SparseRow* row,
-                   const std::vector<real_t>* w);
+                   const Model& model);
 
-  // Calculate gradient and update current model.
+  // Calculate gradient and update current model
   void CalcGrad(const SparseRow* row,
-                std::vector<real_t>& param,
+                Model& model,
                 real_t pg, /* partial gradient */
                 Updater* updater);
 

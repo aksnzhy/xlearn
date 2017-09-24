@@ -37,26 +37,21 @@ class LinearScore : public Score {
   LinearScore() { }
   ~LinearScore() { }
 
-  // For now, we do nothing in Initialize() of linear score
-  void Initialize(index_t num_feat = 0, int k = 0, int field = 0) {
-    /* Do nothing */
-    return;
-  }
-
-  // Given one exmaple and current model, return the score.
+  // Given one exmaple and current model, and
+  // return the score.
   real_t CalcScore(const SparseRow* row,
-                   const std::vector<real_t>* w);
+                   const Model& model);
 
-  // Calculate gradient and update current model.
+  // Calculate gradient and update current model
   void CalcGrad(const SparseRow* row,
-                std::vector<real_t>& param,
-                real_t pg, /* partial gradient */
+                Model& model,
+                real_t pg,  /* partial gradient */
                 Updater* updater);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(LinearScore);
 };
 
-} // namespace xLearn
+}  // namespace xLearn
 
-#endif // XLEARN_LINEAR_SCORE_H_
+#endif  // XLEARN_LINEAR_SCORE_H_

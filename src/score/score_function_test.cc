@@ -38,4 +38,4 @@ TEST(SCORE_TEST, Create_Score) {
   EXPECT_TRUE(CreateScore("unknow_name") == NULL);
 }
 
-} // namespace xLearn
+}  // namespace xLearn

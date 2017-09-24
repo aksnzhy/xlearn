@@ -34,4 +34,4 @@ REGISTER_SCORE("linear", LinearScore);
 REGISTER_SCORE("fm", FMScore);
 REGISTER_SCORE("ffm", FFMScore);
 
-} // namespace xLearn
+}  // namespace xLearn

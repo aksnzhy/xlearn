@@ -17,7 +17,7 @@
 /*
 Author: Chao Ma (mctt90@gmail.com)
 This file defines the Score class, including linear score,
-FM score, FFM score, etc.
+FM score, FFM score, and etc.
 */
 
 #ifndef XLEARN_LOSS_SCORE_FUNCTION_H_
@@ -40,11 +40,9 @@ namespace xLearn {
 // pass its pointer to a Loss class like this:
 //
 //  Score* score = new FMScore();
-//  score->Initialize(num_feat, K, num_field);
-//  Loss* loss = new AbsLoss();
-//  loss->Initialize(score);
+//  score->CalcScore(row, model);
+//  score->CalcGrad(row, model, pg, updater);
 //
-//  The CalcScore() and CalcGrad() function are used by Loss class.
 //------------------------------------------------------------------------------
 class Score {
  public:
@@ -52,23 +50,16 @@ class Score {
   Score() { }
   virtual ~Score() { }
 
-  // This function needs to be invoked before using this class.
-  virtual void Initialize(index_t num_feat, int k, int field) = 0;
-
-  // Given one exmaple and current model, return the score.
+  // Given one exmaple and current model, and
+  // return the score
   virtual real_t CalcScore(const SparseRow* row,
-                           const std::vector<real_t>* w) = 0;
+                           const Model& model) = 0;
 
-  // Calculate gradient and update current model parameters.
+  // Calculate gradient and update current model
   virtual void CalcGrad(const SparseRow* row,
-                        std::vector<real_t>& param,
+                        Model& model,
                         real_t pg, /* partial gradient */
                         Updater* updater) = 0;
-
- protected:
-  index_t num_factor_;
-  index_t num_feature_;
-  index_t num_field_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Score);
@@ -92,6 +83,6 @@ CLASS_REGISTER_DEFINE_REGISTRY(xLearn_score_registry, Score);
       format_name)
 
 
-} // namespace xLearn
+}  // namespace xLearn
 
-#endif // XLEARN_LOSS_SCORE_FUNCTION_H_
+#endif  // XLEARN_LOSS_SCORE_FUNCTION_H_

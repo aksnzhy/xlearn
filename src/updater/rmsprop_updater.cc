@@ -28,80 +28,78 @@ namespace xLearn {
 
 // This function needs to be invoked before update.
 void RMSProp::Initialize(real_t learning_rate,
-                         real_t regu_lambda,
-                         real_t decay_rate_1,
-                         real_t decay_rate_2,
-                         index_t num_param) {
+                      real_t regu_lambda,
+                      real_t decay_rate,
+                      index_t param_num_w) {
   CHECK_GT(learning_rate, 0);
   // regu_lambda == 0 means that we will not use regularizer
   CHECK_GE(regu_lambda, 0);
-  CHECK_GT(decay_rate_1, 0);
-  CHECK_GT(num_param, 0);
+  CHECK_GT(decay_rate, 0);
   learning_rate_ = learning_rate;
-  regu_lambda_ = regu_lambda_;
-  decay_rate_ = decay_rate_1;
+  regu_lambda_ = regu_lambda;
+  decay_rate_ = decay_rate;
   _lr = _MMX_SET1_PS(learning_rate_);
-  _lambda = _MMX_SET1_PS(regu_lambda);
-  _decay_rate = _MMX_SET1_PS(decay_rate_1);
-  _small_num = _MMX_SET1_PS(kVerySmallNumber);
-  // Allocating memory for the cache vector
+  _lambda = _MMX_SET1_PS(regu_lambda_);
+  _decay_rate = _MMX_SET1_PS(decay_rate_);
+  // Allocating memory for cache vector
   try {
-    cache_.resize(num_param, 0.0);
+    #ifdef __AVX__
+      posix_memalign((void**)&cache_, 32,
+         param_num_w * sizeof(real_t));
+    #else // SSE
+      posix_memalign((void**)&cache_, 16,
+         param_num_w * sizeof(real_t));
+    #endif
   } catch (std::bad_alloc&) {
-    LOG(FATAL) << "Cannot allocate enough emmroy for current    \
-                   model parameter. Parameter size: "
-               << num_param;
+    LOG(FATAL) << "Cannot allocate enough memory for current    \
+                   model parameters. Parameter size: "
+               << param_num_w;
+  }
+  for (index_t i = 0; i < param_num_w; ++i) {
+    cache_[i] = 0.0;
   }
 }
 
 // RMSProp updater:
 // [ cache = decay_rate * cache + (1-decay_rate) * dx ^ 2 ]
-// [ w -= learning_rate * dx / sqrt(cache + 1e-7) ]
-void RMSProp::Update(const index_t id,
+// [ w -= learning_rate * dx / sqrt(cache) ]
+void RMSProp::Update(const index_t idx,
                      const real_t grad,
-                     std::vector<real_t>& param) {
+                     real_t* w) {
   // Do not check anything here
-  cache_[id] = (1.0-decay_rate_)*grad*grad
-               + decay_rate_*cache_[id];
+  real_t grad_w = grad + regu_lambda_ * w[idx];
+  cache_[idx] = (1.0 - decay_rate_) * grad_w * grad_w
+                + decay_rate_ * cache_[idx];
   // InvSqrt(n) == 1 / sqrt(n)
-  param[id] -= (learning_rate_*grad*InvSqrt(cache_[id] +
-                kVerySmallNumber) +        // grad
-                regu_lambda_*param[id]);   // regular
+  w[idx] -= (learning_rate_ *
+             grad *
+             InvSqrt(cache_[idx]));
 }
 
 // Update a continuous space of model parameters by
-// using sse/avx to speed up.
-void RMSProp::BatchUpdate(const std::vector<real_t>& value,
-                          const index_t start_id,
-                          std::vector<real_t>& param) {
+// using sse/avx to speed up
+void RMSProp::BatchUpdate(__MX _w,
+                          __MX _grad,
+                          index_t idx,
+                          real_t* w) {
   // Do not check anything here
   static __MX _1_minus_decay_rate = _MMX_SET1_PS(1-decay_rate_);
-  for (size_t i = 0; i < value.size(); i += _MMX_INCREMENT) {
-    index_t id = start_id + i;
-    __MX _grad = _MMX_LOAD_PS(value.data() + i);
-    __MX _cache = _MMX_LOAD_PS(cache_.data() + id);
-    __MX _w = _MMX_LOAD_PS(param.data() + id);
-    // [ cache = decay_rate * cache + (1-decay_rate) * dx ^ 2 ]
-    // [ w -= learning_rate * dx / sqrt(cache + 1e-7) ]
-    _cache = _MMX_ADD_PS(
-               _MMX_MUL_PS(
-                 _MMX_MUL_PS(_1_minus_decay_rate, _grad),
-                 _grad),
-               _MMX_MUL_PS(_decay_rate, _cache));
-    _MMX_STORE_PS(cache_.data() + id,
-                 _cache);
-    _MMX_STORE_PS(param.data() + id,
-                  _MMX_SUB_PS(_w,
-                    _MMX_ADD_PS(
-                      _MMX_MUL_PS(_lr,
-                        _MMX_MUL_PS(_grad,
-                          _MMX_RSQRT_PS(
-                            _MMX_ADD_PS(_cache, _small_num)))),
-                      _MMX_MUL_PS(_lambda, _w)
-                    )
-                  )
-                );
-  }
+  _grad = _MMX_ADD_PS(_grad,
+          _MMX_MUL_PS(_lambda, _w));
+  __MX _cache = _MMX_LOAD_PS(cache_ + idx);
+  // [ cache = decay_rate * cache + (1-decay_rate) * dx ^ 2 ]
+  _cache = _MMX_ADD_PS(
+             _MMX_MUL_PS(
+               _MMX_MUL_PS(_1_minus_decay_rate, _grad),
+               _grad),
+             _MMX_MUL_PS(_decay_rate, _cache));
+  _MMX_STORE_PS(cache_ + idx, _cache);
+  // [ w -= learning_rate * dx / sqrt(cache) ]
+  _MMX_STORE_PS(w + idx,
+          _MMX_SUB_PS(_w,
+          _MMX_MUL_PS(_lr,
+          _MMX_MUL_PS(_grad,
+          _MMX_RSQRT_PS(_cache)))));
 }
 
-}// namespace xLearn
+}  // namespace xLearn
