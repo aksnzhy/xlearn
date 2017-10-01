@@ -45,7 +45,7 @@ class SquaredLoss : public Loss {
   // Given data sample and current model, calculate gradient
   // and update model.
   void CalcGrad(const DMatrix* data_matrix,
-                Model* model,
+                Model& model,
                 Updater* updater);
 
  private:

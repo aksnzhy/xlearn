@@ -20,33 +20,32 @@ This file is the implementation of the base Loss class.
 */
 
 #include "src/loss/loss.h"
-#include "src/loss/squared_loss.h"
-#include "src/loss/hinge_loss.h"
-#include "src/loss/cross_entropy_loss.h"
-#include "src/loss/absolute_loss.h"
+//#include "src/loss/squared_loss.h"
+//#include "src/loss/hinge_loss.h"
+//#include "src/loss/cross_entropy_loss.h"
+//#include "src/loss/absolute_loss.h"
 
 namespace xLearn {
 
 //------------------------------------------------------------------------------
 // Class register
 //------------------------------------------------------------------------------
-CLASS_REGISTER_IMPLEMENT_REGISTRY(xLearn_loss_registry, Loss);
-REGISTER_LOSS("squared", SquaredLoss);
-REGISTER_LOSS("hinge", HingeLoss);
-REGISTER_LOSS("abs", AbsLoss);
-REGISTER_LOSS("cross-entropy", CrossEntropyLoss);
+//CLASS_REGISTER_IMPLEMENT_REGISTRY(xLearn_loss_registry, Loss);
+//REGISTER_LOSS("squared", SquaredLoss);
+//REGISTER_LOSS("hinge", HingeLoss);
+//REGISTER_LOSS("abs", AbsLoss);
+//REGISTER_LOSS("cross-entropy", CrossEntropyLoss);
 
 // Given data sample and current model, return predictions.
 void Loss::Predict(const DMatrix* data_matrix,
-                   Model* model,
+                   Model& model,
                    std::vector<real_t>& pred) {
   CHECK_NOTNULL(data_matrix);
   CHECK_NE(pred.empty(), true);
-  CHECK_EQ(pred.size(), data_matrix->row_len);
-  std::vector<real_t>* w = model->GetParameter();
-  for (size_t i = 0; i < data_matrix->row_len; ++i) {
+  CHECK_EQ(pred.size(), data_matrix->row_length);
+  for (size_t i = 0; i < data_matrix->row_length; ++i) {
     SparseRow* row = data_matrix->row[i];
-    pred[i] = score_func_->CalcScore(row, w);
+    pred[i] = score_func_->CalcScore(row, model);
   }
 }
 

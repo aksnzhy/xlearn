@@ -38,14 +38,14 @@ class AbsLoss : public Loss {
   AbsLoss() { };
   ~AbsLoss() { }
 
-  // Given predictions and labels, return loss value.
+  // Given predictions and labels, return loss value
   real_t Evalute(const std::vector<real_t>& pred,
                  const std::vector<real_t>& label);
 
   // Given data sample and current model, calculate gradient
-  // and update model.
+  // and update model
   void CalcGrad(const DMatrix* data_matrix,
-                Model* model,
+                Model& model,
                 Updater* updater);
 
  private:

@@ -44,23 +44,21 @@ class TestLoss : public Loss {
                  const std::vector<real_t>& label) { return 0.0; }
 
   void CalcGrad(const DMatrix* data_matrix,
-                Model* model,
-                Updater* updater) { }
+                Model& model,
+                Updater* updater) { return; }
 
  private:
   DISALLOW_COPY_AND_ASSIGN(TestLoss);
 };
 
+HyperParam param;
 const index_t kLine = 10;
 
-HyperParam param;
 class LossTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
     param.learning_rate = 0.1;
     param.regu_lambda = 0;
-    param.decay_rate_1 = 0.91;
-    param.num_param = 3;
     param.loss_func = "sqaured";
     param.score_func = "linear";
     param.num_feature = 3;
@@ -72,26 +70,24 @@ class LossTest : public ::testing::Test {
 TEST_F(LossTest, Predict_Linear) {
   // Create Model for Linear
   Model model_lr;
-  model_lr.Initialize(param.num_param,
-                  param.score_func,
+  model_lr.Initialize(param.score_func,
                   param.loss_func,
                   param.num_feature,
                   param.num_field,
-                  param.num_K,
-                  false);
-  std::vector<real_t>* para = model_lr.GetParameter();
-  for (size_t i = 0; i < para->size(); ++i) {
-    (*para)[i] = 2.0;
+                  param.num_K);
+  real_t* w = model_lr.GetParameter_w();
+  index_t num_w = model_lr.GetNumParameter_w();
+  for (size_t i = 0; i < num_w; ++i) {
+    w[i] = 2.0;
   }
   // Create Data matrix
-  DMatrix matrix(kLine);
-  matrix.InitSparseRow();
+  DMatrix matrix;
+  matrix.ResetMatrix(kLine);
   for (int i = 0; i < kLine; ++i) {
     matrix.Y[i] = 0;
-    matrix.row[i]->Resize(param.num_feature);
+    matrix.row[i] = new SparseRow;
     for (int j = 0; j < param.num_feature; ++j) {
-      matrix.row[i]->X[j] = 1.0;
-      matrix.row[i]->idx[j] = j;
+      matrix.AddNode(i, j, 1.0);
     }
   }
   // Create score function
@@ -101,7 +97,7 @@ TEST_F(LossTest, Predict_Linear) {
   loss.Initialize(&score);
   // Test
   std::vector<real_t> pred(kLine);
-  loss.Predict(&matrix, &model_lr, pred);
+  loss.Predict(&matrix, model_lr, pred);
   for (int i = 0; i < kLine; ++i) {
     EXPECT_FLOAT_EQ(pred[i], 6.0);
   }
@@ -109,41 +105,36 @@ TEST_F(LossTest, Predict_Linear) {
 
 TEST_F(LossTest, Predict_FM) {
   // Create Model for FM
-  param.num_param = 3 + 3*24;
   Model model_fm;
-  model_fm.Initialize(param.num_param,
-                  param.score_func,
+  param.score_func = "fm";
+  model_fm.Initialize(param.score_func,
                   param.loss_func,
                   param.num_feature,
                   param.num_field,
-                  param.num_K,
-                  false);
-  std::vector<real_t>* para = model_fm.GetParameter();
-  for (size_t i = 0; i < para->size(); ++i) {
-    (*para)[i] = 2.0;
+                  param.num_K);
+  real_t* w = model_fm.GetParameter_w();
+  index_t num_w = model_fm.GetNumParameter_w();
+  for (size_t i = 0; i < num_w; ++i) {
+    w[i] = 2.0;
   }
   // Create Data matrix
-  DMatrix matrix(kLine);
-  matrix.InitSparseRow();
+  DMatrix matrix;
+  matrix.ResetMatrix(kLine);
   for (int i = 0; i < kLine; ++i) {
     matrix.Y[i] = 0;
-    matrix.row[i]->Resize(param.num_feature);
+    matrix.row[i] = new SparseRow;
     for (int j = 0; j < param.num_feature; ++j) {
-      matrix.row[i]->X[j] = 1.0;
-      matrix.row[i]->idx[j] = j;
+      matrix.AddNode(i, j, 1.0);
     }
   }
   // Create score function
   FMScore score;
-  score.Initialize(param.num_feature,
-                param.num_K,
-                param.num_field);
   // Create loss function
   TestLoss loss;
   loss.Initialize(&score);
   // Test
   std::vector<real_t> pred(kLine);
-  loss.Predict(&matrix, &model_fm, pred);
+  loss.Predict(&matrix, model_fm, pred);
   for (int i = 0; i < kLine; ++i) {
     EXPECT_FLOAT_EQ(pred[i], 294.0);
   }
@@ -151,43 +142,36 @@ TEST_F(LossTest, Predict_FM) {
 
 TEST_F(LossTest, Predict_FFM) {
   // Create Model for FFM
-  index_t parameter_num = 3 + 3*3*24;
-  param.num_param = parameter_num;
   Model model_ffm;
-  model_ffm.Initialize(param.num_param,
-                   param.score_func,
+  param.score_func = "ffm";
+  model_ffm.Initialize(param.score_func,
                    param.loss_func,
                    param.num_feature,
                    param.num_field,
-                   param.num_K,
-                   false);
-  std::vector<real_t>* para = model_ffm.GetParameter();
-  for (size_t i = 0; i < para->size(); ++i) {
-    (*para)[i] = 2.0;
+                   param.num_K);
+  real_t* w = model_ffm.GetParameter_w();
+  index_t num_w = model_ffm.GetNumParameter_w();
+  for (size_t i = 0; i < num_w; ++i) {
+    w[i] = 2.0;
   }
   // Create Data matrix
-  DMatrix matrix(kLine);
-  matrix.InitSparseRow(true);
+  DMatrix matrix;
+  matrix.ResetMatrix(kLine);
   for (int i = 0; i < kLine; ++i) {
     matrix.Y[i] = 0;
-    matrix.row[i]->Resize(param.num_feature);
+    matrix.row[i] = new SparseRow;
     for (int j = 0; j < param.num_feature; ++j) {
-      matrix.row[i]->X[j] = 1.0;
-      matrix.row[i]->idx[j] = j;
-      matrix.row[i]->field[j] = j;
+      matrix.AddNode(i, j, 1.0, j);
     }
   }
   // Create score function
   FFMScore score;
-  score.Initialize(param.num_feature,
-                 param.num_K,
-                 param.num_field);
   // Create loss function
   TestLoss loss;
   loss.Initialize(&score);
   // Test
   std::vector<real_t> pred(kLine);
-  loss.Predict(&matrix, &model_ffm, pred);
+  loss.Predict(&matrix, model_ffm, pred);
   for (int i = 0; i < kLine; ++i) {
     EXPECT_FLOAT_EQ(pred[i], 294.0);
   }
@@ -216,6 +200,7 @@ TEST_F(LossTest, Sigmoid_Test) {
   EXPECT_LT(new_pred[5], 0.5);
 }
 
+/*
 Loss* CreateLoss(const char* format_name) {
   return CREATE_LOSS(format_name);
 }
@@ -227,6 +212,6 @@ TEST_F(LossTest, Create_Loss) {
   EXPECT_TRUE(CreateLoss("abs") != NULL);
   EXPECT_TRUE(CreateLoss("") == NULL);
   EXPECT_TRUE(CreateLoss("unknow_name") == NULL);
-}
+}*/
 
 } // namespace xLearn

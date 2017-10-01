@@ -1,5 +1,5 @@
 # Build library loss
-add_library(loss loss.cc squared_loss.cc absolute_loss.cc cross_entropy_loss.cc hinge_loss.cc)
+add_library(loss loss.cc absolute_loss.cc squared_loss.cc hinge_loss.cc cross_entropy_loss.cc)
 
 # Build uinttests
 set(LIBS loss gtest base data score)

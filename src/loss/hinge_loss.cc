@@ -39,23 +39,22 @@ real_t HingeLoss::Evalute(const std::vector<real_t>& pred,
 // Given data sample and current model, calculate gradient
 // and update model.
 void HingeLoss::CalcGrad(const DMatrix* matrix,
-                         Model* model,
+                         Model& model,
                          Updater* updater) {
   CHECK_NOTNULL(matrix);
-  CHECK_GT(matrix->row_len, 0);
+  CHECK_GT(matrix->row_length, 0);
   CHECK_NOTNULL(updater);
-  std::vector<real_t>* w = model->GetParameter();
-  size_t row_len = matrix->row_len;
+  size_t row_len = matrix->row_length;
   // Calculate gradient
   for (size_t i = 0; i < row_len; ++i) {
     SparseRow* row = matrix->row[i];
-    real_t score = score_func_->CalcScore(row, w);
+    real_t score = score_func_->CalcScore(row, model);
     // partial gradient
     real_t y = matrix->Y[i] > 0 ? 1.0 : -1.0;
     if (score*y < 1) {
       // real gradient and update
       real_t pg = -y;
-      score_func_->CalcGrad(row, *w, pg, updater);
+      score_func_->CalcGrad(row, model, pg, updater);
     }
   }
 }
