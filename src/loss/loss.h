@@ -75,25 +75,25 @@ class Loss {
    Loss() { };
    virtual ~Loss() { }
 
-   // This function needs to be invoked before using this class.
+   // This function needs to be invoked before using this class
    void Initialize(Score* score) { score_func_ = score; }
 
-   // Given predictions and labels, return loss value.
+   // Given predictions and labels, return loss value
    virtual real_t Evalute(const std::vector<real_t>& pred,
                           const std::vector<real_t>& label) = 0;
 
-   // Given data sample and current model, return predictions.
+   // Given data sample and current model, return predictions
    virtual void Predict(const DMatrix* data_matrix,
-                        Model* model,
+                        Model& model,
                         std::vector<real_t>& pred);
 
    // Given data sample and current model, calculate gradient
-   // and update model.
+   // and update model
    virtual void CalcGrad(const DMatrix* data_matrix,
-                         Model* model,
+                         Model& model,
                          Updater* updater) = 0;
 
-   // The Sigmoid function, which map the predictions to 0~1.
+   // The Sigmoid function, which mapping the output to 0~1
    void Sigmoid(const std::vector<real_t>& pred,
                 std::vector<real_t>& new_pred) {
      CHECK_EQ(pred.size(), new_pred.size());
@@ -109,7 +109,7 @@ class Loss {
   }
 
   // The score function, e.g. LinearScore,
-  // FMScore, FFMScore, etc.
+  // FMScore, FFMScore, etc
   Score* score_func_;
 
  private:
