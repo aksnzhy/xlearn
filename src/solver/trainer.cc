@@ -39,13 +39,9 @@ void Trainer::Train() {
     }
     DMatrix* matrix = NULL;
     // Calc grad and update model
-    clock_t start_2, end_2;
-    start_2 = clock();
     while (train_reader_->Samples(matrix)) {
-      loss_->CalcGrad(matrix, model_, updater_);
+      loss_->CalcGrad(matrix, *model_, updater_);
     }
-    end_2 = clock();
-    printf("Time: %.2f sec", (float)(end_2-start_2) / CLOCKS_PER_SEC);
     // Calc Train loss
     train_reader_->Reset();
     index_t count_sample = 0;
@@ -59,7 +55,7 @@ void Trainer::Train() {
         pred.resize(tmp);
       }
       count_sample += tmp;
-      loss_->Predict(matrix, model_, pred);
+      loss_->Predict(matrix, *model_, pred);
       loss_val += loss_->Evalute(pred, matrix->Y);
     }
     loss_val /= count_sample;
@@ -76,7 +72,7 @@ void Trainer::Train() {
           pred.resize(tmp);
         }
         count_sample += tmp;
-        loss_->Predict(matrix, model_, pred);
+        loss_->Predict(matrix, *model_, pred);
         loss_val += loss_->Evalute(pred, matrix->Y);
       }
       loss_val /= count_sample;
@@ -106,7 +102,7 @@ void Trainer::CVTrain() {
         train_reader_->Reset();
         DMatrix* matrix = NULL;
         while (train_reader_->Samples(matrix)) {
-          loss_->CalcGrad(matrix, model_, updater_);
+          loss_->CalcGrad(matrix, *model_, updater_);
         }
       }
       // Calc train loss
@@ -126,7 +122,7 @@ void Trainer::CVTrain() {
             pred.resize(tmp);
           }
           count_sample += tmp;
-          loss_->Predict(matrix, model_, pred);
+          loss_->Predict(matrix, *model_, pred);
           loss_val += loss_->Evalute(pred, matrix->Y);
         }
       }
@@ -149,7 +145,7 @@ void Trainer::CVTrain() {
           pred.resize(tmp);
         }
         count_sample += tmp;
-        loss_->Predict(matrix, model_, pred);
+        loss_->Predict(matrix, *model_, pred);
         loss_val += loss_->Evalute(pred, matrix->Y);
       }
       loss_val /= count_sample;

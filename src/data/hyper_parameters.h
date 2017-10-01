@@ -65,8 +65,6 @@ struct HyperParam {
 //------------------------------------------------------------------------------
 // Parameters for dataset
 //------------------------------------------------------------------------------
-  /* file format for data */
-  std::string file_format = "libsvm";   // 'libsvm', 'libffm', or 'csv'
   /* Number of feature */
   index_t num_feature = 0;              // Include the bias term (feat: 0)
   /* Number of model parameters */

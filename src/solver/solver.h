@@ -61,30 +61,28 @@ class Solver {
   void SetPredict() { hyper_param_.is_train = false; }
 
   // Initialize the xLearn environment, including checking
-  // and parsing the arguments, reading problem (training data
-  // or testing data), create model parameters, and so on.
+  // and parsing the commad line arguments, reading problem
+  // (training data or testing data), and create model parameters
   void Initialize(int argc, char* argv[]);
 
-  // Start training task or start inference task.
+  // Start training task or start inference task
   void StartWork();
 
-  // Finalize the xLearn environment.
+  // Finalize the xLearn environment
   void FinalizeWork();
 
  protected:
   // Main class used by Solver
   xLearn::HyperParam hyper_param_;
   xLearn::Checker checker_;
+  xLearn::Model *model_;
   std::vector<xLearn::Reader*> reader_;
   xLearn::FileSpliter splitor_;
-  xLearn::Parser* parser_;
-  xLearn::Model* model_;
   xLearn::Updater* updater_;
   xLearn::Score* score_;
   xLearn::Loss* loss_;
 
   // Create ovject by name
-  xLearn::Parser* create_parser();
   xLearn::Reader* create_reader();
   xLearn::Updater* create_updater();
   xLearn::Score* create_score();
@@ -105,9 +103,6 @@ class Solver {
   // Read problem and set feature and field
   index_t find_max_feature(DMatrix* matrix, int num_samples);
   index_t find_max_field(DMatrix* matrix, int num_samples);
-
-  // Get the file format
-  std::string get_file_format(const std::string& filename);
 
   // Used by log file suffix
   std::string get_host_name();

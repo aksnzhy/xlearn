@@ -87,11 +87,14 @@ void Model::Initialize_w(bool set_value) {
     for (index_t i = 0; i < num_feat_; ++i) {
       param_w_[i] = 0.0;
     }
-    // Init latent factor using RandDistribution()
-    real_t coef = 1.0f / sqrt(num_K_);
-    RandDistribution(param_w_ + num_feat_,
-        param_num_w_ - num_feat_,
-        0.0, 1.0, coef);
+    if (score_func_.compare("fm") == 0 ||
+        score_func_.compare("ffm") == 0) {
+      // Init latent factor using RandDistribution()
+      real_t coef = 1.0f / sqrt(num_K_);
+      RandDistribution(param_w_ + num_feat_,
+          param_num_w_ - num_feat_,
+          0.0, 1.0, coef);
+    }
   }
 }
 

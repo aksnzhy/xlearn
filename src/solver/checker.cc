@@ -65,7 +65,7 @@ std::string Checker::option_help() const {
 "                         (use 8 by default) \n"
 "  -lr learning_rate  :   Learning rate for optimization method \n"
 "                         (use 0.1 by default) \n"
-"  -lamb value        :   Lambda for regular and use 0 to close the regular \n"
+"  -lamb lambda value :   Lambda for regular and use 0 to close the regular \n"
 "                         (use 0.00002 by default) \n"
 "  -epc epoch_number  :   Number of epoch for training \n"
 "                         (use 10 by default) \n"

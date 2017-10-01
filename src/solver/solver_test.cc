@@ -93,7 +93,7 @@ TEST_F(SolverTest, Train_No_CV_Init) {
       reader[0]->Reset();
       continue;
     }
-    EXPECT_EQ(record_num, hyper_param.batch_size);
+    EXPECT_EQ(record_num, hyper_param.sample_size);
   }
 }
 
@@ -122,9 +122,13 @@ TEST_F(SolverTest, Infer_Init) {
   hyper_param.num_feature = 10;
   hyper_param.num_K = 8;
   hyper_param.num_field = 10;
-  hyper_param.num_param = 10+10*10*8;
-  Model model(hyper_param);
-  model.SaveModel("./xlearn_model");
+  Model model;
+  model.Initialize(hyper_param.score_func,
+                hyper_param.loss_func,
+                hyper_param.num_feature,
+                hyper_param.num_field,
+                hyper_param.num_K);
+  model.Serialize("./xlearn_model");
   argc = 6;
   argv[1] = {"--is_infer"};
   argv[2] = {"-infer_data"};

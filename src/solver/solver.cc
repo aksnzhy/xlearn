@@ -133,22 +133,11 @@ void Solver::init_train() {
   }
   LOG(INFO) << "Number of Reader: " << num_reader;
   reader_.resize(num_reader, NULL);
-  // Get file format and create Parser
-  hyper_param_.file_format =
-       get_file_format(hyper_param_.train_set_file);
-  if ((hyper_param_.file_format == "libsvm" ||
-       hyper_param_.file_format == "csv") &&
-      hyper_param_.score_func == "ffm") {
-    printf("[Error] Please use libffm file format for FFM task \n");
-    exit(0);
-  }
-  parser_ = create_parser();
   // Create Reader
   for (int i = 0; i < num_reader; ++i) {
     reader_[i] = create_reader();
     reader_[i]->Initialize(file_list[i],
-                           hyper_param_.sample_size,
-                           parser_);
+                           hyper_param_.sample_size);
     if (reader_[i] == NULL) {
       printf("Cannot open the file %s\n",
              file_list[i].c_str());
@@ -193,45 +182,25 @@ void Solver::init_train() {
    *********************************************************/
    start = clock();
    printf("Initialize model ...\n");
-   if (hyper_param_.score_func.compare("fm") == 0) {
-     hyper_param_.num_param = hyper_param_.num_feature +
-                              hyper_param_.num_feature *
-                              hyper_param_.num_K;
-   } else if (hyper_param_.score_func.compare("ffm") == 0) {
-     hyper_param_.num_param = hyper_param_.num_feature +
-                              hyper_param_.num_feature *
-                              hyper_param_.num_field *
-                              hyper_param_.num_K;
-   } else { // linear socre
-     hyper_param_.num_param = hyper_param_.num_feature;
-   }
-   LOG(INFO) << "Number parameters: " << hyper_param_.num_param;
+   // Initialize all parameters to zero
+   model_ = new Model();
+   model_->Initialize(hyper_param_.score_func,
+                   hyper_param_.loss_func,
+                   hyper_param_.num_feature,
+                   hyper_param_.num_field,
+                   hyper_param_.num_K);
+   LOG(INFO) << "Initialize model to zero.";
+   // Initialize parameters using Gaussian distribution
+   model_ = new Model();
+   model_->Initialize(hyper_param_.score_func,
+                   hyper_param_.loss_func,
+                   hyper_param_.num_feature,
+                   hyper_param_.num_field,
+                   hyper_param_.num_K);
+  index_t num_param = model_->GetNumParameter_w();
+   LOG(INFO) << "Number parameters: " << num_param;
    printf("  Model size: %.2f MB\n",
-           (double) hyper_param_.num_param /
-           (1024.0 * 1024.0));
-   if (hyper_param_.score_func.compare("linear") == 0) {
-     // Initialize all parameters to zero
-     model_ = new Model();
-     model_->Initialize(hyper_param_.num_param,
-                   hyper_param_.score_func,
-                   hyper_param_.loss_func,
-                   hyper_param_.num_feature,
-                   hyper_param_.num_field,
-                   hyper_param_.num_K,
-                   false);
-     LOG(INFO) << "Initialize model to zero.";
-   } else {
-     // Initialize parameters using Gaussian distribution
-     model_ = new Model();
-     model_->Initialize(hyper_param_.num_param,
-                   hyper_param_.score_func,
-                   hyper_param_.loss_func,
-                   hyper_param_.num_feature,
-                   hyper_param_.num_field,
-                   hyper_param_.num_K,
-                   true);
-     LOG(INFO) << "Initialize model using Gaussian distribution.";
-   }
+           (double) num_param / (1024.0 * 1024.0));
    end = clock();
    printf("  Time cost: %.2f sec \n",
      (float)(end-start) / CLOCKS_PER_SEC);
@@ -241,17 +210,13 @@ void Solver::init_train() {
     updater_ = create_updater();
     updater_->Initialize(hyper_param_.learning_rate,
                      hyper_param_.regu_lambda,
-                     hyper_param_.decay_rate_1,
-                     hyper_param_.decay_rate_2,
+                     hyper_param_.decay_rate,
                      hyper_param_.num_param);
     LOG(INFO) << "Initialize Updater.";
     /*********************************************************
      *  Step 4: Init score function                          *
      *********************************************************/
      score_ = create_score();
-     score_->Initialize(hyper_param_.num_feature,
-                     hyper_param_.num_K,
-                     hyper_param_.num_field);
      LOG(INFO) << "Initialize score function.";
      /*********************************************************
       *  Step 5: Init loss function                           *
@@ -281,21 +246,11 @@ void Solver::init_predict() {
    /*********************************************************
     *  Step 2: Init Reader and read problem                 *
     *********************************************************/
-    // Get file format and create Parser
-    hyper_param_.file_format =
-         get_file_format(hyper_param_.inference_file);
-    if (hyper_param_.file_format == "libsvm" &&
-        hyper_param_.score_func == "ffm") {
-        printf("[Error] Cannot give a libsvm file to FFM task \n");
-        exit(0);
-    }
-    parser_ = create_parser();
     // Create Reader
     reader_.resize(1, create_reader());
     CHECK_NE(hyper_param_.inference_file.empty(), true);
     reader_[0]->Initialize(hyper_param_.inference_file,
-                           hyper_param_.sample_size,
-                           parser_);
+                           hyper_param_.sample_size);
     if (reader_[0] == NULL) {
       printf("Cannot open the file %s\n",
              hyper_param_.inference_file.c_str());
@@ -306,9 +261,6 @@ void Solver::init_predict() {
      *  Step 2: Init score function                          *
      *********************************************************/
      score_ = create_score();
-     score_->Initialize(hyper_param_.num_feature,
-                     hyper_param_.num_K,
-                     hyper_param_.num_field);
      LOG(INFO) << "Initialize score function.";
      /*********************************************************
       *  Step 2: Init loss function                           *
@@ -389,45 +341,6 @@ void Solver::finalize_inference_work() {
   LOG(INFO) << "Finalize inference work.";
 }
 
-// Get the file format
-std::string Solver::get_file_format(const std::string& filename) {
-  FILE* file = OpenFileOrDie(StringPrintf("%s",
-                        filename.c_str()).c_str(), "r");
-  // get the first line of data
-  std::string data_line;
-  GetLine(file, data_line);
-  std::vector<std::string> str_list;
-  SplitStringUsing(data_line, " \t", &str_list);
-  int count = 0;
-  for (int i = 0; i < str_list[1].size(); ++i) {
-    if (str_list[1][i] == ':') {
-      count++;
-    }
-  }
-  if (count == 0) {
-    return "csv";
-  } else if (count == 1) {
-    return "libsvm";
-  } else if (count == 2) {
-    return "libffm";
-  } else {
-    printf("[Error] Unknow file format \n");
-    exit(0);
-  }
-  Close(file);
-}
-
-// Create Parser by a given string
-Parser* Solver::create_parser() {
-  Parser* parser;
-  parser = CREATE_PARSER(hyper_param_.file_format.c_str());
-  if (parser == NULL) {
-    LOG(ERROR) << "Cannot create parser: "
-               << hyper_param_.file_format;
-  }
-  return parser;
-}
-
 // Create Reader by a given string
 Reader* Solver::create_reader() {
   Reader* reader;
@@ -477,9 +390,10 @@ index_t Solver::find_max_feature(DMatrix* matrix, int num_samples) {
   index_t res = 0;
   for (int i = 0; i < num_samples; ++i) {
     SparseRow* row = matrix->row[i];
-    for (int j = 0; j < row->column_len; ++j) {
-      if (row->idx[j] > res) {
-        res = row->idx[j];
+    for (SparseRow::const_iterator iter = row->begin();
+         iter != row->end(); ++iter) {
+      if (iter->feat_id > res) {
+        res = iter->feat_id;
       }
     }
   }
@@ -491,9 +405,10 @@ index_t Solver::find_max_field(DMatrix* matrix, int num_samples) {
   index_t res = 0;
   for (int i = 0; i < num_samples; ++i) {
     SparseRow* row = matrix->row[i];
-    for (int j = 0; j < row->column_len; ++j) {
-      if (row->field[j] > res) {
-        res = row->field[j];
+    for (SparseRow::const_iterator iter = row->begin();
+         iter != row->end(); ++iter) {
+      if (iter->field_id > res) {
+        res = iter->field_id;
       }
     }
   }

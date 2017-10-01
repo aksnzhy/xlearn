@@ -96,7 +96,7 @@ class Trainer {
 
   // Save model to disk file
   void SaveModel(const std::string& filename) {
-    model_->SaveModel(filename);
+    model_->Serialize(filename);
   }
 
  protected:

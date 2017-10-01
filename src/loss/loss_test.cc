@@ -200,7 +200,6 @@ TEST_F(LossTest, Sigmoid_Test) {
   EXPECT_LT(new_pred[5], 0.5);
 }
 
-/*
 Loss* CreateLoss(const char* format_name) {
   return CREATE_LOSS(format_name);
 }
@@ -212,6 +211,6 @@ TEST_F(LossTest, Create_Loss) {
   EXPECT_TRUE(CreateLoss("abs") != NULL);
   EXPECT_TRUE(CreateLoss("") == NULL);
   EXPECT_TRUE(CreateLoss("unknow_name") == NULL);
-}*/
+}
 
 } // namespace xLearn
