@@ -40,9 +40,9 @@ public:
  ~FFMScore() { }
 
  // Given one exmaple and current model, and
- // return the score
+ // return the ffm score
  real_t CalcScore(const SparseRow* row,
-                  const Model& model);
+                  Model& model);
 
  // Calculate gradient and update current model
  void CalcGrad(const SparseRow* row,

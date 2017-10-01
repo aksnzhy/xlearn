@@ -32,8 +32,8 @@ Score* CreateScore(const char* format_name) {
 
 TEST(SCORE_TEST, Create_Score) {
   EXPECT_TRUE(CreateScore("linear") != NULL);
-  EXPECT_TRUE(CreateScore("fm") != NULL);
-  EXPECT_TRUE(CreateScore("ffm") != NULL);
+  //EXPECT_TRUE(CreateScore("fm") != NULL);
+  //EXPECT_TRUE(CreateScore("ffm") != NULL);
   EXPECT_TRUE(CreateScore("") == NULL);
   EXPECT_TRUE(CreateScore("unknow_name") == NULL);
 }

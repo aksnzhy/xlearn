@@ -43,20 +43,29 @@ class LinearScoreTest : public ::testing::Test {
     param.num_param = kLength;
     param.loss_func = "sqaured";
     param.score_func = "linear";
-    param.num_feature = 100;
+    param.num_feature = kLength;
   }
 };
 
 TEST_F(LinearScoreTest, calc_score) {
   SparseRow row(kLength);
-  std::vector<real_t> w(kLength, 3.0);
+  Model model;
+  model.Initialize(param.score_func,
+                param.loss_func,
+                param.num_feature,
+                0, 0);
+  real_t* w = model.GetParameter_w();
+  index_t num_w = model.GetNumParameter_w();
+  for (index_t i = 0; i < num_w; ++i) {
+    w[i] = 3.0;
+  }
   // Init SparseRow
   for (index_t i = 0; i < kLength; ++i) {
-    row.idx[i] = i;
-    row.X[i] = 2.0;
+    row[i].feat_id = i;
+    row[i].feat_val = 2.0;
   }
   LinearScore score;
-  real_t val = score.CalcScore(&row, &w);
+  real_t val = score.CalcScore(&row, model);
   EXPECT_FLOAT_EQ(val, 600.0);
 }
 
@@ -64,21 +73,29 @@ TEST_F(LinearScoreTest, calc_grad) {
   // Create SparseRow
   SparseRow row(kLength);
   for (index_t i = 0; i < kLength; ++i) {
-    row.idx[i] = i;
-    row.X[i] = 2.0;
+    row[i].feat_id = i;
+    row[i].feat_val = 2.0;
   }
   // Create model
-  std::vector<real_t> w(kLength, 3.0);
+  Model model;
+  model.Initialize(param.score_func,
+                param.loss_func,
+                param.num_feature,
+                0, 0);
+  real_t* w = model.GetParameter_w();
+  index_t num_w = model.GetNumParameter_w();
+  for (index_t i = 0; i < num_w; ++i) {
+    w[i] = 3.0;
+  }
   // Create updater
   Updater* updater = new Updater();
   updater->Initialize(param.learning_rate,
                   param.regu_lambda,
                   0,
-                  0,
                   param.num_param);
   // Create score function
   LinearScore score;
-  score.CalcGrad(&row, w, 1.0, updater);
+  score.CalcGrad(&row, model, 1.0, updater);
   // Test
   for (index_t i = 0; i < kLength; ++i) {
     EXPECT_FLOAT_EQ(w[i], 2.8);

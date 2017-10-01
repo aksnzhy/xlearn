@@ -23,6 +23,7 @@ This file defines the LinearScore class.
 #define XLEARN_LINEAR_SCORE_H_
 
 #include "src/base/common.h"
+#include "src/data/model_parameters.h"
 #include "src/score/score_function.h"
 
 namespace xLearn {
@@ -38,9 +39,9 @@ class LinearScore : public Score {
   ~LinearScore() { }
 
   // Given one exmaple and current model, and
-  // return the score.
+  // return the linear score wTx
   real_t CalcScore(const SparseRow* row,
-                   const Model& model);
+                   Model& model);
 
   // Calculate gradient and update current model
   void CalcGrad(const SparseRow* row,

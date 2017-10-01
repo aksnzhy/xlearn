@@ -52,13 +52,13 @@ float sum8(__m256 x) {
 // y = wTx + sum[(V_i_fj*V_j_fi)(x_i * x_j)]
 // Using sse/avx to speed up
 real_t FFMScore::CalcScore(const SparseRow* row,
-                           const Model& model) {
+                           Model& model) {
   real_t score = 0.0;
   /*********************************************************
    *  linear term                                          *
    *********************************************************/
   real_t *w = model.GetParameter_w();
-  for (SparseRow::iterator iter = row->begin();
+  for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
     index_t pos = iter->feat_id;
     score += w[pos] * iter->feat_val;
@@ -66,18 +66,19 @@ real_t FFMScore::CalcScore(const SparseRow* row,
   /*********************************************************
    *  latent factor                                        *
    *********************************************************/
-  index_t matrix_size = model.GetNumField() * model.GetNumK();
-  w = model.GetParameter_v();
+  static index_t matrix_size = model.GetNumField() *
+                               model.GetNumK();
+  static index_t num_factor = model.GetNumK();
+  w = model.GetParameter_w() + model.GetNumFeature();
   __MX _sum = _MMX_SETZERO_PS();
-  index_t num_factor = model.GetNumK();
-  for (SparseRow::iterator iter_i = row->begin();
+  for (SparseRow::const_iterator iter_i = row->begin();
        iter_i != row->end(); ++iter_i) {
     real_t val_i = iter_i->feat_val;
     index_t idx_i = iter_i->feat_id;
     index_t field_i = iter_i->field_id;
     index_t tmp_1 = matrix_size * idx_i;
-    index_t tmp_2 = field_i * num_factor_;
-    for (SparseRow::iterator iter_j = iter_i+1;
+    index_t tmp_2 = field_i * num_factor;
+    for (SparseRow::const_iterator iter_j = iter_i+1;
          iter_j != row->end(); ++iter_j) {
       real_t val_j = iter_j->feat_val;
       index_t idx_j = iter_j->feat_id;
@@ -85,7 +86,7 @@ real_t FFMScore::CalcScore(const SparseRow* row,
       real_t* w_j = w + num_factor * field_j + tmp_1;
       real_t* w_i = w + matrix_size * idx_j + tmp_2;
       __MX _v = _MMX_SET1_PS(val_j*val_i);
-      for (index_t k = 0; k < num_factor_; k += _MMX_INCREMENT) {
+      for (index_t k = 0; k < num_factor; k += _MMX_INCREMENT) {
         __MX _kj = _MMX_LOAD_PS(w_j + k);
         __MX _ki = _MMX_LOAD_PS(w_i + k);
         _sum = _MMX_ADD_PS(_sum,
@@ -105,17 +106,17 @@ real_t FFMScore::CalcScore(const SparseRow* row,
   return score;
 }
 
-// Calculate gradient and update current model parameters.
+// Calculate gradient and update current model parameters
 // Using sse/avx to speed up
 void FFMScore::CalcGrad(const SparseRow* row,
-                        std::vector<real_t>& param,
-                        real_t pg, /* partial gradient */
+                        Model& model,
+                        real_t pg,  /* partial gradient */
                         Updater* updater) {
   /*********************************************************
    *  linear term                                          *
    *********************************************************/
   real_t *w = model.GetParameter_w();
-  for (SparseRow::iterator iter = row->begin();
+  for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
     real_t gradient = pg * iter->feat_val;
     updater->Update(iter->feat_id, gradient, w);
@@ -123,33 +124,35 @@ void FFMScore::CalcGrad(const SparseRow* row,
   /*********************************************************
    *  latent factor                                        *
    *********************************************************/
-  index_t matrix_size = model.GetNumField() * model.GetNumK();
-  w = model.GetParameter_v();
-  for (SparseRow::iterator iter_i = row->begin();
+  static index_t matrix_size = model.GetNumField() *
+                               model.GetNumK();
+  static index_t num_factor = model.GetNumK();
+  w = model.GetParameter_w() + model.GetNumFeature();
+  for (SparseRow::const_iterator iter_i = row->begin();
        iter_i != row->end(); ++iter_i) {
     real_t val_i = iter_i->feat_val;
     index_t idx_i = iter_i->feat_id;
     index_t field_i = iter_i->field_id;
     index_t tmp_1 = matrix_size * idx_i;
-    index_t tmp_2 = field_i * num_factor_;
-    real_t tmp_3 = x_i * pg;
-    for (SparseRow::iterator iter_j = iter_i+1;
+    index_t tmp_2 = field_i * num_factor;
+    real_t tmp_3 = val_i * pg;
+    for (SparseRow::const_iterator iter_j = iter_i+1;
          iter_j != row->end(); ++iter_j) {
       real_t val_j = iter_j->feat_val;
       index_t idx_j = iter_j->feat_id;
       index_t field_j = iter_j->field_id;
-      real_t* w_j = w + num_factor_ * field_j + tmp_1;
-      real_t* w_i = w + matrix_size * idx_j + tmp_2;
-      __MX _v = _MMX_SET1_PS(x_j*tmp_3);
-      for (size_t k = 0; k < num_factor_; k += _MMX_INCREMENT) {
-        real_t* w_i_k = w_i + k;
-        real_t* w_j_k = w_j + k;
-        __MX _kj = _MMX_LOAD_PS(w_j_k);
-        __MX _ki = _MMX_LOAD_PS(w_i_k);
+      index_t pos_j = num_factor * field_j + tmp_1;
+      index_t pos_i = matrix_size * idx_j + tmp_2;
+      __MX _v = _MMX_SET1_PS(val_j*tmp_3);
+      for (size_t k = 0; k < num_factor; k += _MMX_INCREMENT) {
+        index_t p_i = pos_i + k;
+        index_t p_j = pos_j + k;
+        __MX _kj = _MMX_LOAD_PS(w + p_j);
+        __MX _ki = _MMX_LOAD_PS(w + p_i);
         __MX _gj = _MMX_MUL_PS(_v, _ki);
         __MX _gi = _MMX_MUL_PS(_v, _kj);
-        updater->BatchUpdate(_kj, _gj, w_j_k);
-        updater->BatchUpdate(_ki, _gi, w_i_k);
+        updater->BatchUpdate(_kj, _gj, p_j, w);
+        updater->BatchUpdate(_ki, _gi, p_i, w);
       }
     }
   }

@@ -43,6 +43,7 @@ namespace xLearn {
 //  score->CalcScore(row, model);
 //  score->CalcGrad(row, model, pg, updater);
 //
+// In general, the CalcGrad() will be used in loss function.
 //------------------------------------------------------------------------------
 class Score {
  public:
@@ -53,12 +54,12 @@ class Score {
   // Given one exmaple and current model, and
   // return the score
   virtual real_t CalcScore(const SparseRow* row,
-                           const Model& model) = 0;
+                           Model& model) = 0;
 
   // Calculate gradient and update current model
   virtual void CalcGrad(const SparseRow* row,
                         Model& model,
-                        real_t pg, /* partial gradient */
+                        real_t pg,  /* partial gradient */
                         Updater* updater) = 0;
 
  private:

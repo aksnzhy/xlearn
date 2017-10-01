@@ -119,9 +119,9 @@ class Model {
   std::string  score_func_;
   /* Loss function: 'squared', 'cross-entropy', etc */
   std::string  loss_func_;
-  /* Number of feature (from 0, include bias) */
+  /* Number of feature (feat_id is from 0, include bias) */
   index_t  num_feat_;
-  /* Number of field (used in ffm, from 0) */
+  /* Number of field (used in ffm, field_id is from 0) */
   index_t  num_field_;
   /* Number of K (used in fm and ffm) */
   index_t  num_K_;

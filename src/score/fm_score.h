@@ -40,12 +40,12 @@ class FMScore : public Score {
   // Given one exmaple and current model, and
   // return the score
   real_t CalcScore(const SparseRow* row,
-                   const Model& model);
+                   Model& model);
 
   // Calculate gradient and update current model
   void CalcGrad(const SparseRow* row,
                 Model& model,
-                real_t pg, /* partial gradient */
+                real_t pg,  /* partial gradient */
                 Updater* updater);
 
  private:

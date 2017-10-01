@@ -32,69 +32,80 @@ This file tests the FMScore class.
 namespace xLearn {
 
 HyperParam param;
-index_t K = 10;
-index_t Kfeat = 3;
-index_t kLength = Kfeat + Kfeat*K;
 
 class FMScoreTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
     param.learning_rate = 0.1;
     param.regu_lambda = 0;
-    param.num_param = kLength;
     param.loss_func = "sqaured";
-    param.score_func = "linear";
-    param.num_feature = Kfeat;
-    param.num_field = 3;
-    param.num_K = K;
+    param.score_func = "fm";
+    param.num_feature = 3;
+    param.num_K = 10;
   }
 };
 
 TEST_F(FMScoreTest, calc_score) {
-  SparseRow row(Kfeat);
-  std::vector<real_t> w(kLength, 1.0);
   // Init SparseRow
-  for (index_t i = 0; i < Kfeat; ++i) {
-    row.idx[i] = i;
-    row.X[i] = 2.0;
+  SparseRow row(param.num_feature);
+  for (index_t i = 0; i < param.num_feature; ++i) {
+    row[i].feat_id = i;
+    row[i].feat_val = 2.0;
+  }
+  // Init model
+  Model model;
+  model.Initialize(param.score_func,
+                param.loss_func,
+                param.num_feature,
+                param.num_field,
+                param.num_K);
+  real_t* w = model.GetParameter_w();
+  index_t num_w = model.GetNumParameter_w();
+  for (index_t i = 0; i < num_w; ++i) {
+    w[i] = 1.0;
   }
   FMScore score;
-  score.Initialize(param.num_feature,
-                   param.num_K);
-  real_t val = score.CalcScore(&row, &w);
+  real_t val = score.CalcScore(&row, model);
   // 6 + 10*4*3 = 126
   EXPECT_FLOAT_EQ(val, 126.0);
 }
 
 TEST_F(FMScoreTest, calc_grad) {
   // Reset hyper parameters
-  K = 24;
-  Kfeat = 100;
-  kLength = Kfeat + Kfeat*K;
+  param.num_K = 24;
+  param.num_feature = 100;
   // Create SparseRow
-  SparseRow row(Kfeat+1);
-  for (index_t i = 0; i < Kfeat; ++i) {
-    row.idx[i] = i;
-    row.X[i] = 2.0;
+  SparseRow row(param.num_feature);
+  for (index_t i = 0; i < param.num_feature; ++i) {
+    row[i].feat_id = i;
+    row[i].feat_val = 2.0;
   }
   // Create model
-  std::vector<real_t> w(kLength, 3.0);
+  Model model;
+  model.Initialize(param.score_func,
+                param.loss_func,
+                param.num_feature,
+                param.num_field,
+                param.num_K);
+  real_t* w = model.GetParameter_w();
+  index_t num_w = model.GetNumParameter_w();
+  for (index_t i = 0; i < num_w; ++i) {
+    w[i] = 3.0;
+  }
   // Create updater
   Updater* updater = new Updater();
   updater->Initialize(param.learning_rate,
                   param.regu_lambda,
-                  0,
-                  0,
-                  kLength);
+                  0, model.GetNumParameter_w());
   // Create score function
   FMScore score;
-  score.Initialize(Kfeat, K);
-  score.CalcGrad(&row, w, 1.0, updater);
+  score.CalcGrad(&row, model, 1.0, updater);
   // Test
-  for (index_t i = 0; i < Kfeat; ++i) {
+  for (index_t i = 0; i < model.GetNumFeature(); ++i) {
     EXPECT_FLOAT_EQ(w[i], 2.8);
   }
-  for (index_t i = Kfeat; i < kLength; ++i) {
+  for (index_t i = model.GetNumFeature();
+       i < model.GetNumParameter_w(); ++i) {
     EXPECT_FLOAT_EQ(w[i], -115.8);
   }
 }

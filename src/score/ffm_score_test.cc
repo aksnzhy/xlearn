@@ -32,81 +32,83 @@ This file tests the FFMScore class.
 namespace xLearn {
 
 HyperParam param;
-index_t K = 24;
-index_t Kfeat = 3;
-index_t kfield = 3;
-index_t kLength = Kfeat + Kfeat*kfield*K;
 
 class FFMScoreTest : public ::testing::Test {
  protected:
-  virtual void SetUp() {
-    param.learning_rate = 0.1;
-    param.regu_lambda = 0;
-    param.num_param = kLength;
-    param.loss_func = "sqaured";
-    param.score_func = "linear";
-    param.num_feature = Kfeat;
-    param.num_field = kfield;
-    param.num_K = K;
-  }
+   virtual void SetUp() {
+     param.learning_rate = 0.1;
+     param.regu_lambda = 0;
+     param.loss_func = "sqaured";
+     param.score_func = "ffm";
+     param.num_feature = 3;
+     param.num_K = 24;
+     param.num_field = 3;
+   }
 };
 
 TEST_F(FFMScoreTest, calc_score) {
-  SparseRow row(Kfeat, true);
-  std::vector<real_t> w(kLength, 1.0);
   // Init SparseRow
-  for (index_t i = 0; i < Kfeat; ++i) {
-    row.idx[i] = i;
-    row.field[i] = i;
-    row.X[i] = 2.0;
+  SparseRow row(param.num_feature);
+  for (index_t i = 0; i < param.num_feature; ++i) {
+    row[i].feat_id = i;
+    row[i].feat_val = 2.0;
+    row[i].field_id = i;
+  }
+  // Init model
+  Model model;
+  model.Initialize(param.score_func,
+                param.loss_func,
+                param.num_feature,
+                param.num_field,
+                param.num_K);
+  real_t* w = model.GetParameter_w();
+  index_t num_w = model.GetNumParameter_w();
+  for (index_t i = 0; i < num_w; ++i) {
+    w[i] = 1.0;
   }
   FFMScore score;
-  score.Initialize(param.num_feature,
-                param.num_K,
-                param.num_field);
-  real_t val = score.CalcScore(&row, &w);
+  real_t val = score.CalcScore(&row, model);
   // 6 + 24*4*3 = 294.0
   EXPECT_FLOAT_EQ(val, 294.0);
 }
 
 TEST_F(FFMScoreTest, calc_grad) {
   // Reset hyper parameters
-  K = 24;
-  Kfeat = 100;
-  kfield = 100;
-  kLength = Kfeat + Kfeat*kfield*K;
-  // Create SparseRow
-  SparseRow row(Kfeat, true);
-  for (index_t i = 0; i < Kfeat; ++i) {
-    row.idx[i] = i;
-    row.X[i] = 2.0;
-    row.field[i] = i;
+  param.num_feature = 100;
+  param.num_field = 100;
+  param.num_K = 24;
+  // Init SparseRow
+  SparseRow row(param.num_feature);
+  for (index_t i = 0; i < param.num_feature; ++i) {
+    row[i].feat_id = i;
+    row[i].feat_val = 2.0;
+    row[i].field_id = i;
   }
-  // Create model
-  std::vector<real_t> w(kLength, 3.0);
+  // Init model
+  Model model;
+  model.Initialize(param.score_func,
+                param.loss_func,
+                param.num_feature,
+                param.num_field,
+                param.num_K);
+  real_t* w = model.GetParameter_w();
+  index_t num_w = model.GetNumParameter_w();
+  for (index_t i = 0; i < num_w; ++i) {
+    w[i] = 3.0;
+  }
   // Create updater
   Updater* updater = new Updater();
-  HyperParam hyper_param;
-  hyper_param.learning_rate = 0.1;
   updater->Initialize(param.learning_rate,
-                  param.regu_lambda,
-                  0,
-                  0,
-                  kLength);
+                   param.regu_lambda);
   // Create score function
   FFMScore score;
-  param.num_feature = Kfeat;
-  param.num_K = K;
-  param.num_field = kfield;
-  score.Initialize(param.num_feature,
-                param.num_K,
-                param.num_field);
-  score.CalcGrad(&row, w, 1.0, updater);
+  score.CalcGrad(&row, model, 1.0, updater);
   // Test
-  for (index_t i = 0; i < Kfeat; ++i) {
+  for (index_t i = 0; i < model.GetNumFeature(); ++i) {
     EXPECT_FLOAT_EQ(w[i], 2.8);
   }
-  for (index_t i = Kfeat; i < kLength; ++i) {
+  for (index_t i = model.GetNumFeature();
+       i < model.GetNumParameter_w(); ++i) {
     if (w[i] != 3.0) {
       EXPECT_FLOAT_EQ(w[i], 1.8);
     }
