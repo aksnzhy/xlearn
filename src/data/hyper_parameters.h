@@ -50,18 +50,18 @@ struct HyperParam {
 // Parameters for optimization method.
 //------------------------------------------------------------------------------
   /* Learning rate */
-  real_t learning_rate = 0.0005;      // Control the learning setp
+  real_t learning_rate = 0.0005;       // Control the learning setp
   /* Update function */
-  std::string updater_type = "sgd";   // 'sgd', 'adagrad', 'adadelta', 'adam',
-                                      // 'rmsprop', 'nesterov', or 'momentum'
+  std::string updater_type = "sgd";    // 'sgd', 'adagrad', 'adadelta', 'adam',
+                                       // 'rmsprop', 'nesterov', or 'momentum'
   /* decay_rate_1 for updater */
-  real_t decay_rate = 0.5;            // The decay factor used by updater
+  real_t decay_rate = 0.5;             // The decay factor used by updater
   /* lambda for regularizer */
-  real_t regu_lambda = 0.00002;       // xLearn uses sparse regularizer
+  real_t regu_lambda = 0.00002;        // xLearn uses sparse regularizer
   /* Number of epoch (iteration) */
-  int num_epoch = 10;                 // Could be changed in early-stop
+  int num_epoch = 10;                  // Could be changed in early-stop
   /* Sample size for on-disk model */
-  int sample_size = 200;              // reader->Samples(matrix) will return it
+  int sample_size = 200;               // reader->Samples(matrix) will return it
 //------------------------------------------------------------------------------
 // Parameters for dataset
 //------------------------------------------------------------------------------
