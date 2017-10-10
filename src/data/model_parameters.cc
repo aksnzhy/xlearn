@@ -60,7 +60,7 @@ void Model::Initialize(const std::string& score_func,
   num_feat_ = num_feature;
   num_field_ = num_field;
   num_K_ = num_K;
-  Initialize_w();
+  Initialize_w(true);
 }
 
 // To get the best performance for SSE and AVX, we need
@@ -87,8 +87,7 @@ void Model::Initialize_w(bool set_value) {
     for (index_t i = 0; i < num_feat_; ++i) {
       param_w_[i] = 0.0;
     }
-    if (score_func_.compare("fm") == 0 ||
-        score_func_.compare("ffm") == 0) {
+    if (score_func_ == "fm" || score_func_ == "ffm") {
       // Init latent factor using RandDistribution()
       real_t coef = 1.0f / sqrt(num_K_);
       RandDistribution(param_w_ + num_feat_,

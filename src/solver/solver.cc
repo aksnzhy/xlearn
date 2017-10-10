@@ -189,7 +189,6 @@ void Solver::init_train() {
                    hyper_param_.num_feature,
                    hyper_param_.num_field,
                    hyper_param_.num_K);
-   LOG(INFO) << "Initialize model to zero.";
    // Initialize parameters using Gaussian distribution
    model_ = new Model();
    model_->Initialize(hyper_param_.score_func,
