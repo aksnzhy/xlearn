@@ -38,9 +38,10 @@ struct HyperParam {
 // Parameters for current task.
 //------------------------------------------------------------------------------
   /* Train or Predict */
-  bool is_train = true;                     // True for train
+  bool is_train = true;                     // True for train, false for predict
   /* On-disk for limited memory */
-  bool on_disk = false;                     // True for in-memory
+  bool on_disk = false;                     // True for on-disk training, false
+                                            // for in-memory training
   /* Score function */
   std::string score_func = "fm";            // 'linear', 'fm', or 'ffm'
   /* Loss function */
@@ -54,46 +55,49 @@ struct HyperParam {
   /* Update function */
   std::string updater_type = "sgd";    // 'sgd', 'adagrad', 'adadelta', 'adam',
                                        // 'rmsprop', 'nesterov', or 'momentum'
-  /* decay_rate_1 for updater */
+  /* decay_rate for updater */
   real_t decay_rate = 0.5;             // The decay factor used by updater
   /* lambda for regularizer */
   real_t regu_lambda = 0.00002;        // xLearn uses sparse regularizer
-  /* Number of epoch (iteration) */
+  /* Number of epoch */
   int num_epoch = 10;                  // Could be changed in early-stop
-  /* Sample size for on-disk model */
-  int sample_size = 200;               // reader->Samples(matrix) will return it
+  /* Sample size for on-disk training */
+  int sample_size = 200;               // reader->Samples(matrix) will
+                                       // return this value to user
 //------------------------------------------------------------------------------
 // Parameters for dataset
 //------------------------------------------------------------------------------
   /* Number of feature */
-  index_t num_feature = 0;              // Include the bias term (feat: 0)
+  index_t num_feature = 0;              // Include the bias term '0'
   /* Number of model parameters */
   index_t num_param = 0;                // Need to be calculated in init()
+                                        // function in the Solver class
   /* Lateny factor for fm and ffm */
-  index_t num_K = 8;                    // This value must be a multiple of 8
+  index_t num_K = 8;                    // This value must be a multiple of 8,
+                                        // for example, 8, 16, 32 ...
   /* Number of field */
-  index_t num_field = 0;                // Field id start from 0
+  index_t num_field = 0;                // Field id will start from 0
   /* Filename for training set */
   std::string train_set_file;           // Must have value in training task
   /* Filename for test set */
   std::string test_set_file;            // This value can be empty
-  /* Filename for inference set */
-  std::string inference_file;           // Must have value in predict task
+  /* Filename for prediction set */
+  std::string predict_file;             // Must have value in predict task
   /* Filename of model */
   std::string model_file = "./xlearn_model";
   /* Filename of output result */
   std::string output_file = "./xlearn_out";
   /* Filename of log file */
-  std::string log_file = "./xlearn_log";  // This is not the final name
+  std::string log_file = "./xlearn_log";  // This is not the final filename
 //------------------------------------------------------------------------------
 // Parameters for validation
 //------------------------------------------------------------------------------
   /* Use cv or not */
-  bool cross_validation = false;  // True for using cv
+  bool cross_validation = false;  // True for using cv, false for not
   /* Number of folds in cv */
   int num_folds = 5;
   /* Use early-stop or not */
-  bool early_stop = false;        // True for using early-stop
+  bool early_stop = false;        // True for using early-stop, false for not
 };
 
 }  // namespace XLEARN

@@ -247,12 +247,12 @@ void Solver::init_predict() {
     *********************************************************/
     // Create Reader
     reader_.resize(1, create_reader());
-    CHECK_NE(hyper_param_.inference_file.empty(), true);
-    reader_[0]->Initialize(hyper_param_.inference_file,
+    CHECK_NE(hyper_param_.predict_file.empty(), true);
+    reader_[0]->Initialize(hyper_param_.predict_file,
                            hyper_param_.sample_size);
     if (reader_[0] == NULL) {
       printf("Cannot open the file %s\n",
-             hyper_param_.inference_file.c_str());
+             hyper_param_.predict_file.c_str());
       exit(0);
     }
     LOG(INFO) << "Initialize Parser ans Reader.";

@@ -390,7 +390,7 @@ bool Checker::check_inference_options(HyperParam& hyper_param) {
    *  Step 1: Check the path of predict file               *
    *********************************************************/
   if (FileExist(args_[1].c_str())) {
-    hyper_param.inference_file = std::string(args_[1]);
+    hyper_param.predict_file = std::string(args_[1]);
   } else {
     printf("[Error] Predict data file: %s does not exist \n",
            args_[1].c_str());
