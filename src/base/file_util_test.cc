@@ -29,6 +29,60 @@ This file tests file_util.h
 
 namespace xLearn {
 
+TEST(FileTest, File_Exist) {
+  std::string filename = "/tmp/test";
+  FILE* file = OpenFileOrDie(filename.c_str(), "w");
+  bool bo = FileExist(filename.c_str());
+  EXPECT_EQ(bo, true);
+  bo = FileExist("/tmp/non-exist-file");
+  EXPECT_EQ(bo, false);
+  Close(file);
+  RemoveFile(filename.c_str());
+}
+
+TEST(FileTest, Get_File_Size) {
+  std::string filename = "/tmp/test";
+  FILE* file_w = OpenFileOrDie(filename.c_str(), "w");
+  int number = 999;
+  WriteDataToDisk(file_w, (char*)&number, sizeof(number));
+  uint64 size = GetFileSize(file_w);
+  EXPECT_EQ(size, 4);
+  Close(file_w);
+  RemoveFile(filename.c_str());
+}
+
+TEST(FileTest, Get_One_Line) {
+  std::string filename = "/tmp/test";
+  FILE* file_w = OpenFileOrDie(filename.c_str(), "w");
+  std::string w_str("apple\n");
+  for (int i = 0; i < 3; ++i) {
+    fwrite(w_str.c_str(), 1, w_str.size(), file_w);
+  }
+  Close(file_w);
+  FILE* file_r = OpenFileOrDie(filename.c_str(), "r");
+  for (int i = 0; i < 3; ++i) {
+    std::string r_str;
+    GetLine(file_r, r_str);
+    EXPECT_EQ(r_str, "apple");
+  }
+  Close(file_r);
+  RemoveFile(filename.c_str());
+}
+
+TEST(FileTest, Write_and_Read_Data) {
+  std::string filename = "/tmp/test";
+  FILE* file_w = OpenFileOrDie(filename.c_str(), "w");
+  int number = 999;
+  WriteDataToDisk(file_w, (char*)&number, sizeof(number));
+  Close(file_w);
+  int read = 0;
+  FILE* file_r = OpenFileOrDie(filename.c_str(), "r");
+  ReadDataFromDisk(file_r, (char*)&read, sizeof(read));
+  EXPECT_EQ(read, number);
+  Close(file_r);
+  RemoveFile(filename.c_str());
+}
+
 TEST(FileTest, Serialize_and_Deserialize_string) {
   std::string filename = "/tmp/test.bin";
   FILE* file = OpenFileOrDie(filename.c_str(), "w");

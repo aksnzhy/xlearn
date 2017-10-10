@@ -48,14 +48,15 @@ This file contains facilitlies controlling file.
 //    Close(file_w);
 //
 //    /* (4) Get file size */
-//    uint64 size = GetFileSize(filename.c_str());
+//    uint64 size_w = GetFileSize(file_w);
+//    uint64 size_r = GetFileSize(file_r);
 //
 //    /* (5) Get one line from file */
 //    FILE* file_r = OpenFileOrDie(filename.c_str(), "r");
 //    std::string str_line;
 //    GetLine(file_r, str_line);
 //
-//    /* (6) Write data to disk file */
+//    /* (6) Write Binary data to disk file */
 //    FILE* file_w = OpenFileOrDie(filename.c_str(), "w");
 //    int number = 999;
 //    WriteDataToDisk(file_w, (char*)&number, sizeof(number));
