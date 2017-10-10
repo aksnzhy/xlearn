@@ -31,6 +31,7 @@ creating them later per the registered name.
 //   loss.h (the interface definition):
 //   #include "class_register.h"
 //   class Loss {
+//     ...
 //   };
 //
 //   CLASS_REGISTER_DEFINE_REGISTRY(loss_register, Loss);
@@ -45,6 +46,7 @@ creating them later per the registered name.
 //   logit_loss.cc (an implementation of Loss):
 //   #include "loss.h"
 //   class LogitLoss : public Loss {
+//     ...
 //   };
 //   REGISTER_LOSS(LogitLoss);
 //
@@ -58,6 +60,7 @@ creating them later per the registered name.
 //
 //   file_impl.h (the interface definition):
 //   class FileImpl {
+//     ...
 //   };
 //
 //   CLASS_REGISTER_DEFINE_REGISTRY(file_impl_register, FileImpl);
@@ -76,6 +79,7 @@ creating them later per the registered name.
 //   local_file.cc (an implementation of FileImpl):
 //   #include "file.h"
 //   class LocalFileImpl : public FileImpl {
+//     ...
 //   };
 //   REGISTER_DEFAULT_FILE_IMPL(LocalFileImpl);
 //   REGISTER_FILE_IMPL("/local", LocalFileImpl);
