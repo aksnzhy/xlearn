@@ -25,8 +25,8 @@ This file is the implementation of Updater.
 #include "src/updater/updater.h"
 #include "src/updater/adagrad_updater.h"
 #include "src/updater/adadelta_updater.h"
-//#include "src/updater/momentum_updater.h"
-//#include "src/updater/rmsprop_updater.h"
+#include "src/updater/momentum_updater.h"
+#include "src/updater/rmsprop_updater.h"
 
 namespace xLearn {
 
@@ -37,8 +37,8 @@ CLASS_REGISTER_IMPLEMENT_REGISTRY(xLearn_updater_registry, Updater);
 REGISTER_UPDATER("sgd", Updater);
 REGISTER_UPDATER("adagrad", AdaGrad);
 REGISTER_UPDATER("adadelta", AdaDelta);
-//REGISTER_UPDATER("momentum", Momentum);
-//REGISTER_UPDATER("rmsprop", RMSProp);
+REGISTER_UPDATER("momentum", Momentum);
+REGISTER_UPDATER("rmsprop", RMSProp);
 
 // User need to invoke this function before updating
 void Updater::Initialize(real_t learning_rate,
