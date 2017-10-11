@@ -108,7 +108,7 @@ struct DMatrix {
     row_length = length;
     row.resize(length, nullptr);
     Y.resize(length, 0);
-    scale.resize(length, 0.0);
+    scale.resize(length, 1.0);
   }
 
   // Release memory for DMatrix

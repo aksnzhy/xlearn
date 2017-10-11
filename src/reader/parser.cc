@@ -121,6 +121,7 @@ void FFMParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
     // Add bias
     matrix.AddNode(i, 0, 1.0, 0);
     // Add other features
+    real_t scale = 0;
     for (;;) {
       char *field_char = strtok(nullptr, ":");
       char *idx_char = strtok(nullptr, ":");
@@ -128,11 +129,13 @@ void FFMParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
       if(field_char == nullptr || *field_char == '\n') {
         break;
       }
-      matrix.AddNode(i,
-        atoi(idx_char),
-        atof(value_char),
-        atoi(field_char));
+      index_t idx = atoi(idx_char);
+      real_t value = atof(value_char);
+      index_t field_id = atoi(field_char);
+      matrix.AddNode(i, idx, value, field_id);
+      scale += value*value;
     }
+    matrix.scale[i] = 1.0 / scale;
   }
 }
 
