@@ -95,14 +95,14 @@ void Solver::Initialize(int argc, char* argv[]) {
 
 // Initialize training task
 void Solver::init_train() {
-  clock_t start, end;
-  start = clock();
   /*********************************************************
    *  Step 1: Init Reader and read problem                 *
    *********************************************************/
-  printf("Read and parse data ... \n");
+  clock_t start, end;
+  start = clock();
+  printf("Read problem ... \n");
   LOG(INFO) << "Start to init Reader";
-  // Split file if use -cv
+  // Split file if use -c
   if (hyper_param_.cross_validation) {
     CHECK_GT(hyper_param_.num_folds, 0);
     splitor_.split(hyper_param_.train_set_file,
@@ -122,12 +122,12 @@ void Solver::init_train() {
                         i);
       file_list.push_back(filename);
     }
-  } else { // do not use CV
-    num_reader += 1;
+  } else { // do not use cross-validation
+    num_reader++;
     CHECK_NE(hyper_param_.train_set_file.empty(), true);
     file_list.push_back(hyper_param_.train_set_file);
     if (!hyper_param_.test_set_file.empty()) {
-      num_reader += 1;
+      num_reader++;
       file_list.push_back(hyper_param_.test_set_file);
     }
   }
@@ -163,7 +163,7 @@ void Solver::init_train() {
         }
       }
     } while (num_samples != 0);
-    // return to the begining
+    // return to the begining of target file
     reader_[i]->Reset();
   }
   hyper_param_.num_feature = max_feat + 1; // add bias
@@ -175,33 +175,26 @@ void Solver::init_train() {
     printf("  Number of Field: %d \n", hyper_param_.num_field);
   }
   end = clock();
-  printf("  Time cost: %.2f sec \n",
+  printf("  Time cost for reading problem: %.2f sec \n",
     (float)(end-start) / CLOCKS_PER_SEC);
   /*********************************************************
    *  Step 2: Init Model                                   *
    *********************************************************/
    start = clock();
    printf("Initialize model ...\n");
-   // Initialize all parameters to zero
+   // Initialize parameters
    model_ = new Model();
    model_->Initialize(hyper_param_.score_func,
                    hyper_param_.loss_func,
                    hyper_param_.num_feature,
                    hyper_param_.num_field,
                    hyper_param_.num_K);
-   // Initialize parameters using Gaussian distribution
-   model_ = new Model();
-   model_->Initialize(hyper_param_.score_func,
-                   hyper_param_.loss_func,
-                   hyper_param_.num_feature,
-                   hyper_param_.num_field,
-                   hyper_param_.num_K);
-  index_t num_param = model_->GetNumParameter_w();
+   index_t num_param = model_->GetNumParameter_w();
    LOG(INFO) << "Number parameters: " << num_param;
    printf("  Model size: %.2f MB\n",
            (double) num_param / (1024.0 * 1024.0));
    end = clock();
-   printf("  Time cost: %.2f sec \n",
+   printf("  Time cost for model initial: %.2f sec \n",
      (float)(end-start) / CLOCKS_PER_SEC);
    /*********************************************************
     *  Step 3: Init Updater method                          *

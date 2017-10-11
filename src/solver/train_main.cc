@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
   solver.FinalizeWork();
 
   end = clock();
-  printf("Total time: %.2f sec",
+  printf("Total time cost: %.2f sec\n",
          (float)(end-start) / CLOCKS_PER_SEC);
 
   return 0;
