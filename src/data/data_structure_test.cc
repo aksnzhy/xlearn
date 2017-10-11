@@ -47,6 +47,7 @@ TEST(DMATRIX_TEST, Serialize_and_Deserialize) {
     matrix.row[i] = new SparseRow;
     matrix.AddNode(i, i, 2.5, i);
     matrix.Y[i] = i;
+    matrix.scale[i] = 0.1;
   }
   matrix.SetHash(1234, 5678);
   matrix.Serialize("/tmp/test.bin");
@@ -57,6 +58,7 @@ TEST(DMATRIX_TEST, Serialize_and_Deserialize) {
   EXPECT_EQ(matrix.hash_value_2, 5678);
   for (int i = 0; i < 10; ++i) {
     EXPECT_EQ(matrix.Y[i], i);
+    EXPECT_FLOAT_EQ(matrix.scale[i], 0.1);
     SparseRow *row = matrix.row[i];
     for (SparseRow::iterator iter = row->begin();
          iter != row->end(); ++iter) {

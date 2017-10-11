@@ -108,6 +108,7 @@ struct DMatrix {
     row_length = length;
     row.resize(length, nullptr);
     Y.resize(length, 0);
+    scale.resize(length, 0.0);
   }
 
   // Release memory for DMatrix
@@ -117,6 +118,8 @@ struct DMatrix {
     row_length = 0;
     // Delete Y
     std::vector<real_t>().swap(Y);
+    // Delete scale
+    std::vector<real_t>().swap(scale);
     for (int i = 0; i < row_length; ++i) {
       // Delete Node
       std::vector<Node>().swap(*row[i]);
@@ -165,6 +168,8 @@ struct DMatrix {
     }
     // Write Y
     WriteVectorToFile(file, Y);
+    // Write scale
+    WriteVectorToFile(file, scale);
     Close(file);
   }
 
@@ -189,6 +194,8 @@ struct DMatrix {
     }
     // Read Y
     ReadVectorFromFile(file, Y);
+    // Read scale
+    ReadVectorFromFile(file, scale);
     Close(file);
   }
 
@@ -205,6 +212,8 @@ struct DMatrix {
   /* 0 or -1 for negative and +1 for positive
    example, and others for regression */
   std::vector<real_t> Y;
+  /* Used for instance-wise normalization */
+  std::vector<real_t> scale;
 };
 
 }  // namespace xLearn
