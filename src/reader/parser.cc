@@ -113,7 +113,7 @@ void FFMParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
   // Parse every line
   uint64 pos = 0;
   for (index_t i = 0; i < line_num; ++i) {
-    get_line_from_buffer(line_buf, buf, pos, size);
+    pos += get_line_from_buffer(line_buf, buf, pos, size);
     matrix.row[i] = new SparseRow();
     // Add Y
     char *y_char = strtok(line_buf, " \t");
