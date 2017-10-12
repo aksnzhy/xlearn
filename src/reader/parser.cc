@@ -133,7 +133,7 @@ void FFMParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
       real_t value = atof(value_char);
       index_t field_id = atoi(field_char);
       matrix.AddNode(i, idx, value, field_id);
-      scale += value*value;
+      scale += (value*value);
     }
     matrix.scale[i] = 1.0 / scale;
   }

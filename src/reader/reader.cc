@@ -189,6 +189,7 @@ int InmemReader::Samples(DMatrix* &matrix) {
     // Copy data between different DMatrix.
     data_samples_.row[i] = data_buf_.row[order_[pos_]];
     data_samples_.Y[i] = data_buf_.Y[order_[pos_]];
+    data_samples_.scale[i] = data_buf_.scale[order_[pos_]];
     pos_++;
     num_line++;
   }
