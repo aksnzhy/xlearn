@@ -39,7 +39,7 @@ class AbsLoss : public Loss {
   ~AbsLoss() { }
 
   // Given predictions and labels, return loss value
-  real_t Evalute(const std::vector<real_t>& pred,
+  double Evalute(const std::vector<real_t>& pred,
                  const std::vector<real_t>& label);
 
   // Given data sample and current model, calculate gradient

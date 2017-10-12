@@ -44,7 +44,7 @@ TEST(ABSOLUTE_LOSS, Evalute) {
   // Create loss
   AbsLoss loss;
   real_t val = loss.Evalute(pred, label);
-  EXPECT_FLOAT_EQ(val, 45);
+  EXPECT_DOUBLE_EQ(val, 45);
 }
 
 } // namespace xLearn

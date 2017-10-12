@@ -37,15 +37,17 @@ REGISTER_LOSS("abs", AbsLoss);
 REGISTER_LOSS("cross-entropy", CrossEntropyLoss);
 
 // Given data sample and current model, return predictions.
-void Loss::Predict(const DMatrix* data_matrix,
+void Loss::Predict(const DMatrix* matrix,
                    Model& model,
                    std::vector<real_t>& pred) {
-  CHECK_NOTNULL(data_matrix);
+  CHECK_NOTNULL(matrix);
   CHECK_NE(pred.empty(), true);
-  CHECK_EQ(pred.size(), data_matrix->row_length);
-  for (size_t i = 0; i < data_matrix->row_length; ++i) {
-    SparseRow* row = data_matrix->row[i];
-    pred[i] = score_func_->CalcScore(row, model);
+  CHECK_EQ(pred.size(), matrix->row_length);
+  for (size_t i = 0; i < matrix->row_length; ++i) {
+    SparseRow* row = matrix->row[i];
+    pred[i] = score_func_->CalcScore(row,
+      model,
+      matrix->scale[i]); // scale for normalization
   }
 }
 

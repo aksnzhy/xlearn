@@ -24,10 +24,10 @@ This file is the implementation of SquaredLoss class.
 namespace xLearn {
 
 // Given predictions and labels, return squared loss value
-real_t SquaredLoss::Evalute(const std::vector<real_t>& pred,
+double SquaredLoss::Evalute(const std::vector<real_t>& pred,
                             const std::vector<real_t>& label) {
   CHECK_EQ(pred.empty(), false);
-  real_t val = 0.0;
+  double val = 0.0;
   for (size_t i = 0; i < pred.size(); ++i) {
     real_t tmp = pred[i] - label[i];
     val += 0.5*(tmp*tmp);
@@ -51,7 +51,12 @@ void SquaredLoss::CalcGrad(const DMatrix* matrix,
     // partial gradient
     real_t pg = score - matrix->Y[i];
     // real gradient and update
-    score_func_->CalcGrad(row, model, pg, updater);
+    // real gradient and update
+    score_func_->CalcGrad(row,   // sparse row
+       model,                    // curret model
+       pg,                       // partial gradient
+       updater,                  // updater
+       matrix->scale[i]);        // scale for normalization
   }
 }
 

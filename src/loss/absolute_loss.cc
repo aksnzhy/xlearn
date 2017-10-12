@@ -29,10 +29,10 @@ real_t inline abs(real_t value) {
 }
 
 // Given predictions and labels, return absolute loss value.
-real_t AbsLoss::Evalute(const std::vector<real_t>& pred,
+double AbsLoss::Evalute(const std::vector<real_t>& pred,
                         const std::vector<real_t>& label) {
   CHECK_EQ(pred.empty(), false);
-  real_t val = 0.0;
+  double val = 0.0;
   for (size_t i = 0; i < pred.size(); ++i) {
     val += abs(pred[i] - label[i]);
   }
@@ -54,7 +54,12 @@ void AbsLoss::CalcGrad(const DMatrix* matrix,
     // partial gradient
     real_t pg = 1.0;
     // real gradient and update
-    score_func_->CalcGrad(row, model, pg, updater);
+    // real gradient and update
+    score_func_->CalcGrad(row,   // sparse row
+       model,                    // curret model
+       pg,                       // partial gradient
+       updater,                  // updater
+       matrix->scale[i]);        // scale for normalization
   }
 }
 

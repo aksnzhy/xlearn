@@ -24,10 +24,10 @@ This file is the implementation of HingeLoss class.
 namespace xLearn {
 
 // Given predictions and labels, return hinge loss value.
-real_t HingeLoss::Evalute(const std::vector<real_t>& pred,
+double HingeLoss::Evalute(const std::vector<real_t>& pred,
                           const std::vector<real_t>& label) {
   CHECK_EQ(pred.empty(), false);
-  real_t val = 0.0;
+  double val = 0.0;
   for (size_t i = 0; i < pred.size(); ++i) {
     real_t y = label[i] > 0 ? 1.0 : -1.0;
     real_t tmp = pred[i] * y;
@@ -54,7 +54,12 @@ void HingeLoss::CalcGrad(const DMatrix* matrix,
     if (score*y < 1) {
       // real gradient and update
       real_t pg = -y;
-      score_func_->CalcGrad(row, model, pg, updater);
+      // real gradient and update
+      score_func_->CalcGrad(row,   // sparse row
+         model,                    // curret model
+         pg,                       // partial gradient
+         updater,                  // updater
+         matrix->scale[i]);        // scale for normalization
     }
   }
 }
