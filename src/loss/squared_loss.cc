@@ -51,7 +51,6 @@ void SquaredLoss::CalcGrad(const DMatrix* matrix,
     // partial gradient
     real_t pg = score - matrix->Y[i];
     // real gradient and update
-    // real gradient and update
     score_func_->CalcGrad(row, model, pg, updater);
   }
 }

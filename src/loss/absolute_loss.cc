@@ -54,7 +54,6 @@ void AbsLoss::CalcGrad(const DMatrix* matrix,
     // partial gradient
     real_t pg = 1.0;
     // real gradient and update
-    // real gradient and update
     score_func_->CalcGrad(row, model, pg, updater);
   }
 }
