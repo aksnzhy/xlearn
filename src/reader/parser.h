@@ -68,7 +68,7 @@ class Parser {
                          char* buf,
                          uint64 pos,
                          uint64 size);
-                         
+
  private:
   DISALLOW_COPY_AND_ASSIGN(Parser);
 };
@@ -103,6 +103,22 @@ class FFMParser : public Parser {
 
  private:
   DISALLOW_COPY_AND_ASSIGN(FFMParser);
+};
+
+//------------------------------------------------------------------------------
+// CSVParser parses the following data format:
+// [feat_1 feat_2 feat_3 ... feat_n y1]
+// [feat_1 feat_2 feat_3 ... feat_n y2]
+//------------------------------------------------------------------------------
+class CSVParser : public Parser {
+ public:
+  CSVParser() { }
+  ~CSVParser() { }
+
+  void Parse(char* buf, uint64 size, DMatrix& matrix);
+
+ private:
+  DISALLOW_COPY_AND_ASSIGN(CSVParser);
 };
 
 //------------------------------------------------------------------------------

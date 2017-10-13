@@ -32,6 +32,7 @@ namespace xLearn {
 
 const std::string kStr = "0 1:0.12 2:0.12 3:0.12 4:0.12 5:0.12\n";
 const std::string kStrFFM = "1 1:1:0.13 2:2:0.13 3:3:0.13 4:4:0.13 5:5:0.13\n";
+const std::string kStrCSV = "0.123 0.123 0.123 0.123 0.123 1\n";
 const index_t kNum_lines = 100000;
 const std::string filename = "./test_file.txt";
 
@@ -99,6 +100,37 @@ TEST(PARSER_TEST, Parse_libffm) {
   }
 }
 
+TEST(PARSER_TEST, Parse_csv) {
+  FILE* file = OpenFileOrDie(filename.c_str(), "w");
+  for (int i = 0; i < kNum_lines; ++i) {
+    WriteDataToDisk(file, kStrCSV.data(), kStrCSV.size());
+  }
+  Close(file);
+  char* buffer = nullptr;
+  uint64 size = ReadFileToMemory(filename, &buffer);
+  DMatrix matrix;
+  CSVParser parser;
+  parser.Parse(buffer, size, matrix);
+  EXPECT_EQ(matrix.row_length, kNum_lines);
+  for (index_t i = 0; i < matrix.row_length; ++i) {
+    EXPECT_EQ(matrix.Y[i], 1);
+    int col_len = matrix.row[i]->size();
+    EXPECT_EQ(col_len, 6);
+    SparseRow *row = matrix.row[i];
+    int n = 0;
+    for (SparseRow::iterator iter = row->begin();
+         iter != row->end(); ++iter) {
+      EXPECT_EQ(iter->feat_id, n);
+      if (n == 0) {
+        EXPECT_FLOAT_EQ(iter->feat_val, 1.0);
+      } else {
+        EXPECT_FLOAT_EQ(iter->feat_val, 0.123);
+      }
+      n++;
+    }
+  }
+}
+
 Parser* CreateParser(const char* format_name) {
   return CREATE_PARSER(format_name);
 }
@@ -106,6 +138,7 @@ Parser* CreateParser(const char* format_name) {
 TEST(PARSER_TEST, CreateParser) {
   EXPECT_TRUE(CreateParser("libsvm") != NULL);
   EXPECT_TRUE(CreateParser("libffm") != NULL);
+  EXPECT_TRUE(CreateParser("csv") != NULL);
   EXPECT_TRUE(CreateParser("") == NULL);
   EXPECT_TRUE(CreateParser("unknow_name") == NULL);
 }
