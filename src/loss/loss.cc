@@ -45,9 +45,7 @@ void Loss::Predict(const DMatrix* matrix,
   CHECK_EQ(pred.size(), matrix->row_length);
   for (size_t i = 0; i < matrix->row_length; ++i) {
     SparseRow* row = matrix->row[i];
-    pred[i] = score_func_->CalcScore(row,
-      model,
-      matrix->scale[i]); // scale for normalization
+    pred[i] = score_func_->CalcScore(row, model);
   }
 }
 

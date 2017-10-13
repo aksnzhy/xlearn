@@ -56,11 +56,7 @@ void CrossEntropyLoss::CalcGrad(const DMatrix* matrix,
     double expnyt = exp(-y*score);
     real_t pg = -y*expnyt/(1+expnyt);
     // real gradient and update
-    score_func_->CalcGrad(row,   // sparse row
-       model,                    // curret model
-       pg,                       // partial gradient
-       updater,                  // updater
-       matrix->scale[i]);        // scale for normalization
+    score_func_->CalcGrad(row, model, pg, updater);
   }
 }
 

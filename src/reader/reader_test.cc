@@ -90,7 +90,6 @@ void CheckFFM(const DMatrix* matrix) {
   EXPECT_EQ(matrix->row_length, kNumSamples);
   // check the first element
   EXPECT_EQ(matrix->Y[0], (real_t)1);
-  EXPECT_FLOAT_EQ(matrix->scale[0], (real_t)22.03274);
   for (int i = 0; i < matrix->row_length; ++i) {
     SparseRow *row = matrix->row[i];
     int n = 0;

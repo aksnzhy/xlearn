@@ -45,7 +45,7 @@ void Trainer::Train() {
     // Calc Train loss
     train_reader_->Reset();
     index_t count_sample = 0;
-    real_t loss_val = 0.0;
+    double loss_val = 0.0;
     std::vector<real_t> pred;
     int tmp = 0;
     while (1) {

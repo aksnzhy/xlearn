@@ -55,11 +55,7 @@ void AbsLoss::CalcGrad(const DMatrix* matrix,
     real_t pg = 1.0;
     // real gradient and update
     // real gradient and update
-    score_func_->CalcGrad(row,   // sparse row
-       model,                    // curret model
-       pg,                       // partial gradient
-       updater,                  // updater
-       matrix->scale[i]);        // scale for normalization
+    score_func_->CalcGrad(row, model, pg, updater);
   }
 }
 

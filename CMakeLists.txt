@@ -23,6 +23,8 @@ project ("xLearn")
 
 cmake_minimum_required(VERSION 2.8)
 
+#SET(CMAKE_C_COMPILER g++)
+
 #-------------------------------------------------------------------------------
 # Take almost all warnings;
 # Take warnings as errors;
@@ -31,7 +33,7 @@ cmake_minimum_required(VERSION 2.8)
 # Using c++11;
 # Using AVX instructions for speedup;
 #-------------------------------------------------------------------------------
-add_definitions("-Wall -Wno-sign-compare -Werror -O3 -std=c++11 -mavx")
+add_definitions("-Wall -Wno-sign-compare -Werror -O3 -mavx -std=c++0x -march=native")
 
 #-------------------------------------------------------------------------------
 # Declare where our project will be installed.

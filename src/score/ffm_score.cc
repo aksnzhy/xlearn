@@ -66,31 +66,28 @@ real_t FFMScore::CalcScore(const SparseRow* row,
   /*********************************************************
    *  latent factor                                        *
    *********************************************************/
-  static index_t matrix_size = model.GetNumField() *
-                               model.GetNumK();
-  static index_t num_factor = model.GetNumK();
+  index_t align0 = model.GetNumK();
+  index_t align1 = model.GetNumField() * model.GetNumK();
   w = model.GetParameter_w() + model.GetNumFeature();
   __MX _sum = _MMX_SETZERO_PS();
   for (SparseRow::const_iterator iter_i = row->begin();
        iter_i != row->end(); ++iter_i) {
-    real_t val_i = iter_i->feat_val;
-    index_t idx_i = iter_i->feat_id;
-    index_t field_i = iter_i->field_id;
-    index_t tmp_1 = matrix_size * idx_i;
-    index_t tmp_2 = field_i * num_factor;
+    real_t v1 = iter_i->feat_val;
+    index_t j1 = iter_i->feat_id;
+    index_t f1 = iter_i->field_id;
     for (SparseRow::const_iterator iter_j = iter_i+1;
          iter_j != row->end(); ++iter_j) {
-      real_t val_j = iter_j->feat_val;
-      index_t idx_j = iter_j->feat_id;
-      index_t field_j = iter_j->field_id;
-      real_t* w_j = w + num_factor * field_j + tmp_1;
-      real_t* w_i = w + matrix_size * idx_j + tmp_2;
-      __MX _v = _MMX_SET1_PS(val_j*val_i);
-      for (index_t k = 0; k < num_factor; k += _MMX_INCREMENT) {
-        __MX _kj = _MMX_LOAD_PS(w_j + k);
-        __MX _ki = _MMX_LOAD_PS(w_i + k);
+      real_t v2 = iter_j->feat_val;
+      index_t j2 = iter_j->feat_id;
+      index_t f2 = iter_j->field_id;
+      real_t* w1_base = w + j1*align1 + f2*align0;
+      real_t* w2_base = w + j2*align1 + f1*align0;
+      __MX _v = _MMX_SET1_PS(v1*v2);
+      for (index_t k = 0; k < align0; k += _MMX_INCREMENT) {
+        __MX _w1 = _MMX_LOAD_PS(w1_base + k);
+        __MX _w2 = _MMX_LOAD_PS(w2_base + k);
         _sum = _MMX_ADD_PS(_sum,
-               _MMX_MUL_PS(_MMX_MUL_PS(_kj, _ki), _v));
+               _MMX_MUL_PS(_MMX_MUL_PS(_w1, _w2), _v));
       }
     }
   }
@@ -124,35 +121,31 @@ void FFMScore::CalcGrad(const SparseRow* row,
   /*********************************************************
    *  latent factor                                        *
    *********************************************************/
-  static index_t matrix_size = model.GetNumField() *
-                               model.GetNumK();
-  static index_t num_factor = model.GetNumK();
+  index_t align0 = model.GetNumK();
+  index_t align1 = model.GetNumField() * model.GetNumK();
   w = model.GetParameter_w() + model.GetNumFeature();
+  __MX _pg = _MMX_SET1_PS(pg);
   for (SparseRow::const_iterator iter_i = row->begin();
        iter_i != row->end(); ++iter_i) {
-    real_t val_i = iter_i->feat_val;
-    index_t idx_i = iter_i->feat_id;
-    index_t field_i = iter_i->field_id;
-    index_t tmp_1 = matrix_size * idx_i;
-    index_t tmp_2 = field_i * num_factor;
-    real_t tmp_3 = val_i * pg;
+    real_t v1 = iter_i->feat_val;
+    index_t j1 = iter_i->feat_id;
+    index_t f1 = iter_i->field_id;
     for (SparseRow::const_iterator iter_j = iter_i+1;
          iter_j != row->end(); ++iter_j) {
-      real_t val_j = iter_j->feat_val;
-      index_t idx_j = iter_j->feat_id;
-      index_t field_j = iter_j->field_id;
-      index_t pos_j = num_factor * field_j + tmp_1;
-      index_t pos_i = matrix_size * idx_j + tmp_2;
-      __MX _v = _MMX_SET1_PS(val_j*tmp_3);
-      for (size_t k = 0; k < num_factor; k += _MMX_INCREMENT) {
-        index_t p_i = pos_i + k;
-        index_t p_j = pos_j + k;
-        __MX _kj = _MMX_LOAD_PS(w + p_j);
-        __MX _ki = _MMX_LOAD_PS(w + p_i);
-        __MX _gj = _MMX_MUL_PS(_v, _ki);
-        __MX _gi = _MMX_MUL_PS(_v, _kj);
-        updater->BatchUpdate(_kj, _gj, p_j, w);
-        updater->BatchUpdate(_ki, _gi, p_i, w);
+      real_t v2 = iter_j->feat_val;
+      index_t j2 = iter_j->feat_id;
+      index_t f2 = iter_j->field_id;
+      real_t* w1_base = w + j1*align1 + f2*align0;
+      real_t* w2_base = w + j2*align1 + f1*align0;
+      __MX _v = _MMX_SET1_PS(v1*v2);
+      __MX _v_pg = _MMX_MUL_PS(_v, _pg);
+      for (size_t k = 0; k < align0; k += _MMX_INCREMENT) {
+        __MX _w1 = _MMX_LOAD_PS(w1_base + k);
+        __MX _w2 = _MMX_LOAD_PS(w2_base + k);
+        __MX _g1 = _MMX_MUL_PS(_v_pg, _w2);
+        __MX _g2 = _MMX_MUL_PS(_v_pg, _w1);
+        updater->BatchUpdate(_w1, _g1, k, w1_base);
+        updater->BatchUpdate(_w2, _g2, k, w2_base);
       }
     }
   }

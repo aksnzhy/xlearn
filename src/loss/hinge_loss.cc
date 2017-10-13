@@ -55,11 +55,7 @@ void HingeLoss::CalcGrad(const DMatrix* matrix,
       // real gradient and update
       real_t pg = -y;
       // real gradient and update
-      score_func_->CalcGrad(row,   // sparse row
-         model,                    // curret model
-         pg,                       // partial gradient
-         updater,                  // updater
-         matrix->scale[i]);        // scale for normalization
+      score_func_->CalcGrad(row, model, pg, updater);   
     }
   }
 }
