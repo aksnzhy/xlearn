@@ -34,6 +34,7 @@ of the xLearn.
 #include "src/updater/updater.h"
 #include "src/score/score_function.h"
 #include "src/loss/loss.h"
+#include "src/loss/metric.h"
 #include "src/solver/checker.h"
 #include "src/solver/trainer.h"
 
@@ -81,12 +82,14 @@ class Solver {
   xLearn::Updater* updater_;
   xLearn::Score* score_;
   xLearn::Loss* loss_;
+  xLearn::Metric* metric_;
 
   // Create ovject by name
   xLearn::Reader* create_reader();
   xLearn::Updater* create_updater();
   xLearn::Score* create_score();
   xLearn::Loss* create_loss();
+  xLearn::Metric* create_metric();
 
   // Initialize function
   void init_train();

@@ -208,14 +208,20 @@ void Solver::init_train() {
     /*********************************************************
      *  Step 4: Init score function                          *
      *********************************************************/
-     score_ = create_score();
-     LOG(INFO) << "Initialize score function.";
-     /*********************************************************
-      *  Step 5: Init loss function                           *
-      *********************************************************/
-      loss_ = create_loss();
-      loss_->Initialize(score_);
-      LOG(INFO) << "Initialize loss function.";
+    score_ = create_score();
+    LOG(INFO) << "Initialize score function.";
+    /*********************************************************
+     *  Step 5: Init loss function                           *
+     *********************************************************/
+    loss_ = create_loss();
+    loss_->Initialize(score_);
+    LOG(INFO) << "Initialize loss function.";
+    /*********************************************************
+     *  Step 6: Init metric                                  *
+     *********************************************************/
+    metric_ = create_metric();
+    metric_->Initialize(hyper_param_.metric);
+    LOG(INFO) << "Initialize evaluation metric.";
 }
 
 // Initialize predict task
@@ -250,12 +256,12 @@ void Solver::init_predict() {
     }
     LOG(INFO) << "Initialize Parser ans Reader.";
     /*********************************************************
-     *  Step 2: Init score function                          *
+     *  Step 3: Init score function                          *
      *********************************************************/
      score_ = create_score();
      LOG(INFO) << "Initialize score function.";
      /*********************************************************
-      *  Step 2: Init loss function                           *
+      *  Step 4: Init loss function                           *
       *********************************************************/
       loss_ = create_loss();
       loss_->Initialize(score_);
@@ -309,6 +315,7 @@ void Solver::start_train_work() {
                        epoch,
                        model_,
                        loss_,
+                       metric_,
                        updater_,
                        early_stop);
     printf("Start to train ... \n");
@@ -375,6 +382,13 @@ Loss* Solver::create_loss() {
                << hyper_param_.loss_func;
   }
   return loss;
+}
+
+// Create Metric
+Metric* Solver::create_metric() {
+  Metric* metric;
+  metric = new Metric;
+  return metric;
 }
 
 // Find max feature in a data matrix

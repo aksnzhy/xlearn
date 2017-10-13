@@ -53,6 +53,9 @@ std::string Checker::option_help() const {
 "                                                                 \n"
 "  -d <true_or_false>   :  Training on disk for limited memory \n"
 "                          (use 'false' by default to train in memory) \n"
+"  -x <metric>          :  Evaluation metric can be 'acc', 'prec', \n"
+"                          'recall', 'roc', 'auc', 'mae', 'mse' \n"
+"                          (use 'acc' - Accuracy by default) \n"
 "  -t <test_file_path>  :  Path of the test data file \n"
 "                          (this option can be empty by default) \n"
 "  -m <model_file_path> :  Path of the model checkpoint file \n"
@@ -110,6 +113,7 @@ void Checker::Initialize(bool is_train, int argc, char* argv[]) {
   if (is_train_) {
     menu_.push_back(std::string("-s"));
     menu_.push_back(std::string("-d"));
+    menu_.push_back(std::string("-x"));
     menu_.push_back(std::string("-t"));
     menu_.push_back(std::string("-m"));
     menu_.push_back(std::string("-l"));
@@ -230,6 +234,21 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
         bo = false;
       } else {
         hyper_param.on_disk = list[i+1] == "true" ? true : false;
+      }
+    } else if (list[i].compare("-x") == 0) {
+      if (list[i+1].compare("acc") != 0 &&
+          list[i+1].compare("prec") != 0 &&
+          list[i+1].compare("recall") != 0 &&
+          list[i+1].compare("roc") != 0 &&
+          list[i+1].compare("auc") != 0 &&
+          list[i+1].compare("mae") != 0 &&
+          list[i+1].compare("mse") != 0) {
+        printf("[Error] Unknow metric : %s \n"
+               " -x can only be 'acc', 'prec', 'recall', "
+               "'roc', 'auc', 'mae', 'mse' \n", list[i+1].c_str());
+        bo = false;
+      } else {
+        hyper_param.metric = list[i+1];
       }
     } else if (list[i].compare("-t") == 0) {
       if (FileExist(list[i+1].c_str())) {

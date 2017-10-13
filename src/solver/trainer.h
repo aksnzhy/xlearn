@@ -29,6 +29,7 @@ This file defines the Trainer class.
 #include "src/reader/reader.h"
 #include "src/data/model_parameters.h"
 #include "src/loss/loss.h"
+#include "src/loss/metric.h"
 #include "src/updater/updater.h"
 
 namespace xLearn {
@@ -48,23 +49,26 @@ class Trainer {
                   int epoch,
                   Model* model,
                   Loss* loss,
+                  Metric* metric,
                   Updater* updater,
                   bool early_stop) {
     CHECK_NOTNULL(train_reader);
     CHECK_GT(epoch, 0);
     CHECK_NOTNULL(model);
     CHECK_NOTNULL(loss);
+    CHECK_NOTNULL(metric);
     CHECK_NOTNULL(updater);
     train_reader_ = train_reader;
     test_reader_ = test_reader;
     epoch_ = epoch;
     model_ = model;
     loss_ = loss;
+    metric_ = metric;
     updater_ = updater;
     early_stop_ = early_stop;
   }
 
-  // Init for cross-entropy training
+  // Init for CV training
   void Initialize(std::vector<Reader*> reader_list,
                   int epoch,
                   Model* model,
@@ -106,6 +110,7 @@ class Trainer {
   int epoch_;
   Model* model_;
   Loss* loss_;
+  Metric* metric_;
   Updater* updater_;
   bool early_stop_;
 

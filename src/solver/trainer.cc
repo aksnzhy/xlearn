@@ -32,17 +32,17 @@ void Trainer::Train() {
   //for in n epoch
   for (int n = 0; n < epoch_; ++n) {
     TIME_START();
-    // Return to the head of the data
-    train_reader_->Reset();
-    if (test_reader_ != NULL) {
-      test_reader_->Reset();
-    }
-    DMatrix* matrix = NULL;
+    //----------------------------------------------------
     // Calc grad and update model
+    //----------------------------------------------------
+    train_reader_->Reset();
+    DMatrix* matrix = NULL;
     while (train_reader_->Samples(matrix)) {
       loss_->CalcGrad(matrix, *model_, updater_);
     }
+    //----------------------------------------------------
     // Calc Train loss
+    //----------------------------------------------------
     train_reader_->Reset();
     index_t count_sample = 0;
     double loss_val = 0.0;
@@ -60,7 +60,14 @@ void Trainer::Train() {
     }
     loss_val /= count_sample;
     printf("  Epoch %d  |  Train loss: %f  |", n, loss_val);
+    //----------------------------------------------------
     // Calc Test loss
+    //----------------------------------------------------
+    index_t real_pos_example = 10;
+    index_t real_neg_example = 10;
+    index_t pre_pos_example = 5;
+    index_t pre_neg_example = 5;
+    test_reader_->Reset();
     if (test_reader_ != NULL) {
       count_sample = 0;
       loss_val = 0;
@@ -77,6 +84,15 @@ void Trainer::Train() {
       }
       loss_val /= count_sample;
       printf("  Test loss: %f  |", loss_val);
+    }
+    //----------------------------------------------------
+    // Calc Evaluation Metric
+    //----------------------------------------------------
+    if (test_reader_ != NULL) {
+      metric_->Set(real_pos_example, real_neg_example,
+                   pre_pos_example, pre_neg_example);
+      real_t metric_value = metric_->GetMetric();
+      printf("  %s : %f  |", metric_->type().c_str(), metric_value);
     }
     TIME_END();
     printf("  ");

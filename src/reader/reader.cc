@@ -38,7 +38,7 @@ REGISTER_READER("memory", InmemReader);
 REGISTER_READER("disk", OndiskReader);
 
 // Check current file format
-// Return 'libsvm' or 'libffm'
+// Return 'libsvm', 'libffm', or 'csv'
 std::string Reader::check_file_format() {
   FILE* file = OpenFileOrDie(filename_.c_str(), "r");
   // get the first line of data
@@ -57,6 +57,8 @@ std::string Reader::check_file_format() {
     return "libsvm";
   } else if (count == 2) {
     return "libffm";
+  } else if (count == 0){
+    return "csv";
   }
   printf("[Error] Unknow file format \n");
   exit(0);

@@ -43,10 +43,13 @@ struct HyperParam {
   bool on_disk = false;                     // True for on-disk training, false
                                             // for in-memory training
   /* Score function */
-  std::string score_func = "fm";            // 'linear', 'fm', or 'ffm'
+  std::string score_func = "linear";        // 'linear', 'fm', or 'ffm'
   /* Loss function */
   std::string loss_func = "corss-entropy";  // 'cross-entropy', 'squared',
                                             // 'absolute', or 'hinge'
+  /* metric function */
+  std::string metric = "acc";               // 'acc', 'prec', 'recall', 'roc',
+                                            // 'auc', 'mae', 'mse', etc
 //------------------------------------------------------------------------------
 // Parameters for optimization method.
 //------------------------------------------------------------------------------
