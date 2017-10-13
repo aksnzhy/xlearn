@@ -190,6 +190,7 @@ void Solver::init_train() {
                    hyper_param_.num_field,
                    hyper_param_.num_K);
    index_t num_param = model_->GetNumParameter_w();
+   hyper_param_.num_param = num_param;
    LOG(INFO) << "Number parameters: " << num_param;
    printf("  Model size: %.2f MB\n",
            (double) num_param / (1024.0 * 1024.0));

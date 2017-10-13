@@ -63,10 +63,10 @@ void Trainer::Train() {
     //----------------------------------------------------
     // Calc Test loss
     //----------------------------------------------------
-    index_t real_pos_example = 10;
-    index_t real_neg_example = 10;
-    index_t pre_pos_example = 5;
-    index_t pre_neg_example = 5;
+    index_t real_pos_example = 0;
+    index_t real_neg_example = 0;
+    index_t pre_pos_example = 0;
+    index_t pre_neg_example = 0;
     test_reader_->Reset();
     if (test_reader_ != NULL) {
       count_sample = 0;
@@ -80,6 +80,12 @@ void Trainer::Train() {
         }
         count_sample += tmp;
         loss_->Predict(matrix, *model_, pred);
+        metric_->Accumulate(&real_pos_example,
+                            &real_neg_example,
+                            &pre_pos_example,
+                            &pre_neg_example,
+                            matrix->Y,
+                            pred);
         loss_val += loss_->Evalute(pred, matrix->Y);
       }
       loss_val /= count_sample;

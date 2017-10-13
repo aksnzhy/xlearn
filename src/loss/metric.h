@@ -83,6 +83,28 @@ class Metric {
     pre_neg_example_ = pre_neg_example;
   }
 
+  // Will be used during training
+  void Accumulate(index_t* real_pos_example,
+                  index_t* real_neg_example,
+                  index_t* pre_pos_example,
+                  index_t* pre_neg_example,
+                  const std::vector<real_t>& Y,
+                  const std::vector<real_t>& pred) {
+    for (index_t i = 0; i < pred.size(); ++i) {
+      if (Y[i] > 0) {
+        (*real_pos_example)++;
+        if (pred[i] >= 0) {
+          (*pre_pos_example)++;
+        }
+      } else {
+        (*real_neg_example)++;
+        if (pred[i] < 0) {
+          (*pre_neg_example)++;
+        }
+      }
+    }
+  }
+
   // Return metric value
   double GetMetric() {
     if (metric_type_.compare("acc") == 0) {
