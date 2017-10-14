@@ -71,7 +71,7 @@ TEST_F(FFMScoreTest, calc_score) {
   // 6 + 24*4*3 = 294.0
   EXPECT_FLOAT_EQ(val, 294.0);
 }
-
+/*
 TEST_F(FFMScoreTest, calc_grad) {
   // Reset hyper parameters
   param.num_feature = 100;
@@ -113,6 +113,6 @@ TEST_F(FFMScoreTest, calc_grad) {
       EXPECT_FLOAT_EQ(w[i], 1.8);
     }
   }
-}
+}*/
 
 } // namespace xLearn

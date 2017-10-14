@@ -208,7 +208,6 @@ TEST_F(LossTest, Create_Loss) {
   EXPECT_TRUE(CreateLoss("squared") != NULL);
   EXPECT_TRUE(CreateLoss("hinge") != NULL);
   EXPECT_TRUE(CreateLoss("cross-entropy") != NULL);
-  EXPECT_TRUE(CreateLoss("abs") != NULL);
   EXPECT_TRUE(CreateLoss("") == NULL);
   EXPECT_TRUE(CreateLoss("unknow_name") == NULL);
 }

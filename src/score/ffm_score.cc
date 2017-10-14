@@ -20,6 +20,7 @@ This file is the implementation of FFMScore class.
 */
 
 #include "src/score/ffm_score.h"
+#include "src/base/math.h"
 
 namespace xLearn {
 
@@ -103,20 +104,24 @@ real_t FFMScore::CalcScore(const SparseRow* row,
   return score;
 }
 
-// Calculate gradient and update current model parameters
-// Using sse/avx to speed up
+// Calculate gradient and update current model
+// parameters. Using sse/avx to speed up
 void FFMScore::CalcGrad(const SparseRow* row,
                         Model& model,
-                        real_t pg,  /* partial gradient */
-                        Updater* updater) {
+                        real_t pg) {
   /*********************************************************
    *  linear term                                          *
    *********************************************************/
   real_t *w = model.GetParameter_w();
+  real_t* cache = model.GetParameter_cache();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
     real_t gradient = pg * iter->feat_val;
-    updater->Update(iter->feat_id, gradient, w);
+    index_t idx = iter->feat_id;
+    gradient += regu_lambda_ * w[idx];
+    cache[idx] += (gradient * gradient);
+    w[idx] -= (learning_rate_ * gradient *
+               InvSqrt((cache)[idx]));
   }
   /*********************************************************
    *  latent factor                                        *
@@ -124,7 +129,10 @@ void FFMScore::CalcGrad(const SparseRow* row,
   index_t align0 = model.GetNumK();
   index_t align1 = model.GetNumField() * model.GetNumK();
   w = model.GetParameter_w() + model.GetNumFeature();
+  cache = model.GetParameter_cache() + model.GetNumFeature();
   __MX _pg = _MMX_SET1_PS(pg);
+  __MX _lr = _MMX_SET1_PS(learning_rate_);
+  __MX _lamb = _MMX_SET1_PS(regu_lambda_);
   for (SparseRow::const_iterator iter_i = row->begin();
        iter_i != row->end(); ++iter_i) {
     real_t v1 = iter_i->feat_val;
@@ -135,17 +143,39 @@ void FFMScore::CalcGrad(const SparseRow* row,
       real_t v2 = iter_j->feat_val;
       index_t j2 = iter_j->feat_id;
       index_t f2 = iter_j->field_id;
-      real_t* w1_base = w + j1*align1 + f2*align0;
-      real_t* w2_base = w + j2*align1 + f1*align0;
+      index_t bias_1 = j1*align1 + f2*align0;
+      index_t bias_2 = j2*align1 + f1*align0;
+      real_t* w1_base = w + bias_1;
+      real_t* w2_base = w + bias_2;
+      real_t* c1_base = cache + bias_1;
+      real_t* c2_base = cache + bias_2;
       __MX _v = _MMX_SET1_PS(v1*v2);
       __MX _v_pg = _MMX_MUL_PS(_v, _pg);
       for (size_t k = 0; k < align0; k += _MMX_INCREMENT) {
-        __MX _w1 = _MMX_LOAD_PS(w1_base + k);
-        __MX _w2 = _MMX_LOAD_PS(w2_base + k);
-        __MX _g1 = _MMX_MUL_PS(_v_pg, _w2);
-        __MX _g2 = _MMX_MUL_PS(_v_pg, _w1);
-        updater->BatchUpdate(_w1, _g1, k, w1_base);
-        updater->BatchUpdate(_w2, _g2, k, w2_base);
+        real_t* w1 = w1_base + k;
+        real_t* w2 = w2_base + k;
+        real_t* c1 = c1_base + k;
+        real_t* c2 = c2_base + k;
+        __MX _w1 = _MMX_LOAD_PS(w1);
+        __MX _w2 = _MMX_LOAD_PS(w2);
+        __MX _c1 = _MMX_LOAD_PS(c1);
+        __MX _c2 = _MMX_LOAD_PS(c2);
+        __MX _g1 = _MMX_ADD_PS(
+                   _MMX_MUL_PS(_lamb, _w1),
+                   _MMX_MUL_PS(_v_pg, _w2));
+        __MX _g2 = _MMX_ADD_PS(
+                   _MMX_MUL_PS(_lamb, _w2),
+                   _MMX_MUL_PS(_v_pg, _w1));
+        _c1 = _MMX_ADD_PS(_c1, _MMX_MUL_PS(_g1, _g1));
+        _c2 = _MMX_ADD_PS(_c2, _MMX_MUL_PS(_g2, _g2));
+        _w1 = _MMX_SUB_PS(_w1, _MMX_MUL_PS(_lr,
+              _MMX_MUL_PS(_MMX_RSQRT_PS(_c1), _g1)));
+        _w2 = _MMX_SUB_PS(_w2, _MMX_MUL_PS(_lr,
+              _MMX_MUL_PS(_MMX_RSQRT_PS(_c2), _g2)));
+        _MMX_STORE_PS(w1, _w1);
+        _MMX_STORE_PS(w2, _w2);
+        _MMX_STORE_PS(c1, _c1);
+        _MMX_STORE_PS(c2, _c2);
       }
     }
   }

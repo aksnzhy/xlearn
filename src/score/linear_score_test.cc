@@ -68,7 +68,7 @@ TEST_F(LinearScoreTest, calc_score) {
   real_t val = score.CalcScore(&row, model);
   EXPECT_FLOAT_EQ(val, 600.0);
 }
-
+/*
 TEST_F(LinearScoreTest, calc_grad) {
   // Create SparseRow
   SparseRow row(kLength);
@@ -100,6 +100,6 @@ TEST_F(LinearScoreTest, calc_grad) {
   for (index_t i = 0; i < kLength; ++i) {
     EXPECT_FLOAT_EQ(w[i], 2.8);
   }
-}
+}*/
 
 } // namespace xLearn

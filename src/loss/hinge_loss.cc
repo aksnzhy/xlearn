@@ -37,13 +37,11 @@ double HingeLoss::Evalute(const std::vector<real_t>& pred,
 }
 
 // Given data sample and current model, calculate gradient
-// and update model.
+// and update current model parameters
 void HingeLoss::CalcGrad(const DMatrix* matrix,
-                         Model& model,
-                         Updater* updater) {
+                         Model& model) {
   CHECK_NOTNULL(matrix);
   CHECK_GT(matrix->row_length, 0);
-  CHECK_NOTNULL(updater);
   size_t row_len = matrix->row_length;
   // Calculate gradient
   for (size_t i = 0; i < row_len; ++i) {
@@ -55,7 +53,7 @@ void HingeLoss::CalcGrad(const DMatrix* matrix,
       // real gradient and update
       real_t pg = -y;
       // real gradient and update
-      score_func_->CalcGrad(row, model, pg, updater);   
+      score_func_->CalcGrad(row, model, pg);
     }
   }
 }

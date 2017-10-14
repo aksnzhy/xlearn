@@ -23,7 +23,6 @@ This file is the implementation of the base Loss class.
 #include "src/loss/squared_loss.h"
 #include "src/loss/hinge_loss.h"
 #include "src/loss/cross_entropy_loss.h"
-#include "src/loss/absolute_loss.h"
 
 namespace xLearn {
 
@@ -33,7 +32,6 @@ namespace xLearn {
 CLASS_REGISTER_IMPLEMENT_REGISTRY(xLearn_loss_registry, Loss);
 REGISTER_LOSS("squared", SquaredLoss);
 REGISTER_LOSS("hinge", HingeLoss);
-REGISTER_LOSS("abs", AbsLoss);
 REGISTER_LOSS("cross-entropy", CrossEntropyLoss);
 
 // Given data sample and current model, return predictions.

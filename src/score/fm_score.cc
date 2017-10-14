@@ -20,6 +20,7 @@ This file is the implementation of FMScore class.
 */
 
 #include "src/score/fm_score.h"
+#include "src/base/math.h"
 
 namespace xLearn {
 
@@ -61,25 +62,31 @@ real_t FMScore::CalcScore(const SparseRow* row,
   return score;
 }
 
-// Calculate gradient and update current model
+// Calculate gradient and update current
+// model parameters
 void FMScore::CalcGrad(const SparseRow* row,
                        Model& model,
-                       real_t pg,  /* partial gradient */
-                       Updater* updater) {
+                       real_t pg) {
  /*********************************************************
   *  linear term                                          *
   *********************************************************/
   real_t *w = model.GetParameter_w();
+  real_t* cache = model.GetParameter_cache();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
     real_t gradient = pg * iter->feat_val;
-    updater->Update(iter->feat_id, gradient, w);
+    index_t idx = iter->feat_id;
+    gradient += regu_lambda_ * w[idx];
+    cache[idx] += (gradient * gradient);
+    w[idx] -= (learning_rate_ * gradient *
+               InvSqrt((cache)[idx]));
   }
   /*********************************************************
    *  latent factor                                        *
    *********************************************************/
   static index_t num_factor = model.GetNumK();
   w = model.GetParameter_w() + model.GetNumFeature();
+  cache = model.GetParameter_cache() + model.GetNumFeature();
   for (size_t k = 0; k < num_factor; ++k) {
     real_t v_mul_x = 0.0;
     for (SparseRow::const_iterator iter = row->begin();
@@ -95,7 +102,10 @@ void FMScore::CalcGrad(const SparseRow* row,
       real_t v = w[pos];
       real_t x = iter->feat_val;
       real_t gradient = x*(v_mul_x-v*x) * pg;
-      updater->Update(pos, gradient, w);
+      gradient += regu_lambda_ * w[pos];
+      cache[pos] += (gradient * gradient);
+      w[pos] -= (learning_rate_ * gradient *
+                 InvSqrt((cache)[pos]));
     }
   }
 }

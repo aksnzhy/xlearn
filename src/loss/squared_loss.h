@@ -43,10 +43,9 @@ class SquaredLoss : public Loss {
                  const std::vector<real_t>& label);
 
   // Given data sample and current model, calculate gradient
-  // and update model.
+  // and update current model parameters
   void CalcGrad(const DMatrix* data_matrix,
-                Model& model,
-                Updater* updater);
+                Model& model);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(SquaredLoss);

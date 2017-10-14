@@ -43,11 +43,11 @@ class LinearScore : public Score {
   real_t CalcScore(const SparseRow* row,
                    Model& model);
 
-  // Calculate gradient and update current model
+  // Calculate gradient and update current
+  // model parameters
   void CalcGrad(const SparseRow* row,
                 Model& model,
-                real_t pg,  /* partial gradient */
-                Updater* updater);
+                real_t pg);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(LinearScore);

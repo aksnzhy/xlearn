@@ -69,7 +69,7 @@ TEST_F(FMScoreTest, calc_score) {
   // 6 + 10*4*3 = 126
   EXPECT_FLOAT_EQ(val, 126.0);
 }
-
+/*
 TEST_F(FMScoreTest, calc_grad) {
   // Reset hyper parameters
   param.num_K = 24;
@@ -108,6 +108,6 @@ TEST_F(FMScoreTest, calc_grad) {
        i < model.GetNumParameter_w(); ++i) {
     EXPECT_FLOAT_EQ(w[i], -115.8);
   }
-}
+}*/
 
 } // namespace xLearn

@@ -88,10 +88,9 @@ class Loss {
                         std::vector<real_t>& pred);
 
    // Given data sample and current model, calculate gradient
-   // and update model
+   // and update current model parameters
    virtual void CalcGrad(const DMatrix* data_matrix,
-                         Model& model,
-                         Updater* updater) = 0;
+                         Model& model) = 0;
 
    // The Sigmoid function, which mapping the output to 0~1
    void Sigmoid(const std::vector<real_t>& pred,

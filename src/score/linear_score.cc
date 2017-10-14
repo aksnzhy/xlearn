@@ -20,7 +20,7 @@ This file is the implementation of LinearScore class.
 */
 
 #include "src/score/linear_score.h"
-#include "src/score/fm_score.h"
+#include "src/base/math.h"
 
 namespace xLearn {
 
@@ -40,13 +40,17 @@ real_t LinearScore::CalcScore(const SparseRow* row,
 // Calculate gradient and update current model
 void LinearScore::CalcGrad(const SparseRow* row,
                            Model& model,
-                           real_t pg,  /* partial gradient */
-                           Updater* updater) {
+                           real_t pg) {
   real_t* w = model.GetParameter_w();
+  real_t* cache = model.GetParameter_cache();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
     real_t gradient = pg * iter->feat_val;
-    updater->Update(iter->feat_id, gradient, w);
+    index_t idx = iter->feat_id;
+    gradient += regu_lambda_ * w[idx];
+    cache[idx] += (gradient * gradient);
+    w[idx] -= (learning_rate_ * gradient *
+               InvSqrt((cache)[idx]));
   }
 }
 
