@@ -38,7 +38,7 @@ void Trainer::Train() {
     train_reader_->Reset();
     DMatrix* matrix = NULL;
     while (train_reader_->Samples(matrix)) {
-      loss_->CalcGrad(matrix, *model_, updater_);
+      loss_->CalcGrad(matrix, *model_);
     }
     //----------------------------------------------------
     // Calc Train loss
@@ -124,7 +124,7 @@ void Trainer::CVTrain() {
         train_reader_->Reset();
         DMatrix* matrix = NULL;
         while (train_reader_->Samples(matrix)) {
-          loss_->CalcGrad(matrix, *model_, updater_);
+          loss_->CalcGrad(matrix, *model_);
         }
       }
       // Calc train loss

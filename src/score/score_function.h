@@ -29,7 +29,7 @@ FM score, FFM score, and etc.
 #include "src/base/class_register.h"
 #include "src/data/data_structure.h"
 #include "src/data/hyper_parameters.h"
-#include "src/updater/updater.h"
+#include "src/data/model_parameters.h"
 
 namespace xLearn {
 
@@ -41,7 +41,7 @@ namespace xLearn {
 //
 //  Score* score = new FMScore();
 //  score->CalcScore(row, model);
-//  score->CalcGrad(row, model, pg, updater);
+//  score->CalcGrad(row, model, pg);
 //
 // In general, the CalcGrad() will be used in loss function.
 //------------------------------------------------------------------------------
@@ -71,7 +71,7 @@ class Score {
  protected:
   real_t learning_rate_;
   real_t regu_lambda_;
-  
+
  private:
   DISALLOW_COPY_AND_ASSIGN(Score);
 };

@@ -31,7 +31,6 @@ of the xLearn.
 #include "src/reader/reader.h"
 #include "src/reader/parser.h"
 #include "src/reader/file_splitor.h"
-#include "src/updater/updater.h"
 #include "src/score/score_function.h"
 #include "src/loss/loss.h"
 #include "src/loss/metric.h"
@@ -79,14 +78,12 @@ class Solver {
   xLearn::Model *model_;
   std::vector<xLearn::Reader*> reader_;
   xLearn::FileSpliter splitor_;
-  xLearn::Updater* updater_;
   xLearn::Score* score_;
   xLearn::Loss* loss_;
   xLearn::Metric* metric_;
 
   // Create ovject by name
   xLearn::Reader* create_reader();
-  xLearn::Updater* create_updater();
   xLearn::Score* create_score();
   xLearn::Loss* create_loss();
   xLearn::Metric* create_metric();

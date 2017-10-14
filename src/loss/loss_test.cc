@@ -44,8 +44,7 @@ class TestLoss : public Loss {
                  const std::vector<real_t>& label) { return 0.0; }
 
   void CalcGrad(const DMatrix* data_matrix,
-                Model& model,
-                Updater* updater) { return; }
+                Model& model) { return; }
 
  private:
   DISALLOW_COPY_AND_ASSIGN(TestLoss);

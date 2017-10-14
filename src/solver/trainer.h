@@ -30,7 +30,6 @@ This file defines the Trainer class.
 #include "src/data/model_parameters.h"
 #include "src/loss/loss.h"
 #include "src/loss/metric.h"
-#include "src/updater/updater.h"
 
 namespace xLearn {
 
@@ -50,21 +49,18 @@ class Trainer {
                   Model* model,
                   Loss* loss,
                   Metric* metric,
-                  Updater* updater,
                   bool early_stop) {
     CHECK_NOTNULL(train_reader);
     CHECK_GT(epoch, 0);
     CHECK_NOTNULL(model);
     CHECK_NOTNULL(loss);
     CHECK_NOTNULL(metric);
-    CHECK_NOTNULL(updater);
     train_reader_ = train_reader;
     test_reader_ = test_reader;
     epoch_ = epoch;
     model_ = model;
     loss_ = loss;
     metric_ = metric;
-    updater_ = updater;
     early_stop_ = early_stop;
   }
 
@@ -73,7 +69,6 @@ class Trainer {
                   int epoch,
                   Model* model,
                   Loss* loss,
-                  Updater* updater,
                   bool early_stop) {
     CHECK_NE(reader_list.empty(), true);
     reader_list_.resize(reader_list.size(), NULL);
@@ -84,11 +79,9 @@ class Trainer {
     CHECK_GT(epoch, 0);
     CHECK_NOTNULL(model);
     CHECK_NOTNULL(loss);
-    CHECK_NOTNULL(updater);
     epoch_ = epoch;
     model_ = model;
     loss_ = loss;
-    updater_ = updater;
     early_stop_ = early_stop;
   }
 
@@ -111,7 +104,6 @@ class Trainer {
   Model* model_;
   Loss* loss_;
   Metric* metric_;
-  Updater* updater_;
   bool early_stop_;
 
  private:

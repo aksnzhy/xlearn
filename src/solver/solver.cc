@@ -197,15 +197,6 @@ void Solver::init_train() {
    end = clock();
    printf("  Time cost for model initial: %.2f sec \n",
      (float)(end-start) / CLOCKS_PER_SEC);
-   /*********************************************************
-    *  Step 3: Init Updater method                          *
-    *********************************************************/
-    updater_ = create_updater();
-    updater_->Initialize(hyper_param_.learning_rate,
-                     hyper_param_.regu_lambda,
-                     hyper_param_.decay_rate,
-                     hyper_param_.num_param);
-    LOG(INFO) << "Initialize Updater.";
     /*********************************************************
      *  Step 4: Init score function                          *
      *********************************************************/
@@ -299,7 +290,6 @@ void Solver::start_train_work() {
                        epoch,
                        model_,
                        loss_,
-                       updater_,
                        early_stop);
     printf("Start to train ... \n");
     trainer.CVTrain();
@@ -317,7 +307,6 @@ void Solver::start_train_work() {
                        model_,
                        loss_,
                        metric_,
-                       updater_,
                        early_stop);
     printf("Start to train ... \n");
     trainer.Train();
@@ -350,17 +339,6 @@ Reader* Solver::create_reader() {
     LOG(ERROR) << "Cannot create reader: " << str;
   }
   return reader;
-}
-
-// Create Updater by a given string
-Updater* Solver::create_updater() {
-  Updater* updater;
-  updater = CREATE_UPDATER(hyper_param_.updater_type.c_str());
-  if (updater == NULL) {
-    LOG(ERROR) << "Cannot create updater: "
-               << hyper_param_.updater_type;
-  }
-  return updater;
 }
 
 // Create Score by a given string

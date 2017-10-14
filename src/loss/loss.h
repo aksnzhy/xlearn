@@ -29,7 +29,6 @@ function or objective function.
 #include "src/base/class_register.h"
 #include "src/base/math.h"
 #include "src/data/model_parameters.h"
-#include "src/updater/updater.h"
 #include "src/score/score_function.h"
 
 namespace xLearn {

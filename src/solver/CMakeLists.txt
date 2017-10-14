@@ -2,7 +2,7 @@
 add_library(solver checker.cc trainer.cc solver.cc)
 
 # Build xlearn exe
-set(LIBS solver base data loss reader score updater)
+set(LIBS solver base data loss reader score)
 
 add_executable(xlearn_train train_main.cc)
 target_link_libraries(xlearn_train ${LIBS})

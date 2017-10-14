@@ -62,8 +62,6 @@ std::string Checker::option_help() const {
 "                          (use './xlearn_model' by default) \n"
 "  -l <log_file_path>   :  Path of the log file \n"
 "                          (use './xlearn_log' by default) \n"
-"  -u <updater>         :  Updater can be 'sgd', 'adagrad', 'adadelta', \n"
-"                          'rmsprop', and 'momentum' (use 'sgd' by default) \n"
 "  -k <number_of_K>     :  Number of the latent factor for fm and ffm. \n"
 "                          Note that -k must be a multiple of 8 like 8, 16 .. \n"
 "                          (use 8 by default) \n"
@@ -117,7 +115,6 @@ void Checker::Initialize(bool is_train, int argc, char* argv[]) {
     menu_.push_back(std::string("-t"));
     menu_.push_back(std::string("-m"));
     menu_.push_back(std::string("-l"));
-    menu_.push_back(std::string("-u"));
     menu_.push_back(std::string("-k"));
     menu_.push_back(std::string("-r"));
     menu_.push_back(std::string("-b"));
@@ -262,20 +259,6 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       hyper_param.model_file = list[i+1];
     } else if (list[i].compare("-l") == 0) {
       hyper_param.log_file = list[i+1];
-    } else if (list[i].compare("-u") == 0) {
-      std::string value = list[i+1];
-      if (value.compare("sgd") != 0 &&
-          value.compare("adagrad") != 0 &&
-          value.compare("adadelta") != 0 &&
-          value.compare("rmsprop") != 0 &&
-          value.compare("momentum") != 0) {
-        printf("[Error] Unknow updater : '%s' \n"
-               " -u can only be 'sgd', adagrad', 'rmsprop', "
-               "'adadelta' or 'momentum' \n", value.c_str());
-        bo = false;
-      } else {
-        hyper_param.updater_type = value;
-      }
     } else if (list[i].compare("-k") == 0) {
       int value = atoi(list[i+1].c_str());
       if (value % 8 != 0) {
