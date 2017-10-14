@@ -98,7 +98,7 @@ void Trainer::Train() {
       metric_->Set(real_pos_example, real_neg_example,
                    pre_pos_example, pre_neg_example);
       real_t metric_value = metric_->GetMetric();
-      printf("  %s : %f  |", metric_->type().c_str(), metric_value);
+      printf("  Test %s: %f  |", metric_->type().c_str(), metric_value);
     }
     TIME_END();
     printf("  ");
