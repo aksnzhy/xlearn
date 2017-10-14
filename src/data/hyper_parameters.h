@@ -55,11 +55,6 @@ struct HyperParam {
 //------------------------------------------------------------------------------
   /* Learning rate */
   real_t learning_rate = 0.01;          // Control the learning setp
-  /* Update function */
-  std::string updater_type = "adagrad"; // 'sgd', 'adagrad', 'adadelta', 'adam',
-                                        // 'rmsprop', 'nesterov', or 'momentum'
-  /* decay_rate for updater */
-  real_t decay_rate = 0.5;              // The decay factor used by updater
   /* lambda for regularizer */
   real_t regu_lambda = 0.00002;         // xLearn uses sparse regularizer
   /* Number of epoch */

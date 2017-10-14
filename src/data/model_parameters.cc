@@ -60,21 +60,25 @@ void Model::Initialize(const std::string& score_func,
   num_feat_ = num_feature;
   num_field_ = num_field;
   num_K_ = num_K;
-  Initialize_w(true);
+  Initialize_w_and_cache(true);
 }
 
 // To get the best performance for SSE and AVX, we need
 // to allocate memory for the model parameters in aligned way
 // For AVX, the align number should be 32, and for SSE, the
 // align number should be 16
-void Model::Initialize_w(bool set_value) {
+void Model::Initialize_w_and_cache(bool set_value) {
   try {
     // Only used in Unix-like systems
   #ifdef __AVX__
     posix_memalign((void**)&param_w_, 32,
        param_num_w_ * sizeof(real_t));
+    posix_memalign((void**)&param_cache_, 32,
+       param_num_w_ * sizeof(real_t));
   #else // SSE
     posix_memalign((void**)&param_w_, 16,
+       param_num_w_ * sizeof(real_t));
+    posix_memalign((void**)&param_cache_, 16,
        param_num_w_ * sizeof(real_t));
   #endif
   } catch (std::bad_alloc&) {
@@ -93,6 +97,10 @@ void Model::Initialize_w(bool set_value) {
       RandDistribution(param_w_ + num_feat_,
           param_num_w_ - num_feat_,
           0.0, 1.0, coef);
+    }
+    // set cache to zero
+    for (index_t i = 0; i < param_num_w_; ++i) {
+      param_cache_[i] = 0.0;
     }
   }
 }
@@ -149,18 +157,18 @@ bool Model::Deserialize(const std::string& filename) {
 
 // Serialize w
 void Model::serialize_w(FILE* file) {
-  // Write size
+  // Write size of w
   WriteDataToDisk(file, (char*)&param_num_w_, sizeof(param_num_w_));
-  // Write data
+  // Write w
   WriteDataToDisk(file, (char*)param_w_, sizeof(real_t)*param_num_w_);
 }
 
-// Deserialize w and v
+// Deserialize w
 void Model::deserialize_w(FILE* file) {
-  // Read size
+  // Read size of w
   ReadDataFromDisk(file, (char*)&param_num_w_, sizeof(param_num_w_));
   // Allocate memory
-  Initialize_w(false);  /* do not set value */
+  Initialize_w_and_cache(false);  /* do not set value */
   // Read data
   ReadDataFromDisk(file, (char*)param_w_, sizeof(real_t)*param_num_w_);
 }

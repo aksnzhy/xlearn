@@ -60,6 +60,10 @@ TEST(MODEL_TEST, Init) {
   for (index_t i = 0; i < model_ffm.GetNumFeature(); ++i) {
     EXPECT_FLOAT_EQ(w[i], 0.0);
   }
+  real_t* cache = model_ffm.GetParameter_cache();
+  for (index_t i = 0; i < model_ffm.GetNumParameter_w(); ++i) {
+    EXPECT_FLOAT_EQ(cache[i], 0.0);
+  }
 }
 
 TEST(MODEL_TEST, Save_and_Load) {
