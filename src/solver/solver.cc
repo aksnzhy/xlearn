@@ -201,6 +201,8 @@ void Solver::init_train() {
      *  Step 4: Init score function                          *
      *********************************************************/
     score_ = create_score();
+    score_->Initialize(hyper_param_.learning_rate,
+                  hyper_param_.regu_lambda);
     LOG(INFO) << "Initialize score function.";
     /*********************************************************
      *  Step 5: Init loss function                           *
