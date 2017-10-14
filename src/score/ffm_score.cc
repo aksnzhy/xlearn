@@ -58,7 +58,7 @@ real_t FFMScore::CalcScore(const SparseRow* row,
   /*********************************************************
    *  linear term                                          *
    *********************************************************/
-  real_t *w = model.GetParameter_w();
+  static real_t *w = model.GetParameter_w();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
     index_t pos = iter->feat_id;
@@ -67,10 +67,10 @@ real_t FFMScore::CalcScore(const SparseRow* row,
   /*********************************************************
    *  latent factor                                        *
    *********************************************************/
-  index_t align0 = model.GetNumK();
-  index_t align1 = model.GetNumField() * model.GetNumK();
+  static index_t align0 = model.GetNumK();
+  static index_t align1 = model.GetNumField() * model.GetNumK();
+  static __MX _sum = _MMX_SETZERO_PS();
   w = model.GetParameter_w() + model.GetNumFeature();
-  __MX _sum = _MMX_SETZERO_PS();
   for (SparseRow::const_iterator iter_i = row->begin();
        iter_i != row->end(); ++iter_i) {
     real_t v1 = iter_i->feat_val;
@@ -112,8 +112,8 @@ void FFMScore::CalcGrad(const SparseRow* row,
   /*********************************************************
    *  linear term                                          *
    *********************************************************/
-  real_t *w = model.GetParameter_w();
-  real_t* cache = model.GetParameter_cache();
+  static real_t *w = model.GetParameter_w();
+  static real_t* cache = model.GetParameter_cache();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
     real_t gradient = pg * iter->feat_val;
@@ -126,13 +126,13 @@ void FFMScore::CalcGrad(const SparseRow* row,
   /*********************************************************
    *  latent factor                                        *
    *********************************************************/
-  index_t align0 = model.GetNumK();
-  index_t align1 = model.GetNumField() * model.GetNumK();
+  static index_t align0 = model.GetNumK();
+  static index_t align1 = model.GetNumField() * model.GetNumK();
+  static __MX _pg = _MMX_SET1_PS(pg);
+  static __MX _lr = _MMX_SET1_PS(learning_rate_);
+  static __MX _lamb = _MMX_SET1_PS(regu_lambda_);
   w = model.GetParameter_w() + model.GetNumFeature();
   cache = model.GetParameter_cache() + model.GetNumFeature();
-  __MX _pg = _MMX_SET1_PS(pg);
-  __MX _lr = _MMX_SET1_PS(learning_rate_);
-  __MX _lamb = _MMX_SET1_PS(regu_lambda_);
   for (SparseRow::const_iterator iter_i = row->begin();
        iter_i != row->end(); ++iter_i) {
     real_t v1 = iter_i->feat_val;
