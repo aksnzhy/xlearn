@@ -1,5 +1,5 @@
 # Build library loss
-add_library(loss loss.cc absolute_loss.cc squared_loss.cc hinge_loss.cc cross_entropy_loss.cc metric.cc)
+add_library(loss loss.cc squared_loss.cc hinge_loss.cc cross_entropy_loss.cc metric.cc)
 
 # Build uinttests
 set(LIBS loss gtest base data score)
@@ -9,9 +9,6 @@ target_link_libraries(loss_test gtest_main ${LIBS})
 
 add_executable(squared_loss_test squared_loss_test.cc)
 target_link_libraries(squared_loss_test gtest_main ${LIBS})
-
-add_executable(absolute_loss_test absolute_loss_test.cc)
-target_link_libraries(absolute_loss_test gtest_main ${LIBS})
 
 add_executable(cross_entropy_loss_test cross_entropy_loss_test.cc)
 target_link_libraries(cross_entropy_loss_test gtest_main ${LIBS})
