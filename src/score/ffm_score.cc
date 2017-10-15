@@ -69,7 +69,7 @@ real_t FFMScore::CalcScore(const SparseRow* row,
    *********************************************************/
   static index_t align0 = model.GetNumK();
   static index_t align1 = model.GetNumField() * model.GetNumK();
-  static __MX _sum = _MMX_SETZERO_PS();
+  __MX _sum = _MMX_SETZERO_PS();
   w = model.GetParameter_w() + model.GetNumFeature();
   for (SparseRow::const_iterator iter_i = row->begin();
        iter_i != row->end(); ++iter_i) {
