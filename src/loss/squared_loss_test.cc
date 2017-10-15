@@ -44,7 +44,7 @@ TEST(SQUARED_LOSS, Evalute) {
   // Create loss
   SquaredLoss loss;
   real_t val = loss.Evalute(pred, label);
-  EXPECT_DOUBLE_EQ(val, 142.5);
+  EXPECT_FLOAT_EQ(val, 142.5);
 }
 
 } // namespace xLearn

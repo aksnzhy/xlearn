@@ -23,11 +23,11 @@ This file is the implementation of HingeLoss class.
 
 namespace xLearn {
 
-// Given predictions and labels, return hinge loss value.
-double HingeLoss::Evalute(const std::vector<real_t>& pred,
+// Given predictions and labels, return hinge loss value
+real_t HingeLoss::Evalute(const std::vector<real_t>& pred,
                           const std::vector<real_t>& label) {
   CHECK_EQ(pred.empty(), false);
-  double val = 0.0;
+  real_t val = 0.0;
   for (size_t i = 0; i < pred.size(); ++i) {
     real_t y = label[i] > 0 ? 1.0 : -1.0;
     real_t tmp = pred[i] * y;

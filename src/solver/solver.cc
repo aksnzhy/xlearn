@@ -60,11 +60,28 @@ void Solver::print_logo() const {
   );
 }
 
+/******************************************************************************
+ * Functions for xlearn initialization                                        *
+ ******************************************************************************/
+
 // Initialize Solver
 void Solver::Initialize(int argc, char* argv[]) {
   //  Print logo
   print_logo();
   // Check and parse command line arguments
+  checker(argc, argv);
+  // Initialize log file
+  init_log();
+  // Init train or predict
+  if (hyper_param_.is_train) {
+    init_train();
+  } else {
+    init_predict();
+  }
+}
+
+// Check and parse command line arguments
+void Solver::checker(int argc, char* argv[]) {
   try {
     checker_.Initialize(hyper_param_.is_train, argc, argv);
     if (!checker_.Check(hyper_param_)) {
@@ -75,7 +92,10 @@ void Solver::Initialize(int argc, char* argv[]) {
     printf("%s\n", e.what());
     exit(1);
   }
-  // Initialize log file
+}
+
+// Initialize log file
+void Solver::init_log() {
   std::string prefix = get_log_file();
   if (hyper_param_.is_train) {
     prefix += "_train";
@@ -85,12 +105,6 @@ void Solver::Initialize(int argc, char* argv[]) {
   InitializeLogger(StringPrintf("%s.INFO", prefix.c_str()),
                 StringPrintf("%s.WARN", prefix.c_str()),
                 StringPrintf("%s.ERROR", prefix.c_str()));
-  // Init train or predict
-  if (hyper_param_.is_train) {
-    init_train();
-  } else {
-    init_predict();
-  }
 }
 
 // Initialize training task
@@ -198,20 +212,20 @@ void Solver::init_train() {
    printf("  Time cost for model initial: %.2f sec \n",
      (float)(end-start) / CLOCKS_PER_SEC);
     /*********************************************************
-     *  Step 4: Init score function                          *
+     *  Step 3: Init score function                          *
      *********************************************************/
     score_ = create_score();
     score_->Initialize(hyper_param_.learning_rate,
                   hyper_param_.regu_lambda);
     LOG(INFO) << "Initialize score function.";
     /*********************************************************
-     *  Step 5: Init loss function                           *
+     *  Step 4: Init loss function                           *
      *********************************************************/
     loss_ = create_loss();
     loss_->Initialize(score_);
     LOG(INFO) << "Initialize loss function.";
     /*********************************************************
-     *  Step 6: Init metric                                  *
+     *  Step 5: Init metric                                  *
      *********************************************************/
     metric_ = create_metric();
     metric_->Initialize(hyper_param_.metric);
@@ -262,6 +276,10 @@ void Solver::init_predict() {
       LOG(INFO) << "Initialize score function.";
 }
 
+/******************************************************************************
+ * Functions for xlearn start work                                            *
+ ******************************************************************************/
+
 // Start training or inference
 void Solver::StartWork() {
   if (hyper_param_.is_train) {
@@ -270,15 +288,6 @@ void Solver::StartWork() {
   } else {
     LOG(INFO) << "Start inference work.";
     start_inference_work();
-  }
-}
-
-// Finalize xLearn
-void Solver::FinalizeWork() {
-  if (hyper_param_.is_train) {
-    finalize_train_work();
-  } else {
-    finalize_inference_work();
   }
 }
 
@@ -319,18 +328,35 @@ void Solver::start_train_work() {
   }
 }
 
-void Solver::finalize_train_work() {
-  LOG(INFO) << "Finalize training work.";
-}
-
 // Inference
 void Solver::start_inference_work() {
 
 }
 
+/******************************************************************************
+ * Functions for xlearn finalization                                          *
+ ******************************************************************************/
+
+// Finalize xLearn
+void Solver::FinalizeWork() {
+  if (hyper_param_.is_train) {
+    finalize_train_work();
+  } else {
+    finalize_inference_work();
+  }
+}
+
+void Solver::finalize_train_work() {
+  LOG(INFO) << "Finalize training work.";
+}
+
 void Solver::finalize_inference_work() {
   LOG(INFO) << "Finalize inference work.";
 }
+
+/******************************************************************************
+ * The other helper functions                                                 *
+ ******************************************************************************/
 
 // Create Reader by a given string
 Reader* Solver::create_reader() {

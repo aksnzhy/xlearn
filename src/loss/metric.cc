@@ -23,34 +23,34 @@ This file is the implementation of the Metric class.
 
 namespace xLearn {
 
-double Metric::Accuracy() {
-  double res = 0;
+real_t Metric::Accuracy() {
+  real_t res = 0;
   res = (pre_pos_example_ * 1.0 + pre_neg_example_) /
         (real_pos_example_ + real_neg_example_);
   return res;
 }
 
-double Metric::Precision() {
+real_t Metric::Precision() {
   return 0;
 }
 
-double Metric::Recall() {
+real_t Metric::Recall() {
   return 0;
 }
 
-double Metric::ROC() {
+real_t Metric::ROC() {
   return 0;
 }
 
-double Metric::AUC() {
+real_t Metric::AUC() {
   return 0;
 }
 
-double Metric::MAE() {
+real_t Metric::MAE() {
   return 0;
 }
 
-double Metric::MSE() {
+real_t Metric::MSE() {
   return 0;
 }
 

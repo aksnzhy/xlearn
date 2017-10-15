@@ -40,7 +40,7 @@ class HingeLoss : public Loss {
   ~HingeLoss() { }
 
   // Given predictions and labels, return loss value.
-  double Evalute(const std::vector<real_t>& pred,
+  real_t Evalute(const std::vector<real_t>& pred,
                  const std::vector<real_t>& label);
 
   // Given data sample and current model, calculate gradient

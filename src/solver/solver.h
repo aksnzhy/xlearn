@@ -91,6 +91,8 @@ class Solver {
   // Initialize function
   void init_train();
   void init_predict();
+  void checker(int argc, char* argv[]);
+  void init_log();
 
   // Used by start function
   void start_train_work();

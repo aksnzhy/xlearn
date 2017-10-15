@@ -25,14 +25,14 @@ namespace xLearn {
 
 // Given predictions (data samples) and labels, return
 // cross-entropy loss value
-double CrossEntropyLoss::Evalute(const std::vector<real_t>& pred,
+real_t CrossEntropyLoss::Evalute(const std::vector<real_t>& pred,
                                  const std::vector<real_t>& label) {
   CHECK_EQ(pred.empty(), false);
-  double val = 0.0;
+  real_t val = 0.0;
   for (size_t i = 0; i < pred.size(); ++i) {
     real_t y = label[i] > 0 ? 1.0 : -1.0;
-    double t = pred[i];
-    double expnyt = exp(-y*t);
+    real_t t = pred[i];
+    real_t expnyt = exp(-y*t);
     val += log1p(expnyt);
   }
   return val;
@@ -48,10 +48,10 @@ void CrossEntropyLoss::CalcGrad(const DMatrix* matrix,
   // Calculate gradient
   for (size_t i = 0; i < row_len; ++i) {
     SparseRow* row = matrix->row[i];
-    double score = score_func_->CalcScore(row, model);
+    real_t score = score_func_->CalcScore(row, model);
     // partial gradient
     real_t y = matrix->Y[i] > 0 ? 1.0 : -1.0;
-    double expnyt = exp(-y*score);
+    real_t expnyt = exp(-y*score);
     real_t pg = -y*expnyt/(1+expnyt);
     // real gradient and update
     score_func_->CalcGrad(row, model, pg);

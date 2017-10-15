@@ -78,7 +78,7 @@ class Loss {
    void Initialize(Score* score) { score_func_ = score; }
 
    // Given predictions and labels, return loss value
-   virtual double Evalute(const std::vector<real_t>& pred,
+   virtual real_t Evalute(const std::vector<real_t>& pred,
                           const std::vector<real_t>& label) = 0;
 
    // Given data sample and current model, return predictions

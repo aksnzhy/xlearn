@@ -106,7 +106,7 @@ class Metric {
   }
 
   // Return metric value
-  double GetMetric() {
+  real_t GetMetric() {
     if (metric_type_.compare("acc") == 0) {
       return Accuracy();
     } else if (metric_type_.compare("prec") == 0) {
@@ -133,13 +133,13 @@ class Metric {
   index_t pre_pos_example_;
   index_t pre_neg_example_;
   // A set of metric funtions
-  double Accuracy();
-  double Precision();
-  double Recall();
-  double ROC();
-  double AUC();
-  double MAE();
-  double MSE();
+  real_t Accuracy();
+  real_t Precision();
+  real_t Recall();
+  real_t ROC();
+  real_t AUC();
+  real_t MAE();
+  real_t MSE();
 
   DISALLOW_COPY_AND_ASSIGN(Metric);
 };
