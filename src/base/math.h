@@ -95,10 +95,10 @@ static inline real_t fastlog(real_t x) {
 }
 
 static inline real_t fasterlog2(real_t x) {
-    union { real_t f; uint32 i; } vx = { x };
-    real_t y = vx.i;
-    y *= 1.1920928955078125e-7f;
-    return y - 126.94269504f;
+  union { real_t f; uint32 i; } vx = { x };
+  real_t y = vx.i;
+  y *= 1.1920928955078125e-7f;
+  return y - 126.94269504f;
 }
 
 static inline real_t fasterlog(real_t x){
@@ -169,12 +169,12 @@ static inline real_t fastersigmoid(real_t x) {
 // 1 / sqrt() Magic function !!
 //------------------------------------------------------------------------------
 static inline real_t InvSqrt(real_t x) {
-   real_t xhalf = 0.5f*x;
-   int i = *(int*)&x;       // get bits for floating VALUE
-   i = 0x5f375a86- (i>>1);  // gives initial guess y0
-   x = *(real_t*)&i;        // convert bits BACK to float
-   x = x*(1.5f-xhalf*x*x);  // Newton step, repeating increases accuracy
-   return x;
+  real_t xhalf = 0.5f*x;
+  int i = *(int*)&x;       // get bits for floating VALUE
+  i = 0x5f375a86- (i>>1);  // gives initial guess y0
+  x = *(real_t*)&i;        // convert bits BACK to float
+  x = x*(1.5f-xhalf*x*x);  // Newton step, repeating increases accuracy
+  return x;
 }
 
 //------------------------------------------------------------------------------
@@ -192,9 +192,9 @@ static inline void RandDistribution(real_t* array,
   std::mt19937 gen(rd());
   std::uniform_real_distribution<real_t> dis(down, up);
   for (int i = 0; i < array_len; ++i) {
-      // Use dis to transform the random unsigned int generated
-      // by gen into a float in (down, up) * coef
-      array[i] = dis(gen) * coef;
+    // Use dis to transform the random unsigned int generated
+    // by gen into a float in (down, up) * coef
+    array[i] = dis(gen) * coef;
   }
 }
 
