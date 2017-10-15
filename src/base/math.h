@@ -190,7 +190,7 @@ static inline void RandDistribution(real_t* array,
   std::random_device rd;
   // Standard mersenne_twister_engine seeded with rd()
   std::mt19937 gen(rd());
-  std::uniform_real_distribution<real_t> dis(down+kVerySmallNumber, up);
+  std::uniform_real_distribution<real_t> dis(down, up);
   for (int i = 0; i < array_len; ++i) {
       // Use dis to transform the random unsigned int generated
       // by gen into a float in (down, up) * coef
