@@ -27,6 +27,50 @@ This file is the implementation of the Trainer class.
 
 namespace xLearn {
 
+// Calculate gradient and update model
+void Trainer::CalcGrad_Update() {
+  train_reader_->Reset();
+  DMatrix* matrix = nullptr;
+  while (train_reader_->Samples(matrix)) {
+    loss_->CalcGrad(matrix, *model_);
+  }
+}
+
+// Calculate loss
+void Trainer::CalcLoss_Metric(Reader* reader,
+                              real_t* loss,
+                              real_t* metric) {
+  reader->Reset();
+  DMatrix* matrix = nullptr;
+  index_t count_sample = 0;
+  real_t loss_val = 0.0;
+  index_t real_pos_example = 0;
+  index_t real_neg_example = 0;
+  index_t pre_pos_example = 0;
+  index_t pre_neg_example = 0;
+  static std::vector<real_t> pred;
+  int tmp = 0;
+  while (1) {
+    tmp = reader->Samples(matrix);
+    if (tmp == 0) { break; }
+    if (tmp != pred.size()) { pred.resize(tmp); }
+    count_sample += tmp;
+    loss_->Predict(matrix, *model_, pred);
+    metric_->Accumulate(&real_pos_example,
+                        &real_neg_example,
+                        &pre_pos_example,
+                        &pre_neg_example,
+                        matrix->Y,
+                        pred);
+    loss_val += loss_->Evalute(pred, matrix->Y);
+  }
+  loss_val /= count_sample;
+  *loss = loss_val;
+  metric_->Set(real_pos_example, real_neg_example,
+               pre_pos_example, pre_neg_example);
+  *metric = metric_->GetMetric();
+}
+
 // Standard training
 void Trainer::Train() {
   //for in n epoch
@@ -35,70 +79,21 @@ void Trainer::Train() {
     //----------------------------------------------------
     // Calc grad and update model
     //----------------------------------------------------
-    train_reader_->Reset();
-    DMatrix* matrix = NULL;
-    while (train_reader_->Samples(matrix)) {
-      loss_->CalcGrad(matrix, *model_);
-    }
+    CalcGrad_Update();
     //----------------------------------------------------
     // Calc Train loss
     //----------------------------------------------------
-    train_reader_->Reset();
-    index_t count_sample = 0;
-    double loss_val = 0.0;
-    std::vector<real_t> pred;
-    int tmp = 0;
-    while (1) {
-      tmp = train_reader_->Samples(matrix);
-      if (tmp == 0) { break; }
-      if (tmp != pred.size()) {
-        pred.resize(tmp);
-      }
-      count_sample += tmp;
-      loss_->Predict(matrix, *model_, pred);
-      loss_val += loss_->Evalute(pred, matrix->Y);
-    }
-    loss_val /= count_sample;
+    real_t loss_val = 0.0;
+    real_t metric_val = 0.0;
+    CalcLoss_Metric(train_reader_, &loss_val, &metric_val);
     printf("  Epoch %d  |  Train loss: %f  |", n, loss_val);
     //----------------------------------------------------
     // Calc Test loss
     //----------------------------------------------------
-    index_t real_pos_example = 0;
-    index_t real_neg_example = 0;
-    index_t pre_pos_example = 0;
-    index_t pre_neg_example = 0;
-    test_reader_->Reset();
-    if (test_reader_ != NULL) {
-      count_sample = 0;
-      loss_val = 0;
-      tmp = 0;
-      while (1) {
-        tmp = test_reader_->Samples(matrix);
-        if (tmp == 0) { break; }
-        if (tmp != pred.size()) {
-          pred.resize(tmp);
-        }
-        count_sample += tmp;
-        loss_->Predict(matrix, *model_, pred);
-        metric_->Accumulate(&real_pos_example,
-                            &real_neg_example,
-                            &pre_pos_example,
-                            &pre_neg_example,
-                            matrix->Y,
-                            pred);
-        loss_val += loss_->Evalute(pred, matrix->Y);
-      }
-      loss_val /= count_sample;
+    if (test_reader_ != nullptr) {
+      CalcLoss_Metric(test_reader_, &loss_val, &metric_val);
       printf("  Test loss: %f  |", loss_val);
-    }
-    //----------------------------------------------------
-    // Calc Evaluation Metric
-    //----------------------------------------------------
-    if (test_reader_ != NULL) {
-      metric_->Set(real_pos_example, real_neg_example,
-                   pre_pos_example, pre_neg_example);
-      real_t metric_value = metric_->GetMetric();
-      printf("  Test %s: %f  |", metric_->type().c_str(), metric_value);
+      printf("  Test %s: %f  |", metric_->type().c_str(), metric_val);
     }
     TIME_END();
     printf("  ");

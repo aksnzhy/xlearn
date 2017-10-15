@@ -106,6 +106,11 @@ class Trainer {
   Metric* metric_;
   bool early_stop_;
 
+  void CalcGrad_Update();
+  void CalcLoss_Metric(Reader* reader,
+                       real_t* loss_val,
+                       real_t* metric_val);
+
  private:
   DISALLOW_COPY_AND_ASSIGN(Trainer);
 };
