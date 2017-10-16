@@ -27,28 +27,11 @@ This file is the implementation of the Trainer class.
 
 namespace xLearn {
 
-void show(DMatrix* matrix) {
-  size_t row_len = matrix->row_length;
-  std::cout << "length: " << matrix->row_length << std::endl;
-  // Calculate gradient
-  for (size_t i = 0; i < row_len; ++i) {
-    SparseRow* row = matrix->row[i];
-    real_t y = matrix->Y[i];
-    std::cout << "y: " << y << " x: ";
-    for (SparseRow::iterator iter = row->begin();
-         iter != row->end(); ++iter) {
-      std::cout << iter->feat_id << ":" << iter->feat_val << " ";
-    }
-    std::cout << std::endl;
-  }
-}
-
 // Calculate gradient and update model
 void Trainer::CalcGrad_Update() {
   train_reader_->Reset();
   DMatrix* matrix = nullptr;
   while (train_reader_->Samples(matrix)) {
-    //show(matrix);
     loss_->CalcGrad(matrix, *model_);
   }
 }
