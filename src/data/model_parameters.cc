@@ -47,11 +47,9 @@ void Model::Initialize(const std::string& score_func,
   if (score_func == "linear") {
     param_num_w_ = num_feature;
   } else if (score_func == "fm") {
-    param_num_w_ = num_feature +
-                   num_feature * num_K;
+    param_num_w_ = num_feature * num_K;
   } else if (score_func == "ffm") {
-    param_num_w_ = num_feature +
-            num_feature * num_K * num_field;
+    param_num_w_ = num_feature * num_K * num_field;
   } else {
     LOG(FATAL) << "Unknow score function: " << score_func;
   }
@@ -69,12 +67,12 @@ void Model::Initialize(const std::string& score_func,
 // align number should be 16
 void Model::Initialize_w_and_cache(bool set_value) {
   try {
-    // Only used in Unix-like systems
+    // Only used in Unix-like systems for now
   #ifdef __AVX__
     posix_memalign((void**)&param_w_, 32,
-       param_num_w_ * sizeof(real_t));
+      param_num_w_ * sizeof(real_t));
     posix_memalign((void**)&param_cache_, 32,
-       param_num_w_ * sizeof(real_t));
+      param_num_w_ * sizeof(real_t));
   #else // SSE
     posix_memalign((void**)&param_w_, 16,
        param_num_w_ * sizeof(real_t));
@@ -87,20 +85,13 @@ void Model::Initialize_w_and_cache(bool set_value) {
                << param_num_w_;
   }
   if (set_value) {
-    // Set linear term to zero
-    for (index_t i = 0; i < num_feat_; ++i) {
-      param_w_[i] = 0.0;
-    }
+    real_t coef = 1.0;
     if (score_func_ == "fm" || score_func_ == "ffm") {
-      // Init latent factor using RandDistribution()
-      real_t coef = 1.0f / sqrt(num_K_);
-      RandDistribution(param_w_ + num_feat_,
-          param_num_w_ - num_feat_,
-          0.0, 1.0, coef);
+      coef = 1.0f / sqrt(num_K_);
     }
-    // set cache to zero
+    RandDistribution(param_w_, param_num_w_, 0.0, 1.0, coef);
     for (index_t i = 0; i < param_num_w_; ++i) {
-      param_cache_[i] = 0.0;
+      param_cache_[i] = 1.0;
     }
   }
 }

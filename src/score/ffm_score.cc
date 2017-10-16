@@ -56,21 +56,12 @@ real_t FFMScore::CalcScore(const SparseRow* row,
                            Model& model) {
   real_t score = 0.0;
   /*********************************************************
-   *  linear term                                          *
-   *********************************************************/
-  static real_t *w = model.GetParameter_w();
-  for (SparseRow::const_iterator iter = row->begin();
-       iter != row->end(); ++iter) {
-    index_t pos = iter->feat_id;
-    score += w[pos] * iter->feat_val;
-  }
-  /*********************************************************
    *  latent factor                                        *
    *********************************************************/
+  static real_t *w = model.GetParameter_w();
   static index_t align0 = model.GetNumK();
   static index_t align1 = model.GetNumField() * model.GetNumK();
   __MX _sum = _MMX_SETZERO_PS();
-  w = model.GetParameter_w() + model.GetNumFeature();
   for (SparseRow::const_iterator iter_i = row->begin();
        iter_i != row->end(); ++iter_i) {
     real_t v1 = iter_i->feat_val;
@@ -83,7 +74,8 @@ real_t FFMScore::CalcScore(const SparseRow* row,
       index_t f2 = iter_j->field_id;
       real_t* w1_base = w + j1*align1 + f2*align0;
       real_t* w2_base = w + j2*align1 + f1*align0;
-      __MX _v = _MMX_SET1_PS(v1*v2);
+      __MX _v = _MMX_SET1_PS(v1*v2/39.0);
+      //printf("%.6f\n", v1*v2/39.0);
       for (index_t k = 0; k < align0; k += _MMX_INCREMENT) {
         __MX _w1 = _MMX_LOAD_PS(w1_base + k);
         __MX _w2 = _MMX_LOAD_PS(w2_base + k);
@@ -101,6 +93,7 @@ real_t FFMScore::CalcScore(const SparseRow* row,
   _mm_store_ss(&sum, _sum);
 #endif
   score += sum;
+  //std::cout << "Score: " << score << std::endl;
   return score;
 }
 
@@ -110,29 +103,15 @@ void FFMScore::CalcGrad(const SparseRow* row,
                         Model& model,
                         real_t pg) {
   /*********************************************************
-   *  linear term                                          *
+   *  latent factor                                        *
    *********************************************************/
   static real_t *w = model.GetParameter_w();
   static real_t* cache = model.GetParameter_cache();
-  for (SparseRow::const_iterator iter = row->begin();
-       iter != row->end(); ++iter) {
-    real_t gradient = pg * iter->feat_val;
-    index_t idx = iter->feat_id;
-    gradient += regu_lambda_ * w[idx];
-    cache[idx] += (gradient * gradient);
-    w[idx] -= (learning_rate_ * gradient *
-               InvSqrt((cache)[idx]));
-  }
-  /*********************************************************
-   *  latent factor                                        *
-   *********************************************************/
   static index_t align0 = model.GetNumK();
   static index_t align1 = model.GetNumField() * model.GetNumK();
   static __MX _pg = _MMX_SET1_PS(pg);
   static __MX _lr = _MMX_SET1_PS(learning_rate_);
   static __MX _lamb = _MMX_SET1_PS(regu_lambda_);
-  w = model.GetParameter_w() + model.GetNumFeature();
-  cache = model.GetParameter_cache() + model.GetNumFeature();
   for (SparseRow::const_iterator iter_i = row->begin();
        iter_i != row->end(); ++iter_i) {
     real_t v1 = iter_i->feat_val;
@@ -149,7 +128,7 @@ void FFMScore::CalcGrad(const SparseRow* row,
       real_t* w2_base = w + bias_2;
       real_t* c1_base = cache + bias_1;
       real_t* c2_base = cache + bias_2;
-      __MX _v = _MMX_SET1_PS(v1*v2);
+      __MX _v = _MMX_SET1_PS(v1*v2/39.0);
       __MX _v_pg = _MMX_MUL_PS(_v, _pg);
       for (size_t k = 0; k < align0; k += _MMX_INCREMENT) {
         real_t* w1 = w1_base + k;

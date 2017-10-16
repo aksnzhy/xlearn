@@ -82,7 +82,7 @@ class Reader {
   // Sample data from disk or from memory buffer
   // Return the number of record in each samplling
   // Samples() return 0 when reaching end of the data
-  virtual int Samples(DMatrix* &matrix) = 0;
+  virtual int Samples(DMatrix* &matrix, bool shuffle = true) = 0;
 
   // Return to the begining of the data.
   virtual void Reset() = 0;
@@ -126,7 +126,7 @@ class InmemReader : public Reader {
                           int num_samples);
 
   // Sample data from memory buffer
-  virtual int Samples(DMatrix* &matrix);
+  virtual int Samples(DMatrix* &matrix, bool shuffle = true);
 
   // Return to the begining of the data
   virtual void Reset();
@@ -170,7 +170,7 @@ class OndiskReader : public Reader {
                           int num_samples);
 
   // Sample data from disk file.
-  virtual int Samples(DMatrix* &matrix);
+  virtual int Samples(DMatrix* &matrix, bool shuffle = true);
 
   // Return to the begining of the file.
   virtual void Reset();

@@ -27,11 +27,28 @@ This file is the implementation of the Trainer class.
 
 namespace xLearn {
 
+void show(DMatrix* matrix) {
+  size_t row_len = matrix->row_length;
+  std::cout << "length: " << matrix->row_length << std::endl;
+  // Calculate gradient
+  for (size_t i = 0; i < row_len; ++i) {
+    SparseRow* row = matrix->row[i];
+    real_t y = matrix->Y[i];
+    std::cout << "y: " << y << " x: ";
+    for (SparseRow::iterator iter = row->begin();
+         iter != row->end(); ++iter) {
+      std::cout << iter->feat_id << ":" << iter->feat_val << " ";
+    }
+    std::cout << std::endl;
+  }
+}
+
 // Calculate gradient and update model
 void Trainer::CalcGrad_Update() {
   train_reader_->Reset();
   DMatrix* matrix = nullptr;
   while (train_reader_->Samples(matrix)) {
+    //show(matrix);
     loss_->CalcGrad(matrix, *model_);
   }
 }
@@ -57,11 +74,11 @@ void Trainer::CalcLoss_Metric(Reader* reader,
     count_sample += tmp;
     loss_->Predict(matrix, *model_, pred);
     metric_->Accumulate(&real_pos_example,
-                        &real_neg_example,
-                        &pre_pos_example,
-                        &pre_neg_example,
-                        matrix->Y,
-                        pred);
+                      &real_neg_example,
+                      &pre_pos_example,
+                      &pre_neg_example,
+                      matrix->Y,
+                      pred);
     loss_val += loss_->Evalute(pred, matrix->Y);
   }
   loss_val /= count_sample;
@@ -87,6 +104,7 @@ void Trainer::Train() {
     real_t metric_val = 0.0;
     CalcLoss_Metric(train_reader_, &loss_val, &metric_val);
     printf("  Epoch %d  |  Train loss: %f  |", n, loss_val);
+    printf("  Train %s: %f  |", metric_->type().c_str(), metric_val);
     //----------------------------------------------------
     // Calc Test loss
     //----------------------------------------------------

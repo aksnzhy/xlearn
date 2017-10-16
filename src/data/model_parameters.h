@@ -114,8 +114,8 @@ class Model {
  protected:
   /* Number of model parameters.
    For linear socre, param_num =  num_feat
-   For fm, param_num = num_feat + num_feat * num_K
-   For ffm, param_num = num_feat + num_feat * num_field * num_K */
+   For fm, param_num = num_feat * num_K
+   For ffm, param_num = num_feat * num_field * num_K */
   index_t  param_num_w_;
   /* Score function: 'linear', 'fm', or 'ffm' */
   std::string  score_func_;

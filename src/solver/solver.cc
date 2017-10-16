@@ -110,7 +110,7 @@ void Solver::init_log() {
 // Initialize training task
 void Solver::init_train() {
   /*********************************************************
-   *  Step 1: Init Reader and read problem                 *
+   *  Step 1: Init Reader                                  *
    *********************************************************/
   clock_t start, end;
   start = clock();
@@ -159,13 +159,16 @@ void Solver::init_train() {
     }
     LOG(INFO) << "Init Reader: " << file_list[i];
   }
-  // Read problem and init some hyper_param
+  /*********************************************************
+   *  Step 2: Read problem                                 *
+   *********************************************************/
   DMatrix* matrix = NULL;
   index_t max_feat = 0, max_field = 0;
   for (int i = 0; i < num_reader; ++i) {
     int num_samples = 0;
-    do {
-      num_samples = reader_[i]->Samples(matrix);
+    while(1) {
+      num_samples = reader_[i]->Samples(matrix, false);
+      if (num_samples == 0) { break; }
       int tmp = find_max_feature(matrix, num_samples);
       if (tmp > max_feat) {
         max_feat = tmp;
@@ -176,7 +179,7 @@ void Solver::init_train() {
           max_field = tmp;
         }
       }
-    } while (num_samples != 0);
+    }
     // return to the begining of target file
     reader_[i]->Reset();
   }
@@ -192,7 +195,7 @@ void Solver::init_train() {
   printf("  Time cost for reading problem: %.2f sec \n",
     (float)(end-start) / CLOCKS_PER_SEC);
   /*********************************************************
-   *  Step 2: Init Model                                   *
+   *  Step 3: Init Model                                   *
    *********************************************************/
    start = clock();
    printf("Initialize model ...\n");
@@ -212,20 +215,20 @@ void Solver::init_train() {
    printf("  Time cost for model initial: %.2f sec \n",
      (float)(end-start) / CLOCKS_PER_SEC);
     /*********************************************************
-     *  Step 3: Init score function                          *
+     *  Step 4: Init score function                          *
      *********************************************************/
     score_ = create_score();
     score_->Initialize(hyper_param_.learning_rate,
                   hyper_param_.regu_lambda);
     LOG(INFO) << "Initialize score function.";
     /*********************************************************
-     *  Step 4: Init loss function                           *
+     *  Step 5: Init loss function                           *
      *********************************************************/
     loss_ = create_loss();
     loss_->Initialize(score_);
     LOG(INFO) << "Initialize loss function.";
     /*********************************************************
-     *  Step 5: Init metric                                  *
+     *  Step 6: Init metric                                  *
      *********************************************************/
     metric_ = create_metric();
     metric_->Initialize(hyper_param_.metric);

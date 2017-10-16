@@ -42,7 +42,7 @@ index_t Parser::get_line_number(char* buf, uint64 buf_size) {
   for (uint64 i = 0; i < buf_size; ++i) {
     if (buf[i] == '\n') num++;
   }
-  return num;
+  return num+1;
 }
 
 // Get one line from memory buffer
@@ -50,9 +50,9 @@ uint64 Parser::get_line_from_buffer(char* line,
                                char* buf,
                                uint64 pos,
                                uint64 size) {
-  if (pos > size) { return 0; }
+  if (pos >= size) { return 0; }
   uint64 end_pos = pos;
-  while (buf[end_pos] != '\n') { end_pos++; }
+  while (end_pos < size && buf[end_pos] != '\n') { end_pos++; }
   uint64 read_size = end_pos - pos + 1;
   if (read_size > kMaxLineSize) {
     LOG(FATAL) << "Encountered a too-long line.    \
@@ -61,8 +61,8 @@ uint64 Parser::get_line_from_buffer(char* line,
   memcpy(line, buf+pos, read_size);
   line[read_size - 1] = '\0';
   if (read_size > 1 && line[read_size - 2] == '\r') {
-      // Handle some txt format in windows or DOS.
-      line[read_size - 2] = '\0';
+    // Handle some txt format in windows or DOS.
+    line[read_size - 2] = '\0';
   }
   return read_size;
 }
@@ -167,6 +167,8 @@ void CSVParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
     for (int j = 0; j < size-1; ++j) {
       index_t idx = j+1;
       real_t value = atof(str_vec[j].c_str());
+      // skip zero
+      if (value < kVerySmallNumber) { continue; }
       matrix.AddNode(i, idx, value);
     }
   }

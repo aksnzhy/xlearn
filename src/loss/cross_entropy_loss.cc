@@ -52,7 +52,7 @@ void CrossEntropyLoss::CalcGrad(const DMatrix* matrix,
     // partial gradient
     real_t y = matrix->Y[i] > 0 ? 1.0 : -1.0;
     real_t expnyt = exp(-y*score);
-    real_t pg = -y*expnyt/(1+expnyt);
+    real_t pg = -y / (1.0 + (1.0 / expnyt)) + kVerySmallNumber;
     // real gradient and update
     score_func_->CalcGrad(row, model, pg);
   }

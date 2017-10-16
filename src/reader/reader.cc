@@ -176,12 +176,12 @@ void InmemReader::init_from_txt() {
 }
 
 // Smaple data from memory buffer.
-int InmemReader::Samples(DMatrix* &matrix) {
+int InmemReader::Samples(DMatrix* &matrix, bool shuffle) {
   int num_line = 0;
   for (int i = 0; i < num_samples_; ++i) {
     if (pos_ >= data_buf_.row_length) {
       // End of the data buffer
-      if (i == 0) {
+      if (i == 0 && shuffle) {
         random_shuffle(order_.begin(), order_.end());
         matrix = nullptr;
         return 0;
@@ -229,7 +229,7 @@ void OndiskReader::Initialize(const std::string& filename,
 }
 
 // Sample data from disk file.
-int OndiskReader::Samples(DMatrix* &matrix) {
+int OndiskReader::Samples(DMatrix* &matrix, bool shuffle) {
   /*
   static scoped_array<char> line(new char[kMaxLineSize]);
   static StringList list(num_samples_);
