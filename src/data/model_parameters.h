@@ -105,6 +105,12 @@ class Model {
   index_t GetNumField() { return num_field_; }
   index_t GetNumK() { return num_K_; }
 
+  // Because we use SSE, so the momery should be aligned
+  // For SSE, the align constant is 4
+  inline index_t get_aligned_k() {
+    return (index_t) ceil((real_t)num_K_ / 4) * 4;
+  }
+
  protected:
   /* Number of model parameters. We store both the model
    parameter and the gradient cache for adagrad in param_w_
@@ -124,12 +130,6 @@ class Model {
   index_t  num_K_;
   /* Storing the model parameters */
   real_t*  param_w_;
-
-  // Because we use SSE, so the momery should be aligned
-  // For SSE, the align constant is 4
-  inline index_t get_aligned_k(index_t k) {
-    return (index_t) ceil((real_t)k / 4) * 4;
-  }
 
   // Initialize model parameters and gradient cache
   void Initialize_w(bool set_value = false);

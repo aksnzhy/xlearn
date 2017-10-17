@@ -46,22 +46,23 @@ void Model::Initialize(const std::string& score_func,
   CHECK_GT(num_feature, 0);
   CHECK_GE(num_field, 0);
   CHECK_GE(num_K, 0);
+  score_func_ = score_func;
+  loss_func_ = loss_func;
+  num_feat_ = num_feature;
+  num_field_ = num_field;
+  num_K_ = num_K;
+  // Calculate the number of model parameters
   if (score_func == "linear") {
     param_num_w_ = num_feature * 2;
   } else if (score_func == "fm") {
     param_num_w_ = num_feature * num_K * 2;
   } else if (score_func == "ffm") {
     param_num_w_ = num_feature *
-        get_aligned_k(num_K) *
-        num_field * 2;
+                   get_aligned_k() *
+                   num_field * 2;
   } else {
     LOG(FATAL) << "Unknow score function: " << score_func;
   }
-  score_func_ = score_func;
-  loss_func_ = loss_func;
-  num_feat_ = num_feature;
-  num_field_ = num_field;
-  num_K_ = num_K;
   this->Initialize_w(true);
 }
 
@@ -111,7 +112,7 @@ void Model::Initialize_w(bool set_value) {
         param_w_[i+1] = 1.0;
       }
     } else if (score_func_.compare("ffm") == 0) {
-      index_t k_aligned = get_aligned_k(num_K_);
+      index_t k_aligned = get_aligned_k();
       real_t* w = param_w_;
       real_t coef = 1.0f / sqrt(num_K_);
       for (index_t j = 0; j < num_feat_; ++j) {
