@@ -33,8 +33,6 @@ programming convenient.
 #include "base/stdint_msvc.h"  // Visual C++ use this header.
 #endif
 
-#include <pmmintrin.h>  // for SSE instructions
-#include <x86intrin.h>  // for AVX instructions
 #include <limits>
 
 #include "src/base/logging.h"
@@ -160,44 +158,6 @@ programming convenient.
   void operator=(const TypeName&)
 
 //------------------------------------------------------------------------------
-// SSE and AVX for vectorization
-//------------------------------------------------------------------------------
-
-#ifdef __AVX__
-
-#define __MX             __m256
-#define _MMX_LOAD_PS     _mm256_load_ps
-#define _MMX_STORE_PS    _mm256_store_ps
-#define _MMX_SETZERO_PS  _mm256_setzero_ps
-#define _MMX_SET1_PS     _mm256_set1_ps
-#define _MMX_ADD_PS      _mm256_add_ps
-#define _MMX_DIV_PS      _mm256_div_ps
-#define _MMX_SUB_PS      _mm256_sub_ps
-#define _MMX_MUL_PS      _mm256_mul_ps
-#define _MMX_RSQRT_PS    _mm256_rsqrt_ps
-#define _MMX_HADD_PS     _mm256_hadd_ps
-#define _MMX_STORE_SS    _mm256_storeu_ps
-#define _MMX_INCREMENT   8
-
-#else // SSE
-
-#define __MX             __m128
-#define _MMX_LOAD_PS     _mm_load_ps
-#define _MMX_STORE_PS    _mm_store_ps
-#define _MMX_SETZERO_PS  _mm_setzero_ps
-#define _MMX_SET1_PS     _mm_set1_ps
-#define _MMX_ADD_PS      _mm_add_ps
-#define _MMX_SUB_PS      _mm_sub_ps
-#define _MMX_MUL_PS      _mm_mul_ps
-#define _MMX_DIV_PS      _mm_div_ps
-#define _MMX_RSQRT_PS    _mm_rsqrt_ps
-#define _MMX_HADD_PS     _mm_hadd_ps
-#define _MMX_STORE_SS    _mm_store_ss
-#define _MMX_INCREMENT   4
-
-#endif
-
-//------------------------------------------------------------------------------
 // Basis POD types.
 //------------------------------------------------------------------------------
 
@@ -238,7 +198,6 @@ static const float kFloatMin = std::numeric_limits<float>::min();
 /* To avoid dividing by zero */
 static const float kVerySmallNumber = 1e-15;
 static const double kVerySmallNumberDouble = 1e-15;
-static const __MX _small_num = _MMX_SET1_PS(kVerySmallNumber);
 
 //------------------------------------------------------------------------------
 // Testing program's execution time. For example:
