@@ -69,10 +69,8 @@ struct HyperParam {
   index_t num_feature = 0;              // Include the bias term '0'
   /* Number of model parameters */
   index_t num_param = 0;                // Need to be calculated in init()
-                                        // function in the Solver class
   /* Lateny factor for fm and ffm */
-  index_t num_K = 8;                    // This value must be a multiple of 8,
-                                        // for example, 8, 16, 32 ...
+  index_t num_K = 4;                    // The number of latent factor
   /* Number of field */
   index_t num_field = 0;                // Field id will start from 0
   /* Filename for training set */

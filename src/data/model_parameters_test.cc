@@ -52,17 +52,12 @@ TEST(MODEL_TEST, Init) {
                     hyper_param.num_field,
                     hyper_param.num_K);
   real_t* w = model_ffm.GetParameter_w();
-  index_t param_num_w = hyper_param.num_feature +
-                      hyper_param.num_feature *
+  index_t param_num_w = hyper_param.num_feature *
                       hyper_param.num_field *
-                      hyper_param.num_K;
+                      hyper_param.num_K * 2;
   EXPECT_EQ(param_num_w, model_ffm.GetNumParameter_w());
-  for (index_t i = 0; i < model_ffm.GetNumFeature(); ++i) {
-    EXPECT_FLOAT_EQ(w[i], 0.0);
-  }
-  real_t* cache = model_ffm.GetParameter_cache();
-  for (index_t i = 0; i < model_ffm.GetNumParameter_w(); ++i) {
-    EXPECT_FLOAT_EQ(cache[i], 0.0);
+  for (index_t i = 0; i < model_ffm.GetNumParameter_w(); i+=8) {
+    EXPECT_FLOAT_EQ(w[i+4], 1.0);
   }
 }
 
@@ -84,17 +79,15 @@ TEST(MODEL_TEST, Save_and_Load) {
   Model new_model(hyper_param.model_file);
   w = new_model.GetParameter_w();
   w_len = new_model.GetNumParameter_w();
-  index_t param_num_w = hyper_param.num_feature +
-                      hyper_param.num_feature *
+  index_t param_num_w = hyper_param.num_feature *
                       hyper_param.num_field *
-                      hyper_param.num_K;
+                      hyper_param.num_K * 2;
   EXPECT_EQ(w_len, param_num_w);
   EXPECT_EQ(hyper_param.score_func, new_model.GetScoreFunction());
   EXPECT_EQ(hyper_param.loss_func, new_model.GetLossFunction());
   EXPECT_EQ(hyper_param.num_K, new_model.GetNumK());
   EXPECT_EQ(hyper_param.num_feature, new_model.GetNumFeature());
   EXPECT_EQ(hyper_param.num_field, new_model.GetNumField());
-
   for (int i = 0; i < w_len; ++i) {
     EXPECT_FLOAT_EQ(w[i], 2.5);
   }

@@ -27,6 +27,8 @@ used by xLearn.
 #include <vector>
 #include <string>
 
+#include <math.h>
+
 #include "src/base/common.h"
 #include "src/base/stringprintf.h"
 #include "src/base/file_util.h"
@@ -63,11 +65,6 @@ namespace xLearn {
 //      /* access w[i] ... */
 //    }
 //
-//    real_t* cache = model.GetParameter_cache();
-//    for (index_t i = 0; i < w_len; ++i) {
-//      /* access cache[i] ... */
-//    }
-//
 //    /* We can save model to a disk file: */
 //    model.SaveModel("/tmp/model.txt");
 //
@@ -100,9 +97,6 @@ class Model {
   // Get the pointer of model parameters
   real_t* GetParameter_w() { return param_w_; }
 
-  // Get the poiner of gradient cache
-  real_t* GetParameter_cache() { return param_cache_; }
-
   // Other Get functions
   index_t GetNumParameter_w() { return param_num_w_; }
   std::string GetScoreFunction() { return score_func_; }
@@ -112,10 +106,11 @@ class Model {
   index_t GetNumK() { return num_K_; }
 
  protected:
-  /* Number of model parameters.
-   For linear socre, param_num =  num_feat
-   For fm, param_num = num_feat * num_K
-   For ffm, param_num = num_feat * num_field * num_K */
+  /* Number of model parameters. We store both the model
+   parameter and the gradient cache for adagrad in param_w_
+   For linear socre, param_num =  num_feat * 2
+   For fm, param_num = num_feat * num_K * 2
+   For ffm, param_num = num_feat * num_field * num_K * 2  */
   index_t  param_num_w_;
   /* Score function: 'linear', 'fm', or 'ffm' */
   std::string  score_func_;
@@ -129,11 +124,15 @@ class Model {
   index_t  num_K_;
   /* Storing the model parameters */
   real_t*  param_w_;
-  /* Storing the gradient cache for adagrad */
-  real_t*  param_cache_;
+
+  // Because we use SSE, so the momery should be aligned
+  // For SSE, the align constant is 4
+  inline index_t get_aligned_k(index_t k) {
+    return (index_t) ceil((real_t)k / 4) * 4;
+  }
 
   // Initialize model parameters and gradient cache
-  void Initialize_w_and_cache(bool set_value = false);
+  void Initialize_w(bool set_value = false);
 
   // Serialize w and v to disk file
   void serialize_w(FILE* file);
