@@ -106,9 +106,11 @@ class Loss {
     return 1.0f / (1.0f + fastexp(-x));
   }
 
-  // The score function, e.g. LinearScore,
-  // FMScore, FFMScore, etc
+  /* The score function, including LinearScore,
+     FMScore, FFMScore, etc */
   Score* score_func_;
+  /* margin size for hinge loss */
+  real_t margin_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Loss);
