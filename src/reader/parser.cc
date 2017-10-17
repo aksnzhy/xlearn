@@ -42,7 +42,12 @@ index_t Parser::get_line_number(char* buf, uint64 buf_size) {
   for (uint64 i = 0; i < buf_size; ++i) {
     if (buf[i] == '\n') num++;
   }
-  return num+1;
+  // The last line may doesn't contain the '\n'
+  // and we need +1 here
+  if (buf[buf_size-1] == '\n') {
+    return num;
+  }
+  return num + 1;
 }
 
 // Get one line from memory buffer
