@@ -26,7 +26,8 @@ namespace xLearn {
 
 // y = wTx + sum[(V_i*V_j)(x_i * x_j)]
 real_t FMScore::CalcScore(const SparseRow* row,
-                          Model& model) {
+                          Model& model,
+                          real_t norm) {
   real_t score = 0.0;
   real_t tmp = 0.0;
   real_t *w = model.GetParameter_w();
@@ -41,7 +42,7 @@ real_t FMScore::CalcScore(const SparseRow* row,
       real_t v = w[pos];
       real_t x_v = x*v;
       square_sum += x_v;
-      sum_square += x_v*x_v;
+      sum_square += (x_v*x_v);
     }
     square_sum *= square_sum;
     tmp += (square_sum - sum_square);
@@ -54,7 +55,8 @@ real_t FMScore::CalcScore(const SparseRow* row,
 // model parameters
 void FMScore::CalcGrad(const SparseRow* row,
                        Model& model,
-                       real_t pg) {
+                       real_t pg,
+                       real_t norm) {
   real_t *w = model.GetParameter_w();
   static index_t num_factor = model.GetNumK();
   for (size_t k = 0; k < num_factor; ++k) {

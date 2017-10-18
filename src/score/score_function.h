@@ -61,13 +61,15 @@ class Score {
   // Given one exmaple and current model, and
   // return the score
   virtual real_t CalcScore(const SparseRow* row,
-                           Model& model) = 0;
+                           Model& model,
+                           real_t norm = 1.0) = 0;
 
   // Calculate gradient and update current
   // model parameters
   virtual void CalcGrad(const SparseRow* row,
                         Model& model,
-                        real_t pg) = 0;
+                        real_t pg,
+                        real_t norm = 1.0) = 0;
  protected:
   real_t learning_rate_;
   real_t regu_lambda_;

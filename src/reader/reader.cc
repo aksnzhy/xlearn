@@ -191,6 +191,7 @@ int InmemReader::Samples(DMatrix* &matrix, bool shuffle) {
     // Copy data between different DMatrix.
     data_samples_.row[i] = data_buf_.row[order_[pos_]];
     data_samples_.Y[i] = data_buf_.Y[order_[pos_]];
+    data_samples_.norm[i] = data_buf_.norm[order_[pos_]];
     pos_++;
     num_line++;
   }

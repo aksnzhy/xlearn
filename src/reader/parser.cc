@@ -94,16 +94,20 @@ void LibsvmParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
     // Add bias
     matrix.AddNode(i, 0, 1.0);
     // Add other features
+    real_t norm = 0.0;
     for (;;) {
       char *idx_char = strtok(nullptr, ":");
       char *value_char = strtok(nullptr, " \t");
       if(idx_char == nullptr || *idx_char == '\n') {
         break;
       }
-      matrix.AddNode(i,
-        atoi(idx_char),
-        atof(value_char));
+      index_t idx = atoi(idx_char);
+      real_t value = atof(value_char);
+      matrix.AddNode(i, idx, value);
+      norm += value;
     }
+    norm = 1.0f / norm;
+    matrix.norm[i] = norm;
   }
 }
 
@@ -129,6 +133,7 @@ void FFMParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
     // Add bias
     matrix.AddNode(i, 0, 1.0, 0);
     // Add other features
+    real_t norm = 0.0;
     for (;;) {
       char *field_char = strtok(nullptr, ":");
       char *idx_char = strtok(nullptr, ":");
@@ -140,7 +145,10 @@ void FFMParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
       real_t value = atof(value_char);
       index_t field_id = atoi(field_char);
       matrix.AddNode(i, idx, value, field_id);
+      norm += value * value;
     }
+    norm = 1.0f / norm;
+    matrix.norm[i] = norm;
   }
 }
 

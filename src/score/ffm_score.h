@@ -42,13 +42,15 @@ public:
  // Given one exmaple and current model, and
  // return the ffm score
  real_t CalcScore(const SparseRow* row,
-                  Model& model);
+                  Model& model,
+                  real_t norm = 1.0);
 
  // Calculate gradient and update current
  // model parameters
  void CalcGrad(const SparseRow* row,
                Model& model,
-               real_t pg);
+               real_t pg,
+               real_t norm = 1.0);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(FFMScore);
