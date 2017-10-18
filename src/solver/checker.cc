@@ -63,8 +63,7 @@ std::string Checker::option_help() const {
 "  -l <log_file_path>   :  Path of the log file \n"
 "                          (use './xlearn_log' by default) \n"
 "  -k <number_of_K>     :  Number of the latent factor for fm and ffm. \n"
-"                          Note that -k must be a multiple of 8 like 8, 16 .. \n"
-"                          (use 8 by default) \n"
+"                          (use 4 by default) \n"
 "  -r <learning_rate>   :  Learning rate for gradient descent \n"
 "                          (use 0.0005 by default) \n"
 "  -b <lambda_for_regu> :  Lambda for regular and use 0 to close the regular \n"
@@ -261,9 +260,9 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       hyper_param.log_file = list[i+1];
     } else if (list[i].compare("-k") == 0) {
       int value = atoi(list[i+1].c_str());
-      if (value % 8 != 0) {
+      if (value <= 0) {
         printf("[Error] Illegal -k '%i' \n"
-               " -k must be a multiple of 8, like 8, 16 32 ... \n",
+               " -k must be geater than zero \n",
                value);
         bo = false;
       } else {

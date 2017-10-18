@@ -28,9 +28,6 @@ namespace xLearn {
 real_t FMScore::CalcScore(const SparseRow* row,
                           Model& model) {
   real_t score = 0.0;
-  /*********************************************************
-   *  latent factor                                        *
-   *********************************************************/
   real_t tmp = 0.0;
   real_t *w = model.GetParameter_w();
   static index_t num_factor = model.GetNumK();
@@ -40,7 +37,7 @@ real_t FMScore::CalcScore(const SparseRow* row,
     for (SparseRow::const_iterator iter = row->begin();
          iter != row->end(); ++iter) {
       real_t x = iter->feat_val;
-      index_t pos = iter->feat_id * num_factor + k;
+      index_t pos = (iter->feat_id * num_factor + k) * 2;
       real_t v = w[pos];
       real_t x_v = x*v;
       square_sum += x_v;
@@ -58,31 +55,28 @@ real_t FMScore::CalcScore(const SparseRow* row,
 void FMScore::CalcGrad(const SparseRow* row,
                        Model& model,
                        real_t pg) {
-  /*********************************************************
-   *  latent factor                                        *
-   *********************************************************/
   real_t *w = model.GetParameter_w();
-  real_t* cache = model.GetParameter_cache();
   static index_t num_factor = model.GetNumK();
   for (size_t k = 0; k < num_factor; ++k) {
     real_t v_mul_x = 0.0;
     for (SparseRow::const_iterator iter = row->begin();
          iter != row->end(); ++iter) {
-      index_t pos = iter->feat_id * num_factor + k;
+      index_t pos = (iter->feat_id * num_factor + k) * 2;
       real_t v = w[pos];
       real_t x = iter->feat_val;
       v_mul_x += (x*v);
     }
     for (SparseRow::const_iterator iter = row->begin();
          iter != row->end(); ++iter) {
-      index_t pos = iter->feat_id * num_factor + k;
-      real_t v = w[pos];
+      index_t pos_g = (iter->feat_id * num_factor + k) * 2;
+      index_t pos_c = pos_g + 1;
+      real_t v = w[pos_g];
       real_t x = iter->feat_val;
       real_t gradient = x*(v_mul_x-v*x) * pg;
-      gradient += regu_lambda_ * w[pos];
-      cache[pos] += (gradient * gradient);
-      w[pos] -= (learning_rate_ * gradient *
-                 InvSqrt((cache)[pos]));
+      gradient += regu_lambda_ * w[pos_g];
+      w[pos_c] += (gradient * gradient);
+      w[pos_g] -= (learning_rate_ * gradient *
+                   InvSqrt(w[pos_c]));
     }
   }
 }

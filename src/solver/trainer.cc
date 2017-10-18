@@ -71,11 +71,62 @@ void Trainer::CalcLoss_Metric(Reader* reader,
   *metric = metric_->GetMetric();
 }
 
+/*********************************************************
+ *  Show head info                                       *
+ *********************************************************/
+void Trainer::show_head_info(bool validate) {
+  std::cout.width(6);
+  std::cout << "Epoch";
+  std::cout.width(15);
+  std::cout << "Train loss";
+  std::cout.width(20);
+  std::string str = "Train " + metric_->type();
+  std::cout << str;
+  if (validate) {
+    std::cout.width(15);
+    std::cout << "Test loss";
+    std::cout.width(20);
+    str = "Test " + metric_->type();
+    std::cout << str;
+  }
+  std::cout.width(19);
+  std::cout << "Time cost (s)";
+  std::cout << std::endl;
+}
+
+/*********************************************************
+ *  Show train info                                      *
+ *********************************************************/
+void Trainer::show_train_info(real_t tr_loss, real_t tr_metric,
+                              real_t te_loss, real_t te_metric,
+                              real_t time_cost, bool validate,
+                              index_t epoch) {
+  std::cout.width(6);
+  std::cout << epoch;
+  std::cout.width(15);
+  std::cout << std::fixed << std::setprecision(5) << tr_loss;
+  std::cout.width(20);
+  std::cout << std::fixed << std::setprecision(5) << tr_metric;
+  if (validate) {
+    std::cout.width(15);
+    std::cout << std::fixed << std::setprecision(5) << te_loss;
+    std::cout.width(20);
+    std::cout << std::fixed << std::setprecision(5) << te_metric;
+  }
+  std::cout.width(19);
+  std::cout << std::fixed << std::setprecision(2) << time_cost;
+  std::cout << std::endl;
+}
+
 // Standard training
 void Trainer::Train() {
+  // show head info
+  bool validate = test_reader_ == nullptr ? false : true;
+  show_head_info(validate);
   //for in n epoch
   for (int n = 0; n < epoch_; ++n) {
-    TIME_START();
+    clock_t start, end;
+    start = clock();
     //----------------------------------------------------
     // Calc grad and update model
     //----------------------------------------------------
@@ -83,23 +134,25 @@ void Trainer::Train() {
     //----------------------------------------------------
     // Calc Train loss
     //----------------------------------------------------
-    real_t loss_val = 0.0;
-    real_t metric_val = 0.0;
-    CalcLoss_Metric(train_reader_, &loss_val, &metric_val);
-    printf("  Epoch %d  |  Train loss: %f  |", n, loss_val);
-    printf("  Train %s: %f  |", metric_->type().c_str(), metric_val);
+    real_t tr_loss = 0.0;
+    real_t tr_metric = 0.0;
+    CalcLoss_Metric(train_reader_,
+      &tr_loss, &tr_metric);
     //----------------------------------------------------
     // Calc Test loss
     //----------------------------------------------------
-    if (test_reader_ != nullptr) {
-      CalcLoss_Metric(test_reader_, &loss_val, &metric_val);
-      printf("  Test loss: %f  |", loss_val);
-      printf("  Test %s: %f  |", metric_->type().c_str(), metric_val);
+    real_t te_loss = 0.0;
+    real_t te_metric = 0.0;
+    if (validate) {
+      CalcLoss_Metric(test_reader_,
+        &te_loss, &te_metric);
     }
-    TIME_END();
-    printf("  ");
-    SHOW_TIME();
-    printf("  |\n");
+    end = clock();
+    real_t time_cost = (real_t)(end-start) / CLOCKS_PER_SEC;
+    // show train info
+    show_train_info(tr_loss, tr_metric,
+                    te_loss, te_metric,
+                    time_cost, validate, n);
   }
 }
 

@@ -106,6 +106,10 @@ class Trainer {
   Metric* metric_;
   bool early_stop_;
 
+  void show_head_info(bool validate);
+  void show_train_info(real_t tr_loss, real_t tr_metric,
+                       real_t te_loss, real_t te_metric,
+                       real_t time_cost, bool validate, index_t n);
   void CalcGrad_Update();
   void CalcLoss_Metric(Reader* reader,
                        real_t* loss_val,

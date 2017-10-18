@@ -31,7 +31,7 @@ real_t LinearScore::CalcScore(const SparseRow* row,
   real_t score = 0.0;
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
-    index_t idx = iter->feat_id;
+    index_t idx = iter->feat_id * 2;
     score += w[idx] * iter->feat_val;
   }
   return score;
@@ -42,15 +42,16 @@ void LinearScore::CalcGrad(const SparseRow* row,
                            Model& model,
                            real_t pg) {
   real_t* w = model.GetParameter_w();
-  real_t* cache = model.GetParameter_cache();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
     real_t gradient = pg * iter->feat_val;
-    index_t idx = iter->feat_id;
-    gradient += regu_lambda_ * w[idx];
-    cache[idx] += (gradient * gradient);
-    w[idx] -= (learning_rate_ * gradient *
-               InvSqrt((cache)[idx]));
+    index_t idx_g = iter->feat_id * 2;
+    index_t idx_c = idx_g + 1;
+    gradient += regu_lambda_ * w[idx_g];
+    w[idx_c] += (gradient * gradient);
+    w[idx_g] -= (learning_rate_ *
+                 gradient *
+                 InvSqrt(w[idx_c]));
   }
 }
 

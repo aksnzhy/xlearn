@@ -54,7 +54,7 @@ struct HyperParam {
 // Parameters for optimization method.
 //------------------------------------------------------------------------------
   /* Learning rate */
-  real_t learning_rate = 0.2;               // Control the learning setp
+  real_t learning_rate = 0.1;               // Control the learning setp
   /* lambda for regularizer */
   real_t regu_lambda = 0.00002;             // xLearn uses sparse regularizer
   /* Number of epoch */
