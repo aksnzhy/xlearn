@@ -103,7 +103,7 @@ struct HyperParam {
   /* Filename of model checkpoint
   If the value is empty, xlearn will not dump model
   to the disk file */
-  std::string model_file;
+  std::string model_file = "./xlearn_model";
   /* Filename of output result */
   std::string output_file = "./xlearn_out";
   /* Filename of log file
