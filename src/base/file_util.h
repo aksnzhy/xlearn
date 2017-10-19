@@ -17,7 +17,7 @@
 /*
 Author: Chao Ma (mctt90@gmail.com)
 
-This file contains facilitlies controlling file.
+This file contains facilitlies controlling the file.
 */
 
 #ifndef XLEARN_BASE_FILE_UTIL_H_

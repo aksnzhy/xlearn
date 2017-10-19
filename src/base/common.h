@@ -199,26 +199,4 @@ static const float kFloatMin = std::numeric_limits<float>::min();
 static const float kVerySmallNumber = 1e-15;
 static const double kVerySmallNumberDouble = 1e-15;
 
-//------------------------------------------------------------------------------
-// Testing program's execution time. For example:
-//
-//  TIME_START_MS();
-//
-//    ... test this section of code
-//
-//  TIME_END_MS();
-//  SHOW_TIME();
-//------------------------------------------------------------------------------
-
-#define TIME_START()                                    \
-   clock_t start, end;                                  \
-   start = clock()                                      \
-
-#define TIME_END()                                      \
-   end = clock()
-
-#define SHOW_TIME()                                     \
-   printf("Time: %.2f sec",                             \
-     (float)(end-start) / CLOCKS_PER_SEC)               \
-
 #endif  // XLEARN_BASE_COMMON_H_
