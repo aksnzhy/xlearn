@@ -65,24 +65,25 @@ class Solver {
   // (training data or testing data), and create model parameters
   void Initialize(int argc, char* argv[]);
 
-  // Start training task or start inference task
+  // Start a training task or start an inference task
   void StartWork();
 
   // Finalize the xLearn environment
   void FinalizeWork();
 
  protected:
-  // Main class used by Solver
+  // Main classes used by Solver
   xLearn::HyperParam hyper_param_;
   xLearn::Checker checker_;
   xLearn::Model *model_;
+  /* One Reader corresponds one file */
   std::vector<xLearn::Reader*> reader_;
   xLearn::FileSpliter splitor_;
   xLearn::Score* score_;
   xLearn::Loss* loss_;
   xLearn::Metric* metric_;
 
-  // Create ovject by name
+  // Create object by name
   xLearn::Reader* create_reader();
   xLearn::Score* create_score();
   xLearn::Loss* create_loss();
@@ -94,15 +95,15 @@ class Solver {
   void checker(int argc, char* argv[]);
   void init_log();
 
-  // Used by start function
+  // Start function
   void start_train_work();
   void start_inference_work();
 
-  // Used by finalize funcrion
+  // Finalize funcrion
   void finalize_train_work();
   void finalize_inference_work();
 
-  // Read problem and set feature and field
+  // Read problem and set the feature size and field size
   index_t find_max_feature(DMatrix* matrix, int num_samples);
   index_t find_max_field(DMatrix* matrix, int num_samples);
 
