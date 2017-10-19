@@ -67,7 +67,7 @@ struct HyperParam {
   real_t regu_lambda = 0.00002;
   /* Number of epoch
   Could be changed in early-stop */
-  int num_epoch = 5;
+  int num_epoch = 10;
   /* Sample size for each training iteration
   reader->Samples(matrix) will return this
   value to user */
