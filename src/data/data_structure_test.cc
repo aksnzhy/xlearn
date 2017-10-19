@@ -31,12 +31,14 @@ TEST(DMATRIX_TEST, Resize_and_Release) {
   matrix.ResetMatrix(10);
   for (int i = 0; i < 10; ++i) {
     EXPECT_EQ(matrix.row[i], nullptr);
-    EXPECT_EQ(matrix.Y[i], 0);
+    EXPECT_FLOAT_EQ(matrix.Y[i], 0);
+    EXPECT_FLOAT_EQ(matrix.norm[i], 1.0);
   }
   matrix.Release();
   for (int i = 0; i < 10; ++i) {
     EXPECT_EQ(matrix.row.empty(), true);
     EXPECT_EQ(matrix.Y.empty(), true);
+    EXPECT_EQ(matrix.norm.empty(), true);
   }
 }
 
@@ -47,6 +49,7 @@ TEST(DMATRIX_TEST, Serialize_and_Deserialize) {
     matrix.row[i] = new SparseRow;
     matrix.AddNode(i, i, 2.5, i);
     matrix.Y[i] = i;
+    matrix.norm[i] = 0.25;
   }
   matrix.SetHash(1234, 5678);
   matrix.Serialize("/tmp/test.bin");
@@ -57,6 +60,7 @@ TEST(DMATRIX_TEST, Serialize_and_Deserialize) {
   EXPECT_EQ(matrix.hash_value_2, 5678);
   for (int i = 0; i < 10; ++i) {
     EXPECT_EQ(matrix.Y[i], i);
+    EXPECT_EQ(matrix.norm[i], 0.25);
     SparseRow *row = matrix.row[i];
     for (SparseRow::iterator iter = row->begin();
          iter != row->end(); ++iter) {

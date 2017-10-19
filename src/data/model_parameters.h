@@ -24,25 +24,22 @@ used by xLearn.
 #ifndef XLEARN_DATA_MODEL_PARAMETERS_H_
 #define XLEARN_DATA_MODEL_PARAMETERS_H_
 
-#include <vector>
 #include <string>
 
 #include <math.h>
 
 #include "src/base/common.h"
-#include "src/base/stringprintf.h"
-#include "src/base/file_util.h"
 #include "src/data/data_structure.h"
-#include "src/data/hyper_parameters.h"
 
 namespace xLearn {
 
 //------------------------------------------------------------------------------
-// The Model class is responsible for storing global model prameters.
-// We can make a checkpoint for current model, and we can also load
-// a model checkpoint from disk file.
+// The Model class is responsible for storing global
+// model prameters. We can dump a checkpoint for current model
+// and we can also load a model checkpoint from disk file.
 // A model can be initialized by Initialize() function or from a
-// checkpoint file. We can use the Model class like this:
+// checkpoint file through constructor.
+// We can use the Model class like this:
 //
 //    HyperParam hyper_param;
 //    hyper_param.score_func = "ffm";
@@ -97,8 +94,10 @@ class Model {
   // Get the pointer of model parameters
   real_t* GetParameter_w() { return param_w_; }
 
-  // Other Get functions
+  // Get the size of model parameters
   index_t GetNumParameter_w() { return param_num_w_; }
+
+  // Other Get functions
   std::string GetScoreFunction() { return score_func_; }
   std::string GetLossFunction() { return loss_func_; }
   index_t GetNumFeature() { return num_feat_; }
@@ -108,7 +107,7 @@ class Model {
   // Because we use SSE, so the momery should be aligned
   // For SSE, the align constant is 4
   inline index_t get_aligned_k() {
-    return (index_t) ceil((real_t)num_K_ / 4) * 4;
+    return (index_t) ceil((real_t)num_K_ / kAlign) * kAlign;
   }
 
  protected:
@@ -120,24 +119,26 @@ class Model {
   index_t  param_num_w_;
   /* Score function: 'linear', 'fm', or 'ffm' */
   std::string  score_func_;
-  /* Loss function: 'squared', 'cross-entropy', etc */
+  /* Loss function: 'squared', 'cross-entropy', 'hinge' */
   std::string  loss_func_;
-  /* Number of feature (feat_id is from 0, include bias) */
+  /* Number of feature (feat_id is from 0, which is the bias) */
   index_t  num_feat_;
   /* Number of field (used in ffm, field_id is from 0) */
   index_t  num_field_;
-  /* Number of K (used in fm and ffm) */
+  /* Number of K (used in fm and ffm)
+   Becasue we use SSE, so the real k will be aligned
+   User can get the aligned K by using get_aligned_k() */
   index_t  num_K_;
-  /* Storing the model parameters */
+  /* Storing the model parameters and gradient cache */
   real_t*  param_w_;
 
   // Initialize model parameters and gradient cache
   void Initialize_w(bool set_value = false);
 
-  // Serialize w and v to disk file
+  // Serialize w  to disk file
   void serialize_w(FILE* file);
 
-  // Deserialize w and v from disk file
+  // Deserialize w from disk file
   void deserialize_w(FILE* file);
 
  private:

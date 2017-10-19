@@ -24,10 +24,8 @@ This file is the implementation of the Model class.
 
 #include <pmmintrin.h>  // for SSE
 
-#include "src/base/common.h"
 #include "src/base/file_util.h"
 #include "src/base/math.h"
-#include "src/base/scoped_ptr.h"
 
 namespace xLearn {
 
@@ -79,11 +77,11 @@ void Model::Initialize_w(bool set_value) {
 #ifdef _WIN32
       param_w_ = _aligned_malloc(
           param_num_w_ * sizeof(real_t),
-          16);
+          kAlignByte);
 #else
       posix_memalign(
           (void**)&param_w_,
-          16,
+          kAlignByte,
           param_num_w_ * sizeof(real_t));
 #endif
     } else {
@@ -118,11 +116,11 @@ void Model::Initialize_w(bool set_value) {
       for (index_t j = 0; j < num_feat_; ++j) {
         for (index_t f = 0; f < num_field_; ++f) {
           for (index_t d = 0; d < k_aligned; ) {
-            for (index_t s = 0; s < 4; s++, w++, d++) {
+            for (index_t s = 0; s < kAlign; s++, w++, d++) {
               w[0] = (d < num_K_) ? coef * dis(generator) : 0.0;
-              w[4] = 1.0;
+              w[kAlign] = 1.0;
             }
-            w += 4;
+            w += kAlign;
           }
         }
       }
@@ -161,7 +159,7 @@ void Model::Serialize(const std::string& filename) {
   Close(file);
 }
 
-// Deserialize model from a checkpoint file.
+// Deserialize model from a checkpoint file
 bool Model::Deserialize(const std::string& filename) {
   CHECK_NE(filename.empty(), true);
   FILE* file = OpenFileOrDie(filename.c_str(), "r");
@@ -195,7 +193,7 @@ void Model::deserialize_w(FILE* file) {
   // Read size of w
   ReadDataFromDisk(file, (char*)&param_num_w_, sizeof(param_num_w_));
   // Allocate memory
-  this->Initialize_w(false);  /* do not set value */
+  this->Initialize_w(false);  /* do not set value here */
   // Read data
   ReadDataFromDisk(file, (char*)param_w_, sizeof(real_t)*param_num_w_);
 }

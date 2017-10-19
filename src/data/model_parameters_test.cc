@@ -56,8 +56,8 @@ TEST(MODEL_TEST, Init) {
                       hyper_param.num_field *
                       hyper_param.num_K * 2;
   EXPECT_EQ(param_num_w, model_ffm.GetNumParameter_w());
-  for (index_t i = 0; i < model_ffm.GetNumParameter_w(); i+=8) {
-    EXPECT_FLOAT_EQ(w[i+4], 1.0);
+  for (index_t i = 0; i < model_ffm.GetNumParameter_w(); i+=(kAlign*2)) {
+    EXPECT_FLOAT_EQ(w[i+kAlign], 1.0);
   }
 }
 

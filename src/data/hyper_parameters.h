@@ -35,65 +35,90 @@ namespace xLearn {
 //------------------------------------------------------------------------------
 struct HyperParam {
 //------------------------------------------------------------------------------
-// Parameters for current task.
+// Parameters for current task
 //------------------------------------------------------------------------------
-  /* Train or Predict */
-  bool is_train = true;                     // True for train, false for predict
-  /* On-disk for limited memory */
-  bool on_disk = false;                     // True for on-disk training, false
-                                            // for in-memory training
-  /* Score function */
-  std::string score_func = "linear";        // 'linear', 'fm', or 'ffm'
-  /* Loss function */
-  std::string loss_func = "corss-entropy";  // 'cross-entropy', 'squared',
-                                            // 'absolute', or 'hinge'
-  /* metric function */
-  std::string metric = "acc";               // 'acc', 'prec', 'recall', 'roc',
-                                            // 'auc', 'mae', 'mse', etc
+  /* Train or Predict
+   True for train, false for predict */
+  bool is_train = true;
+  /* On-disk for limited memory
+   True for on-disk training, false for
+   in-memory training */
+  bool on_disk = false;
+  /* Don't print any evaluation information
+   during the training. Just train the model */
+  bool quiet = false;
+  /* Score function
+   Could be 'linear', 'fm', or 'ffm' */
+  std::string score_func = "linear";
+  /* Loss function
+   Could be 'cross-entropy', 'squared', or 'hinge' */
+  std::string loss_func = "corss-entropy";
+  /* metric function
+   Could be acc', 'prec', 'recall', 'roc',
+   'auc', 'mae', or 'mse' */
+  std::string metric = "acc";
 //------------------------------------------------------------------------------
-// Parameters for optimization method.
+// Parameters for optimization method
 //------------------------------------------------------------------------------
   /* Learning rate */
-  real_t learning_rate = 0.2;               // Control the learning setp
-  /* lambda for regularizer */
-  real_t regu_lambda = 0.00002;             // xLearn uses sparse regularizer
-  /* Number of epoch */
-  int num_epoch = 5;                        // Could be changed in early-stop
-  /* Sample size for on-disk training */
-  int sample_size = 200;                    // reader->Samples(matrix) will
-                                            // return this value to user
+  real_t learning_rate = 0.2;
+  /* lambda for regularizer
+   xLearn uses sparse regularizer */
+  real_t regu_lambda = 0.00002;
+  /* Number of epoch
+   Could be changed in early-stop */
+  int num_epoch = 5;
+  /* Sample size for each training iteration
+   reader->Samples(matrix) will return this
+   value to user */
+  int sample_size = 200;
+  /* True for use instance-wise
+   normalization. False for not */
+  bool norm = true;
 //------------------------------------------------------------------------------
 // Parameters for dataset
 //------------------------------------------------------------------------------
-  /* Number of feature */
-  index_t num_feature = 0;              // Include the bias term '0'
-  /* Number of model parameters */
-  index_t num_param = 0;                // Need to be calculated in init()
-  /* Lateny factor for fm and ffm */
-  index_t num_K = 4;                    // The number of latent factor
-  /* Number of field */
-  index_t num_field = 0;                // Field id will start from 0
-  /* Filename for training set */
-  std::string train_set_file;           // Must have value in training task
-  /* Filename for test set */
-  std::string test_set_file;            // This value can be empty
-  /* Filename for prediction set */
-  std::string predict_file;             // Must have value in predict task
-  /* Filename of model */
-  std::string model_file = "./xlearn_model";
+  /* Number of feature
+   Include the bias term '0'
+   We get this value from initialization */
+  index_t num_feature = 0;
+  /* Number of model parameters
+   We get this value from initialization */
+  index_t num_param = 0;
+  /* Number of lateny factor for fm and ffm
+   We get this value from initialization */
+  index_t num_K = 4;
+  /* Number of field, used by ffm tasks
+   We get this value from initialization */
+  index_t num_field = 0;
+  /* Filename of training set
+   We must set this value in training */
+  std::string train_set_file;
+  /* Filename for test set
+   This value can be empty */
+  std::string test_set_file;
+  /* Filename of prediction set
+   We must set this value in prediction */
+  std::string predict_file;
+  /* Filename of model checkpoint
+   If the value is empty, xlearn will not dump model
+   to the disk file */
+  std::string model_file;
   /* Filename of output result */
   std::string output_file = "./xlearn_out";
-  /* Filename of log file */
-  std::string log_file = "./xlearn_log";  // This is not the final filename
+  /* Filename of log file
+   If this value is empty, xlearn will not generate
+   any log information */
+  std::string log_file;
 //------------------------------------------------------------------------------
 // Parameters for validation
 //------------------------------------------------------------------------------
-  /* Use cv or not */
-  bool cross_validation = false;  // True for using cv, false for not
-  /* Number of folds in cv */
+  /* Use cross-validation or not */
+  bool cross_validation = false;
+  /* Number of folds in cross-validation */
   int num_folds = 5;
   /* Use early-stop or not */
-  bool early_stop = false;        // True for using early-stop, false for not
+  bool early_stop = false;
 };
 
 }  // namespace XLEARN
