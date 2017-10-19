@@ -103,7 +103,7 @@ class Loss {
                 std::vector<real_t>& new_pred) {
      CHECK_EQ(pred.size(), new_pred.size());
      for (size_t i = 0; i < pred.size(); ++i) {
-       new_pred[i] = fast_sigmoid(pred[i]);
+       new_pred[i] = sigmoid(pred[i]);
      }
    }
 
@@ -119,8 +119,8 @@ class Loss {
 
  protected:
   // fast sigmoid function
-  inline real_t fast_sigmoid(real_t x) {
-    return 1.0f / (1.0f + fasterexp(-x));
+  inline real_t sigmoid(real_t x) {
+    return 1.0f / (1.0f + exp(-x));
   }
 
   /* The score function, including LinearScore,

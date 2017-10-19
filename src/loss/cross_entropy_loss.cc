@@ -32,7 +32,7 @@ real_t CrossEntropyLoss::Evalute(const std::vector<real_t>& pred,
   real_t val = 0.0;
   for (size_t i = 0; i < pred.size(); ++i) {
     real_t y = label[i] > 0 ? 1.0 : -1.0;
-    val += log1p(fasterexp(-y*pred[i]));
+    val += log1p(exp(-y*pred[i]));
   }
   return val;
 }
@@ -51,7 +51,7 @@ void CrossEntropyLoss::CalcGrad(const DMatrix* matrix,
     real_t score = score_func_->CalcScore(row, model, norm);
     // partial gradient
     real_t y = matrix->Y[i] > 0 ? 1.0 : -1.0;
-    real_t pg = -y/(1.0+(1.0/fasterexp(-y*score)));
+    real_t pg = -y/(1.0+(1.0/exp(-y*score)));
     // real gradient and update
     score_func_->CalcGrad(row, model, pg, norm);
   }

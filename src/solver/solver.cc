@@ -110,7 +110,7 @@ void Solver::init_log() {
 // Initialize training task
 void Solver::init_train() {
   /*********************************************************
-   *  Step 1: Init Reader                                  *
+   *  Init Reader                                          *
    *********************************************************/
   clock_t start, end;
   start = clock();
@@ -160,7 +160,7 @@ void Solver::init_train() {
     LOG(INFO) << "Init Reader: " << file_list[i];
   }
   /*********************************************************
-   *  Step 2: Read problem                                 *
+   *  Read problem                                         *
    *********************************************************/
   DMatrix* matrix = NULL;
   index_t max_feat = 0, max_field = 0;
@@ -195,7 +195,7 @@ void Solver::init_train() {
   printf("  Time cost for reading problem: %.2f sec \n",
     (float)(end-start) / CLOCKS_PER_SEC);
   /*********************************************************
-   *  Step 3: Init Model                                   *
+   *  Init Model                                           *
    *********************************************************/
    start = clock();
    printf("Initialize model ...\n");
@@ -215,20 +215,20 @@ void Solver::init_train() {
    printf("  Time cost for model initial: %.2f sec \n",
      (float)(end-start) / CLOCKS_PER_SEC);
     /*********************************************************
-     *  Step 4: Init score function                          *
+     *  Init score function                                  *
      *********************************************************/
     score_ = create_score();
     score_->Initialize(hyper_param_.learning_rate,
                   hyper_param_.regu_lambda);
     LOG(INFO) << "Initialize score function.";
     /*********************************************************
-     *  Step 5: Init loss function                           *
+     *  Init loss function                                   *
      *********************************************************/
     loss_ = create_loss();
     loss_->Initialize(score_, hyper_param_.norm);
     LOG(INFO) << "Initialize loss function.";
     /*********************************************************
-     *  Step 6: Init metric                                  *
+     *  Init metric                                          *
      *********************************************************/
     metric_ = create_metric();
     metric_->Initialize(hyper_param_.metric);
@@ -238,7 +238,7 @@ void Solver::init_train() {
 // Initialize predict task
 void Solver::init_predict() {
   /*********************************************************
-   *  Step 1: Read problem from model file                 *
+   *  Read problem from model file                         *
    *********************************************************/
    model_ = new Model(hyper_param_.model_file);
    hyper_param_.score_func = model_->GetScoreFunction();
@@ -253,7 +253,7 @@ void Solver::init_predict() {
    }
    LOG(INFO) << "Initialize model.";
    /*********************************************************
-    *  Step 2: Init Reader and read problem                 *
+    *  Init Reader and read problem                         *
     *********************************************************/
     // Create Reader
     reader_.resize(1, create_reader());
@@ -267,12 +267,12 @@ void Solver::init_predict() {
     }
     LOG(INFO) << "Initialize Parser ans Reader.";
     /*********************************************************
-     *  Step 3: Init score function                          *
+     *  Init score function                                  *
      *********************************************************/
     score_ = create_score();
     LOG(INFO) << "Initialize score function.";
     /*********************************************************
-     *  Step 4: Init loss function                           *
+     *  Init loss function                                   *
      *********************************************************/
     loss_ = create_loss();
     loss_->Initialize(score_, hyper_param_.norm);
