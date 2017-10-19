@@ -31,7 +31,7 @@ namespace xLearn {
 // HingeLoss is used for classification tasks, which
 // has the following form:
 // tmp = pred * y
-// loss = sum_1_n(tmp < 1 ? 1 - tmp : 0)
+// loss = sum_all_example(tmp < 1 ? 1 - tmp : 0)
 //------------------------------------------------------------------------------
 class HingeLoss : public Loss {
  public:
@@ -39,7 +39,7 @@ class HingeLoss : public Loss {
   HingeLoss() { };
   ~HingeLoss() { }
 
-  // Given predictions and labels, return loss value.
+  // Given predictions and labels, return hinge loss
   real_t Evalute(const std::vector<real_t>& pred,
                  const std::vector<real_t>& label);
 
@@ -47,6 +47,9 @@ class HingeLoss : public Loss {
   // and update current model parameters
   void CalcGrad(const DMatrix* data_matrix,
                 Model& model);
+
+  // Return current loss type
+  virtual std::string loss_type() { return "hinge"; }
 
  private:
   DISALLOW_COPY_AND_ASSIGN(HingeLoss);

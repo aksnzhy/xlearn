@@ -44,7 +44,7 @@ TEST(CROSS_ENTROPY_LOSS, Evalute) {
   // Create loss
   CrossEntropyLoss loss;
   real_t val = loss.Evalute(pred, label);
-  EXPECT_FLOAT_EQ(val, 0.0);
+  EXPECT_LT(val, 0.000001);
   // Test2
   for (int i = 0; i < pred.size(); ++i) {
     pred[i] = -10000;
@@ -53,7 +53,7 @@ TEST(CROSS_ENTROPY_LOSS, Evalute) {
     label[i] = -1.0;
   }
   val = loss.Evalute(pred, label);
-  EXPECT_FLOAT_EQ(val, 0.0);
+  EXPECT_LT(val, 0.000001);
 }
 
-} // namespace xLearn
+}  // namespace xLearn

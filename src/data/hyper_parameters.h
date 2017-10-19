@@ -109,7 +109,7 @@ struct HyperParam {
   /* Filename of log file
    If this value is empty, xlearn will not generate
    any log information */
-  std::string log_file;
+  std::string log_file = "./log";
 //------------------------------------------------------------------------------
 // Parameters for validation
 //------------------------------------------------------------------------------

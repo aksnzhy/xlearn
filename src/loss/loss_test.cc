@@ -46,6 +46,8 @@ class TestLoss : public Loss {
   void CalcGrad(const DMatrix* data_matrix,
                 Model& model) { return; }
 
+  std::string loss_type() { return "test"; }
+
  private:
   DISALLOW_COPY_AND_ASSIGN(TestLoss);
 };
@@ -67,7 +69,7 @@ class LossTest : public ::testing::Test {
 };
 
 TEST_F(LossTest, Predict_Linear) {
-  // Create Model for Linear
+  // Create Model for Linear Re
   Model model_lr;
   model_lr.Initialize(param.score_func,
                   param.loss_func,
@@ -135,7 +137,7 @@ TEST_F(LossTest, Predict_FM) {
   std::vector<real_t> pred(kLine);
   loss.Predict(&matrix, model_fm, pred);
   for (int i = 0; i < kLine; ++i) {
-    EXPECT_FLOAT_EQ(pred[i], 294.0);
+    EXPECT_FLOAT_EQ(pred[i], 288.0);
   }
 }
 
@@ -172,7 +174,7 @@ TEST_F(LossTest, Predict_FFM) {
   std::vector<real_t> pred(kLine);
   loss.Predict(&matrix, model_ffm, pred);
   for (int i = 0; i < kLine; ++i) {
-    EXPECT_FLOAT_EQ(pred[i], 294.0);
+    EXPECT_FLOAT_EQ(pred[i], 288.0);
   }
 }
 
@@ -197,6 +199,29 @@ TEST_F(LossTest, Sigmoid_Test) {
   EXPECT_LT(new_pred[3], 0.5);
   EXPECT_LT(new_pred[4], 0.5);
   EXPECT_LT(new_pred[5], 0.5);
+}
+
+TEST_F(LossTest, Sign_Test) {
+  std::vector<real_t> pred(6);
+  pred[0] = 0.5;
+  pred[1] = 3;
+  pred[2] = 20;
+  pred[3] = -0.5;
+  pred[4] = -3;
+  pred[5] = -20;
+  std::vector<real_t> new_pred(pred.size());
+  // Create score function
+  LinearScore score;
+  // Create loss function
+  TestLoss loss;
+  loss.Initialize(&score);
+  loss.Sign(pred, new_pred);
+  EXPECT_FLOAT_EQ(new_pred[0], 1);
+  EXPECT_FLOAT_EQ(new_pred[1], 1);
+  EXPECT_FLOAT_EQ(new_pred[2], 1);
+  EXPECT_FLOAT_EQ(new_pred[3], 0);
+  EXPECT_FLOAT_EQ(new_pred[4], 0);
+  EXPECT_FLOAT_EQ(new_pred[5], 0);
 }
 
 Loss* CreateLoss(const char* format_name) {

@@ -24,6 +24,7 @@ function or objective function.
 #define XLEARN_LOSS_LOSS_H_
 
 #include <vector>
+#include <string>
 
 #include "src/base/common.h"
 #include "src/base/class_register.h"
@@ -40,10 +41,10 @@ namespace xLearn {
 // There are three important method in Loss, including Evalute(), Predict(),
 // and CalcGrad(). We can use the Loss class like this:
 //
-//   // Create a AbsLoss with linear score function, which
+//   // Create a squared loss with linear score function, which
 //   // is usually used for linear regression.
-//   Loss* abs_loss = new AbsLoss();
-//   abs_loss->Initialize(linear_score);
+//   Loss* sq_loss = new SquaredLoss();
+//   sq_loss->Initialize(linear_score);
 //
 //   // Then, we can perform gradient descent like this:
 //   DMatrix* matrix = NULL;
@@ -51,7 +52,7 @@ namespace xLearn {
 //     reader->Reset();
 //     while (reader->Samples(matrix)) {
 //       // Assume that the model and updater have been initialized
-//       abs_loss->CalcGrad(matrix, model, updater);
+//       sq_loss->CalcGrad(matrix, model, updater);
 //     }
 //   }
 //
@@ -63,8 +64,8 @@ namespace xLearn {
 //     if (tmp == 0) { break; }
 //     pred.resize(tmp);
 //     count += tmp;
-//     abs_loss->Predict(matrix, model, pred);
-//     loss_val += abs_loss->Evalute(pred, matrix->Y);
+//     sq_loss->Predict(matrix, model, pred);
+//     loss_val += sq_loss->Evalute(pred, matrix->Y);
 //   }
 //   loss_val /= count;
 //------------------------------------------------------------------------------
@@ -91,6 +92,9 @@ class Loss {
    virtual void CalcGrad(const DMatrix* data_matrix,
                          Model& model) = 0;
 
+  // Return a current loss type
+  virtual std::string loss_type() = 0;
+
    // The Sigmoid function, which mapping the output to 0~1
    void Sigmoid(const std::vector<real_t>& pred,
                 std::vector<real_t>& new_pred) {
@@ -100,17 +104,25 @@ class Loss {
      }
    }
 
+   // if pred[i] >= 0, new_pred -> 1
+   // else new_pred -> 0
+   void Sign(const std::vector<real_t>& pred,
+             std::vector<real_t>& new_pred) {
+    CHECK_EQ(pred.size(), new_pred.size());
+    for (size_t i = 0; i < pred.size(); ++i) {
+      new_pred[i] = pred[i] >= 0 ? 1 : 0;
+    }
+   }
+
  protected:
   // fast sigmoid function
   inline real_t fast_sigmoid(real_t x) {
-    return 1.0f / (1.0f + fastexp(-x));
+    return 1.0f / (1.0f + fasterexp(-x));
   }
 
   /* The score function, including LinearScore,
      FMScore, FFMScore, etc */
   Score* score_func_;
-  /* margin size for hinge loss */
-  real_t margin_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Loss);

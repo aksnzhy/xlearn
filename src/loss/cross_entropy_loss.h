@@ -30,7 +30,7 @@ namespace xLearn {
 //------------------------------------------------------------------------------
 // CrossEntropyLoss is used for classification tasks, which
 // has the following form:
-// loss = sum_1_n(log(1.0+exp(-y*pred)))
+// loss = sum_all_example( log(1.0+exp(-y*pred)) )
 //------------------------------------------------------------------------------
 class CrossEntropyLoss : public Loss {
  public:
@@ -38,7 +38,7 @@ class CrossEntropyLoss : public Loss {
   CrossEntropyLoss() { };
   ~CrossEntropyLoss() { }
 
-  // Given predictions and labels, return loss value
+  // Given predictions and labels, return cross-entropy loss
   real_t Evalute(const std::vector<real_t>& pred,
                  const std::vector<real_t>& label);
 
@@ -47,10 +47,13 @@ class CrossEntropyLoss : public Loss {
   void CalcGrad(const DMatrix* data_matrix,
                 Model& model);
 
+  // Return current loss type
+  virtual std::string loss_type() { return "cross-entropy"; }
+
  private:
   DISALLOW_COPY_AND_ASSIGN(CrossEntropyLoss);
 };
 
-} // namespace xLearn
+}  // namespace xLearn
 
-#endif // XLEARN_LOSS_CROSS_ENTROPY_LOSS_H_
+#endif  // XLEARN_LOSS_CROSS_ENTROPY_LOSS_H_

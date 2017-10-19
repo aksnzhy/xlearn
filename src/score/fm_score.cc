@@ -77,7 +77,7 @@ void FMScore::CalcGrad(const SparseRow* row,
       real_t gradient = x*(v_mul_x-v*x) * pg;
       gradient += regu_lambda_ * w[pos_g];
       w[pos_c] += (gradient * gradient);
-      w[pos_g] -= (learning_rate_ * gradient *
+      w[pos_g] -= (learning_rate_ * gradient /
                    InvSqrt(w[pos_c]));
     }
   }

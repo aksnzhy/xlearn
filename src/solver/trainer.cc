@@ -165,7 +165,7 @@ void Trainer::CVTrain() {
     printf("  Cross-validation: %d/%lu: \n", i+1, reader_list_.size());
     // for n epoch
     for (int n = 0; n < epoch_; ++n) {
-      TIME_START();
+      //TIME_START();
       // Use the other Reader to train
       for (int j = 0; j < reader_list_.size(); ++j) {
         if (i == j) { continue; }
@@ -224,9 +224,9 @@ void Trainer::CVTrain() {
         test_loss[i] = loss_val;
       }
       printf("  Test loss: %f  |", loss_val);
-      TIME_END();
+      //TIME_END();
       printf("  ");
-      SHOW_TIME();
+      //SHOW_TIME();
       printf("  |\n");
     }
   }
