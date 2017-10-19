@@ -100,16 +100,12 @@ struct HyperParam {
   /* Filename of prediction set
   We must set this value in prediction */
   std::string predict_file;
-  /* Filename of model checkpoint
-  If the value is empty, xlearn will not dump model
-  to the disk file */
+  /* Filename of model checkpoint */
   std::string model_file = "./xlearn_model";
-  /* Filename of output result */
+  /* Filename of output result of prediction */
   std::string output_file = "./xlearn_out";
-  /* Filename of log file
-  If this value is empty, xlearn will not generate
-  any log information */
-  std::string log_file;
+  /* Filename of log file */
+  std::string log_file = "/tmp/xlearn_log/";
 //------------------------------------------------------------------------------
 // Parameters for validation
 //------------------------------------------------------------------------------
