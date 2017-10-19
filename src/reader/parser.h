@@ -44,9 +44,12 @@ namespace xLearn {
 //   Parser* parser = nullptr;
 //   if (format == "libsvm") {
 //     parser = new LibsvmParser();
-//   } else {
+//   } else if (format == "ffm") {
 //     parser = new FFMParser();
+//   } else {
+//     parser = new CSVParser();
 //   }
+//   parser->Initialize(true); // use normalization
 //   char* buffer = nullptr;
 //   uint64 size = ReadFileToMemory(filename, buffer);
 //   DMatrix matrix;
@@ -56,6 +59,10 @@ class Parser {
  public:
   Parser() { }
   virtual ~Parser() {  }
+
+  virtual void Initialize(bool norm = true) {
+    if_norm_ = norm;
+  }
 
   virtual void Parse(char* buf, uint64 size, DMatrix& matrix) = 0;
 
@@ -68,6 +75,9 @@ class Parser {
                          char* buf,
                          uint64 pos,
                          uint64 size);
+
+   /* Use instance-wise normalization */
+   bool if_norm_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Parser);
@@ -138,6 +148,6 @@ CLASS_REGISTER_DEFINE_REGISTRY(xLearn_parser_registry, Parser);
       xLearn_parser_registry,                              \
       format_name)
 
-} // namespace xLearn
+}  // namespace xLearn
 
-#endif // XLEARN_READER_PARSER_H_
+#endif  // XLEARN_READER_PARSER_H_

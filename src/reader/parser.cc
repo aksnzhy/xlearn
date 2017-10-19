@@ -177,13 +177,17 @@ void CSVParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
     // Add bias
     matrix.AddNode(i, 0, 1.0, 0);
     // Add other features
+    real_t norm = 0.0;
     for (int j = 0; j < size-1; ++j) {
       index_t idx = j+1;
       real_t value = atof(str_vec[j].c_str());
       // skip zero
       if (value < kVerySmallNumber) { continue; }
       matrix.AddNode(i, idx, value);
+      norm += value;
     }
+    norm = 1.0f / norm;
+    matrix.norm[i] = norm;
   }
 }
 

@@ -45,6 +45,6 @@ class FileSpliter {
   DISALLOW_COPY_AND_ASSIGN(FileSpliter);
 };
 
-} // namespace xLearn
+}  // namespace xLearn
 
-#endif // XLEARN_READER_FILE_SPLIT_H_
+#endif  // XLEARN_READER_FILE_SPLIT_H_

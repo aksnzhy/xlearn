@@ -65,6 +65,7 @@ void CheckLR(const DMatrix* matrix) {
   EXPECT_EQ(matrix->row_length, kNumSamples);
   // check the first element
   EXPECT_EQ(matrix->Y[0], (real_t)0);
+  EXPECT_FLOAT_EQ(matrix->norm[0], 2.710027);
   for (int i = 0; i < matrix->row_length; ++i) {
     SparseRow *row = matrix->row[i];
     int n = 0;
@@ -90,6 +91,7 @@ void CheckFFM(const DMatrix* matrix) {
   EXPECT_EQ(matrix->row_length, kNumSamples);
   // check the first element
   EXPECT_EQ(matrix->Y[0], (real_t)1);
+  EXPECT_FLOAT_EQ(matrix->norm[0], 22.03274);
   for (int i = 0; i < matrix->row_length; ++i) {
     SparseRow *row = matrix->row[i];
     int n = 0;
@@ -189,57 +191,7 @@ TEST(ReaderTest, ReadFromBinary) {
   RemoveFile(ffm_bin.c_str());
 }
 
-/*
-TEST_F(ReaderTest, SampleFromDisk) {
-  string lr_file = kTestfilename + "_LR.txt";
-  string ffm_file = kTestfilename + "_ffm.txt";
-  string csv_file = kTestfilename + "_csv.txt";
-  // libsvm
-  OndiskReader reader_lr;
-  reader_lr.Initialize(lr_file, kNumSamples, parser_lr);
-  DMatrix* matrix = nullptr;
-  int i = 0;
-  for (; i < iteration_num; ++i) {
-    int record_num = reader_lr.Samples(matrix);
-    if (record_num == 0) {
-      --i;
-      reader_lr.Reset();
-      continue;
-    }
-    EXPECT_EQ(record_num, kNumSamples);
-    CheckLR(matrix);
-  }
-  EXPECT_EQ(i, iteration_num);
-  // libffm
-  OndiskReader reader_ffm;
-  reader_ffm.Initialize(ffm_file, kNumSamples, parser_ffm);
-  for (i = 0; i < iteration_num; ++i) {
-    int record_num = reader_ffm.Samples(matrix);
-    if (record_num == 0) {
-      --i;
-      reader_ffm.Reset();
-      continue;
-    }
-    EXPECT_EQ(record_num, kNumSamples);
-    CheckFFM(matrix);
-  }
-  EXPECT_EQ(i, iteration_num);
-  // csv
-  OndiskReader reader_csv;
-  reader_csv.Initialize(csv_file, kNumSamples, parser_csv);
-  for (i = 0; i < iteration_num; ++i) {
-    int record_num = reader_csv.Samples(matrix);
-    if (record_num == 0) {
-      --i;
-      reader_csv.Reset();
-      continue;
-    }
-    EXPECT_EQ(record_num, kNumSamples);
-    CheckLR(matrix);
-  }
-  EXPECT_EQ(i, iteration_num);
-}
-*/
+//TEST_F(ReaderTest, SampleFromDisk) { }
 
 Reader* CreateReader(const char* format_name) {
   return CREATE_READER(format_name);

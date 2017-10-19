@@ -50,6 +50,7 @@ TEST(PARSER_TEST, Parse_libsvm) {
   EXPECT_EQ(matrix.row_length, kNum_lines);
   for (index_t i = 0; i < matrix.row_length; ++i) {
     EXPECT_EQ(matrix.Y[i], 0);
+    EXPECT_FLOAT_EQ(matrix.norm[i], 1.6666667);
     int col_len = matrix.row[i]->size();
     EXPECT_EQ(col_len, 6);
     SparseRow *row = matrix.row[i];
@@ -82,6 +83,7 @@ TEST(PARSER_TEST, Parse_libffm) {
   EXPECT_EQ(matrix.row_length, kNum_lines);
   for (index_t i = 0; i < matrix.row_length; ++i) {
     EXPECT_EQ(matrix.Y[i], 1);
+    EXPECT_FLOAT_EQ(matrix.norm[i], 11.834319);
     int col_len = matrix.row[i]->size();
     EXPECT_EQ(col_len, 6);
     SparseRow *row = matrix.row[i];
@@ -114,6 +116,7 @@ TEST(PARSER_TEST, Parse_csv) {
   EXPECT_EQ(matrix.row_length, kNum_lines);
   for (index_t i = 0; i < matrix.row_length; ++i) {
     EXPECT_EQ(matrix.Y[i], 1);
+    EXPECT_FLOAT_EQ(matrix.norm[i], 1.62601626);
     int col_len = matrix.row[i]->size();
     EXPECT_EQ(col_len, 6);
     SparseRow *row = matrix.row[i];

@@ -214,65 +214,14 @@ void InmemReader::serialize_buffer(const std::string& filename) {
 
 void OndiskReader::Initialize(const std::string& filename,
                               int num_samples) {
-  /*
-  CHECK_NE(filename.empty(), true);
-  CHECK_GT(num_samples, 0);
-  CHECK_NOTNULL(parser);
-  filename_ = filename;
-  num_samples_ = num_samples;
-  parser_ = parser;
-  file_ptr_ = OpenFileOrDie(filename_.c_str(), "r");
-  if (file_ptr_ == NULL) { return false; }
-  bool has_field = parser_->Type() == "libffm" ? true : false;
-  data_samples_.Resize(num_samples);
-  data_samples_.InitSparseRow(has_field);
-  return false;*/
 }
 
 // Sample data from disk file.
 int OndiskReader::Samples(DMatrix* &matrix, bool shuffle) {
-  /*
-  static scoped_array<char> line(new char[kMaxLineSize]);
-  static StringList list(num_samples_);
-  int num_lines = 0;
-  for (int i = 0; i < num_samples_; ++i) {
-    if (fgets(line.get(), kMaxLineSize, file_ptr_) == nullptr) {
-      // Either ferror or feof.
-      if (i == 0) {
-        matrix = nullptr;
-        return 0;
-      }
-      break;
-    }
-    int read_len = strlen(line.get());
-    if (line[read_len - 1] != '\n') {
-      LOG(FATAL) << "Encountered a too-long line.   \
-                     Please check the data.";
-    } else {
-      line[read_len - 1] = '\0';
-      // Handle the txt format in DOS and windows.
-      if (read_len > 1 && line[read_len - 2] == '\r') {
-        line[read_len - 2] = '\0';
-      }
-    }
-    list[i].assign(line.get());
-    num_lines++;
-  }
-  // The last data block
-  if (num_lines != num_samples_) {
-    data_samples_.Setlength(num_lines);
-  }
-  parser_->Parse(list, data_samples_);
-  matrix = &data_samples_;
-  return num_lines;*/
   return 0;
 }
 
 // Return to the begining of the file.
-void OndiskReader::Reset() {
-  /*
-  fseek(file_ptr_, 0, SEEK_SET);
-  data_samples_.Setlength(num_samples_);*/
-}
+void OndiskReader::Reset() {}
 
 }  // namespace xLearn

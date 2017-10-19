@@ -98,7 +98,8 @@ class Reader {
   Parser* parser_;
 
   // Check current file format and return
-  // "libsvm" or "libfm". Program crashes for unknow format
+  // "libsvm", "ffm", or "csv". Program crashes for
+  // unknow format
   std::string check_file_format();
 
   // Create parser for different file format
@@ -158,8 +159,9 @@ class InmemReader : public Reader {
 //------------------------------------------------------------------------------
 // Samplling data from disk file.
 // OndiskReader is used to train very big data, which cannot be
-// loaded into main memory of current machine.
-// We use multi-thread to support data pipeline reading
+// loaded into main memory of current single machine.
+// We use multi-thread to support data pipeline reading for
+// better performance
 //------------------------------------------------------------------------------
 class OndiskReader : public Reader {
  public:
@@ -169,10 +171,10 @@ class OndiskReader : public Reader {
   virtual void Initialize(const std::string& filename,
                           int num_samples);
 
-  // Sample data from disk file.
+  // Sample data from disk file
   virtual int Samples(DMatrix* &matrix, bool shuffle = true);
 
-  // Return to the begining of the file.
+  // Return to the begining of the file
   virtual void Reset();
 
  private:
