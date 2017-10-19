@@ -51,8 +51,7 @@ void LinearScore::CalcGrad(const SparseRow* row,
     index_t idx_c = idx_g + 1;
     gradient += regu_lambda_ * w[idx_g];
     w[idx_c] += (gradient * gradient);
-    w[idx_g] -= (learning_rate_ *
-                 gradient *
+    w[idx_g] -= (learning_rate_ * gradient *
                  InvSqrt(w[idx_c]));
   }
 }

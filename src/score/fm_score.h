@@ -29,7 +29,7 @@ namespace xLearn {
 
 //------------------------------------------------------------------------------
 // FMScore is used to implemente factorization machines, in which
-// the socre function is y = wTx + sum[(V_i*V_j)(x_i * x_j)]
+// the socre function is y = sum( (V_i*V_j)(x_i * x_j) )
 //------------------------------------------------------------------------------
 class FMScore : public Score {
  public:

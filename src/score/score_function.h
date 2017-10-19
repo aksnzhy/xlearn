@@ -95,7 +95,6 @@ CLASS_REGISTER_DEFINE_REGISTRY(xLearn_score_registry, Score);
       xLearn_score_registry,                                \
       format_name)
 
-
 }  // namespace xLearn
 
 #endif  // XLEARN_LOSS_SCORE_FUNCTION_H_

@@ -26,13 +26,14 @@ This file is the implementation of FFMScore class.
 
 namespace xLearn {
 
-// y = sum[(V_i_fj*V_j_fi)(x_i * x_j)]
-// Using sse/avx to speed up
+// y = sum( (V_i_fj*V_j_fi)(x_i * x_j) )
+// Using SSE for speedup vector operation
 real_t FFMScore::CalcScore(const SparseRow* row,
                            Model& model,
                            real_t norm) {
   static index_t align0 = 2 * model.get_aligned_k();
   static index_t align1 = model.GetNumField() * align0;
+  static int align = kAlign * 2;
   real_t *w = model.GetParameter_w();
   __m128 XMMt = _mm_setzero_ps();
   for (SparseRow::const_iterator iter_i = row->begin();
@@ -48,7 +49,7 @@ real_t FFMScore::CalcScore(const SparseRow* row,
       real_t* w1_base = w + j1*align1 + f2*align0;
       real_t* w2_base = w + j2*align1 + f1*align0;
       __m128 XMMv = _mm_set1_ps(v1*v2*norm);
-      for (index_t d = 0; d < align0; d += 8) {
+      for (index_t d = 0; d < align0; d += align) {
         __m128 XMMw1 = _mm_load_ps(w1_base + d);
         __m128 XMMw2 = _mm_load_ps(w2_base + d);
         XMMt = _mm_add_ps(XMMt,
@@ -64,13 +65,14 @@ real_t FFMScore::CalcScore(const SparseRow* row,
 }
 
 // Calculate gradient and update current model
-// parameters. Here we use the SSE for speedup
+// Using the SSE for speedup vector operation
 void FFMScore::CalcGrad(const SparseRow* row,
                         Model& model,
                         real_t pg,
                         real_t norm) {
   static index_t align0 = 2 * model.get_aligned_k();
   static index_t align1 = model.GetNumField() * align0;
+  static int align = kAlign * 2;
   real_t *w = model.GetParameter_w();
   __m128 XMMpg = _mm_set1_ps(pg);
   __m128 XMMlr = _mm_set1_ps(learning_rate_);
@@ -89,11 +91,11 @@ void FFMScore::CalcGrad(const SparseRow* row,
       real_t* w2_base = w + j2*align1 + f1*align0;
       __m128 XMMv = _mm_set1_ps(v1*v2*norm);
       __m128 XMMpgv = _mm_mul_ps(XMMv, XMMpg);
-      for (index_t d = 0; d < align0; d += 8) {
+      for (index_t d = 0; d < align0; d += align) {
         real_t *w1 = w1_base + d;
         real_t *w2 = w2_base + d;
-        real_t *wg1 = w1 + 4;
-        real_t *wg2 = w1 + 4;
+        real_t *wg1 = w1 + kAlign;
+        real_t *wg2 = w1 + kAlign;
         __m128 XMMw1 = _mm_load_ps(w1);
         __m128 XMMw2 = _mm_load_ps(w2);
         __m128 XMMwg1 = _mm_load_ps(wg1);

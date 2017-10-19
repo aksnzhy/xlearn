@@ -24,7 +24,7 @@ This file is the implementation of FMScore class.
 
 namespace xLearn {
 
-// y = wTx + sum[(V_i*V_j)(x_i * x_j)]
+// y = sum( (V_i*V_j)(x_i * x_j) )
 real_t FMScore::CalcScore(const SparseRow* row,
                           Model& model,
                           real_t norm) {
@@ -37,7 +37,7 @@ real_t FMScore::CalcScore(const SparseRow* row,
     real_t sum_square = 0.0;
     for (SparseRow::const_iterator iter = row->begin();
          iter != row->end(); ++iter) {
-      real_t x = iter->feat_val;
+      real_t x = iter->feat_val * norm;
       index_t pos = (iter->feat_id * num_factor + k) * 2;
       real_t v = w[pos];
       real_t x_v = x*v;
@@ -65,7 +65,7 @@ void FMScore::CalcGrad(const SparseRow* row,
          iter != row->end(); ++iter) {
       index_t pos = (iter->feat_id * num_factor + k) * 2;
       real_t v = w[pos];
-      real_t x = iter->feat_val;
+      real_t x = iter->feat_val * norm;
       v_mul_x += (x*v);
     }
     for (SparseRow::const_iterator iter = row->begin();
@@ -73,11 +73,11 @@ void FMScore::CalcGrad(const SparseRow* row,
       index_t pos_g = (iter->feat_id * num_factor + k) * 2;
       index_t pos_c = pos_g + 1;
       real_t v = w[pos_g];
-      real_t x = iter->feat_val;
+      real_t x = iter->feat_val * norm;
       real_t gradient = x*(v_mul_x-v*x) * pg;
       gradient += regu_lambda_ * w[pos_g];
       w[pos_c] += (gradient * gradient);
-      w[pos_g] -= (learning_rate_ * gradient /
+      w[pos_g] -= (learning_rate_ * gradient *
                    InvSqrt(w[pos_c]));
     }
   }

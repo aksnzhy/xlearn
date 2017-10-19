@@ -68,51 +68,8 @@ TEST_F(FFMScoreTest, calc_score) {
   }
   FFMScore score;
   real_t val = score.CalcScore(&row, model);
-  // 6 + 24*4*3 = 294.0
-  EXPECT_FLOAT_EQ(val, 294.0);
+  // 24*4*3 = 288.0
+  EXPECT_FLOAT_EQ(val, 288.0);
 }
-/*
-TEST_F(FFMScoreTest, calc_grad) {
-  // Reset hyper parameters
-  param.num_feature = 100;
-  param.num_field = 100;
-  param.num_K = 24;
-  // Init SparseRow
-  SparseRow row(param.num_feature);
-  for (index_t i = 0; i < param.num_feature; ++i) {
-    row[i].feat_id = i;
-    row[i].feat_val = 2.0;
-    row[i].field_id = i;
-  }
-  // Init model
-  Model model;
-  model.Initialize(param.score_func,
-                param.loss_func,
-                param.num_feature,
-                param.num_field,
-                param.num_K);
-  real_t* w = model.GetParameter_w();
-  index_t num_w = model.GetNumParameter_w();
-  for (index_t i = 0; i < num_w; ++i) {
-    w[i] = 3.0;
-  }
-  // Create updater
-  Updater* updater = new Updater();
-  updater->Initialize(param.learning_rate,
-                   param.regu_lambda);
-  // Create score function
-  FFMScore score;
-  score.CalcGrad(&row, model, 1.0, updater);
-  // Test
-  for (index_t i = 0; i < model.GetNumFeature(); ++i) {
-    EXPECT_FLOAT_EQ(w[i], 2.8);
-  }
-  for (index_t i = model.GetNumFeature();
-       i < model.GetNumParameter_w(); ++i) {
-    if (w[i] != 3.0) {
-      EXPECT_FLOAT_EQ(w[i], 1.8);
-    }
-  }
-}*/
 
 } // namespace xLearn

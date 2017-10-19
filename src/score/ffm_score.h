@@ -31,7 +31,7 @@ namespace xLearn {
 //------------------------------------------------------------------------------
 // FFMScore is used to implemente field-aware factorization machines,
 // in which the socre function is:
-//   y = wTx + sum[(V_i_fj*V_j_fi)(x_i * x_j)]
+//   y = sum( (V_i_fj*V_j_fi)(x_i * x_j) )
 //------------------------------------------------------------------------------
 class FFMScore : public Score {
 public:
@@ -56,6 +56,6 @@ public:
   DISALLOW_COPY_AND_ASSIGN(FFMScore);
 };
 
-} // namespace xLearn
+}  // namespace xLearn
 
-#endif // XLEARN_LOSS_FFM_SCORE_H_
+#endif  // XLEARN_LOSS_FFM_SCORE_H_

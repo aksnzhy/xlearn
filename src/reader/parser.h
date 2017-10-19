@@ -77,7 +77,7 @@ class Parser {
                          uint64 size);
 
    /* Use instance-wise normalization */
-   bool if_norm_;
+   bool if_norm_ = true;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Parser);
