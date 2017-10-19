@@ -106,10 +106,8 @@ void LibsvmParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
       matrix.AddNode(i, idx, value);
       norm += value;
     }
-    if (if_norm_) {
-      norm = 1.0f / norm;
-      matrix.norm[i] = norm;
-    }
+    norm = 1.0f / norm;
+    matrix.norm[i] = norm;
   }
 }
 
@@ -149,10 +147,8 @@ void FFMParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
       matrix.AddNode(i, idx, value, field_id);
       norm += value * value;
     }
-    if (if_norm_) {
-      norm = 1.0f / norm;
-      matrix.norm[i] = norm;
-    }
+    norm = 1.0f / norm;
+    matrix.norm[i] = norm;
   }
 }
 
@@ -190,10 +186,8 @@ void CSVParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
       matrix.AddNode(i, idx, value);
       norm += value;
     }
-    if (if_norm_) {
-      norm = 1.0f / norm;
-      matrix.norm[i] = norm;
-    }
+    norm = 1.0f / norm;
+    matrix.norm[i] = norm;
   }
 }
 

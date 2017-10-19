@@ -47,12 +47,13 @@ void CrossEntropyLoss::CalcGrad(const DMatrix* matrix,
   // Calculate gradient
   for (size_t i = 0; i < row_len; ++i) {
     SparseRow* row = matrix->row[i];
-    real_t score = score_func_->CalcScore(row, model, matrix->norm[i]);
+    real_t norm = norm_ ? matrix->norm[i] : 1.0;
+    real_t score = score_func_->CalcScore(row, model, norm);
     // partial gradient
     real_t y = matrix->Y[i] > 0 ? 1.0 : -1.0;
     real_t pg = -y/(1.0+(1.0/fasterexp(-y*score)));
     // real gradient and update
-    score_func_->CalcGrad(row, model, pg, matrix->norm[i]);
+    score_func_->CalcGrad(row, model, pg, norm);
   }
 }
 

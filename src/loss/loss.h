@@ -76,7 +76,10 @@ class Loss {
    virtual ~Loss() { }
 
    // This function needs to be invoked before using this class
-   void Initialize(Score* score) { score_func_ = score; }
+   void Initialize(Score* score, bool norm = true) {
+     score_func_ = score;
+     norm_ = norm;
+   }
 
    // Given predictions and labels, return loss value
    virtual real_t Evalute(const std::vector<real_t>& pred,
@@ -123,6 +126,8 @@ class Loss {
   /* The score function, including LinearScore,
      FMScore, FFMScore, etc */
   Score* score_func_;
+  /* Use instance-wise normalization */
+  bool norm_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Loss);

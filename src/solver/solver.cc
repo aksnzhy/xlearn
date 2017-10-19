@@ -225,7 +225,7 @@ void Solver::init_train() {
      *  Step 5: Init loss function                           *
      *********************************************************/
     loss_ = create_loss();
-    loss_->Initialize(score_);
+    loss_->Initialize(score_, hyper_param_.norm);
     LOG(INFO) << "Initialize loss function.";
     /*********************************************************
      *  Step 6: Init metric                                  *
@@ -269,14 +269,14 @@ void Solver::init_predict() {
     /*********************************************************
      *  Step 3: Init score function                          *
      *********************************************************/
-     score_ = create_score();
-     LOG(INFO) << "Initialize score function.";
-     /*********************************************************
-      *  Step 4: Init loss function                           *
-      *********************************************************/
-      loss_ = create_loss();
-      loss_->Initialize(score_);
-      LOG(INFO) << "Initialize score function.";
+    score_ = create_score();
+    LOG(INFO) << "Initialize score function.";
+    /*********************************************************
+     *  Step 4: Init loss function                           *
+     *********************************************************/
+    loss_ = create_loss();
+    loss_->Initialize(score_, hyper_param_.norm);
+    LOG(INFO) << "Initialize score function.";
 }
 
 /******************************************************************************
