@@ -45,7 +45,7 @@ namespace xLearn {
 // We can use Solver class like this:
 //
 //  xLearn::Solver solver;
-//  solver.SetPredict();   // or solver.SetPredict()
+//  solver.SetTrain();   // or solver.SetPredict()
 //  solver.Initialize(argc, argv);
 //  solver.StartWork();
 //  solver.Finalize();
