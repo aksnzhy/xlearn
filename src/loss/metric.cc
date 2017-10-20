@@ -31,11 +31,23 @@ real_t Metric::Accuracy() {
 }
 
 real_t Metric::Precision() {
-  return 0;
+  real_t res = 0;
+  real_t pos_prec = (pre_pos_example_ * 1.0) /
+        (pre_pos_example_ + (real_neg_example_ - pre_neg_example_));
+  real_t neg_prec = (pre_neg_example_ * 1.0) /
+        (pre_neg_example_ + (real_pos_example_ - pre_pos_example_));
+  res = (pos_prec + neg_prec) / 2.0;
+  return res;
 }
 
 real_t Metric::Recall() {
-  return 0;
+  real_t res = 0;
+  real_t pos_recall = (pre_pos_example_ * 1.0) /
+         (pre_pos_example_ + (real_pos_example_ - pre_pos_example_));
+  real_t neg_recall = (pre_neg_example_ * 1.0) /
+         (pre_neg_example_ + (real_neg_example_ - pre_neg_example_));
+  res = (pos_recall + neg_recall) / 2.0;
+  return res;
 }
 
 real_t Metric::ROC() {
