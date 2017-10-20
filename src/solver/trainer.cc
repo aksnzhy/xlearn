@@ -118,7 +118,7 @@ void Trainer::show_train_info(real_t tr_loss, real_t tr_metric,
   std::cout << std::endl;
 }
 
-// Standard training
+// The basic
 void Trainer::Train() {
   // show head info
   bool validate = test_reader_ == nullptr ? false : true;
@@ -136,16 +136,14 @@ void Trainer::Train() {
     //----------------------------------------------------
     real_t tr_loss = 0.0;
     real_t tr_metric = 0.0;
-    CalcLoss_Metric(train_reader_,
-      &tr_loss, &tr_metric);
+    CalcLoss_Metric(train_reader_, &tr_loss, &tr_metric);
     //----------------------------------------------------
     // Calc Test loss
     //----------------------------------------------------
     real_t te_loss = 0.0;
     real_t te_metric = 0.0;
     if (validate) {
-      CalcLoss_Metric(test_reader_,
-        &te_loss, &te_metric);
+      CalcLoss_Metric(test_reader_, &te_loss, &te_metric);
     }
     end = clock();
     real_t time_cost = (real_t)(end-start) / CLOCKS_PER_SEC;
@@ -160,12 +158,11 @@ void Trainer::Train() {
 void Trainer::CVTrain() {
   std::vector<real_t> train_loss(reader_list_.size());
   std::vector<real_t> test_loss(reader_list_.size());
-  // Use ith Reader as validation Reader
+  // Use the i-th Reader as validation Reader
   for (int i = 0; i < reader_list_.size(); ++i) {
     printf("  Cross-validation: %d/%lu: \n", i+1, reader_list_.size());
     // for n epoch
     for (int n = 0; n < epoch_; ++n) {
-      //TIME_START();
       // Use the other Reader to train
       for (int j = 0; j < reader_list_.size(); ++j) {
         if (i == j) { continue; }

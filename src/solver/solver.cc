@@ -255,28 +255,28 @@ void Solver::init_predict() {
    /*********************************************************
     *  Init Reader and read problem                         *
     *********************************************************/
-    // Create Reader
-    reader_.resize(1, create_reader());
-    CHECK_NE(hyper_param_.predict_file.empty(), true);
-    reader_[0]->Initialize(hyper_param_.predict_file,
-                           hyper_param_.sample_size);
-    if (reader_[0] == NULL) {
-      printf("Cannot open the file %s\n",
-             hyper_param_.predict_file.c_str());
-      exit(0);
-    }
-    LOG(INFO) << "Initialize Parser ans Reader.";
-    /*********************************************************
-     *  Init score function                                  *
-     *********************************************************/
-    score_ = create_score();
-    LOG(INFO) << "Initialize score function.";
-    /*********************************************************
-     *  Init loss function                                   *
-     *********************************************************/
-    loss_ = create_loss();
-    loss_->Initialize(score_, hyper_param_.norm);
-    LOG(INFO) << "Initialize score function.";
+   // Create Reader
+   reader_.resize(1, create_reader());
+   CHECK_NE(hyper_param_.predict_file.empty(), true);
+   reader_[0]->Initialize(hyper_param_.predict_file,
+                          hyper_param_.sample_size);
+   if (reader_[0] == NULL) {
+    printf("Cannot open the file %s\n",
+            hyper_param_.predict_file.c_str());
+    exit(0);
+   }
+   LOG(INFO) << "Initialize Parser ans Reader.";
+   /*********************************************************
+    *  Init score function                                  *
+    *********************************************************/
+   score_ = create_score();
+   LOG(INFO) << "Initialize score function.";
+   /*********************************************************
+    *  Init loss function                                   *
+    *********************************************************/
+   loss_ = create_loss();
+   loss_->Initialize(score_, hyper_param_.norm);
+   LOG(INFO) << "Initialize score function.";
 }
 
 /******************************************************************************
@@ -311,7 +311,7 @@ void Solver::start_train_work() {
   } else { // do not use cv
     Trainer trainer;
     Reader* train_reader = reader_[0];
-    Reader* test_reader = NULL;
+    Reader* test_reader = nullptr;
     if (!hyper_param_.test_set_file.empty()) {
       test_reader = reader_[1];
     }
