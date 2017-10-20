@@ -351,6 +351,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     printf("[Warning] -c (cross-validation) has be set, and "
            "xLearn will ignore the test file: %s \n",
            hyper_param.test_set_file.c_str());
+    hyper_param.test_set_file.clear();
   }
   if (hyper_param.early_stop &&
       hyper_param.test_set_file.empty() &&
@@ -359,6 +360,18 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
            "assign a test set via '-t' option, or using "
            "cross-validation. \n");
     exit(0);
+  }
+  if (hyper_param.cross_validation &&
+      !hyper_param.model_file.empty()) {
+    printf("[Warning] Training in cross-validation and will "
+           "not dump the final model checkpoint. \n");
+    hyper_param.model_file.clear();
+  }
+  if (hyper_param.cross_validation &&
+      hyper_param.quiet) {
+    printf("[Warning] Cannot use -quiet option in "
+           "cross-validation. \n");
+    hyper_param.quiet = false;      
   }
 
   return true;

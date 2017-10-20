@@ -77,8 +77,8 @@ void InmemReader::Initialize(const std::string& filename,
   CHECK_GT(num_samples, 0);
   filename_ = filename;
   num_samples_ = num_samples;
-  printf("First check if the text file has been already "
-         "converted to binary format \n");
+  printf("First check if the text file (%s) has been already "
+         "converted to binary format \n", filename.c_str());
   // HashBinary() will read the first two hash value
   // and then check it whether equal to the hash value generated
   // by HashFile() function from current txt file
