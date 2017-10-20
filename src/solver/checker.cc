@@ -328,7 +328,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("--no-norm") == 0) {
       hyper_param.norm = false;
       i += 1;
-    } else if (list[i].compare("quiet") == 0) {
+    } else if (list[i].compare("--quiet") == 0) {
       hyper_param.quiet = true;
       i += 1;
     } else {  // no match
@@ -339,6 +339,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
              list[i].c_str(),
              similar_str.c_str());
       bo = false;
+      i += 1;
     }
   }
   if (!bo) { return false; }

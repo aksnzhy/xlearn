@@ -197,42 +197,42 @@ void Solver::init_train() {
   /*********************************************************
    *  Init Model                                           *
    *********************************************************/
-   start = clock();
-   printf("Initialize model ...\n");
-   // Initialize parameters
-   model_ = new Model();
-   model_->Initialize(hyper_param_.score_func,
+  start = clock();
+  printf("Initialize model ...\n");
+  // Initialize parameters
+  model_ = new Model();
+  model_->Initialize(hyper_param_.score_func,
                    hyper_param_.loss_func,
                    hyper_param_.num_feature,
                    hyper_param_.num_field,
                    hyper_param_.num_K);
-   index_t num_param = model_->GetNumParameter_w();
-   hyper_param_.num_param = num_param;
-   LOG(INFO) << "Number parameters: " << num_param;
-   printf("  Model size: %.2f MB\n",
+  index_t num_param = model_->GetNumParameter_w();
+  hyper_param_.num_param = num_param;
+  LOG(INFO) << "Number parameters: " << num_param;
+  printf("  Model size: %.2f MB\n",
            (double) num_param / (1024.0 * 1024.0));
-   end = clock();
-   printf("  Time cost for model initial: %.2f sec \n",
+  end = clock();
+  printf("  Time cost for model initial: %.2f sec \n",
      (float)(end-start) / CLOCKS_PER_SEC);
-    /*********************************************************
-     *  Init score function                                  *
-     *********************************************************/
-    score_ = create_score();
-    score_->Initialize(hyper_param_.learning_rate,
-                  hyper_param_.regu_lambda);
-    LOG(INFO) << "Initialize score function.";
-    /*********************************************************
-     *  Init loss function                                   *
-     *********************************************************/
-    loss_ = create_loss();
-    loss_->Initialize(score_, hyper_param_.norm);
-    LOG(INFO) << "Initialize loss function.";
-    /*********************************************************
-     *  Init metric                                          *
-     *********************************************************/
-    metric_ = create_metric();
-    metric_->Initialize(hyper_param_.metric);
-    LOG(INFO) << "Initialize evaluation metric.";
+  /*********************************************************
+   *  Init score function                                  *
+   *********************************************************/
+  score_ = create_score();
+  score_->Initialize(hyper_param_.learning_rate,
+                     hyper_param_.regu_lambda);
+  LOG(INFO) << "Initialize score function.";
+  /*********************************************************
+   *  Init loss function                                   *
+   *********************************************************/
+  loss_ = create_loss();
+  loss_->Initialize(score_, hyper_param_.norm);
+  LOG(INFO) << "Initialize loss function.";
+  /*********************************************************
+   *  Init metric                                          *
+   *********************************************************/
+  metric_ = create_metric();
+  metric_->Initialize(hyper_param_.metric);
+  LOG(INFO) << "Initialize evaluation metric.";
 }
 
 // Initialize predict task
@@ -298,36 +298,30 @@ void Solver::StartWork() {
 void Solver::start_train_work() {
   int epoch = hyper_param_.num_epoch;
   bool early_stop = hyper_param_.early_stop;
+  bool quiet = hyper_param_.quiet;
+  bool save_model = hyper_param_.model_file == "none" ? false: true;
+  Trainer trainer;
+  trainer.Initialize(reader_,  /* Reader list */
+                     epoch,
+                     model_,
+                     loss_,
+                     metric_,
+                     early_stop,
+                     quiet);
+  printf("Start to train ... \n");
   if (hyper_param_.cross_validation) {
-    Trainer trainer;
-    trainer.Initialize(reader_, /* reader list */
-                       epoch,
-                       model_,
-                       loss_,
-                       early_stop);
-    printf("Start to train ... \n");
     trainer.CVTrain();
     printf("Finish training. \n");
-  } else { // do not use cv
-    Trainer trainer;
-    Reader* train_reader = reader_[0];
-    Reader* test_reader = nullptr;
-    if (!hyper_param_.test_set_file.empty()) {
-      test_reader = reader_[1];
-    }
-    trainer.Initialize(train_reader,
-                       test_reader,
-                       epoch,
-                       model_,
-                       loss_,
-                       metric_,
-                       early_stop);
-    printf("Start to train ... \n");
+  } else {
     trainer.Train();
-    printf("Finish training and start to save model ...\n"
-           "  Filename: %s\n",
-           hyper_param_.model_file.c_str());
-    trainer.SaveModel(hyper_param_.model_file);
+    if (save_model) {
+      printf("Finish training and start to save model ...\n"
+             "  Filename: %s\n",
+             hyper_param_.model_file.c_str());
+      trainer.SaveModel(hyper_param_.model_file);
+    } else {
+      printf("Finish training \n");
+    }
   }
 }
 

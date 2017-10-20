@@ -97,6 +97,9 @@ class Model {
   // Get the size of model parameters
   index_t GetNumParameter_w() { return param_num_w_; }
 
+  // Re-init current model parameters
+  void Reset() { set_value(); }
+
   // Other Get functions
   std::string GetScoreFunction() { return score_func_; }
   std::string GetLossFunction() { return loss_func_; }
@@ -134,6 +137,9 @@ class Model {
 
   // Initialize model parameters and gradient cache
   void Initialize_w(bool set_value = false);
+
+  // Re-init current model parameters
+  void set_value();
 
   // Serialize w  to disk file
   void serialize_w(FILE* file);

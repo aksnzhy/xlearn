@@ -42,79 +42,63 @@ class Trainer {
   Trainer() {}
   ~Trainer() {}
 
-  // Init for standard training
-  void Initialize(Reader* train_reader,
-                  Reader* test_reader,
+  // Invoke this function before we use this class
+  void Initialize(std::vector<Reader*>& reader_list,
                   int epoch,
                   Model* model,
                   Loss* loss,
                   Metric* metric,
-                  bool early_stop) {
-    CHECK_NOTNULL(train_reader);
+                  bool early_stop,
+                  bool quiet) {
+    CHECK_NE(reader_list.empty(), true);
     CHECK_GT(epoch, 0);
     CHECK_NOTNULL(model);
     CHECK_NOTNULL(loss);
     CHECK_NOTNULL(metric);
-    train_reader_ = train_reader;
-    test_reader_ = test_reader;
+    reader_list_ = reader_list;
     epoch_ = epoch;
     model_ = model;
     loss_ = loss;
     metric_ = metric;
     early_stop_ = early_stop;
+    quiet_ = quiet;
   }
 
-  // Init for CV training
-  void Initialize(std::vector<Reader*> reader_list,
-                  int epoch,
-                  Model* model,
-                  Loss* loss,
-                  bool early_stop) {
-    CHECK_NE(reader_list.empty(), true);
-    reader_list_.resize(reader_list.size(), NULL);
-    for (int i = 0; i < reader_list.size(); ++i) {
-      CHECK_NOTNULL(reader_list[i]);
-      reader_list_[i] = reader_list[i];
-    }
-    CHECK_GT(epoch, 0);
-    CHECK_NOTNULL(model);
-    CHECK_NOTNULL(loss);
-    epoch_ = epoch;
-    model_ = model;
-    loss_ = loss;
-    early_stop_ = early_stop;
-  }
-
-  // Standard training
+  // Training without cross-validation
   void Train();
 
-  // cross_validation training
+  // Training using cross-validation
   void CVTrain();
 
   // Save model to disk file
   void SaveModel(const std::string& filename) {
+    CHECK_NE(filename.compare("none"), 0);
     model_->Serialize(filename);
   }
 
  protected:
-  Reader* train_reader_;
-  Reader* test_reader_;
   std::vector<Reader*> reader_list_;
   int epoch_;
   Model* model_;
   Loss* loss_;
   Metric* metric_;
   bool early_stop_;
+  bool quiet_;
+
+  // Basic train function
+  void train(std::vector<Reader*> train_reader,
+             std::vector<Reader*> test_reader);
 
   void show_head_info(bool validate);
   void show_train_info(real_t tr_loss, real_t tr_metric,
                        real_t te_loss, real_t te_metric,
                        real_t time_cost, bool validate, index_t n);
 
-  void CalcGrad_Update();
-  void CalcLoss_Metric(Reader* reader,
-                       real_t* loss_val,
-                       real_t* metric_val);
+  // Caculate gradient and update model
+  void CalcGrad_Update(std::vector<Reader*>& reader_list);
+  // Calculate loss and evaluation metric
+  void CalcLoss_Metric(std::vector<Reader*>& reader_list,
+                       real_t* loss_val, real_t* metric_val);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Trainer);

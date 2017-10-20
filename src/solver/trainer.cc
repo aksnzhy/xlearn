@@ -27,50 +27,6 @@ This file is the implementation of the Trainer class.
 
 namespace xLearn {
 
-// Calculate gradient and update model
-void Trainer::CalcGrad_Update() {
-  train_reader_->Reset();
-  DMatrix* matrix = nullptr;
-  while (train_reader_->Samples(matrix)) {
-    loss_->CalcGrad(matrix, *model_);
-  }
-}
-
-// Calculate loss
-void Trainer::CalcLoss_Metric(Reader* reader,
-                              real_t* loss,
-                              real_t* metric) {
-  reader->Reset();
-  DMatrix* matrix = nullptr;
-  index_t count_sample = 0;
-  real_t loss_val = 0.0;
-  index_t real_pos_example = 0;
-  index_t real_neg_example = 0;
-  index_t pre_pos_example = 0;
-  index_t pre_neg_example = 0;
-  static std::vector<real_t> pred;
-  int tmp = 0;
-  while (1) {
-    tmp = reader->Samples(matrix);
-    if (tmp == 0) { break; }
-    if (tmp != pred.size()) { pred.resize(tmp); }
-    count_sample += tmp;
-    loss_->Predict(matrix, *model_, pred);
-    metric_->Accumulate(&real_pos_example,
-                      &real_neg_example,
-                      &pre_pos_example,
-                      &pre_neg_example,
-                      matrix->Y,
-                      pred);
-    loss_val += loss_->Evalute(pred, matrix->Y);
-  }
-  loss_val /= count_sample;
-  *loss = loss_val;
-  metric_->Set(real_pos_example, real_neg_example,
-               pre_pos_example, pre_neg_example);
-  *metric = metric_->GetMetric();
-}
-
 /*********************************************************
  *  Show head info                                       *
  *********************************************************/
@@ -118,129 +74,130 @@ void Trainer::show_train_info(real_t tr_loss, real_t tr_metric,
   std::cout << std::endl;
 }
 
-// The basic
-void Trainer::Train() {
-  // show head info
-  bool validate = test_reader_ == nullptr ? false : true;
-  show_head_info(validate);
-  //for in n epoch
+/*********************************************************
+ *  Basic train function                                 *
+ *********************************************************/
+void Trainer::train(std::vector<Reader*> train_reader,
+                    std::vector<Reader*> test_reader) {
+  bool validate = test_reader.empty() ? false : true;
+  // Show header info
+  if (!quiet_) {
+    show_head_info(validate);
+  }
   for (int n = 0; n < epoch_; ++n) {
     clock_t start, end;
     start = clock();
     //----------------------------------------------------
     // Calc grad and update model
     //----------------------------------------------------
-    CalcGrad_Update();
-    //----------------------------------------------------
-    // Calc Train loss
-    //----------------------------------------------------
-    real_t tr_loss = 0.0;
-    real_t tr_metric = 0.0;
-    CalcLoss_Metric(train_reader_, &tr_loss, &tr_metric);
-    //----------------------------------------------------
-    // Calc Test loss
-    //----------------------------------------------------
-    real_t te_loss = 0.0;
-    real_t te_metric = 0.0;
-    if (validate) {
-      CalcLoss_Metric(test_reader_, &te_loss, &te_metric);
+    CalcGrad_Update(train_reader);
+    // we don't do any evaluation in a quiet model
+    if (!quiet_) {
+      //----------------------------------------------------
+      // Calc Train loss
+      //----------------------------------------------------
+      real_t tr_loss = 0.0;
+      real_t tr_metric = 0.0;
+      CalcLoss_Metric(train_reader, &tr_loss, &tr_metric);
+      //----------------------------------------------------
+      // Calc Test loss
+      //----------------------------------------------------
+      real_t te_loss = 0.0;
+      real_t te_metric = 0.0;
+      if (validate) {
+        CalcLoss_Metric(test_reader, &te_loss, &te_metric);
+      }
+      end = clock();
+      real_t time_cost = (real_t)(end-start) / CLOCKS_PER_SEC;
+      // show train info
+      show_train_info(tr_loss, tr_metric,
+                      te_loss, te_metric,
+                      time_cost, validate, n);
     }
-    end = clock();
-    real_t time_cost = (real_t)(end-start) / CLOCKS_PER_SEC;
-    // show train info
-    show_train_info(tr_loss, tr_metric,
-                    te_loss, te_metric,
-                    time_cost, validate, n);
   }
+}
+
+// Calculate gradient and update model
+void Trainer::CalcGrad_Update(std::vector<Reader*>& reader) {
+  CHECK_NE(reader.empty(), true);
+  for (int i = 0; i < reader.size(); ++i) {
+    reader[i]->Reset();
+    DMatrix* matrix = nullptr;
+    while (reader[i]->Samples(matrix)) {
+      loss_->CalcGrad(matrix, *model_);
+    }
+  }
+}
+
+// Calculate loss
+void Trainer::CalcLoss_Metric(std::vector<Reader*>& reader,
+                              real_t* loss,
+                              real_t* metric) {
+  CHECK_NE(reader.empty(), true);
+  DMatrix* matrix = nullptr;
+  index_t count_sample = 0;
+  real_t loss_val = 0.0;
+  index_t real_pos_example = 0;
+  index_t real_neg_example = 0;
+  index_t pre_pos_example = 0;
+  index_t pre_neg_example = 0;
+  std::vector<real_t> pred;
+  for (int i = 0; i < reader.size(); ++i) {
+    reader[i]->Reset();
+    index_t tmp = 0;
+    while (1) {
+      tmp = reader[i]->Samples(matrix);
+      if (tmp == 0) { break; }
+      if (tmp != pred.size()) { pred.resize(tmp); }
+      count_sample += tmp;
+      loss_->Predict(matrix, *model_, pred);
+      metric_->Accumulate(&real_pos_example,
+                      &real_neg_example,
+                      &pre_pos_example,
+                      &pre_neg_example,
+                      matrix->Y,
+                      pred);
+      loss_val += loss_->Evalute(pred, matrix->Y);
+    }
+  }
+  loss_val /= count_sample;
+  *loss = loss_val;
+  metric_->Set(real_pos_example, real_neg_example,
+               pre_pos_example, pre_neg_example);
+  *metric = metric_->GetMetric();
+}
+
+// The basic
+void Trainer::Train() {
+  // Get train Reader and test Reader
+  std::vector<Reader*> tr_reader;
+  tr_reader.push_back(reader_list_[0]);
+  std::vector<Reader*> te_reader;
+  if (reader_list_.size() == 2) {
+    te_reader.push_back(reader_list_[1]);
+  }
+  this->train(tr_reader, te_reader);
 }
 
 // Training using cross-validation
 void Trainer::CVTrain() {
-  std::vector<real_t> train_loss(reader_list_.size());
-  std::vector<real_t> test_loss(reader_list_.size());
-  // Use the i-th Reader as validation Reader
+  // Use the i-th reader as validation Reader
   for (int i = 0; i < reader_list_.size(); ++i) {
-    printf("  Cross-validation: %d/%lu: \n", i+1, reader_list_.size());
-    // for n epoch
-    for (int n = 0; n < epoch_; ++n) {
-      // Use the other Reader to train
-      for (int j = 0; j < reader_list_.size(); ++j) {
-        if (i == j) { continue; }
-        train_reader_ = reader_list_[j];
-        train_reader_->Reset();
-        DMatrix* matrix = NULL;
-        while (train_reader_->Samples(matrix)) {
-          loss_->CalcGrad(matrix, *model_);
-        }
-      }
-      // Calc train loss
-      index_t count_sample = 0;
-      real_t loss_val = 0.0;
-      std::vector<real_t> pred;
-      int tmp = 0;
-      for (int j = 0; j < reader_list_.size(); ++j) {
-        if (i == j) { continue; }
-        train_reader_ = reader_list_[j];
-        train_reader_->Reset();
-        DMatrix* matrix = NULL;
-        while (1) {
-          tmp = train_reader_->Samples(matrix);
-          if (tmp == 0) { break; }
-          if (tmp != pred.size()) {
-            pred.resize(tmp);
-          }
-          count_sample += tmp;
-          loss_->Predict(matrix, *model_, pred);
-          loss_val += loss_->Evalute(pred, matrix->Y);
-        }
-      }
-      loss_val /= count_sample;
-      if (n == epoch_-1) {
-        train_loss[i] = loss_val;
-      }
-      printf("    Epoch %d  |  Train loss: %f  |", n, loss_val);
-      // Calc Test loss
-      count_sample = 0;
-      loss_val = 0.0;
-      tmp = 0;
-      test_reader_ = reader_list_[i];
-      test_reader_->Reset();
-      DMatrix* matrix = NULL;
-      while (1) {
-        tmp = test_reader_->Samples(matrix);
-        if (tmp == 0) { break; }
-        if (tmp != pred.size()) {
-          pred.resize(tmp);
-        }
-        count_sample += tmp;
-        loss_->Predict(matrix, *model_, pred);
-        loss_val += loss_->Evalute(pred, matrix->Y);
-      }
-      loss_val /= count_sample;
-      if (n == epoch_-1) {
-        test_loss[i] = loss_val;
-      }
-      printf("  Test loss: %f  |", loss_val);
-      //TIME_END();
-      printf("  ");
-      //SHOW_TIME();
-      printf("  |\n");
+    printf("Cross-validation: %d/%lu: \n", i+1, reader_list_.size());
+    // Get the train Reader and test Reader
+    std::vector<Reader*> tr_reader;
+    for (int j = 0; j < reader_list_.size(); ++j) {
+      if (i == j) { continue; }
+      tr_reader.push_back(reader_list_[j]);
     }
+    std::vector<Reader*> te_reader;
+    te_reader.push_back(reader_list_[i]);
+    if (i != 0) {
+      // Re-init current model parameters
+      model_->Reset();
+    }
+    this->train(tr_reader, te_reader);
   }
-  // average train loss
-  real_t aver = 0;
-  for (int i = 0; i < train_loss.size(); ++i) {
-    aver += train_loss[i];
-  }
-  aver /= train_loss.size();
-  printf("  Average train loss: %f \n", aver);
-  // average test loss
-  aver = 0;
-  for (int i = 0; i < test_loss.size(); ++i) {
-    aver += test_loss[i];
-  }
-  aver /= test_loss.size();
-  printf("  Average test loss: %f \n", aver);
 }
 
 } // namespace xLearn
