@@ -51,9 +51,9 @@ std::string Checker::option_help() const {
 "         5 -- factorization machines (FM) \n"
 "         6 -- field-aware factorization machines (FFM) \n"
 "                                                                            \n"
-"  -x <metric>          :  Evaluation metric can be 'acc', 'prec', 'recall', 'roc', 'auc', \n"
-"                          and 'mae', and 'mse'. Using 'acc' - Accuracy by default. If we set \n"
-"                          this flag to 'none', xlearn will not output any metric information. \n"
+"  -x <metric>          :  The metric can be 'acc', 'prec', 'recall', 'f1' (for classification), \n"
+"                          and 'mae', 'mape' (for regression). Using 'acc' - Accuracy by default. \n "
+"                          If we set this flag to 'none', xlearn will not print any metric info. \n"
 "                                                                                              \n"
 "  -t <test_file_path>  :  Path of the test data file. This option will be empty by default, \n"
 "                          and in this way, the xLearn will not perform validation. \n"
@@ -234,13 +234,12 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       if (list[i+1].compare("acc") != 0 &&
           list[i+1].compare("prec") != 0 &&
           list[i+1].compare("recall") != 0 &&
-          list[i+1].compare("roc") != 0 &&
-          list[i+1].compare("auc") != 0 &&
+          list[i+1].compare("f1") != 0 &&
           list[i+1].compare("mae") != 0 &&
-          list[i+1].compare("mse") != 0) {
+          list[i+1].compare("mape") != 0) {
         printf("[Error] Unknow metric : %s \n"
                " -x can only be 'acc', 'prec', 'recall', "
-               "'roc', 'auc', 'mae', or 'mse' \n", list[i+1].c_str());
+               "'f1', 'mae', or 'mape' \n", list[i+1].c_str());
         bo = false;
       } else {
         hyper_param.metric = list[i+1];
@@ -371,7 +370,29 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       hyper_param.quiet) {
     printf("[Warning] Cannot use -quiet option in "
            "cross-validation. \n");
-    hyper_param.quiet = false;      
+    hyper_param.quiet = false;
+  }
+  if (hyper_param.loss_func.compare("cross-entropy") == 0 ||
+      hyper_param.loss_func.compare("hinge") == 0) {
+    // for classification
+    if (hyper_param.metric.compare("mae") ||
+        hyper_param.metric.compare("mape")) {
+      printf("[Error] The -x: %s metric can only be used "
+             "in regression tasks. \n",
+             hyper_param.metric.c_str());
+      exit(0);
+    }
+  } else if (hyper_param.loss_func.compare("squared")) {
+    // for regression
+    if (hyper_param.metric.compare("acc") ||
+        hyper_param.metric.compare("prec") ||
+        hyper_param.metric.compare("recall") ||
+        hyper_param.metric.compare("f1")) {
+      printf("[Error] The -x: %s metric can only be used "
+             "in classification tasks. \n",
+              hyper_param.metric.c_str());
+      exit(0);
+    }
   }
 
   return true;

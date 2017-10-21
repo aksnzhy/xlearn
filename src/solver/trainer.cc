@@ -53,10 +53,9 @@ void Trainer::show_head_info(bool validate) {
 /*********************************************************
  *  Show train info                                      *
  *********************************************************/
-void Trainer::show_train_info(real_t tr_loss, real_t tr_metric,
-                              real_t te_loss, real_t te_metric,
-                              real_t time_cost, bool validate,
-                              index_t epoch) {
+void Trainer::show_train_info(real_t tr_loss, const std::string& tr_metric,
+                              real_t te_loss, const std::string& te_metric,
+                              real_t time_cost, bool validate, index_t epoch) {
   std::cout.width(6);
   std::cout << epoch;
   std::cout.width(15);
@@ -96,16 +95,16 @@ void Trainer::train(std::vector<Reader*> train_reader,
       //----------------------------------------------------
       // Calc Train loss
       //----------------------------------------------------
-      real_t tr_loss = 0.0;
-      real_t tr_metric = 0.0;
-      CalcLoss_Metric(train_reader, &tr_loss, &tr_metric);
+      real_t tr_loss = CalcLoss(train_reader);
+      std::string tr_metric = CalcMetric(train_reader);
       //----------------------------------------------------
       // Calc Test loss
       //----------------------------------------------------
       real_t te_loss = 0.0;
-      real_t te_metric = 0.0;
+      std::string te_metric;
       if (validate) {
-        CalcLoss_Metric(test_reader, &te_loss, &te_metric);
+        te_loss = CalcLoss(test_reader);
+        te_metric= CalcMetric(test_reader);
       }
       end = clock();
       real_t time_cost = (real_t)(end-start) / CLOCKS_PER_SEC;
@@ -129,42 +128,44 @@ void Trainer::CalcGrad_Update(std::vector<Reader*>& reader) {
   }
 }
 
-// Calculate loss
-void Trainer::CalcLoss_Metric(std::vector<Reader*>& reader,
-                              real_t* loss,
-                              real_t* metric) {
-  CHECK_NE(reader.empty(), true);
+// Calculate loss value
+real_t Trainer::CalcLoss(std::vector<Reader*>& reader_list) {
+  CHECK_NE(reader_list.empty(), true);
   DMatrix* matrix = nullptr;
   index_t count_sample = 0;
-  real_t loss_val = 0.0;
-  index_t real_pos_example = 0;
-  index_t real_neg_example = 0;
-  index_t pre_pos_example = 0;
-  index_t pre_neg_example = 0;
   std::vector<real_t> pred;
-  for (int i = 0; i < reader.size(); ++i) {
-    reader[i]->Reset();
-    index_t tmp = 0;
-    while (1) {
-      tmp = reader[i]->Samples(matrix);
+  real_t loss_val = 0;
+  for (int i = 0; i < reader_list.size(); ++i) {
+    reader_list[i]->Reset();
+    for (;;) {
+      index_t tmp = reader_list[i]->Samples(matrix);
       if (tmp == 0) { break; }
       if (tmp != pred.size()) { pred.resize(tmp); }
       count_sample += tmp;
       loss_->Predict(matrix, *model_, pred);
-      metric_->Accumulate(&real_pos_example,
-                      &real_neg_example,
-                      &pre_pos_example,
-                      &pre_neg_example,
-                      matrix->Y,
-                      pred);
       loss_val += loss_->Evalute(pred, matrix->Y);
     }
   }
   loss_val /= count_sample;
-  *loss = loss_val;
-  metric_->Set(real_pos_example, real_neg_example,
-               pre_pos_example, pre_neg_example);
-  *metric = metric_->GetMetric();
+  return loss_val;
+}
+
+// Calculate evaluation metric
+std::string Trainer::CalcMetric(std::vector<Reader*>& reader_list) {
+  CHECK_NE(reader_list.empty(), true);
+  DMatrix* matrix = nullptr;
+  std::vector<real_t> pred;
+  for (int i = 0; i < reader_list.size(); ++i) {
+    reader_list[i]->Reset();
+    for (;;) {
+      index_t tmp = reader_list[i]->Samples(matrix);
+      if (tmp == 0) { break; }
+      if (tmp != pred.size()) { pred.resize(tmp); }
+      loss_->Predict(matrix, *model_, pred);
+      metric_->Accumulate(matrix->Y, pred);
+    }
+  }
+  return metric_->GetMetric();
 }
 
 // The basic
