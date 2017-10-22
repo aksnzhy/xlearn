@@ -124,7 +124,7 @@ class Loss {
   }
 
   /* The score function, including LinearScore,
-     FMScore, FFMScore, etc */
+  FMScore, FFMScore, etc */
   Score* score_func_;
   /* Use instance-wise normalization */
   bool norm_;

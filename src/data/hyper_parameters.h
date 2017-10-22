@@ -71,7 +71,7 @@ struct HyperParam {
   /* Sample size for each training iteration
   reader->Samples(matrix) will return this
   value to user */
-  int sample_size = 200;
+  int sample_size = 2000;
   /* True for use instance-wise
   normalization. False for not */
   bool norm = true;
