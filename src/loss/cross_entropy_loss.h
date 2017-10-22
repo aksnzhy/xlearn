@@ -48,7 +48,7 @@ class CrossEntropyLoss : public Loss {
                 Model& model);
 
   // Return current loss type
-  virtual std::string loss_type() { return "cross-entropy"; }
+  virtual std::string loss_type() { return "log_loss"; }
 
  private:
   DISALLOW_COPY_AND_ASSIGN(CrossEntropyLoss);

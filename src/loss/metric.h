@@ -38,10 +38,9 @@ class Metric {
     if (metric.compare("acc") != 0 &&     // Accuracy
         metric.compare("prec") != 0 &&    // Precision
         metric.compare("recall") != 0 &&
-        metric.compare("roc") != 0 &&
-        metric.compare("auc") != 0 &&
+        metric.compare("f1") != 0 &&
         metric.compare("mae") != 0 &&
-        metric.compare("mse") != 0) {
+        metric.compare("mape") != 0) {
       LOG(FATAL) << "Unknow metric: " << metric;
     }
     metric_type_ = metric;
@@ -50,80 +49,31 @@ class Metric {
   // Get metric type
   std::string type() {
     if (metric_type_.compare("acc") == 0) {
-      return "Accuracy";
+      return "accuracy";
     } else if (metric_type_.compare("prec") == 0) {
-      return "Precision";
+      return "precision";
     } else if (metric_type_.compare("recall") == 0) {
-      return "Recall";
-    } else if (metric_type_.compare("roc") == 0) {
-      return "ROC";
-    } else if (metric_type_.compare("auc") == 0) {
-      return "AUC";
+      return "recall";
+    } else if (metric_type_.compare("f1") == 0) {
+      return "F1";
     } else if (metric_type_.compare("mae") == 0) {
-      return "MAE";
-    } else if (metric_type_.compare("mse") == 0) {
-      return "MSE";
+      return "MAP";
+    } else if (metric_type_.compare("mape") == 0) {
+      return "MAPE";
     }
     LOG(ERROR) << "Unknow metric: " << metric_type_;
     return 0;
-  }
-
-  // Set value
-  void Set(index_t real_pos_example,  // number of positive example
-      index_t real_neg_example,  // number of negative example
-      index_t pre_pos_example,  // right prediction for positive example
-      index_t pre_neg_example) {  // right prediction for negative exmaple
-    CHECK_GE(real_pos_example, 0);
-    CHECK_GE(real_neg_example, 0);
-    CHECK_GE(pre_pos_example, 0);
-    CHECK_GE(pre_neg_example, 0);
-    real_pos_example_ = real_pos_example;
-    real_neg_example_ = real_neg_example;
-    pre_pos_example_ = pre_pos_example;
-    pre_neg_example_ = pre_neg_example;
   }
 
   // Will be used during training
-  void Accumulate(index_t* real_pos_example,
-                  index_t* real_neg_example,
-                  index_t* pre_pos_example,
-                  index_t* pre_neg_example,
-                  const std::vector<real_t>& Y,
+  void Accumulate(const std::vector<real_t>& Y,
                   const std::vector<real_t>& pred) {
-    for (index_t i = 0; i < pred.size(); ++i) {
-      if (Y[i] > 0) {
-        (*real_pos_example)++;
-        if (pred[i] >= 0) {
-          (*pre_pos_example)++;
-        }
-      } else {
-        (*real_neg_example)++;
-        if (pred[i] < 0) {
-          (*pre_neg_example)++;
-        }
-      }
-    }
+
   }
 
   // Return metric value
-  real_t GetMetric() {
-    if (metric_type_.compare("acc") == 0) {
-      return Accuracy();
-    } else if (metric_type_.compare("prec") == 0) {
-      return Precision();
-    } else if (metric_type_.compare("recall") == 0) {
-      return Recall();
-    } else if (metric_type_.compare("roc") == 0) {
-      return ROC();
-    } else if (metric_type_.compare("auc") == 0) {
-      return AUC();
-    } else if (metric_type_.compare("mae") == 0) {
-      return MAE();
-    } else if (metric_type_.compare("mse") == 0) {
-      return MSE();
-    }
-    LOG(ERROR) << "Unknow metric: " << metric_type_;
-    return 0;
+  std::string GetMetric() {
+    return "00.00";
   }
 
  private:
@@ -136,10 +86,9 @@ class Metric {
   real_t Accuracy();
   real_t Precision();
   real_t Recall();
-  real_t ROC();
-  real_t AUC();
+  real_t F1();
   real_t MAE();
-  real_t MSE();
+  real_t MAPE();
 
   DISALLOW_COPY_AND_ASSIGN(Metric);
 };

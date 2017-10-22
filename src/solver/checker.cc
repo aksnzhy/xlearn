@@ -375,19 +375,19 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
   if (hyper_param.loss_func.compare("cross-entropy") == 0 ||
       hyper_param.loss_func.compare("hinge") == 0) {
     // for classification
-    if (hyper_param.metric.compare("mae") ||
-        hyper_param.metric.compare("mape")) {
+    if (hyper_param.metric.compare("mae") == 0 ||
+        hyper_param.metric.compare("mape") == 0) {
       printf("[Error] The -x: %s metric can only be used "
              "in regression tasks. \n",
              hyper_param.metric.c_str());
       exit(0);
     }
-  } else if (hyper_param.loss_func.compare("squared")) {
+  } else if (hyper_param.loss_func.compare("squared") == 0) {
     // for regression
-    if (hyper_param.metric.compare("acc") ||
-        hyper_param.metric.compare("prec") ||
-        hyper_param.metric.compare("recall") ||
-        hyper_param.metric.compare("f1")) {
+    if (hyper_param.metric.compare("acc") == 0 ||
+        hyper_param.metric.compare("prec") == 0 ||
+        hyper_param.metric.compare("recall") == 0 ||
+        hyper_param.metric.compare("f1") == 0) {
       printf("[Error] The -x: %s metric can only be used "
              "in classification tasks. \n",
               hyper_param.metric.c_str());

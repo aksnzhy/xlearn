@@ -50,11 +50,7 @@ real_t Metric::Recall() {
   return res;
 }
 
-real_t Metric::ROC() {
-  return 0;
-}
-
-real_t Metric::AUC() {
+real_t Metric::F1() {
   return 0;
 }
 
@@ -62,7 +58,7 @@ real_t Metric::MAE() {
   return 0;
 }
 
-real_t Metric::MSE() {
+real_t Metric::MAPE() {
   return 0;
 }
 

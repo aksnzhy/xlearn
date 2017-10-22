@@ -33,14 +33,16 @@ namespace xLearn {
 void Trainer::show_head_info(bool validate) {
   std::cout.width(6);
   std::cout << "Epoch";
-  std::cout.width(15);
-  std::cout << "Train loss";
+  std::cout.width(25);
+  std::string str = "Train " + loss_->loss_type();
+  std::cout << str;
   std::cout.width(20);
-  std::string str = "Train " + metric_->type();
+  str = "Train " + metric_->type();
   std::cout << str;
   if (validate) {
-    std::cout.width(15);
-    std::cout << "Test loss";
+    std::cout.width(25);
+    str = "Test " + loss_->loss_type();
+    std::cout << str;
     std::cout.width(20);
     str = "Test " + metric_->type();
     std::cout << str;
@@ -58,12 +60,12 @@ void Trainer::show_train_info(real_t tr_loss, const std::string& tr_metric,
                               real_t time_cost, bool validate, index_t epoch) {
   std::cout.width(6);
   std::cout << epoch;
-  std::cout.width(15);
+  std::cout.width(25);
   std::cout << std::fixed << std::setprecision(5) << tr_loss;
   std::cout.width(20);
   std::cout << std::fixed << std::setprecision(5) << tr_metric;
   if (validate) {
-    std::cout.width(15);
+    std::cout.width(25);
     std::cout << std::fixed << std::setprecision(5) << te_loss;
     std::cout.width(20);
     std::cout << std::fixed << std::setprecision(5) << te_metric;
