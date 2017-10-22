@@ -33,21 +33,21 @@ namespace xLearn {
 void Trainer::show_head_info(bool validate) {
   std::cout.width(6);
   std::cout << "Epoch";
-  std::cout.width(25);
+  std::cout.width(20);
   std::string str = "Train " + loss_->loss_type();
   std::cout << str;
   std::cout.width(20);
   str = "Train " + metric_->type();
   std::cout << str;
   if (validate) {
-    std::cout.width(25);
+    std::cout.width(20);
     str = "Test " + loss_->loss_type();
     std::cout << str;
     std::cout.width(20);
     str = "Test " + metric_->type();
     std::cout << str;
   }
-  std::cout.width(19);
+  std::cout.width(20);
   std::cout << "Time cost (s)";
   std::cout << std::endl;
 }
@@ -57,20 +57,21 @@ void Trainer::show_head_info(bool validate) {
  *********************************************************/
 void Trainer::show_train_info(real_t tr_loss, real_t tr_metric,
                               real_t te_loss, real_t te_metric,
-                              real_t time_cost, bool validate, index_t epoch) {
+                              real_t time_cost, bool validate,
+                              index_t epoch) {
   std::cout.width(6);
   std::cout << epoch;
-  std::cout.width(25);
+  std::cout.width(20);
   std::cout << std::fixed << std::setprecision(5) << tr_loss;
   std::cout.width(20);
   std::cout << std::fixed << std::setprecision(5) << tr_metric;
   if (validate) {
-    std::cout.width(25);
+    std::cout.width(20);
     std::cout << std::fixed << std::setprecision(5) << te_loss;
     std::cout.width(20);
     std::cout << std::fixed << std::setprecision(5) << te_metric;
   }
-  std::cout.width(19);
+  std::cout.width(20);
   std::cout << std::fixed << std::setprecision(2) << time_cost;
   std::cout << std::endl;
 }
@@ -91,35 +92,32 @@ void Trainer::train(std::vector<Reader*> train_reader,
     //----------------------------------------------------
     // Calc grad and update model
     //----------------------------------------------------
-    CalcGrad_Update(train_reader);
+    CalcGradUpdate(train_reader);
     // we don't do any evaluation in a quiet model
     if (!quiet_) {
       //----------------------------------------------------
       // Calc Train loss
       //----------------------------------------------------
-      real_t tr_loss = CalcLoss(train_reader);
-      real_t tr_metric = CalcMetric(train_reader);
+      MetricInfo tr_info = CalcLossMetric(train_reader);
       //----------------------------------------------------
       // Calc Test loss
       //----------------------------------------------------
-      real_t te_loss = 0.0;
-      real_t te_metric = 0.0;
+      MetricInfo te_info;
       if (validate) {
-        te_loss = CalcLoss(test_reader);
-        te_metric= CalcMetric(test_reader);
+        te_info = CalcLossMetric(test_reader);
       }
       end = clock();
       real_t time_cost = (real_t)(end-start) / CLOCKS_PER_SEC;
       // show train info
-      show_train_info(tr_loss, tr_metric,
-                      te_loss, te_metric,
+      show_train_info(tr_info.loss_val, tr_info.metric_val,
+                      te_info.loss_val, te_info.metric_val,
                       time_cost, validate, n);
     }
   }
 }
 
 // Calculate gradient and update model
-void Trainer::CalcGrad_Update(std::vector<Reader*>& reader) {
+void Trainer::CalcGradUpdate(std::vector<Reader*>& reader) {
   CHECK_NE(reader.empty(), true);
   for (int i = 0; i < reader.size(); ++i) {
     reader[i]->Reset();
@@ -131,12 +129,13 @@ void Trainer::CalcGrad_Update(std::vector<Reader*>& reader) {
 }
 
 // Calculate loss value
-real_t Trainer::CalcLoss(std::vector<Reader*>& reader_list) {
+MetricInfo Trainer::CalcLossMetric(std::vector<Reader*>& reader_list) {
   CHECK_NE(reader_list.empty(), true);
   DMatrix* matrix = nullptr;
   index_t count_sample = 0;
   std::vector<real_t> pred;
-  real_t loss_val = 0;
+  real_t loss_val = 0.0;
+  metric_->Reset();
   for (int i = 0; i < reader_list.size(); ++i) {
     reader_list[i]->Reset();
     for (;;) {
@@ -146,28 +145,13 @@ real_t Trainer::CalcLoss(std::vector<Reader*>& reader_list) {
       count_sample += tmp;
       loss_->Predict(matrix, *model_, pred);
       loss_val += loss_->Evalute(pred, matrix->Y);
-    }
-  }
-  loss_val /= count_sample;
-  return loss_val;
-}
-
-// Calculate evaluation metric
-real_t Trainer::CalcMetric(std::vector<Reader*>& reader_list) {
-  CHECK_NE(reader_list.empty(), true);
-  DMatrix* matrix = nullptr;
-  std::vector<real_t> pred;
-  for (int i = 0; i < reader_list.size(); ++i) {
-    reader_list[i]->Reset();
-    for (;;) {
-      index_t tmp = reader_list[i]->Samples(matrix);
-      if (tmp == 0) { break; }
-      if (tmp != pred.size()) { pred.resize(tmp); }
-      loss_->Predict(matrix, *model_, pred);
       metric_->Accumulate(matrix->Y, pred);
     }
   }
-  return metric_->GetMetric();
+  MetricInfo info;
+  info.loss_val = loss_val / count_sample;
+  info.metric_val = metric_->GetMetric();
+  return info;
 }
 
 // The basic

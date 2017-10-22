@@ -33,6 +33,11 @@ This file defines the Trainer class.
 
 namespace xLearn {
 
+struct MetricInfo {
+  real_t loss_val;
+  real_t metric_val;
+};
+
 //------------------------------------------------------------------------------
 // Trainer is the core class of xLearn, which can perform standard training
 // process (training set and test set) and cross_validation training process.
@@ -96,11 +101,9 @@ class Trainer {
                        index_t n);
 
   // Caculate gradient and update model
-  void CalcGrad_Update(std::vector<Reader*>& reader_list);
-  // Calculate loss value
-  real_t CalcLoss(std::vector<Reader*>& reader_list);
-  // Calculate evaluation metric
-  real_t CalcMetric(std::vector<Reader*>& reader_list);
+  void CalcGradUpdate(std::vector<Reader*>& reader_list);
+  // Calculate loss value and evaluation metric
+  MetricInfo CalcLossMetric(std::vector<Reader*>& reader_list);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Trainer);

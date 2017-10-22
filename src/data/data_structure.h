@@ -209,9 +209,9 @@ struct DMatrix {
   }
 
   /* The DMatrix has a hash value that is
-   geneerated from the txt file.
-   These two values are used to check whether
-   we can use binary file to speedup data reading */
+  geneerated from the txt file.
+  These two values are used to check whether
+  we can use binary file to speedup data reading */
   uint64 hash_value_1;
   uint64 hash_value_2;
   /* Row length of current matrix */
@@ -219,7 +219,7 @@ struct DMatrix {
   /* Using pointer to implement zero-copy */
   std::vector<SparseRow*> row;
   /* 0 or -1 for negative and +1 for positive
-   example, and others for regression */
+  example, and others for regression */
   std::vector<real_t> Y;
   /* Used for instance-wise normalization */
   std::vector<real_t> norm;

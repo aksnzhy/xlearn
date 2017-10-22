@@ -25,32 +25,34 @@ namespace xLearn {
 
 real_t Metric::Accuracy() {
   real_t res = 0;
-
+  res = (true_pos_ * 1.0 + true_neg_) / counter_;
   return res;
 }
 
 real_t Metric::Precision() {
   real_t res = 0;
-
+  res = (true_pos_ * 1.0) / (true_pos_ + false_pos_);
   return res;
 }
 
 real_t Metric::Recall() {
   real_t res = 0;
-
+  res = (true_pos_ * 1.0) / (true_pos_ + false_neg_);
   return res;
 }
 
 real_t Metric::F1() {
-  return 0;
+  real_t res = 0;
+  res = (2.0 * true_pos_) / (counter_ + true_pos_ - true_neg_);
+  return res;
 }
 
 real_t Metric::MAE() {
-  return 0;
+  return error_accum_ * 1.0 / counter_;
 }
 
 real_t Metric::MAPE() {
-  return 0;
+  return error_accum_ * 1.0 / counter_;;
 }
 
 }  // namespace xLearn
