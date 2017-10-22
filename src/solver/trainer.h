@@ -90,16 +90,17 @@ class Trainer {
              std::vector<Reader*> test_reader);
 
   void show_head_info(bool validate);
-  void show_train_info(real_t tr_loss, const std::string& tr_metric,
-                       real_t te_loss, const std::string& te_metric,
-                       real_t time_cost, bool validate, index_t n);
+  void show_train_info(real_t tr_loss, real_t tr_metric,
+                       real_t te_loss, real_t te_metric,
+                       real_t time_cost, bool validate,
+                       index_t n);
 
   // Caculate gradient and update model
   void CalcGrad_Update(std::vector<Reader*>& reader_list);
   // Calculate loss value
   real_t CalcLoss(std::vector<Reader*>& reader_list);
   // Calculate evaluation metric
-  std::string CalcMetric(std::vector<Reader*>& reader_list);
+  real_t CalcMetric(std::vector<Reader*>& reader_list);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Trainer);

@@ -17,7 +17,7 @@
 /*
 Author: Chao Ma (mctt90@gmail.com)
 This file defines the Metric class, which can be used for
-Accuracy, Precision, Recall, ROC, AUC, MAE, MSE, etc.
+Accuracy, Precision, Recall, F1, MAE, MAPE, etc.
 */
 
 #ifndef XLEARN_LOSS_METRIC_H_
@@ -72,16 +72,26 @@ class Metric {
   }
 
   // Return metric value
-  std::string GetMetric() {
-    return "00.00";
+  real_t GetMetric() {
+    return 0;
   }
 
- private:
+protected:
+  /* Can be 'acc', 'prec', 'recall', 'f1'
+     'mae', and 'mape' */
   std::string metric_type_;
-  index_t real_pos_example_;
-  index_t real_neg_example_;
-  index_t pre_pos_example_;
-  index_t pre_neg_example_;
+  /* The number of real positive */
+  index_t real_pos_;
+  /* The number of real negative */
+  index_t real_neg_;
+  /* The number of true positive */
+  index_t true_pos_;
+  /* The number of false positive */
+  index_t false_pos_;
+  /* The number of true negative */
+  index_t true_neg_;
+  /* The number of false negative */
+  index_t false_neg_;
   // A set of metric funtions
   real_t Accuracy();
   real_t Precision();
@@ -90,6 +100,7 @@ class Metric {
   real_t MAE();
   real_t MAPE();
 
+ private:
   DISALLOW_COPY_AND_ASSIGN(Metric);
 };
 

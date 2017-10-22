@@ -55,8 +55,8 @@ void Trainer::show_head_info(bool validate) {
 /*********************************************************
  *  Show train info                                      *
  *********************************************************/
-void Trainer::show_train_info(real_t tr_loss, const std::string& tr_metric,
-                              real_t te_loss, const std::string& te_metric,
+void Trainer::show_train_info(real_t tr_loss, real_t tr_metric,
+                              real_t te_loss, real_t te_metric,
                               real_t time_cost, bool validate, index_t epoch) {
   std::cout.width(6);
   std::cout << epoch;
@@ -98,12 +98,12 @@ void Trainer::train(std::vector<Reader*> train_reader,
       // Calc Train loss
       //----------------------------------------------------
       real_t tr_loss = CalcLoss(train_reader);
-      std::string tr_metric = CalcMetric(train_reader);
+      real_t tr_metric = CalcMetric(train_reader);
       //----------------------------------------------------
       // Calc Test loss
       //----------------------------------------------------
       real_t te_loss = 0.0;
-      std::string te_metric;
+      real_t te_metric = 0.0;
       if (validate) {
         te_loss = CalcLoss(test_reader);
         te_metric= CalcMetric(test_reader);
@@ -153,7 +153,7 @@ real_t Trainer::CalcLoss(std::vector<Reader*>& reader_list) {
 }
 
 // Calculate evaluation metric
-std::string Trainer::CalcMetric(std::vector<Reader*>& reader_list) {
+real_t Trainer::CalcMetric(std::vector<Reader*>& reader_list) {
   CHECK_NE(reader_list.empty(), true);
   DMatrix* matrix = nullptr;
   std::vector<real_t> pred;
