@@ -115,10 +115,10 @@ class Model {
 
  protected:
   /* Number of model parameters. We store both the model
-   parameter and the gradient cache for adagrad in param_w_
-   For linear socre, param_num =  num_feat * 2
-   For fm, param_num = num_feat * num_K * 2
-   For ffm, param_num = num_feat * num_field * num_K * 2  */
+  parameter and the gradient cache for adagrad in param_w_
+  For linear socre, param_num =  num_feat * 2
+  For fm, param_num = num_feat * num_K * 2
+  For ffm, param_num = num_feat * num_field * num_K * 2  */
   index_t  param_num_w_;
   /* Score function: 'linear', 'fm', or 'ffm' */
   std::string  score_func_;
@@ -129,8 +129,8 @@ class Model {
   /* Number of field (used in ffm, field_id is from 0) */
   index_t  num_field_;
   /* Number of K (used in fm and ffm)
-   Becasue we use SSE, so the real k will be aligned
-   User can get the aligned K by using get_aligned_k() */
+  Becasue we use SSE, so the real k will be aligned
+  User can get the aligned K by using get_aligned_k() */
   index_t  num_K_;
   /* Storing the model parameters and gradient cache */
   real_t*  param_w_;
