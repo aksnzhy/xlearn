@@ -34,6 +34,7 @@ programming convenient.
 #endif
 
 #include <limits>
+#include <chrono>  // for timer
 
 #include "src/base/logging.h"
 
@@ -198,5 +199,49 @@ static const float kFloatMin = std::numeric_limits<float>::min();
 /* To avoid dividing by zero */
 static const float kVerySmallNumber = 1e-15;
 static const double kVerySmallNumberDouble = 1e-15;
+
+//------------------------------------------------------------------------------
+// Timer class
+//------------------------------------------------------------------------------
+
+class Timer {
+ public:
+  Timer() {
+    reset();
+  }
+  ~Timer() {}
+
+  // Reset time start
+  void reset() {
+    begin = std::chrono::high_resolution_clock::now();
+    duration =
+     std::chrono::duration_cast<std::chrono::milliseconds>(begin-begin);
+  }
+
+  // Start
+  void tic() {
+    begin = std::chrono::high_resolution_clock::now();
+  }
+
+  // End
+  float toc() {
+    duration += std::chrono::duration_cast<std::chrono::milliseconds>
+                (std::chrono::high_resolution_clock::now()-begin);
+    return get();
+  }
+
+  // Get time duration
+  float get() {
+    return (float)duration.count() / 1000;
+  }
+
+ protected:
+  std::chrono::high_resolution_clock::time_point begin;
+  std::chrono::milliseconds duration;
+
+ private:
+   DISALLOW_COPY_AND_ASSIGN(Timer);
+};
+
 
 #endif  // XLEARN_BASE_COMMON_H_
