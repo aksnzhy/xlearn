@@ -49,7 +49,7 @@ class HingeLoss : public Loss {
                 Model& model);
 
   // Return current loss type
-  virtual std::string loss_type() { return "hinge_loss"; }
+  std::string loss_type() { return "hinge_loss"; }
 
  private:
   DISALLOW_COPY_AND_ASSIGN(HingeLoss);

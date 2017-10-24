@@ -41,14 +41,14 @@ real_t CrossEntropyLoss::Evalute(const std::vector<real_t>& pred,
 }
 
 // Calculate gradient in one thread
-void cross_entropy(const DMatrix* matrix,
-                      Model* model,
-                      Score* score_func,
-                      bool is_norm,
-                      index_t start,
-                      index_t end) {
-  // Calculate gradient
-  for (size_t i = start; i < end; ++i) {
+void cross_entropy_thread(const DMatrix* matrix,
+                        Model* model,
+                        Score* score_func,
+                        bool is_norm,
+                        index_t start,
+                        index_t end) {
+  CHECK_GT(end, start);
+  for (index_t i = start; i < end; ++i) {
     SparseRow* row = matrix->row[i];
     real_t norm = is_norm ? matrix->norm[i] : 1.0;
     real_t score = score_func->CalcScore(row, *model, norm);
@@ -65,12 +65,12 @@ void CrossEntropyLoss::CalcGrad(const DMatrix* matrix,
                                 Model& model) {
   CHECK_NOTNULL(matrix);
   CHECK_GT(matrix->row_length, 0);
-  size_t row_len = matrix->row_length;
+  index_t row_len = matrix->row_length;
   // multi-thread training
   for (int i = 0; i < threadNumber_; ++i) {
     index_t start = getStart(row_len, threadNumber_, i);
     index_t end = getEnd(row_len, threadNumber_, i);
-    pool_->enqueue(std::bind(cross_entropy,
+    pool_->enqueue(std::bind(cross_entropy_thread,
                              matrix,
                              &model,
                              score_func_,
