@@ -87,8 +87,8 @@ void Trainer::train(std::vector<Reader*> train_reader,
     show_head_info(validate);
   }
   for (int n = 0; n < epoch_; ++n) {
-    clock_t start, end;
-    start = clock();
+    Timer timer;
+    timer.tic();
     //----------------------------------------------------
     // Calc grad and update model
     //----------------------------------------------------
@@ -106,8 +106,7 @@ void Trainer::train(std::vector<Reader*> train_reader,
       if (validate) {
         te_info = CalcLossMetric(test_reader);
       }
-      end = clock();
-      real_t time_cost = (real_t)(end-start) / CLOCKS_PER_SEC;
+      real_t time_cost = timer.toc();
       // show train info
       show_train_info(tr_info.loss_val, tr_info.metric_val,
                       te_info.loss_val, te_info.metric_val,

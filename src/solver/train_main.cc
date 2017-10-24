@@ -28,8 +28,8 @@ This file is the entry for training of the xLearn.
 //------------------------------------------------------------------------------
 
 int main(int argc, char* argv[]) {
-  clock_t start, end;
-  start = clock();
+  Timer timer;
+  timer.tic();
 
   xLearn::Solver solver;
   solver.SetTrain();
@@ -37,9 +37,8 @@ int main(int argc, char* argv[]) {
   solver.StartWork();
   solver.FinalizeWork();
 
-  end = clock();
-  printf("Total time cost: %.2f sec\n",
-         (float)(end-start) / CLOCKS_PER_SEC);
+  real_t time_cost = timer.toc();
+  printf("Total time cost: %.2f sec\n", time_cost);
 
   return 0;
 }
