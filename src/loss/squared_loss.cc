@@ -35,6 +35,47 @@ real_t SquaredLoss::Evalute(const std::vector<real_t>& pred,
   return val;
 }
 
+// Calculate gradient in one thread
+void squared(const DMatrix* matrix,
+                             Model* model,
+                             Score* score_func_,
+                             bool is_norm,
+                             index_t start,
+                             index_t end) {
+
+  // Calculate gradient
+  for (size_t i = start; i < end; ++i) {
+    SparseRow* row = matrix->row[i];
+    real_t norm = is_norm ? matrix->norm[i] : 1.0;
+    real_t score = score_func_->CalcScore(row, *model, norm);
+    // partial gradient
+    real_t pg = score - matrix->Y[i];
+    // real gradient and update
+    score_func_->CalcGrad(row, *model, pg, norm);
+  }
+}
+
+// Calculate gradient in multi-thread
+void SquaredLoss::CalcGrad(const DMatrix* matrix,
+                           Model& model) {
+  CHECK_NOTNULL(matrix);
+  CHECK_GT(matrix->row_length, 0);
+  size_t row_len = matrix->row_length;
+  for (int i = 0; i < threadNumber_; ++i) {
+    size_t start = getStart(row_len, threadNumber_, i);
+    size_t end = getEnd(row_len, threadNumber_, i);
+    pool_->enqueue(std::bind(squared,
+                             matrix,
+                             &model,
+                             score_func_,
+                             norm_,
+                             start,
+                             end));
+  }
+  pool_->Sync();
+}
+
+/*
 // Given data sample and current model, calculate gradient
 // and update current model parameters
 void SquaredLoss::CalcGrad(const DMatrix* matrix,
@@ -52,6 +93,6 @@ void SquaredLoss::CalcGrad(const DMatrix* matrix,
     // real gradient and update
     score_func_->CalcGrad(row, model, pg, norm);
   }
-}
+}*/
 
 } // namespace xLearn

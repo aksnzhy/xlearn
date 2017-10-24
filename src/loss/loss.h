@@ -29,6 +29,7 @@ function or objective function.
 #include "src/base/common.h"
 #include "src/base/class_register.h"
 #include "src/base/math.h"
+#include "src/base/thread_pool.h"
 #include "src/data/model_parameters.h"
 #include "src/score/score_function.h"
 
@@ -79,6 +80,8 @@ class Loss {
    void Initialize(Score* score, bool norm = true) {
      score_func_ = score;
      norm_ = norm;
+     threadNumber_ = std::thread::hardware_concurrency();
+     pool_ = new ThreadPool(threadNumber_);
    }
 
    // Given predictions and labels, return loss value
@@ -111,10 +114,10 @@ class Loss {
    // else new_pred -> 0
    void Sign(const std::vector<real_t>& pred,
              std::vector<real_t>& new_pred) {
-    CHECK_EQ(pred.size(), new_pred.size());
-    for (size_t i = 0; i < pred.size(); ++i) {
-      new_pred[i] = pred[i] >= 0 ? 1 : 0;
-    }
+     CHECK_EQ(pred.size(), new_pred.size());
+     for (size_t i = 0; i < pred.size(); ++i) {
+       new_pred[i] = pred[i] >= 0 ? 1 : 0;
+     }
    }
 
  protected:
@@ -128,10 +131,31 @@ class Loss {
   Score* score_func_;
   /* Use instance-wise normalization */
   bool norm_;
+  /* Thread pool for multi-thread training */
+  ThreadPool* pool_;
+  /* Number of thread in thread pool */
+  size_t threadNumber_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Loss);
 };
+
+// Get start and end index used in multi-thread training
+inline index_t getStart(index_t count, int total, int id) {
+  index_t gap = count / total;
+  index_t start_id = id * gap;
+  return start_id;
+}
+
+inline index_t getEnd(index_t count, int total, int id) {
+  index_t gap = count / total;
+  index_t remain = count % total;
+  index_t end_index = (id+1) * gap;
+  if (id == total-1) {
+    end_index += remain;
+  }
+  return end_index;
+}
 
 //------------------------------------------------------------------------------
 // Class register

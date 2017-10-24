@@ -21,6 +21,9 @@ This file is the implementation of CrossEntropyLoss class.
 
 #include "src/loss/cross_entropy_loss.h"
 
+#include <thread>
+#include<atomic>
+
 namespace xLearn {
 
 // Given predictions (data samples) and labels, return
@@ -37,24 +40,45 @@ real_t CrossEntropyLoss::Evalute(const std::vector<real_t>& pred,
   return val;
 }
 
-// Given data sample and current model, calculate gradient
-// and update current model parameters
+// Calculate gradient in one thread
+void cross_entropy(const DMatrix* matrix,
+                      Model* model,
+                      Score* score_func,
+                      bool is_norm,
+                      index_t start,
+                      index_t end) {
+  // Calculate gradient
+  for (size_t i = start; i < end; ++i) {
+    SparseRow* row = matrix->row[i];
+    real_t norm = is_norm ? matrix->norm[i] : 1.0;
+    real_t score = score_func->CalcScore(row, *model, norm);
+    // partial gradient
+    real_t y = matrix->Y[i] > 0 ? 1.0 : -1.0;
+    real_t pg = -y/(1.0+(1.0/exp(-y*score)));
+    // real gradient and update
+    score_func->CalcGrad(row, *model, pg, norm);
+  }
+}
+
+// Calculate gradient in multi-thread
 void CrossEntropyLoss::CalcGrad(const DMatrix* matrix,
                                 Model& model) {
   CHECK_NOTNULL(matrix);
   CHECK_GT(matrix->row_length, 0);
   size_t row_len = matrix->row_length;
-  // Calculate gradient
-  for (size_t i = 0; i < row_len; ++i) {
-    SparseRow* row = matrix->row[i];
-    real_t norm = norm_ ? matrix->norm[i] : 1.0;
-    real_t score = score_func_->CalcScore(row, model, norm);
-    // partial gradient
-    real_t y = matrix->Y[i] > 0 ? 1.0 : -1.0;
-    real_t pg = -y/(1.0+(1.0/exp(-y*score)));
-    // real gradient and update
-    score_func_->CalcGrad(row, model, pg, norm);
+  // multi-thread training
+  for (int i = 0; i < threadNumber_; ++i) {
+    index_t start = getStart(row_len, threadNumber_, i);
+    index_t end = getEnd(row_len, threadNumber_, i);
+    pool_->enqueue(std::bind(cross_entropy,
+                             matrix,
+                             &model,
+                             score_func_,
+                             norm_,
+                             start,
+                             end));
   }
+  pool_->Sync();
 }
 
 } // namespace xLearn

@@ -37,6 +37,51 @@ real_t HingeLoss::Evalute(const std::vector<real_t>& pred,
   return val;
 }
 
+// Calculate gradient in one thread
+static void hinge(const DMatrix* matrix,
+                             Model* model,
+                             Score* score_func,
+                             bool is_norm,
+                             index_t start,
+                             index_t end) {
+  // Calculate gradient
+  for (size_t i = start; i < end; ++i) {
+    SparseRow* row = matrix->row[i];
+    real_t norm = is_norm ? matrix->norm[i] : 1.0;
+    real_t score = score_func->CalcScore(row, *model, norm);
+    // partial gradient
+    real_t y = matrix->Y[i] > 0 ? 1.0 : -1.0;
+    if (score*y < 1.0) {
+      // real gradient and update
+      real_t pg = -y;
+      // real gradient and update
+      score_func->CalcGrad(row, *model, pg, norm);
+    }
+  }
+}
+
+// Calculate gradient in multi-thread
+void HingeLoss::CalcGrad(const DMatrix* matrix,
+                                Model& model) {
+  CHECK_NOTNULL(matrix);
+  CHECK_GT(matrix->row_length, 0);
+  size_t row_len = matrix->row_length;
+  // multi-thread training
+  for (int i = 0; i < threadNumber_; ++i) {
+    index_t start = getStart(row_len, threadNumber_, i);
+    index_t end = getEnd(row_len, threadNumber_, i);
+    pool_->enqueue(std::bind(hinge,
+                             matrix,
+                             &model,
+                             score_func_,
+                             norm_,
+                             start,
+                             end));
+  }
+  pool_->Sync();
+}
+
+/*
 // Given data sample and current model, calculate gradient
 // and update current model parameters
 void HingeLoss::CalcGrad(const DMatrix* matrix,
@@ -58,6 +103,6 @@ void HingeLoss::CalcGrad(const DMatrix* matrix,
       score_func_->CalcGrad(row, model, pg, norm);
     }
   }
-}
+}*/
 
 } // namespace xLearn

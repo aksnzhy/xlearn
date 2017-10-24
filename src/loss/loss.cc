@@ -34,18 +34,43 @@ REGISTER_LOSS("squared", SquaredLoss);
 REGISTER_LOSS("hinge", HingeLoss);
 REGISTER_LOSS("cross-entropy", CrossEntropyLoss);
 
-// Given data sample and current model, return predictions.
+// Predict in one thread
+void pred_thread(const DMatrix* matrix,
+                        Model* model,
+                        std::vector<real_t>* pred,
+                        Score* score_func_,
+                        bool is_norm,
+                        index_t start,
+                        index_t end) {
+  for (size_t i = start; i < end; ++i) {
+    SparseRow* row = matrix->row[i];
+    real_t norm = is_norm ? matrix->norm[i] : 1.0;
+    (*pred)[i] = score_func_->CalcScore(row, *model, norm);
+  }
+}
+
+// Predict in multi-thread
 void Loss::Predict(const DMatrix* matrix,
                    Model& model,
                    std::vector<real_t>& pred) {
   CHECK_NOTNULL(matrix);
   CHECK_NE(pred.empty(), true);
   CHECK_EQ(pred.size(), matrix->row_length);
-  for (size_t i = 0; i < matrix->row_length; ++i) {
-    SparseRow* row = matrix->row[i];
-    real_t norm = norm_ ? matrix->norm[i] : 1.0;
-    pred[i] = score_func_->CalcScore(row, model, norm);
+  index_t row_len = matrix->row_length;
+  // Predict in multi-thread
+  for (int i = 0; i < threadNumber_; ++i) {
+    index_t start = getStart(row_len, threadNumber_, i);
+    index_t end = getEnd(row_len, threadNumber_, i);
+    pool_->enqueue(std::bind(pred_thread,
+                             matrix,
+                             &model,
+                             &pred,
+                             score_func_,
+                             norm_,
+                             start,
+                             end));
   }
+  pool_->Sync();
 }
 
 } // xLearn
