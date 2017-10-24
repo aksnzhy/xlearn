@@ -23,8 +23,8 @@ This file contains facilities that enhance the STL.
 #ifndef XLEARN_BASE_STL_UTIL_H_
 #define XLEARN_BASE_STL_UTIL_H_
 
-// Delete elements (in pointer type) in a STL container like vector,
-// list, and deque.
+// Delete elements (in pointer type) in a STL container like
+// vector, list, and deque.
 template <class Container>
 void STLDeleteElementsAndClear(Container* c) {
   for (typename Container::iterator iter = c->begin();

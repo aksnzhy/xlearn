@@ -34,7 +34,7 @@ programming convenient.
 #endif
 
 #include <limits>
-#include <chrono>  // for timer
+#include <chrono>  // for Timer
 
 #include "src/base/logging.h"
 
@@ -201,9 +201,12 @@ static const float kVerySmallNumber = 1e-15;
 static const double kVerySmallNumberDouble = 1e-15;
 
 //------------------------------------------------------------------------------
-// Timer class
+// Timer class:
+//   Timer timer();
+//   timer.tic();
+//     ....
+//   float time = timer.toc();
 //------------------------------------------------------------------------------
-
 class Timer {
  public:
   Timer() {
