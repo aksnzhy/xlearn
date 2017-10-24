@@ -97,7 +97,7 @@ class Model {
   // Get the size of model parameters
   index_t GetNumParameter_w() { return param_num_w_; }
 
-  // Re-init current model parameters
+  // Reset current model parameters
   void Reset() { set_value(); }
 
   // Other Get functions

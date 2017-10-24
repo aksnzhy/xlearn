@@ -54,8 +54,8 @@ struct HyperParam {
   Could be 'cross-entropy', 'squared', or 'hinge' */
   std::string loss_func = "corss-entropy";
   /* metric function
-   Could be 'acc', 'prec', 'recall', 'f1' (for classification)
-   and 'mae', 'mape' (for regression) */
+  Could be 'acc', 'prec', 'recall', 'f1' (for classification)
+  and 'mae', 'mape' (for regression) */
   std::string metric = "acc";
 //------------------------------------------------------------------------------
 // Parameters for optimization method
@@ -71,7 +71,7 @@ struct HyperParam {
   /* Sample size for each training iteration
   reader->Samples(matrix) will return this
   value to user */
-  int sample_size = 2000;
+  int sample_size = 20000;
   /* True for use instance-wise
   normalization. False for not */
   bool norm = true;
