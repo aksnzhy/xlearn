@@ -36,12 +36,12 @@ REGISTER_LOSS("cross-entropy", CrossEntropyLoss);
 
 // Predict in one thread
 void pred_thread(const DMatrix* matrix,
-                        Model* model,
-                        std::vector<real_t>* pred,
-                        Score* score_func_,
-                        bool is_norm,
-                        index_t start,
-                        index_t end) {
+                 Model* model,
+                 std::vector<real_t>* pred,
+                 Score* score_func_,
+                 bool is_norm,
+                 index_t start,
+                 index_t end) {
   for (size_t i = start; i < end; ++i) {
     SparseRow* row = matrix->row[i];
     real_t norm = is_norm ? matrix->norm[i] : 1.0;
