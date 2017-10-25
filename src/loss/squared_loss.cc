@@ -30,9 +30,9 @@ real_t SquaredLoss::Evalute(const std::vector<real_t>& pred,
   real_t val = 0.0;
   for (size_t i = 0; i < pred.size(); ++i) {
     real_t tmp = pred[i] - label[i];
-    val += 0.5*(tmp*tmp);
+    val += (tmp*tmp);
   }
-  return val;
+  return val * 0.5;
 }
 
 // Calculate gradient in one thread
