@@ -352,7 +352,11 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
              list[i].c_str(),
              similar_str.c_str());
       bo = false;
-      i += 1;
+      if (list[i][1] == '-') {  // "--" options
+        i += 1;
+      } else {  // "-" options
+        i += 2;
+      }
     }
   }
   if (!bo) { return false; }
