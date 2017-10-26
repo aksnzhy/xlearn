@@ -74,6 +74,8 @@ std::string Checker::option_help() const {
 "  -b <lambda_for_regu> :  Lambda for regular. Using 0.00002 by default. We can close the \n"
 "                          regular by setting this value to 0.0 \n"
 "                                                                   \n"
+"  -u <model_scale>     :  Hyper param used for init model parameters. Using 0.66 by default. \n"
+"                                                                             \n"
 "  -e <epoch_number>    :  Number of epoch for training. Using 10 by default. \n"
 "                                                                              \n"
 "  -f <fold_number>     :  Number of folds for cross-validation. Using 5 by default. \n"
@@ -131,6 +133,7 @@ void Checker::Initialize(bool is_train, int argc, char* argv[]) {
     menu_.push_back(std::string("-k"));
     menu_.push_back(std::string("-r"));
     menu_.push_back(std::string("-b"));
+    menu_.push_back(std::string("-u"));
     menu_.push_back(std::string("-e"));
     menu_.push_back(std::string("-f"));
     menu_.push_back(std::string("--disk"));
@@ -291,6 +294,17 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
         bo = false;
       } else {
         hyper_param.regu_lambda = value;
+      }
+      i += 2;
+    } else if (list[i].compare("-u") == 0) {
+      real_t value = atof(list[i+1].c_str());
+      if (value < 0) {
+        printf("[Error] Illegal -u : '%f' \n"
+               " -u must be greater than zero \n",
+               value);
+        bo = false;
+      } else {
+        hyper_param.model_scale = value;
       }
       i += 2;
     } else if (list[i].compare("-e") == 0) {

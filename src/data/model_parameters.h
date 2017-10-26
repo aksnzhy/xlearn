@@ -83,7 +83,8 @@ class Model {
               const std::string& loss_func,
               index_t num_feature,
               index_t num_field,
-              index_t num_K);
+              index_t num_K,
+              real_t scale = 1.0);
 
   // Serialize model to a checkpoint file
   void Serialize(const std::string& filename);
@@ -134,6 +135,8 @@ class Model {
   index_t  num_K_;
   /* Storing the model parameters and gradient cache */
   real_t*  param_w_;
+  /* Used for init model parameters */
+  real_t scale_;
 
   // Initialize model parameters and gradient cache
   void Initialize_w(bool set_value = false);

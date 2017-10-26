@@ -65,6 +65,8 @@ struct HyperParam {
   /* lambda for regularizer
   xLearn uses sparse regularizer */
   real_t regu_lambda = 0.00002;
+  /* Hyper param for init model parameters */
+  real_t model_scale = 0.66;
   /* Number of epoch
   Could be changed in early-stop */
   int num_epoch = 10;

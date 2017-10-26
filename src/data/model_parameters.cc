@@ -38,7 +38,8 @@ void Model::Initialize(const std::string& score_func,
                   const std::string& loss_func,
                   index_t num_feature,
                   index_t num_field,
-                  index_t num_K) {
+                  index_t num_K,
+                  real_t scale) {
   CHECK(!score_func.empty());
   CHECK(!loss_func.empty());
   CHECK_GT(num_feature, 0);
@@ -49,6 +50,7 @@ void Model::Initialize(const std::string& score_func,
   num_feat_ = num_feature;
   num_field_ = num_field;
   num_K_ = num_K;
+  scale_ = scale;
   // Calculate the number of model parameters
   if (score_func == "linear") {
     param_num_w_ = num_feature * 2;
@@ -108,15 +110,15 @@ void Model::set_value() {
       param_w_[i+1] = 1.0;
     }
   } else if (score_func_.compare("fm") == 0) {
+    real_t coef = 1.0f / sqrt(num_K_) * scale_;
     for (index_t i = 0; i < param_num_w_; i += 2) {
-      real_t coef = 1.0f / sqrt(num_K_);
       param_w_[i] = coef * dis(generator);
       param_w_[i+1] = 1.0;
     }
   } else if (score_func_.compare("ffm") == 0) {
     index_t k_aligned = get_aligned_k();
     real_t* w = param_w_;
-    real_t coef = 1.0f / sqrt(num_K_);
+    real_t coef = 1.0f / sqrt(num_K_) * scale_;
     for (index_t j = 0; j < num_feat_; ++j) {
       for (index_t f = 0; f < num_field_; ++f) {
         for (index_t d = 0; d < k_aligned; ) {
