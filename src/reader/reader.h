@@ -48,7 +48,7 @@ namespace xLearn {
 //   Reader* reader = new OndiskReader();
 //
 //   reader->Initialize(filename = "/tmp/testdata",  /* the data path */
-//                      num_samples = 200)           /* return 200 examples */
+//                      num_samples = 200);      /* return 200 examples */
 //
 //   Loop {
 //
@@ -96,6 +96,8 @@ class Reader {
   DMatrix data_samples_;
   /* Parse txt file to binary data */
   Parser* parser_;
+  /* If this data has label y? */
+  bool has_label_;
 
   // Check current file format and return
   // "libsvm", "ffm", or "csv". Program crashes for

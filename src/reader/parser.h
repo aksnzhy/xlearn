@@ -49,7 +49,7 @@ namespace xLearn {
 //   } else {
 //     parser = new CSVParser();
 //   }
-//   parser->Initialize(true); // use normalization
+//   parser->setLabel(true);  // This dataset has label y
 //   char* buffer = nullptr;
 //   uint64 size = ReadFileToMemory(filename, buffer);
 //   DMatrix matrix;
@@ -60,8 +60,9 @@ class Parser {
   Parser() { }
   virtual ~Parser() {  }
 
-  virtual void Initialize(bool norm = true) {
-    if_norm_ = norm;
+  // This dataset has label y
+  inline void setLabel(bool label) {
+    has_label_ = label;
   }
 
   virtual void Parse(char* buf, uint64 size, DMatrix& matrix) = 0;
@@ -76,8 +77,9 @@ class Parser {
                          uint64 pos,
                          uint64 size);
 
-   /* Use instance-wise normalization */
-   bool if_norm_ = true;
+   /* True for training task and
+   False for prediction task */
+   bool has_label_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Parser);

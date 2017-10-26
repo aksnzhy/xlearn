@@ -89,16 +89,32 @@ void LibsvmParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
     pos += get_line_from_buffer(line_buf, buf, pos, size);
     matrix.row[i] = new SparseRow();
     // Add Y
-    char *y_char = strtok(line_buf, " \t");
-    matrix.Y[i] = atof(y_char);
+    if (has_label_) {  // for training task
+      char *y_char = strtok(line_buf, " \t");
+      matrix.Y[i] = atof(y_char);
+    } else {  // for predict task
+      matrix.Y[i] = -2;
+    }
     // Add bias
     matrix.AddNode(i, 0, 1.0);
     // Add other features
     real_t norm = 0.0;
+    // The first element
+    if (!has_label_) {
+      char *idx_char = strtok(line_buf, ":");
+      char *value_char = strtok(nullptr, " \t");
+      if (idx_char != nullptr && *idx_char != '\n') {
+        index_t idx = atoi(idx_char);
+        real_t value = atof(value_char);
+        matrix.AddNode(i, idx, value);
+        norm += value;
+      }
+    }
+    // The remain elements
     for (;;) {
       char *idx_char = strtok(nullptr, ":");
       char *value_char = strtok(nullptr, " \t");
-      if(idx_char == nullptr || *idx_char == '\n') {
+      if (idx_char == nullptr || *idx_char == '\n') {
         break;
       }
       index_t idx = atoi(idx_char);
@@ -128,17 +144,35 @@ void FFMParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
     pos += get_line_from_buffer(line_buf, buf, pos, size);
     matrix.row[i] = new SparseRow();
     // Add Y
-    char *y_char = strtok(line_buf, " \t");
-    matrix.Y[i] = atof(y_char);
+    if (has_label_) {  // for training task
+      char *y_char = strtok(line_buf, " \t");
+      matrix.Y[i] = atof(y_char);
+    } else {  // for predict task
+      matrix.Y[i] = -2;
+    }
     // Add bias
     matrix.AddNode(i, 0, 1.0, 0);
     // Add other features
     real_t norm = 0.0;
+    // The first element
+    if (!has_label_) {
+      char *field_char = strtok(line_buf, ":");
+      char *idx_char = strtok(nullptr, ":");
+      char *value_char = strtok(nullptr, " \t");
+      if (idx_char != nullptr && *idx_char != '\n') {
+        index_t idx = atoi(idx_char);
+        real_t value = atof(value_char);
+        index_t field_id = atoi(field_char);
+        matrix.AddNode(i, idx, value, field_id);
+        norm += value;
+      }
+    }
+    // The remain elements
     for (;;) {
       char *field_char = strtok(nullptr, ":");
       char *idx_char = strtok(nullptr, ":");
       char *value_char = strtok(nullptr, " \t");
-      if(field_char == nullptr || *field_char == '\n') {
+      if (field_char == nullptr || *field_char == '\n') {
         break;
       }
       index_t idx = atoi(idx_char);
@@ -156,6 +190,7 @@ void FFMParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
 // CSVParser parses the following data format:
 // [feat_1 feat_2 feat_3 ... feat_n y1]
 // [feat_1 feat_2 feat_3 ... feat_n y2]
+// Note that the CSV file will always contain label y
 //------------------------------------------------------------------------------
 void CSVParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
   CHECK_NOTNULL(buf);

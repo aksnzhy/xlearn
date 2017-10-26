@@ -33,6 +33,8 @@ namespace xLearn {
 const std::string kStr = "0 1:0.12 2:0.12 3:0.12 4:0.12 5:0.12\n";
 const std::string kStrFFM = "1 1:1:0.13 2:2:0.13 3:3:0.13 4:4:0.13 5:5:0.13\n";
 const std::string kStrCSV = "0.123 0.123 0.123 0.123 0.123 1\n";
+const std::string kStrNoy = "1:0.12 2:0.12 3:0.12 4:0.12 5:0.12\n";
+const std::string kStrFFMNoy = "1:1:0.13 2:2:0.13 3:3:0.13 4:4:0.13 5:5:0.13\n";
 const index_t kNum_lines = 100000;
 const std::string filename = "./test_file.txt";
 
@@ -46,6 +48,7 @@ TEST(PARSER_TEST, Parse_libsvm) {
   uint64 size = ReadFileToMemory(filename, &buffer);
   DMatrix matrix;
   LibsvmParser parser;
+  parser.setLabel(true);
   parser.Parse(buffer, size, matrix);
   EXPECT_EQ(matrix.row_length, kNum_lines);
   for (index_t i = 0; i < matrix.row_length; ++i) {
@@ -66,7 +69,45 @@ TEST(PARSER_TEST, Parse_libsvm) {
       }
       n++;
     }
+    EXPECT_EQ(n, 6);
   }
+  RemoveFile(filename.c_str());
+}
+
+TEST(PARSER_TEST, Parse_libsvm_no_y) {
+  FILE* file = OpenFileOrDie(filename.c_str(), "w");
+  for (int i = 0; i < kNum_lines; ++i) {
+    WriteDataToDisk(file, kStrNoy.data(), kStrNoy.size());
+  }
+  Close(file);
+  char* buffer = nullptr;
+  uint64 size = ReadFileToMemory(filename, &buffer);
+  DMatrix matrix;
+  LibsvmParser parser;
+  parser.setLabel(false);
+  parser.Parse(buffer, size, matrix);
+  EXPECT_EQ(matrix.row_length, kNum_lines);
+  for (index_t i = 0; i < matrix.row_length; ++i) {
+    EXPECT_EQ(matrix.Y[i], -2);
+    EXPECT_FLOAT_EQ(matrix.norm[i], 1.6666667);
+    int col_len = matrix.row[i]->size();
+    EXPECT_EQ(col_len, 6);
+    SparseRow *row = matrix.row[i];
+    int n = 0;
+    for (SparseRow::iterator iter = row->begin();
+         iter != row->end(); ++iter) {
+      EXPECT_EQ(iter->field_id, 0);
+      EXPECT_EQ(iter->feat_id, n);
+      if (n == 0) {
+        EXPECT_FLOAT_EQ(iter->feat_val, 1.0);
+      } else {
+        EXPECT_FLOAT_EQ(iter->feat_val, 0.12);
+      }
+      n++;
+    }
+    EXPECT_EQ(n, 6);
+  }
+  RemoveFile(filename.c_str());
 }
 
 TEST(PARSER_TEST, Parse_libffm) {
@@ -79,11 +120,12 @@ TEST(PARSER_TEST, Parse_libffm) {
   uint64 size = ReadFileToMemory(filename, &buffer);
   DMatrix matrix;
   FFMParser parser;
+  parser.setLabel(true);
   parser.Parse(buffer, size, matrix);
   EXPECT_EQ(matrix.row_length, kNum_lines);
   for (index_t i = 0; i < matrix.row_length; ++i) {
     EXPECT_EQ(matrix.Y[i], 1);
-    EXPECT_FLOAT_EQ(matrix.norm[i], 11.834319);
+    EXPECT_FLOAT_EQ(matrix.norm[i], 1.5384616);
     int col_len = matrix.row[i]->size();
     EXPECT_EQ(col_len, 6);
     SparseRow *row = matrix.row[i];
@@ -99,7 +141,45 @@ TEST(PARSER_TEST, Parse_libffm) {
       }
       n++;
     }
+    EXPECT_EQ(n, 6);
   }
+  RemoveFile(filename.c_str());
+}
+
+TEST(PARSER_TEST, Parse_libffm_no_y) {
+  FILE* file = OpenFileOrDie(filename.c_str(), "w");
+  for (int i = 0; i < kNum_lines; ++i) {
+    WriteDataToDisk(file, kStrFFMNoy.data(), kStrFFMNoy.size());
+  }
+  Close(file);
+  char* buffer = nullptr;
+  uint64 size = ReadFileToMemory(filename, &buffer);
+  DMatrix matrix;
+  FFMParser parser;
+  parser.setLabel(false);
+  parser.Parse(buffer, size, matrix);
+  EXPECT_EQ(matrix.row_length, kNum_lines);
+  for (index_t i = 0; i < matrix.row_length; ++i) {
+    EXPECT_EQ(matrix.Y[i], -2);
+    EXPECT_FLOAT_EQ(matrix.norm[i], 1.5384616);
+    int col_len = matrix.row[i]->size();
+    EXPECT_EQ(col_len, 6);
+    SparseRow *row = matrix.row[i];
+    int n = 0;
+    for (SparseRow::iterator iter = row->begin();
+         iter != row->end(); ++iter) {
+      EXPECT_EQ(iter->field_id, n);
+      EXPECT_EQ(iter->feat_id, n);
+      if (n == 0) {
+        EXPECT_FLOAT_EQ(iter->feat_val, 1.0);
+      } else {
+        EXPECT_FLOAT_EQ(iter->feat_val, 0.13);
+      }
+      n++;
+    }
+    EXPECT_EQ(n, 6);
+  }
+  RemoveFile(filename.c_str());
 }
 
 TEST(PARSER_TEST, Parse_csv) {
@@ -112,6 +192,7 @@ TEST(PARSER_TEST, Parse_csv) {
   uint64 size = ReadFileToMemory(filename, &buffer);
   DMatrix matrix;
   CSVParser parser;
+  parser.setLabel(true);
   parser.Parse(buffer, size, matrix);
   EXPECT_EQ(matrix.row_length, kNum_lines);
   for (index_t i = 0; i < matrix.row_length; ++i) {
@@ -131,7 +212,9 @@ TEST(PARSER_TEST, Parse_csv) {
       }
       n++;
     }
+    EXPECT_EQ(n, 6);
   }
+  RemoveFile(filename.c_str());
 }
 
 Parser* CreateParser(const char* format_name) {

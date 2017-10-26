@@ -38,7 +38,7 @@ HyperParam Init() {
   hyper_param.num_feature = 10;
   hyper_param.num_K = 8;
   hyper_param.num_field = 10;
-  hyper_param.model_file = "/tmp/test_model.bin";
+  hyper_param.model_file = "./test_model.bin";
   return hyper_param;
 }
 
@@ -91,6 +91,7 @@ TEST(MODEL_TEST, Save_and_Load) {
   for (int i = 0; i < w_len; ++i) {
     EXPECT_FLOAT_EQ(w[i], 2.5);
   }
+  RemoveFile(hyper_param.model_file.c_str());
 }
 
 }   // namespace xLearn

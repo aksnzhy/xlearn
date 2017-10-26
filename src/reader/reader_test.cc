@@ -36,35 +36,76 @@ namespace xLearn {
 const string kTestfilename = "./test_reader";
 const string kStr = "0 1:0.123 1:0.123 1:0.123\n";
 const string kStrFFM = "1 1:1:0.123 1:1:0.123 1:1:0.123\n";
-const index_t kFeatureNum = 3;
+const string kStrCSV = "0.123 0.123 0.123 0\n";
+const string kStrNoy = "1:0.123 1:0.123 1:0.123\n";
+const string kStrFFMNoy = "1:1:0.123 1:1:0.123 1:1:0.123\n";
+//const index_t kFeatureNum = 3;
 const index_t kNumLines = 100000;
 const index_t kNumSamples = 200;
 const int iteration_num = 2000;
 
-void WriteFile() {
-  string lr_file = kTestfilename + "_LR.txt";
-  string ffm_file = kTestfilename + "_ffm.txt";
-  // Create libsvm file
-  FILE* file_lr = OpenFileOrDie(lr_file.c_str(), "w");
+void write_data(const std::string& filename,
+                const std::string& data) {
+  FILE* file = OpenFileOrDie(filename.c_str(), "w");
   for (index_t i = 0; i < kNumLines; ++i) {
-    uint32 write_len = fwrite(kStr.c_str(), 1, kStr.size(), file_lr);
-    EXPECT_EQ(write_len, kStr.size());
+    uint32 write_len = fwrite(data.c_str(), 1, data.size(), file);
+    EXPECT_EQ(write_len, data.size());
   }
-  Close(file_lr);
-  // Create libffm file
-  FILE* file_ffm = OpenFileOrDie(ffm_file.c_str(), "w");
-  for (index_t i = 0; i < kNumLines; ++i) {
-    uint32 write_len = fwrite(kStrFFM.c_str(), 1, kStrFFM.size(), file_ffm);
-    EXPECT_EQ(write_len, kStrFFM.size());
-
-  }
-  Close(file_ffm);
+  Close(file);
 }
 
-void CheckLR(const DMatrix* matrix) {
+void WriteFile() {
+  // has label
+  string lr_file = kTestfilename + "_LR.txt";
+  string ffm_file = kTestfilename + "_ffm.txt";
+  string csv_file = kTestfilename + "_csv.txt";
+  // has no label
+  string lr_no_file = kTestfilename + "_LR_no.txt";
+  string ffm_no_file = kTestfilename + "_ffm_no.txt";
+  // Create file
+  write_data(lr_file, kStr);
+  write_data(ffm_file, kStrFFM);
+  write_data(csv_file, kStrCSV);
+  write_data(lr_no_file, kStrNoy);
+  write_data(ffm_no_file, kStrFFMNoy);
+}
+
+void delete_file() {
+  // has label
+  string lr_file = kTestfilename + "_LR.txt";
+  string ffm_file = kTestfilename + "_ffm.txt";
+  string csv_file = kTestfilename + "_csv.txt";
+  // has no label
+  string lr_no_file = kTestfilename + "_LR_no.txt";
+  string ffm_no_file = kTestfilename + "_ffm_no.txt";
+  // remove
+  RemoveFile(lr_file.c_str());
+  RemoveFile(ffm_file.c_str());
+  RemoveFile(csv_file.c_str());
+  RemoveFile(lr_no_file.c_str());
+  RemoveFile(ffm_no_file.c_str());
+  // bin file
+  lr_file += ".bin";
+  ffm_file += ".bin";
+  csv_file += ".bin";
+  lr_no_file += ".bin";
+  ffm_no_file += ".bin";
+  // remove
+  RemoveFile(lr_file.c_str());
+  RemoveFile(ffm_file.c_str());
+  RemoveFile(csv_file.c_str());
+  RemoveFile(lr_no_file.c_str());
+  RemoveFile(ffm_no_file.c_str());
+}
+
+void CheckLR(const DMatrix* matrix, bool has_label) {
   EXPECT_EQ(matrix->row_length, kNumSamples);
   // check the first element
-  EXPECT_EQ(matrix->Y[0], (real_t)0);
+  if (has_label) {
+    EXPECT_EQ(matrix->Y[0], 0);
+  } else {
+    EXPECT_EQ(matrix->Y[0], -2);
+  }
   EXPECT_FLOAT_EQ(matrix->norm[0], 2.710027);
   for (int i = 0; i < matrix->row_length; ++i) {
     SparseRow *row = matrix->row[i];
@@ -82,16 +123,19 @@ void CheckLR(const DMatrix* matrix) {
       }
       n++;
     }
-    EXPECT_EQ(n, kFeatureNum+1);
+    EXPECT_EQ(n, 4);
   }
-
 }
 
-void CheckFFM(const DMatrix* matrix) {
+void CheckFFM(const DMatrix* matrix, bool has_label) {
   EXPECT_EQ(matrix->row_length, kNumSamples);
   // check the first element
-  EXPECT_EQ(matrix->Y[0], (real_t)1);
-  EXPECT_FLOAT_EQ(matrix->norm[0], 22.03274);
+  if (has_label) {
+    EXPECT_EQ(matrix->Y[0], 1);
+  } else {
+    EXPECT_EQ(matrix->Y[0], -2);
+  }
+  EXPECT_FLOAT_EQ(matrix->norm[0], 2.710027);
   for (int i = 0; i < matrix->row_length; ++i) {
     SparseRow *row = matrix->row[i];
     int n = 0;
@@ -108,87 +152,97 @@ void CheckFFM(const DMatrix* matrix) {
       }
       n++;
     }
-    EXPECT_EQ(n, kFeatureNum+1);
+    EXPECT_EQ(n, 4);
+  }
+}
+
+void CheckCSV(const DMatrix* matrix) {
+  EXPECT_EQ(matrix->row_length, kNumSamples);
+  EXPECT_EQ(matrix->Y[0], 0);
+  EXPECT_FLOAT_EQ(matrix->norm[0], 2.710027);
+  for (int i = 0; i < matrix->row_length; ++i) {
+    SparseRow *row = matrix->row[i];
+    int n = 0;
+    for (SparseRow::iterator iter = row->begin();
+         iter != row->end(); ++iter) {
+      if (n == 0) {
+        EXPECT_EQ(iter->feat_id, 0);
+        EXPECT_FLOAT_EQ(iter->feat_val, 1.0);
+      } else {
+        EXPECT_EQ(iter->feat_id, n);
+        EXPECT_FLOAT_EQ(iter->feat_val, 0.123);
+      }
+      n++;
+    }
+    EXPECT_EQ(n ,4);
+  }
+}
+
+void read_from_memory(const std::string& filename, int task_id) {
+  InmemReader reader;
+  reader.Initialize(filename, kNumSamples);
+  DMatrix* matrix = nullptr;
+  for (int i = 0; i < iteration_num; ++i) {
+    int record_num = reader.Samples(matrix);
+    if (record_num == 0) {
+      --i;
+      reader.Reset();
+      continue;
+    }
+    EXPECT_EQ(record_num, kNumSamples);
+    switch (task_id) {
+      case 0:
+        CheckLR(matrix, true);
+        break;
+      case 1:
+        CheckFFM(matrix, true);
+        break;
+      case 2:
+        CheckCSV(matrix);
+        break;
+      case 3:
+        CheckLR(matrix, false);
+        break;
+      case 4:
+        CheckFFM(matrix, false);
+        break;
+    }
   }
 }
 
 TEST(ReaderTest, SampleFromMemory) {
   WriteFile();
+  // has label
   string lr_file = kTestfilename + "_LR.txt";
   string ffm_file = kTestfilename + "_ffm.txt";
-  // libsvm
-  InmemReader reader_lr;
-  reader_lr.Initialize(lr_file, kNumSamples);
-  DMatrix* matrix = NULL;
-  int i = 0;
-  for (; i < iteration_num; ++i) {
-    int record_num = reader_lr.Samples(matrix);
-    if (record_num == 0) {
-      --i;
-      reader_lr.Reset();
-      continue;
-    }
-    EXPECT_EQ(record_num, kNumSamples);
-    CheckLR(matrix);
-  }
-  EXPECT_EQ(i, iteration_num);
-  // libffm
-  matrix = nullptr;
-  InmemReader reader_ffm;
-  reader_ffm.Initialize(ffm_file, kNumSamples);
-  for (i = 0; i < iteration_num; ++i) {
-    int record_num = reader_ffm.Samples(matrix);
-    if (record_num == 0) {
-      --i;
-      reader_ffm.Reset();
-      continue;
-    }
-    EXPECT_EQ(record_num, kNumSamples);
-    CheckFFM(matrix);
-  }
-  EXPECT_EQ(i, iteration_num);
+  string csv_file = kTestfilename + "_csv.txt";
+  // has no label
+  string lr_no_file = kTestfilename + "_LR_no.txt";
+  string ffm_no_file = kTestfilename + "_ffm_no.txt";
+  // check
+  read_from_memory(lr_file, 0);
+  read_from_memory(ffm_file, 1);
+  read_from_memory(csv_file, 2);
+  read_from_memory(lr_no_file, 3);
+  read_from_memory(ffm_no_file, 4);
 }
 
 TEST(ReaderTest, ReadFromBinary) {
+  // has label
   string lr_file = kTestfilename + "_LR.txt";
   string ffm_file = kTestfilename + "_ffm.txt";
-  // libsvm
-  InmemReader reader_lr;
-  reader_lr.Initialize(lr_file, kNumSamples);
-  DMatrix* matrix = NULL;
-  int i = 0;
-  for (; i < iteration_num; ++i) {
-    int record_num = reader_lr.Samples(matrix);
-    if (record_num == 0) {
-      --i;
-      reader_lr.Reset();
-      continue;
-    }
-    EXPECT_EQ(record_num, kNumSamples);
-    CheckLR(matrix);
-  }
-  EXPECT_EQ(i, iteration_num);
-  // libffm
-  matrix = nullptr;
-  InmemReader reader_ffm;
-  reader_ffm.Initialize(ffm_file, kNumSamples);
-  for (i = 0; i < iteration_num; ++i) {
-    int record_num = reader_ffm.Samples(matrix);
-    if (record_num == 0) {
-      --i;
-      reader_ffm.Reset();
-      continue;
-    }
-    EXPECT_EQ(record_num, kNumSamples);
-    CheckFFM(matrix);
-  }
-  EXPECT_EQ(i, iteration_num);
-  string lr_bin = lr_file + ".bin";
-  string ffm_bin = ffm_file + ".bin";
-  RemoveFile(lr_file.c_str());
-  RemoveFile(ffm_file.c_str());
-  RemoveFile(lr_bin.c_str());
-  RemoveFile(ffm_bin.c_str());
+  string csv_file = kTestfilename + "_csv.txt";
+  // has no label
+  string lr_no_file = kTestfilename + "_LR_no.txt";
+  string ffm_no_file = kTestfilename + "_ffm_no.txt";
+  // check
+  read_from_memory(lr_file, 0);
+  read_from_memory(ffm_file, 1);
+  read_from_memory(csv_file, 2);
+  read_from_memory(lr_no_file, 3);
+  read_from_memory(ffm_no_file, 4);
+  // delete file
+  delete_file();
 }
 
 //TEST_F(ReaderTest, SampleFromDisk) { }

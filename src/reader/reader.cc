@@ -47,6 +47,14 @@ std::string Reader::check_file_format() {
   Close(file);
   std::vector<std::string> str_list;
   SplitStringUsing(data_line, " \t", &str_list);
+  // has y?
+  size_t found = str_list[0].find(":");
+  if (found != std::string::npos) {  // find ":", no label
+    has_label_ = false;
+  } else {
+    has_label_ = true;
+  }
+  // file format
   int count = 0;
   for (int i = 0; i < str_list[1].size(); ++i) {
     if (str_list[1][i] == ':') {
@@ -148,6 +156,8 @@ void InmemReader::init_from_txt() {
    *  Step 2: Init parser_                                 *
    *********************************************************/
   parser_ = CreateParser(check_file_format().c_str());
+  if (has_label_) parser_->setLabel(true);
+  else parser_->setLabel(false);
   /*********************************************************
    *  Step 3: Init data_buf_                               *
    *********************************************************/
