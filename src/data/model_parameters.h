@@ -53,14 +53,26 @@ namespace xLearn {
 //                     hyper_param.loss_func,
 //                     hyper_param.num_feature,
 //                     hyper_param.num_field,
-//                     hyper_param.num_K);
+//                     hyper_param.num_K,
+//                     hyper_param.model_scale);
 //
-//    /* We can get the model parameter vector: */
+//    /* We can get the parameter of the linear term: */
 //    real_t* w = model.GetParameter_w();
 //    index_t w_len = model.GetNumParameter_w();
 //    for (index_t i = 0; i < w_len; ++i) {
 //      /* access w[i] ... */
 //    }
+//
+//    /* We can also get the parameter of the latent factor */
+//    real_t* v = model.GetParameter_v();
+//    index_t v_len = model.GetNumParameter_v();
+//    for (index_t i = 0; i < v_len; ++i) {
+//      /* access v[i] ... */
+//    }
+//
+//    /* We can also get the bias term */
+//    real_t b = model.GetParameter_b();
+//    /* access b[0] and b[1] */
 //
 //    /* We can save model to a disk file: */
 //    model.SaveModel("/tmp/model.txt");
@@ -92,63 +104,84 @@ class Model {
   // Deserialize model from a checkpoint file
   bool Deserialize(const std::string& filename);
 
-  // Get the pointer of model parameters
+  // Get the pointer of linear term
   real_t* GetParameter_w() { return param_w_; }
 
-  // Get the size of model parameters
+  // Get the pointer of latent factor
+  real_t* GetParameter_v() { return param_v_; }
+
+  // Get the pointer of bias
+  real_t* GetParameter_b() { return param_b_; }
+
+  // Get the size of the linear term
   index_t GetNumParameter_w() { return param_num_w_; }
+
+  // Get the size of the latent factor
+  index_t GetNumParameter_v() { return param_num_v_; }
 
   // Reset current model parameters
   void Reset() { set_value(); }
 
   // Other Get functions
-  std::string GetScoreFunction() { return score_func_; }
-  std::string GetLossFunction() { return loss_func_; }
-  index_t GetNumFeature() { return num_feat_; }
-  index_t GetNumField() { return num_field_; }
-  index_t GetNumK() { return num_K_; }
+  inline std::string GetScoreFunction() { return score_func_; }
+  inline std::string GetLossFunction() { return loss_func_; }
+  inline index_t GetNumFeature() { return num_feat_; }
+  inline index_t GetNumField() { return num_field_; }
+  inline index_t GetNumK() { return num_K_; }
+  inline index_t GetNumParameter() {
+    return param_num_w_ + param_num_v_ + 2;
+  }
 
-  // Because we use SSE, so the momery should be aligned
-  // For SSE, the align constant is 4
+  // Because we use SSE, so the momery should be
+  // aligned. For SSE, the align constant is 4
   inline index_t get_aligned_k() {
     return (index_t) ceil((real_t)num_K_ / kAlign) * kAlign;
   }
 
  protected:
-  /* Number of model parameters. We store both the model
-  parameter and the gradient cache for adagrad in param_w_
-  For linear socre, param_num =  num_feat * 2
-  For fm, param_num = num_feat * num_K * 2
-  For ffm, param_num = num_feat * num_field * num_K * 2  */
-  index_t  param_num_w_;
   /* Score function: 'linear', 'fm', or 'ffm' */
   std::string  score_func_;
   /* Loss function: 'squared', 'cross-entropy', 'hinge' */
   std::string  loss_func_;
-  /* Number of feature (feat_id is from 0, which is the bias) */
+  /* Size of the linear term.
+  Note that we store both of the model parameter
+  and the gradient cache in param_w_
+  Note that param_num_w_ == num_feat_ * 2 */
+  index_t param_num_w_;
+  /* Size of the latent factor. We store both the model
+  parameter and the gradient cache for adagrad in param_v_
+  For linear function, param_num_v =  0
+  For fm, param_num_v_ = num_feat * num_K * 2
+  For ffm, param_num_v_ = num_feat * num_field * num_K * 2  */
+  index_t  param_num_v_;
+  /* Number of feature (feat_id is start from 0) */
   index_t  num_feat_;
-  /* Number of field (used in ffm, field_id is from 0) */
+  /* Number of field (used in ffm, field_id is start from 0) */
   index_t  num_field_;
   /* Number of K (used in fm and ffm)
   Becasue we use SSE, so the real k will be aligned
   User can get the aligned K by using get_aligned_k() */
   index_t  num_K_;
-  /* Storing the model parameters and gradient cache */
+  /* Storing the parameter of linear term */
   real_t*  param_w_;
+  /* Storing the parameter of latent factor */
+  real_t*  param_v_;
+  /* Storing the bias term */
+  real_t*  param_b_;
   /* Used for init model parameters */
   real_t scale_;
 
   // Initialize model parameters and gradient cache
-  void Initialize_w(bool set_value = false);
+  void initial(bool set_value = false);
 
   // Re-init current model parameters
   void set_value();
 
-  // Serialize w  to disk file
-  void serialize_w(FILE* file);
+  // Serialize w, v, b to disk file
+  void serialize_w_v_b(FILE* file);
 
-  // Deserialize w from disk file
-  void deserialize_w(FILE* file);
+  // Deserialize w, v, b from disk file
+  void deserialize_w_v_b(FILE* file);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Model);

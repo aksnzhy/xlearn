@@ -80,18 +80,13 @@ struct HyperParam {
 //------------------------------------------------------------------------------
 // Parameters for dataset
 //------------------------------------------------------------------------------
-  /* Number of feature
-  Include the bias term '0'
-  We get this value from initialization */
+  /* Number of feature */
   index_t num_feature = 0;
-  /* Number of model parameters
-  We get this value from initialization */
+  /* Number of total model parameters */
   index_t num_param = 0;
-  /* Number of lateny factor for fm and ffm
-  We get this value from initialization */
+  /* Number of lateny factor for fm and ffm */
   index_t num_K = 4;
-  /* Number of field, used by ffm tasks
-  We get this value from initialization */
+  /* Number of field, used by ffm tasks */
   index_t num_field = 0;
   /* Filename of training set
   We must set this value in training */

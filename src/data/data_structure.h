@@ -56,8 +56,8 @@ const int kAlignByte = 16;
 //------------------------------------------------------------------------------
 struct Node {
   index_t field_id;  /* Start from 0 */
-  index_t feat_id;   /* Start from 0, which is the bias term */
-  real_t feat_val;   /* Can be numeric or catagorical feature */
+  index_t feat_id;   /* Start from 0 */
+  real_t feat_val;   /* feature value */
 };
 
 //------------------------------------------------------------------------------
