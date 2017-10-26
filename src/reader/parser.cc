@@ -95,9 +95,7 @@ void LibsvmParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
     } else {  // for predict task
       matrix.Y[i] = -2;
     }
-    // Add bias
-    matrix.AddNode(i, 0, 1.0);
-    // Add other features
+    // Add features
     real_t norm = 0.0;
     // The first element
     if (!has_label_) {
@@ -150,9 +148,7 @@ void FFMParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
     } else {  // for predict task
       matrix.Y[i] = -2;
     }
-    // Add bias
-    matrix.AddNode(i, 0, 1.0, 0);
-    // Add other features
+    // Add features
     real_t norm = 0.0;
     // The first element
     if (!has_label_) {
@@ -209,12 +205,10 @@ void CSVParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
     int size = str_vec.size();
     // Add Y
     matrix.Y[i] = atof(str_vec[size-1].c_str());
-    // Add bias
-    matrix.AddNode(i, 0, 1.0, 0);
-    // Add other features
+    // Add features
     real_t norm = 0.0;
     for (int j = 0; j < size-1; ++j) {
-      index_t idx = j+1;
+      index_t idx = j;
       real_t value = atof(str_vec[j].c_str());
       // skip zero
       if (value < kVerySmallNumber) { continue; }

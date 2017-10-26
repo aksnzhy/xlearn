@@ -112,18 +112,12 @@ void CheckLR(const DMatrix* matrix, bool has_label) {
     int n = 0;
     for (SparseRow::iterator iter = row->begin();
          iter != row->end(); ++iter) {
-      if (n == 0) {
-        EXPECT_EQ(iter->field_id, 0);
-        EXPECT_EQ(iter->feat_id, 0);
-        EXPECT_FLOAT_EQ(iter->feat_val, 1.0);
-      } else {
-        EXPECT_EQ(iter->field_id, 0);
-        EXPECT_EQ(iter->feat_id, 1);
-        EXPECT_FLOAT_EQ(iter->feat_val, 0.123);
-      }
+      EXPECT_EQ(iter->field_id, 0);
+      EXPECT_EQ(iter->feat_id, 1);
+      EXPECT_FLOAT_EQ(iter->feat_val, 0.123);
       n++;
     }
-    EXPECT_EQ(n, 4);
+    EXPECT_EQ(n, 3);
   }
 }
 
@@ -141,18 +135,12 @@ void CheckFFM(const DMatrix* matrix, bool has_label) {
     int n = 0;
     for (SparseRow::iterator iter = row->begin();
          iter != row->end(); ++iter) {
-      if (n == 0) {
-        EXPECT_EQ(iter->field_id, 0);
-        EXPECT_EQ(iter->feat_id, 0);
-        EXPECT_FLOAT_EQ(iter->feat_val, 1.0);
-      } else {
-        EXPECT_EQ(iter->field_id, 1);
-        EXPECT_EQ(iter->feat_id, 1);
-        EXPECT_FLOAT_EQ(iter->feat_val, 0.123);
-      }
+      EXPECT_EQ(iter->field_id, 1);
+      EXPECT_EQ(iter->feat_id, 1);
+      EXPECT_FLOAT_EQ(iter->feat_val, 0.123);
       n++;
     }
-    EXPECT_EQ(n, 4);
+    EXPECT_EQ(n, 3);
   }
 }
 
@@ -165,16 +153,11 @@ void CheckCSV(const DMatrix* matrix) {
     int n = 0;
     for (SparseRow::iterator iter = row->begin();
          iter != row->end(); ++iter) {
-      if (n == 0) {
-        EXPECT_EQ(iter->feat_id, 0);
-        EXPECT_FLOAT_EQ(iter->feat_val, 1.0);
-      } else {
-        EXPECT_EQ(iter->feat_id, n);
-        EXPECT_FLOAT_EQ(iter->feat_val, 0.123);
-      }
+      EXPECT_EQ(iter->feat_id, n);
+      EXPECT_FLOAT_EQ(iter->feat_val, 0.123);
       n++;
     }
-    EXPECT_EQ(n ,4);
+    EXPECT_EQ(n, 3);
   }
 }
 
