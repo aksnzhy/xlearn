@@ -183,7 +183,7 @@ void Solver::init_train() {
     // return to the begining of target file
     reader_[i]->Reset();
   }
-  hyper_param_.num_feature = max_feat + 1; // add bias
+  hyper_param_.num_feature = max_feat + 1;
   LOG(INFO) << "Number of feature: " << hyper_param_.num_feature;
   printf("  Number of Feature: %d \n", hyper_param_.num_feature);
   if (hyper_param_.score_func.compare("ffm") == 0) {
@@ -207,7 +207,7 @@ void Solver::init_train() {
                    hyper_param_.num_field,
                    hyper_param_.num_K,
                    hyper_param_.model_scale);
-  index_t num_param = model_->GetNumParameter_w();
+  index_t num_param = model_->GetNumParameter();
   hyper_param_.num_param = num_param;
   LOG(INFO) << "Number parameters: " << num_param;
   printf("  Model size: %.2f MB\n",
