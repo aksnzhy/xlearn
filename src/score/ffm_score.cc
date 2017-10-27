@@ -69,7 +69,8 @@ real_t FFMScore::CalcScore(const SparseRow* row,
         __m128 XMMw1 = _mm_load_ps(w1_base + d);
         __m128 XMMw2 = _mm_load_ps(w2_base + d);
         XMMt = _mm_add_ps(XMMt,
-               _mm_mul_ps(_mm_mul_ps(XMMw1, XMMw2), XMMv));
+               _mm_mul_ps(
+               _mm_mul_ps(XMMw1, XMMw2), XMMv));
       }
     }
   }
@@ -77,6 +78,7 @@ real_t FFMScore::CalcScore(const SparseRow* row,
   XMMt = _mm_hadd_ps(XMMt, XMMt);
   XMMt = _mm_hadd_ps(XMMt, XMMt);
   _mm_store_ss(&sum_v, XMMt);
+
   return sum_v + sum_w;
 }
 

@@ -33,6 +33,7 @@ programming convenient.
 #include "base/stdint_msvc.h"  // Visual C++ use this header.
 #endif
 
+#include <x86intrin.h>
 #include <limits>
 #include <chrono>  // for Timer
 
@@ -245,6 +246,5 @@ class Timer {
  private:
    DISALLOW_COPY_AND_ASSIGN(Timer);
 };
-
 
 #endif  // XLEARN_BASE_COMMON_H_

@@ -41,7 +41,7 @@ class FFMScoreTest : public ::testing::Test {
      param.loss_func = "sqaured";
      param.score_func = "ffm";
      param.num_feature = 3;
-     param.num_K = 20;
+     param.num_K = 8;
      param.num_field = 3;
    }
 };
@@ -74,8 +74,8 @@ TEST_F(FFMScoreTest, calc_score) {
   model.GetParameter_b()[0] = 0.0;
   FFMScore score;
   real_t val = score.CalcScore(&row, model);
-  // 6 + 20*4*3 = 246
-  EXPECT_FLOAT_EQ(val, 246);
+  // 6 + 8*4*3 = 102
+  EXPECT_FLOAT_EQ(val, 102);
 }
 
 } // namespace xLearn

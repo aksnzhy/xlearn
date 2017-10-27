@@ -132,13 +132,12 @@ class Model {
   inline index_t GetNumField() { return num_field_; }
 
   inline index_t GetNumK() { return num_K_; }
-  
+
   inline index_t GetNumParameter() {
     return param_num_w_ + param_num_v_ + 2;
   }
 
-  // Because we use SSE, so the momery should be
-  // aligned. For SSE, the align constant is 4
+  // Because we use SSE, so the momery should be aligned
   inline index_t get_aligned_k() {
     return (index_t) ceil((real_t)num_K_ / kAlign) * kAlign;
   }
