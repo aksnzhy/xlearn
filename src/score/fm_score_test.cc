@@ -73,7 +73,7 @@ TEST_F(FMScoreTest, calc_score) {
   FMScore score;
   real_t val = score.CalcScore(&row, model);
   // 6 + 10*4*3 = 126
-  EXPECT_FLOAT_EQ(val, 126.0);
+  EXPECT_FLOAT_EQ(val, 126);
 }
 
 } // namespace xLearn
