@@ -96,10 +96,8 @@ TEST(MODEL_TEST, Init_fm) {
     EXPECT_FLOAT_EQ(w[i], 0.0);
     EXPECT_FLOAT_EQ(w[i+1], 1.0);
   }
-  for (index_t i = 0; i < model_fm.GetNumParameter_v(); i+=2) {
-    EXPECT_GT(v[i], 0);
-    EXPECT_LT(v[i], 0.5);
-    EXPECT_FLOAT_EQ(v[i+1], 1.0);
+  for (index_t i = 0; i < model_fm.GetNumParameter_v(); i+=(kAlign*2)) {
+    EXPECT_FLOAT_EQ(v[i+kAlign], 1.0);
   }
 }
 

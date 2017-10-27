@@ -56,7 +56,8 @@ void Model::Initialize(const std::string& score_func,
   if (score_func == "linear") {
     param_num_v_ = 0;
   } else if (score_func == "fm") {
-    param_num_v_ = num_feature * num_K * 2;
+    param_num_v_ = num_feature *
+                   get_aligned_k() * 2;
   } else if (score_func == "ffm") {
     param_num_v_ = num_feature *
                    get_aligned_k() *
@@ -119,10 +120,17 @@ void Model::set_value() {
    *  Initialize latent factor                             *
    *********************************************************/
   if (score_func_.compare("fm") == 0) {
+    index_t k_aligned = get_aligned_k();
     real_t coef = 1.0f / sqrt(num_K_) * scale_;
-    for (index_t i = 0; i < param_num_v_; i += 2) {
-      param_v_[i] = coef * dis(generator);
-      param_v_[i+1] = 1.0;
+    real_t* w = param_v_;
+    for (index_t j = 0; j < num_feat_; ++j) {
+      for (index_t d = 0; d < k_aligned; ) {
+        for (index_t s = 0; s < kAlign; s++, w++, d++) {
+          w[0] = (d < num_K_) ? coef * dis(generator) : 0.0;
+          w[kAlign] = 1.0;
+        }
+        w += kAlign;
+      }
     }
   } else if (score_func_.compare("ffm") == 0) {
     index_t k_aligned = get_aligned_k();
