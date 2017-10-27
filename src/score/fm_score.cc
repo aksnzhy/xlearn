@@ -82,6 +82,7 @@ real_t FMScore::CalcScore(const SparseRow* row,
   XMMt = _mm_hadd_ps(XMMt, XMMt);
   real_t t_all;
   _mm_store_ss(&t_all, XMMt);
+  t_all *= 0.5;
   t_all += t;
   return t_all;
 }
