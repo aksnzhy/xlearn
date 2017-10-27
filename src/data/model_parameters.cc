@@ -205,13 +205,17 @@ void Model::serialize_w_v_b(FILE* file) {
   // Write size of w
   WriteDataToDisk(file, (char*)&param_num_w_, sizeof(param_num_w_));
   // Write size of v
-  WriteDataToDisk(file, (char*)&param_num_v_, sizeof(param_num_v_));
+  if (score_func_.compare("linear") != 0) {
+    WriteDataToDisk(file, (char*)&param_num_v_, sizeof(param_num_v_));
+  }
   // Write w
   WriteDataToDisk(file, (char*)param_w_, sizeof(real_t)*param_num_w_);
   // Write b
   WriteDataToDisk(file, (char*)param_b_, sizeof(real_t)*2);
   // Write v
-  WriteDataToDisk(file, (char*)param_v_, sizeof(real_t)*param_num_v_);
+  if (score_func_.compare("linear") != 0) {
+    WriteDataToDisk(file, (char*)param_v_, sizeof(real_t)*param_num_v_);
+  }
 }
 
 // Deserialize w,v,b from disk file
@@ -219,7 +223,9 @@ void Model::deserialize_w_v_b(FILE* file) {
   // Read size of w
   ReadDataFromDisk(file, (char*)&param_num_w_, sizeof(param_num_w_));
   // Read size of v
-  ReadDataFromDisk(file, (char*)&param_num_v_, sizeof(param_num_v_));
+  if (score_func_.compare("linear") != 0) {
+    ReadDataFromDisk(file, (char*)&param_num_v_, sizeof(param_num_v_));
+  }
   // Allocate memory. Don't set value here
   this->initial(false);
   // Read w
@@ -227,7 +233,9 @@ void Model::deserialize_w_v_b(FILE* file) {
   // Read b
   ReadDataFromDisk(file, (char*)param_b_, sizeof(real_t)*2);
   // Read v
-  ReadDataFromDisk(file, (char*)param_v_, sizeof(real_t)*param_num_v_);
+  if (score_func_.compare("linear") != 0) {
+    ReadDataFromDisk(file, (char*)param_v_, sizeof(real_t)*param_num_v_);
+  }
 }
 
 }  // namespace xLearn

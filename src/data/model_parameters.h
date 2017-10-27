@@ -105,29 +105,34 @@ class Model {
   bool Deserialize(const std::string& filename);
 
   // Get the pointer of linear term
-  real_t* GetParameter_w() { return param_w_; }
+  inline real_t* GetParameter_w() { return param_w_; }
 
   // Get the pointer of latent factor
-  real_t* GetParameter_v() { return param_v_; }
+  inline real_t* GetParameter_v() { return param_v_; }
 
   // Get the pointer of bias
-  real_t* GetParameter_b() { return param_b_; }
+  inline real_t* GetParameter_b() { return param_b_; }
 
   // Get the size of the linear term
-  index_t GetNumParameter_w() { return param_num_w_; }
+  inline index_t GetNumParameter_w() { return param_num_w_; }
 
   // Get the size of the latent factor
-  index_t GetNumParameter_v() { return param_num_v_; }
+  inline index_t GetNumParameter_v() { return param_num_v_; }
 
   // Reset current model parameters
   void Reset() { set_value(); }
 
   // Other Get functions
   inline std::string GetScoreFunction() { return score_func_; }
+
   inline std::string GetLossFunction() { return loss_func_; }
+
   inline index_t GetNumFeature() { return num_feat_; }
+
   inline index_t GetNumField() { return num_field_; }
+
   inline index_t GetNumK() { return num_K_; }
+  
   inline index_t GetNumParameter() {
     return param_num_w_ + param_num_v_ + 2;
   }
