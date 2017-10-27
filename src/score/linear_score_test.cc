@@ -58,6 +58,7 @@ TEST_F(LinearScoreTest, calc_score) {
   for (index_t i = 0; i < num_w; ++i) {
     w[i] = 3.0;
   }
+  model.GetParameter_b()[0] = 0.0;
   // Init SparseRow
   for (index_t i = 0; i < kLength; ++i) {
     row[i].feat_id = i;

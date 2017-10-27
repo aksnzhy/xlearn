@@ -35,6 +35,8 @@ real_t LinearScore::CalcScore(const SparseRow* row,
     index_t idx = iter->feat_id * 2;
     score += w[idx] * iter->feat_val;
   }
+  // bias
+  score += model.GetParameter_b()[0];
   return score;
 }
 
@@ -54,6 +56,13 @@ void LinearScore::CalcGrad(const SparseRow* row,
     w[idx_g] -= (learning_rate_ * gradient *
                  InvSqrt(w[idx_c]));
   }
+  // bias
+  w = model.GetParameter_b();
+  real_t &wb = w[0];
+  real_t &wbg = w[1];
+  real_t g = pg;
+  wbg += g*g;
+  wb -= learning_rate_ * g * InvSqrt(wbg);
 }
 
 } // namespace xLearn

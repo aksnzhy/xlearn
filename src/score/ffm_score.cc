@@ -31,10 +31,26 @@ namespace xLearn {
 real_t FFMScore::CalcScore(const SparseRow* row,
                            Model& model,
                            real_t norm) {
+  /*********************************************************
+   *  linear and bias term                                 *
+   *********************************************************/
+  real_t sum_w = 0;
+  real_t sqrt_norm = sqrt(norm);
+  real_t *w = model.GetParameter_w();
+  for (SparseRow::const_iterator iter = row->begin();
+       iter != row->end(); ++iter) {
+    sum_w += (iter->feat_val * w[iter->feat_id*2] * sqrt_norm);
+  }
+  // bias
+  w = model.GetParameter_b();
+  sum_w += w[0];
+  /*********************************************************
+   *  latent factor                                        *
+   *********************************************************/
   static index_t align0 = 2 * model.get_aligned_k();
   static index_t align1 = model.GetNumField() * align0;
   static int align = kAlign * 2;
-  real_t *w = model.GetParameter_w();
+  w = model.GetParameter_v();
   __m128 XMMt = _mm_setzero_ps();
   for (SparseRow::const_iterator iter_i = row->begin();
        iter_i != row->end(); ++iter_i) {
@@ -57,11 +73,11 @@ real_t FFMScore::CalcScore(const SparseRow* row,
       }
     }
   }
-  real_t sum = 0;
+  real_t sum_v = 0;
   XMMt = _mm_hadd_ps(XMMt, XMMt);
   XMMt = _mm_hadd_ps(XMMt, XMMt);
-  _mm_store_ss(&sum, XMMt);
-  return sum;
+  _mm_store_ss(&sum_v, XMMt);
+  return sum_v + sum_w;
 }
 
 // Calculate gradient and update current model
@@ -70,10 +86,33 @@ void FFMScore::CalcGrad(const SparseRow* row,
                         Model& model,
                         real_t pg,
                         real_t norm) {
+  /*********************************************************
+   *  linear and bias term                                 *
+   *********************************************************/
+  real_t sqrt_norm = sqrt(norm);
+  real_t *w = model.GetParameter_w();
+  for (SparseRow::const_iterator iter = row->begin();
+       iter != row->end(); ++iter) {
+    real_t &wl = w[iter->feat_id*2];
+    real_t &wlg = w[iter->feat_id*2+1];
+    real_t g = regu_lambda_*wl+pg*iter->feat_val*sqrt_norm;
+    wlg += g*g;
+    wl -= learning_rate_ * g * InvSqrt(wlg);
+  }
+  // bias
+  w = model.GetParameter_b();
+  real_t &wb = w[0];
+  real_t &wbg = w[1];
+  real_t g = pg;
+  wbg += g*g;
+  wb -= learning_rate_ * g * InvSqrt(wbg);
+  /*********************************************************
+   *  latent factor                                        *
+   *********************************************************/
   static index_t align0 = 2 * model.get_aligned_k();
   static index_t align1 = model.GetNumField() * align0;
   static int align = kAlign * 2;
-  real_t *w = model.GetParameter_w();
+  w = model.GetParameter_v();
   __m128 XMMpg = _mm_set1_ps(pg);
   __m128 XMMlr = _mm_set1_ps(learning_rate_);
   __m128 XMMlamb = _mm_set1_ps(regu_lambda_);

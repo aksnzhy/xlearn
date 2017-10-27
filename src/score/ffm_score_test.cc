@@ -66,10 +66,16 @@ TEST_F(FFMScoreTest, calc_score) {
   for (index_t i = 0; i < num_w; ++i) {
     w[i] = 1.0;
   }
+  real_t* v = model.GetParameter_v();
+  index_t num_v = model.GetNumParameter_v();
+  for (index_t i = 0; i < num_v; ++i) {
+    v[i] = 1.0;
+  }
+  model.GetParameter_b()[0] = 0.0;
   FFMScore score;
   real_t val = score.CalcScore(&row, model);
-  // 24*4*3 = 288.0
-  EXPECT_FLOAT_EQ(val, 288.0);
+  // 6 + 24*4*3 = 294.0
+  EXPECT_FLOAT_EQ(val, 294.0);
 }
 
 } // namespace xLearn
