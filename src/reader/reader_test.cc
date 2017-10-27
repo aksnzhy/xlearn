@@ -106,7 +106,7 @@ void CheckLR(const DMatrix* matrix, bool has_label) {
   } else {
     EXPECT_EQ(matrix->Y[0], -2);
   }
-  EXPECT_FLOAT_EQ(matrix->norm[0], 2.710027);
+  EXPECT_FLOAT_EQ(matrix->norm[0], 22.03274);
   for (int i = 0; i < matrix->row_length; ++i) {
     SparseRow *row = matrix->row[i];
     int n = 0;
@@ -129,7 +129,7 @@ void CheckFFM(const DMatrix* matrix, bool has_label) {
   } else {
     EXPECT_EQ(matrix->Y[0], -2);
   }
-  EXPECT_FLOAT_EQ(matrix->norm[0], 2.710027);
+  EXPECT_FLOAT_EQ(matrix->norm[0], 22.03274);
   for (int i = 0; i < matrix->row_length; ++i) {
     SparseRow *row = matrix->row[i];
     int n = 0;
@@ -147,7 +147,7 @@ void CheckFFM(const DMatrix* matrix, bool has_label) {
 void CheckCSV(const DMatrix* matrix) {
   EXPECT_EQ(matrix->row_length, kNumSamples);
   EXPECT_EQ(matrix->Y[0], 0);
-  EXPECT_FLOAT_EQ(matrix->norm[0], 2.710027);
+  EXPECT_FLOAT_EQ(matrix->norm[0], 22.03274);
   for (int i = 0; i < matrix->row_length; ++i) {
     SparseRow *row = matrix->row[i];
     int n = 0;

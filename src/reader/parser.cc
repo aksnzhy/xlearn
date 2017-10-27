@@ -105,7 +105,7 @@ void LibsvmParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
         index_t idx = atoi(idx_char);
         real_t value = atof(value_char);
         matrix.AddNode(i, idx, value);
-        norm += value;
+        norm += value*value;
       }
     }
     // The remain elements
@@ -118,7 +118,7 @@ void LibsvmParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
       index_t idx = atoi(idx_char);
       real_t value = atof(value_char);
       matrix.AddNode(i, idx, value);
-      norm += value;
+      norm += value*value;
     }
     norm = 1.0f / norm;
     matrix.norm[i] = norm;
@@ -160,7 +160,7 @@ void FFMParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
         real_t value = atof(value_char);
         index_t field_id = atoi(field_char);
         matrix.AddNode(i, idx, value, field_id);
-        norm += value;
+        norm += value*value;
       }
     }
     // The remain elements
@@ -175,7 +175,7 @@ void FFMParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
       real_t value = atof(value_char);
       index_t field_id = atoi(field_char);
       matrix.AddNode(i, idx, value, field_id);
-      norm += value;
+      norm += value*value;
     }
     norm = 1.0f / norm;
     matrix.norm[i] = norm;
@@ -213,7 +213,7 @@ void CSVParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
       // skip zero
       if (value < kVerySmallNumber) { continue; }
       matrix.AddNode(i, idx, value);
-      norm += value;
+      norm += value*value;
     }
     norm = 1.0f / norm;
     matrix.norm[i] = norm;
