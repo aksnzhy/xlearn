@@ -298,7 +298,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       i += 2;
     } else if (list[i].compare("-u") == 0) {
       real_t value = atof(list[i+1].c_str());
-      if (value < 0) {
+      if (value <= 0) {
         printf("[Error] Illegal -u : '%f' \n"
                " -u must be greater than zero \n",
                value);

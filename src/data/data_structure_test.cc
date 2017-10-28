@@ -46,7 +46,6 @@ TEST(DMATRIX_TEST, Serialize_and_Deserialize) {
   DMatrix matrix;
   matrix.ResetMatrix(10);
   for (int i = 0; i < 10; ++i) {
-    matrix.row[i] = new SparseRow;
     matrix.AddNode(i, i, 2.5, i);
     matrix.Y[i] = i;
     matrix.norm[i] = 0.25;

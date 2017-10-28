@@ -17,8 +17,7 @@
 /*
 Author: Chao Ma (mctt90@gmail.com)
 
-This file defines the class of model parameters
-used by xLearn.
+This file defines the class of model parameters.
 */
 
 #ifndef XLEARN_DATA_MODEL_PARAMETERS_H_
@@ -34,7 +33,7 @@ used by xLearn.
 namespace xLearn {
 
 //------------------------------------------------------------------------------
-// The Model class is responsible for storing global
+// The Model class is responsible for storing the global
 // model prameters. We can dump a checkpoint for current model
 // and we can also load a model checkpoint from disk file.
 // A model can be initialized by Initialize() function or from a
@@ -47,6 +46,7 @@ namespace xLearn {
 //    hyper_param.num_feature = 10;
 //    hyper_param.num_K = 8;
 //    hyper_param.num_field = 10;
+//    hyper_param.model_scale = 0.66;
 //
 //    Model model;
 //    model_ffm.Initialize(hyper_param.score_func,
@@ -69,10 +69,6 @@ namespace xLearn {
 //    for (index_t i = 0; i < v_len; ++i) {
 //      /* access v[i] ... */
 //    }
-//
-//    /* We can also get the bias term */
-//    real_t b = model.GetParameter_b();
-//    /* access b[0] and b[1] */
 //
 //    /* We can save model to a disk file: */
 //    model.SaveModel("/tmp/model.txt");
@@ -117,53 +113,63 @@ class Model {
   inline index_t GetNumParameter_w() { return param_num_w_; }
 
   // Get the size of the latent factor
+  // For linear score this value equals zero
   inline index_t GetNumParameter_v() { return param_num_v_; }
 
   // Reset current model parameters
   void Reset() { set_value(); }
 
-  // Other Get functions
-  inline std::string GetScoreFunction() { return score_func_; }
+  // Get score function type
+  inline std::string& GetScoreFunction() { return score_func_; }
 
-  inline std::string GetLossFunction() { return loss_func_; }
+  // Get the loss function type
+  inline std::string& GetLossFunction() { return loss_func_; }
 
+  // Get the number of feature
   inline index_t GetNumFeature() { return num_feat_; }
 
+  // Get the number of field
   inline index_t GetNumField() { return num_field_; }
 
+  // Get the number of k
   inline index_t GetNumK() { return num_K_; }
 
+  // Get the aligned size of K
+  inline index_t get_aligned_k() {
+    return (index_t)ceil((real_t)num_K_/kAlign)*kAlign;
+  }
+
+  // Get the total size of model parameters
   inline index_t GetNumParameter() {
     return param_num_w_ + param_num_v_ + 2;
   }
 
-  // Because we use SSE, so the momery should be aligned
-  inline index_t get_aligned_k() {
-    return (index_t) ceil((real_t)num_K_ / kAlign) * kAlign;
-  }
-
  protected:
-  /* Score function: 'linear', 'fm', or 'ffm' */
+  /* Score function: for now it could
+  be 'linear', 'fm', or 'ffm' */
   std::string  score_func_;
-  /* Loss function: 'squared', 'cross-entropy', 'hinge' */
+  /* Loss function: for now it could
+  be 'squared', 'cross-entropy', 'hinge' */
   std::string  loss_func_;
   /* Size of the linear term.
   Note that we store both of the model parameter
-  and the gradient cache in param_w_
-  Note that param_num_w_ == num_feat_ * 2 */
+  and the gradient cache in param_w_, so
+  param_num_w_ equals num_feat_ * 2 */
   index_t param_num_w_;
   /* Size of the latent factor. We store both the model
   parameter and the gradient cache for adagrad in param_v_
-  For linear function, param_num_v =  0
+  For linear function, param_num_v = 0
   For fm, param_num_v_ = num_feat * num_K * 2
   For ffm, param_num_v_ = num_feat * num_field * num_K * 2  */
   index_t  param_num_v_;
-  /* Number of feature (feat_id is start from 0) */
+  /* Number of feature
+  (feature id is start from 0) */
   index_t  num_feat_;
-  /* Number of field (used in ffm, field_id is start from 0) */
+  /* Number of field
+  (used in ffm, field id is start from 0) */
   index_t  num_field_;
   /* Number of K (used in fm and ffm)
-  Becasue we use SSE, so the real k will be aligned
+  Becasue we use SSE, so the real k should be aligned
   User can get the aligned K by using get_aligned_k() */
   index_t  num_K_;
   /* Storing the parameter of linear term */
@@ -175,10 +181,11 @@ class Model {
   /* Used for init model parameters */
   real_t scale_;
 
-  // Initialize model parameters and gradient cache
+  // Initialize the value of model parameters
+  // and gradient cache
   void initial(bool set_value = false);
 
-  // Re-init current model parameters
+  // Reset the value of current model parameters
   void set_value();
 
   // Serialize w, v, b to disk file

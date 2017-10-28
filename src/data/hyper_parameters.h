@@ -17,7 +17,7 @@
 /*
 Author: Chao Ma (mctt90@gmail.com)
 
-This file defines the hyper-parameters used by xLearn.
+This file defines the basic hyper-parameters used by xLearn.
 */
 
 #ifndef XLEARN_DATA_HYPER_PARAMETER_H_
@@ -30,52 +30,53 @@ This file defines the hyper-parameters used by xLearn.
 namespace xLearn {
 
 //------------------------------------------------------------------------------
-// We use a single data structure - HyperParam to handle all the
-// hyper parameters used by xLearn.
+// We use a single data structure - HyperParam to handle all of
+// the hyper parameters used by xLearn.
 //------------------------------------------------------------------------------
 struct HyperParam {
 //------------------------------------------------------------------------------
-// Parameters for current task
+// Baisc parameters for current task
 //------------------------------------------------------------------------------
   /* Train or Predict
-  True for train, false for predict */
+  True for train, and false for predict */
   bool is_train = true;
-  /* On-disk for limited memory
-  True for on-disk training, false for
+  /* On-disk training for limited memory
+  True for on-disk training, and false for
   in-memory training */
   bool on_disk = false;
-  /* Don't print any evaluation information
-  during the training. Just train the model */
+  /* Don't print any evaluation information during
+  the training, and just train the model */
   bool quiet = false;
-  /* Score function
-  Could be 'linear', 'fm', or 'ffm' */
+  /* Score function. For now, it could
+  be 'linear', 'fm', or 'ffm' */
   std::string score_func = "linear";
-  /* Loss function
-  Could be 'cross-entropy', 'squared', or 'hinge' */
+  /* Loss function. For now, it could
+  be 'cross-entropy', 'squared', or 'hinge' */
   std::string loss_func = "corss-entropy";
-  /* metric function
-  Could be 'acc', 'prec', 'recall', 'f1' (for classification)
-  and 'mae', 'mape' (for regression) */
+  /* Metric function. For now, it could
+  be 'acc', 'prec', 'recall', 'f1', 'auc',
+  'mae', or 'mape' */
   std::string metric = "acc";
 //------------------------------------------------------------------------------
 // Parameters for optimization method
 //------------------------------------------------------------------------------
   /* Learning rate */
   real_t learning_rate = 0.2;
-  /* lambda for regularizer
-  xLearn uses sparse regularizer */
+  /* lambda for regularize. xLearn uses L2-regular */
   real_t regu_lambda = 0.00002;
   /* Hyper param for init model parameters */
   real_t model_scale = 0.66;
-  /* Number of epoch
-  Could be changed in early-stop */
+  /* Number of epoch. This value could
+  be changed in early-stop */
   int num_epoch = 10;
-  /* Sample size for each training iteration
+  /* Sample size for each training iterator, and
   reader->Samples(matrix) will return this
-  value to user */
+  value to user in on-disk training, while in in-memory
+  training, xlearn always samples the whole data set
+  at each epoch */
   int sample_size = 20000;
-  /* True for use instance-wise
-  normalization. False for not */
+  /* True for using instance-wise
+  normalization, and False for not */
   bool norm = true;
 //------------------------------------------------------------------------------
 // Parameters for dataset
@@ -88,29 +89,31 @@ struct HyperParam {
   index_t num_K = 4;
   /* Number of field, used by ffm tasks */
   index_t num_field = 0;
-  /* Filename of training set
-  We must set this value in training */
+  /* Filename of training dataset
+  We must set this value in training task */
   std::string train_set_file;
   /* Filename for test set
   This value can be empty */
   std::string test_set_file;
   /* Filename of prediction set
-  We must set this value in prediction */
+  We must set this value in prediction astk */
   std::string predict_file;
   /* Filename of model checkpoint */
   std::string model_file = "./xlearn_model";
-  /* Filename of output result of prediction */
+  /* Filename of output result for prediction */
   std::string output_file = "./xlearn_out";
   /* Filename of log file */
   std::string log_file = "./xlearn_log";
 //------------------------------------------------------------------------------
 // Parameters for validation
 //------------------------------------------------------------------------------
-  /* Use cross-validation or not */
+  /* True for using cross-validation, and
+  false for not */
   bool cross_validation = false;
   /* Number of folds in cross-validation */
   int num_folds = 5;
-  /* Use early-stop or not */
+  /* True for using early-stop, and
+  False for not */
   bool early_stop = false;
 };
 
