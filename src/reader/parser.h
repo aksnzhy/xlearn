@@ -35,9 +35,9 @@ namespace xLearn {
 
 //------------------------------------------------------------------------------
 // Given a memory buffer, parse it to the DMatrix format.
-// Parser is an abstract class, which can be implemented by real Parser
-// such as the LibsvmParser and the FFMParser. Note that the Parser will add
-// a bias term for each SparseRow. We can use the Parse class like this:
+// Parser is an abstract class, which can be implemented by real
+// Parser such as the LibsvmParser, FFMParser, and CSVParser.
+// We can use the Parser class like this:
 //
 //   std::string filename = "/tmp/train.txt";
 //   std::string format = CheckFileFormat(filename);
@@ -49,7 +49,7 @@ namespace xLearn {
 //   } else {
 //     parser = new CSVParser();
 //   }
-//   parser->setLabel(true);  // This dataset has label y
+//   parser->setLabel(true);  // this dataset contains label y
 //   char* buffer = nullptr;
 //   uint64 size = ReadFileToMemory(filename, buffer);
 //   DMatrix matrix;
@@ -60,11 +60,12 @@ class Parser {
   Parser() { }
   virtual ~Parser() {  }
 
-  // This dataset has label y
+  // This dataset contains label y
   inline void setLabel(bool label) {
     has_label_ = label;
   }
 
+  // The real parse function invoked by user
   virtual void Parse(char* buf, uint64 size, DMatrix& matrix) = 0;
 
  protected:
@@ -95,6 +96,7 @@ class LibsvmParser : public Parser {
   LibsvmParser() { }
   ~LibsvmParser() {  }
 
+  // Parse the libsvm file
   void Parse(char* buf, uint64 size, DMatrix& matrix);
 
  private:
@@ -111,6 +113,7 @@ class FFMParser : public Parser {
   FFMParser() { }
   ~FFMParser() {  }
 
+  // Parse the libffm file
   void Parse(char* buf, uint64 size, DMatrix& matrix);
 
  private:
@@ -121,12 +124,17 @@ class FFMParser : public Parser {
 // CSVParser parses the following data format:
 // [feat_1 feat_2 feat_3 ... feat_n y1]
 // [feat_1 feat_2 feat_3 ... feat_n y2]
+// Note that, if the csv data doesn't contain the
+// label y, the user should add a placeholder to the dataset
+// by themselves. Otherwise, the parser will treat the last
+// element as the label y.
 //------------------------------------------------------------------------------
 class CSVParser : public Parser {
  public:
   CSVParser() { }
   ~CSVParser() { }
 
+  // Parse the csv file
   void Parse(char* buf, uint64 size, DMatrix& matrix);
 
  private:

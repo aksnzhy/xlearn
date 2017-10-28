@@ -44,10 +44,10 @@ index_t Parser::get_line_number(char* buf, uint64 buf_size) {
   }
   // The last line may doesn't contain the '\n'
   // and we need +1 here
-  if (buf[buf_size-1] == '\n') {
-    return num;
+  if (buf[buf_size-1] != '\n') {
+    num += 1;
   }
-  return num + 1;
+  return num;
 }
 
 // Get one line from memory buffer
@@ -87,7 +87,6 @@ void LibsvmParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
   uint64 pos = 0;
   for (index_t i = 0; i < line_num; ++i) {
     pos += get_line_from_buffer(line_buf, buf, pos, size);
-    matrix.row[i] = new SparseRow();
     // Add Y
     if (has_label_) {  // for training task
       char *y_char = strtok(line_buf, " \t");
@@ -140,7 +139,6 @@ void FFMParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
   uint64 pos = 0;
   for (index_t i = 0; i < line_num; ++i) {
     pos += get_line_from_buffer(line_buf, buf, pos, size);
-    matrix.row[i] = new SparseRow();
     // Add Y
     if (has_label_) {  // for training task
       char *y_char = strtok(line_buf, " \t");
@@ -186,7 +184,10 @@ void FFMParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
 // CSVParser parses the following data format:
 // [feat_1 feat_2 feat_3 ... feat_n y1]
 // [feat_1 feat_2 feat_3 ... feat_n y2]
-// Note that the CSV file will always contain label y
+// Note that, if the csv file doesn't contain the
+// label y, the user should add a placeholder to the dataset
+// by themselves. Otherwise, the parser will treat the last
+// element as the label y.
 //------------------------------------------------------------------------------
 void CSVParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
   CHECK_NOTNULL(buf);
@@ -199,7 +200,6 @@ void CSVParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
   std::vector<std::string> str_vec;
   for (index_t i = 0; i < line_num; ++i) {
     pos += get_line_from_buffer(line_buf, buf, pos, size);
-    matrix.row[i] = new SparseRow();
     str_vec.clear();
     SplitStringUsing(line_buf, " \t", &str_vec);
     int size = str_vec.size();

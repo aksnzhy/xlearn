@@ -42,7 +42,7 @@ const string kStrFFMNoy = "1:1:0.123 1:1:0.123 1:1:0.123\n";
 //const index_t kFeatureNum = 3;
 const index_t kNumLines = 100000;
 const index_t kNumSamples = 200;
-const int iteration_num = 2000;
+const int iteration_num = 10;
 
 void write_data(const std::string& filename,
                 const std::string& data) {
@@ -98,8 +98,12 @@ void delete_file() {
   RemoveFile(ffm_no_file.c_str());
 }
 
-void CheckLR(const DMatrix* matrix, bool has_label) {
-  EXPECT_EQ(matrix->row_length, kNumSamples);
+void CheckLR(const DMatrix* matrix, bool has_label, bool disk) {
+  if (disk) {
+    EXPECT_EQ(matrix->row_length, kNumSamples);
+  } else {
+    EXPECT_EQ(matrix->row_length, kNumLines);
+  }
   // check the first element
   if (has_label) {
     EXPECT_EQ(matrix->Y[0], 0);
@@ -121,8 +125,12 @@ void CheckLR(const DMatrix* matrix, bool has_label) {
   }
 }
 
-void CheckFFM(const DMatrix* matrix, bool has_label) {
-  EXPECT_EQ(matrix->row_length, kNumSamples);
+void CheckFFM(const DMatrix* matrix, bool has_label, bool disk) {
+  if (disk) {
+    EXPECT_EQ(matrix->row_length, kNumSamples);
+  } else {
+    EXPECT_EQ(matrix->row_length, kNumLines);
+  }
   // check the first element
   if (has_label) {
     EXPECT_EQ(matrix->Y[0], 1);
@@ -144,8 +152,12 @@ void CheckFFM(const DMatrix* matrix, bool has_label) {
   }
 }
 
-void CheckCSV(const DMatrix* matrix) {
-  EXPECT_EQ(matrix->row_length, kNumSamples);
+void CheckCSV(const DMatrix* matrix, bool disk) {
+  if (disk) {
+    EXPECT_EQ(matrix->row_length, kNumSamples);
+  } else {
+    EXPECT_EQ(matrix->row_length, kNumLines);
+  }
   EXPECT_EQ(matrix->Y[0], 0);
   EXPECT_FLOAT_EQ(matrix->norm[0], 22.03274);
   for (int i = 0; i < matrix->row_length; ++i) {
@@ -172,22 +184,21 @@ void read_from_memory(const std::string& filename, int task_id) {
       reader.Reset();
       continue;
     }
-    EXPECT_EQ(record_num, kNumSamples);
     switch (task_id) {
       case 0:
-        CheckLR(matrix, true);
+        CheckLR(matrix, true, false);
         break;
       case 1:
-        CheckFFM(matrix, true);
+        CheckFFM(matrix, true, false);
         break;
       case 2:
-        CheckCSV(matrix);
+        CheckCSV(matrix, false);
         break;
       case 3:
-        CheckLR(matrix, false);
+        CheckLR(matrix, false, false);
         break;
       case 4:
-        CheckFFM(matrix, false);
+        CheckFFM(matrix, false, false);
         break;
     }
   }

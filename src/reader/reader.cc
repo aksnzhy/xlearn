@@ -37,14 +37,17 @@ CLASS_REGISTER_IMPLEMENT_REGISTRY(xLearn_reader_registry, Reader);
 REGISTER_READER("memory", InmemReader);
 REGISTER_READER("disk", OndiskReader);
 
-// Check current file format
-// Return 'libsvm', 'libffm', or 'csv'
+// Check current file format and
+// return 'libsvm', 'libffm', or 'csv'
+// This function will also check if current
+// data has the label y
 std::string Reader::check_file_format() {
   FILE* file = OpenFileOrDie(filename_.c_str(), "r");
   // get the first line of data
   std::string data_line;
   GetLine(file, data_line);
   Close(file);
+  // Split the first line of data
   std::vector<std::string> str_list;
   SplitStringUsing(data_line, " \t", &str_list);
   // has y?
@@ -54,7 +57,7 @@ std::string Reader::check_file_format() {
   } else {
     has_label_ = true;
   }
-  // file format
+  // check file format
   int count = 0;
   for (int i = 0; i < str_list[1].size(); ++i) {
     if (str_list[1][i] == ':') {
@@ -82,7 +85,7 @@ std::string Reader::check_file_format() {
 void InmemReader::Initialize(const std::string& filename,
                              int num_samples) {
   CHECK_NE(filename.empty(), true)
-  CHECK_GT(num_samples, 0);
+  CHECK_GE(num_samples, 0);
   filename_ = filename;
   num_samples_ = num_samples;
   printf("First check if the text file (%s) has been already "
@@ -130,36 +133,36 @@ bool InmemReader::hash_binary(const std::string& filename) {
 // In-memory Reader can be initialized from binary file
 void InmemReader::init_from_binary() {
   /*********************************************************
-   *  Step 1: Init data_samples_                           *
-   *********************************************************/
-  data_samples_.ResetMatrix(num_samples_);
-  /*********************************************************
-   *  Step 2: Init data_buf_                               *
+   *  Step 1: Init data_buf_                               *
    *********************************************************/
   data_buf_.Deserialize(filename_);
   /*********************************************************
+   *  Step 3: Init data_samples_                           *
+   *********************************************************/
+  // For in-memory Reader, the size of data sample is
+  // equals to the size of data buffer
+  num_samples_ = data_buf_.row_length;
+  data_samples_.ResetMatrix(num_samples_);
+  /*********************************************************
    *  Step 3: Init order_                                  *
    *********************************************************/
-  order_.resize(data_buf_.row_length);
+  order_.resize(num_samples_);
   for (int i = 0; i < order_.size(); ++i) {
     order_[i] = i;
   }
+  random_shuffle(order_.begin(), order_.end());
 }
 
 // Pre-load all the data to memory buffer from txt file
 void InmemReader::init_from_txt() {
   /*********************************************************
-   *  Step 1: Init data_samples_                           *
-   *********************************************************/
-  data_samples_.ResetMatrix(num_samples_);
-  /*********************************************************
-   *  Step 2: Init parser_                                 *
+   *  Step 1: Init parser_                                 *
    *********************************************************/
   parser_ = CreateParser(check_file_format().c_str());
   if (has_label_) parser_->setLabel(true);
   else parser_->setLabel(false);
   /*********************************************************
-   *  Step 3: Init data_buf_                               *
+   *  Step 2: Init data_buf_                               *
    *********************************************************/
   char* buffer = nullptr;
   uint64 file_size = ReadFileToMemory(filename_, &buffer);
@@ -168,12 +171,18 @@ void InmemReader::init_from_txt() {
   data_buf_.SetHash(HashFile(filename_, true),
                     HashFile(filename_, false));
   /*********************************************************
+   *  Step 3: Init data_samples_                           *
+   *********************************************************/
+  num_samples_ = data_buf_.row_length;
+  data_samples_.ResetMatrix(num_samples_);
+  /*********************************************************
    *  Step 4: order_                                       *
    *********************************************************/
-  order_.resize(data_buf_.row_length);
+  order_.resize(num_samples_);
   for (int i = 0; i < order_.size(); ++i) {
     order_[i] = i;
   }
+  random_shuffle(order_.begin(), order_.end());
   /*********************************************************
    *  Step 5: Deserialize in-memory buffer to disk file    *
    *********************************************************/

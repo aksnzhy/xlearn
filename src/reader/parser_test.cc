@@ -30,29 +30,33 @@ This file tests parser.h
 
 namespace xLearn {
 
-const std::string kStr = "0 0:0.12 1:0.12 2:0.12 3:0.12 4:0.12\n";
-const std::string kStrFFM = "1 0:0:0.13 1:1:0.13 2:2:0.13 3:3:0.13 4:4:0.13\n";
-const std::string kStrCSV = "0.123 0.123 0.123 0.123 0.123 1\n";
+const std::string kStr = "1 0:0.12 1:0.12 2:0.12 3:0.12 4:0.12\n";
+const std::string kStrFFM = "1 0:0:0.12 1:1:0.12 2:2:0.12 3:3:0.12 4:4:0.12\n";
+const std::string kStrCSV = "0.12 0.12 0.12 0.12 0.12 1\n";
 const std::string kStrNoy = "0:0.12 1:0.12 2:0.12 3:0.12 4:0.12\n";
-const std::string kStrFFMNoy = "0:0:0.13 1:1:0.13 2:2:0.13 3:3:0.13 4:4:0.13\n";
+const std::string kStrFFMNoy = "0:0:0.12 1:1:0.12 2:2:0.12 3:3:0.12 4:4:0.12\n";
+const std::string Kfilename = "./test_file.txt";
 const index_t kNum_lines = 100000;
-const std::string filename = "./test_file.txt";
 
-TEST(PARSER_TEST, Parse_libsvm) {
+// Write data to disk file
+void write_data(const std::string& filename,
+                const std::string& data) {
   FILE* file = OpenFileOrDie(filename.c_str(), "w");
   for (int i = 0; i < kNum_lines; ++i) {
-    WriteDataToDisk(file, kStr.data(), kStr.size());
+    WriteDataToDisk(file, data.data(), data.size());
   }
   Close(file);
-  char* buffer = nullptr;
-  uint64 size = ReadFileToMemory(filename, &buffer);
-  DMatrix matrix;
-  LibsvmParser parser;
-  parser.setLabel(true);
-  parser.Parse(buffer, size, matrix);
+}
+
+// Check the parser's result
+void check(const DMatrix& matrix, bool has_label, bool has_field) {
   EXPECT_EQ(matrix.row_length, kNum_lines);
   for (index_t i = 0; i < matrix.row_length; ++i) {
-    EXPECT_EQ(matrix.Y[i], 0);
+    if (has_label) {
+      EXPECT_EQ(matrix.Y[i], 1);
+    } else {
+      EXPECT_EQ(matrix.Y[i], -2);
+    }
     EXPECT_FLOAT_EQ(matrix.norm[i], 13.888889);
     int col_len = matrix.row[i]->size();
     EXPECT_EQ(col_len, 5);
@@ -60,141 +64,77 @@ TEST(PARSER_TEST, Parse_libsvm) {
     int n = 0;
     for (SparseRow::iterator iter = row->begin();
          iter != row->end(); ++iter) {
-      EXPECT_EQ(iter->field_id, 0);
+      if (has_field) {
+        EXPECT_EQ(iter->field_id, n);
+      } else {
+        EXPECT_EQ(iter->field_id, 0);
+      }
       EXPECT_EQ(iter->feat_id, n);
       EXPECT_FLOAT_EQ(iter->feat_val, 0.12);
       n++;
     }
     EXPECT_EQ(n, 5);
   }
-  RemoveFile(filename.c_str());
+}
+
+TEST(PARSER_TEST, Parse_libsvm) {
+  write_data(Kfilename, kStr);
+  char* buffer = nullptr;
+  uint64 size = ReadFileToMemory(Kfilename, &buffer);
+  DMatrix matrix;
+  LibsvmParser parser;
+  parser.setLabel(true);
+  parser.Parse(buffer, size, matrix);
+  check(matrix, true, false);
+  RemoveFile(Kfilename.c_str());
 }
 
 TEST(PARSER_TEST, Parse_libsvm_no_y) {
-  FILE* file = OpenFileOrDie(filename.c_str(), "w");
-  for (int i = 0; i < kNum_lines; ++i) {
-    WriteDataToDisk(file, kStrNoy.data(), kStrNoy.size());
-  }
-  Close(file);
+  write_data(Kfilename, kStrNoy);
   char* buffer = nullptr;
-  uint64 size = ReadFileToMemory(filename, &buffer);
+  uint64 size = ReadFileToMemory(Kfilename, &buffer);
   DMatrix matrix;
   LibsvmParser parser;
   parser.setLabel(false);
   parser.Parse(buffer, size, matrix);
-  EXPECT_EQ(matrix.row_length, kNum_lines);
-  for (index_t i = 0; i < matrix.row_length; ++i) {
-    EXPECT_EQ(matrix.Y[i], -2);
-    EXPECT_FLOAT_EQ(matrix.norm[i], 13.888889);
-    int col_len = matrix.row[i]->size();
-    EXPECT_EQ(col_len, 5);
-    SparseRow *row = matrix.row[i];
-    int n = 0;
-    for (SparseRow::iterator iter = row->begin();
-         iter != row->end(); ++iter) {
-      EXPECT_EQ(iter->field_id, 0);
-      EXPECT_EQ(iter->feat_id, n);
-      EXPECT_FLOAT_EQ(iter->feat_val, 0.12);
-      n++;
-    }
-    EXPECT_EQ(n, 5);
-  }
-  RemoveFile(filename.c_str());
+  check(matrix, false, false);
+  RemoveFile(Kfilename.c_str());
 }
 
 TEST(PARSER_TEST, Parse_libffm) {
-  FILE* file = OpenFileOrDie(filename.c_str(), "w");
-  for (int i = 0; i < kNum_lines; ++i) {
-    WriteDataToDisk(file, kStrFFM.data(), kStrFFM.size());
-  }
-  Close(file);
+  write_data(Kfilename, kStrFFM);
   char* buffer = nullptr;
-  uint64 size = ReadFileToMemory(filename, &buffer);
+  uint64 size = ReadFileToMemory(Kfilename, &buffer);
   DMatrix matrix;
   FFMParser parser;
   parser.setLabel(true);
   parser.Parse(buffer, size, matrix);
-  EXPECT_EQ(matrix.row_length, kNum_lines);
-  for (index_t i = 0; i < matrix.row_length; ++i) {
-    EXPECT_EQ(matrix.Y[i], 1);
-    EXPECT_FLOAT_EQ(matrix.norm[i], 11.834319);
-    int col_len = matrix.row[i]->size();
-    EXPECT_EQ(col_len, 5);
-    SparseRow *row = matrix.row[i];
-    int n = 0;
-    for (SparseRow::iterator iter = row->begin();
-         iter != row->end(); ++iter) {
-      EXPECT_EQ(iter->field_id, n);
-      EXPECT_EQ(iter->feat_id, n);
-      EXPECT_FLOAT_EQ(iter->feat_val, 0.13);
-      n++;
-    }
-    EXPECT_EQ(n, 5);
-  }
-  RemoveFile(filename.c_str());
+  check(matrix, true, true);
+  RemoveFile(Kfilename.c_str());
 }
 
 TEST(PARSER_TEST, Parse_libffm_no_y) {
-  FILE* file = OpenFileOrDie(filename.c_str(), "w");
-  for (int i = 0; i < kNum_lines; ++i) {
-    WriteDataToDisk(file, kStrFFMNoy.data(), kStrFFMNoy.size());
-  }
-  Close(file);
+  write_data(Kfilename, kStrFFMNoy);
   char* buffer = nullptr;
-  uint64 size = ReadFileToMemory(filename, &buffer);
+  uint64 size = ReadFileToMemory(Kfilename, &buffer);
   DMatrix matrix;
   FFMParser parser;
   parser.setLabel(false);
   parser.Parse(buffer, size, matrix);
-  EXPECT_EQ(matrix.row_length, kNum_lines);
-  for (index_t i = 0; i < matrix.row_length; ++i) {
-    EXPECT_EQ(matrix.Y[i], -2);
-    EXPECT_FLOAT_EQ(matrix.norm[i], 11.834319);
-    int col_len = matrix.row[i]->size();
-    EXPECT_EQ(col_len, 5);
-    SparseRow *row = matrix.row[i];
-    int n = 0;
-    for (SparseRow::iterator iter = row->begin();
-         iter != row->end(); ++iter) {
-      EXPECT_EQ(iter->field_id, n);
-      EXPECT_EQ(iter->feat_id, n);
-      EXPECT_FLOAT_EQ(iter->feat_val, 0.13);
-      n++;
-    }
-    EXPECT_EQ(n, 5);
-  }
-  RemoveFile(filename.c_str());
+  check(matrix, false, true);
+  RemoveFile(Kfilename.c_str());
 }
 
 TEST(PARSER_TEST, Parse_csv) {
-  FILE* file = OpenFileOrDie(filename.c_str(), "w");
-  for (int i = 0; i < kNum_lines; ++i) {
-    WriteDataToDisk(file, kStrCSV.data(), kStrCSV.size());
-  }
-  Close(file);
+  write_data(Kfilename, kStrCSV);
   char* buffer = nullptr;
-  uint64 size = ReadFileToMemory(filename, &buffer);
+  uint64 size = ReadFileToMemory(Kfilename, &buffer);
   DMatrix matrix;
   CSVParser parser;
   parser.setLabel(true);
   parser.Parse(buffer, size, matrix);
-  EXPECT_EQ(matrix.row_length, kNum_lines);
-  for (index_t i = 0; i < matrix.row_length; ++i) {
-    EXPECT_EQ(matrix.Y[i], 1);
-    EXPECT_FLOAT_EQ(matrix.norm[i], 13.219644);
-    int col_len = matrix.row[i]->size();
-    EXPECT_EQ(col_len, 5);
-    SparseRow *row = matrix.row[i];
-    int n = 0;
-    for (SparseRow::iterator iter = row->begin();
-         iter != row->end(); ++iter) {
-      EXPECT_EQ(iter->feat_id, n);
-      EXPECT_FLOAT_EQ(iter->feat_val, 0.123);
-      n++;
-    }
-    EXPECT_EQ(n, 5);
-  }
-  RemoveFile(filename.c_str());
+  check(matrix, true, false);
+  RemoveFile(Kfilename.c_str());
 }
 
 Parser* CreateParser(const char* format_name) {

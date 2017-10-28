@@ -38,7 +38,7 @@ namespace xLearn {
 //------------------------------------------------------------------------------
 // Reader is an abstract class which can be implemented in different way,
 // such as the InmemReader that reads data from memory, and the OndiskReader
-// that reads data from disk file.
+// that reads data from disk file (for limited memory).
 //
 // We can use the Reader class like this (Pseudo code):
 //
@@ -47,30 +47,30 @@ namespace xLearn {
 //   /* or new InmemReader() */
 //   Reader* reader = new OndiskReader();
 //
-//   reader->Initialize(filename = "/tmp/testdata",  /* the data path */
-//                      num_samples = 200);      /* return 200 examples */
+//   reader->Initialize(filename = "/tmp/testdata",
+//                      num_samples = 20000);  // size of the working set
 //
 //   Loop {
 //
 //      int num_samples = reader->Sample(DMatrix);
 //
 //      /* The reader will return 0 when reaching the end of
-//       data source, and then we can invoke Reset() to return
-//       to the begining of data */
-//
+//      data source, and then we can invoke Reset() to return
+//      to the begining of data */
 //      if (num_samples == 0) {
 //        reader->Reset()
 //      }
 //
-//      /* use data samples ... */
+//      /* use data matrix ... */
 //
 //   }
 //
-// For now, the Reader can parse two kinds of file format, including
-// libsvm format and libffm format.
+// For now, the Reader can parse three kinds of file format, including
+// libsvm format, libffm format, and CSV format.
 //------------------------------------------------------------------------------
 class Reader {
  public:
+  // Constructor and Desstructor
   Reader() {  }
   virtual ~Reader() {  }
 
@@ -82,26 +82,31 @@ class Reader {
   // Sample data from disk or from memory buffer
   // Return the number of record in each samplling
   // Samples() return 0 when reaching end of the data
+  // We can shuffle data randomly, this is good for SGD
   virtual int Samples(DMatrix* &matrix, bool shuffle = true) = 0;
 
-  // Return to the begining of the data.
+  // Return to the begining of the data
   virtual void Reset() = 0;
 
  protected:
-  /* Indicate the input file */
+  /* Input file name */
   std::string filename_;
   /* Number of data samples in working set */
   int num_samples_;
   /* Data sample */
   DMatrix data_samples_;
-  /* Parse txt file to binary data */
+  /* Parser for a block of memory buffer */
   Parser* parser_;
-  /* If this data has label y? */
+  /* If this data has label y?
+  This value will be set automitically
+  in initialization */
   bool has_label_;
 
   // Check current file format and return
-  // "libsvm", "ffm", or "csv". Program crashes for
-  // unknow format
+  // "libsvm", "ffm", or "csv".
+  // Program crashes for unknow format
+  // This function will also check if current
+  // data has the label y
   std::string check_file_format();
 
   // Create parser for different file format
@@ -125,30 +130,33 @@ class InmemReader : public Reader {
   ~InmemReader() { }
 
   // Pre-load all the data into memory buffer
+  // The num_samples will be setted to the line size
+  // of current data automatically
   virtual void Initialize(const std::string& filename,
-                          int num_samples);
+                          int num_samples = 0);
 
-  // Sample data from memory buffer
+  // Sample data from the memory buffer
   virtual int Samples(DMatrix* &matrix, bool shuffle = true);
 
   // Return to the begining of the data
   virtual void Reset();
 
  protected:
-  /* We load all the data into this buffer */
+  /* Reader will load all the data
+  into this buffer */
   DMatrix data_buf_;
   /* Position for samplling */
   index_t pos_;
-  /* For shuffle */
+  /* For random shuffle */
   std::vector<index_t> order_;
 
   // Check wheter current path has a binary file
   bool hash_binary(const std::string& filename);
 
-  // Initialize Reader from binary file
+  // Initialize Reader from existing binary file
   void init_from_binary();
 
-  // Initialize Reader from txt file
+  // Initialize Reader from a new txt file
   void init_from_txt();
 
   // Serialize in-memory buffer to disk file
