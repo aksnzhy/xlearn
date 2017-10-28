@@ -33,7 +33,6 @@ programming convenient.
 #include "base/stdint_msvc.h"  // Visual C++ use this header.
 #endif
 
-#include <x86intrin.h>
 #include <limits>
 #include <chrono>  // for Timer
 
@@ -203,10 +202,13 @@ static const double kVerySmallNumberDouble = 1e-15;
 
 //------------------------------------------------------------------------------
 // Timer class:
+//
 //   Timer timer();
 //   timer.tic();
 //     ....
-//   float time = timer.toc();
+//   float time = timer.toc();  // (sec)
+//
+// This class can be used to evaluate multi-thread code.
 //------------------------------------------------------------------------------
 class Timer {
  public:
