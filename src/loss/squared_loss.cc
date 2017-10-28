@@ -29,8 +29,8 @@ real_t SquaredLoss::Evalute(const std::vector<real_t>& pred,
   CHECK_EQ(pred.empty(), false);
   real_t val = 0.0;
   for (size_t i = 0; i < pred.size(); ++i) {
-    real_t tmp = pred[i] - label[i];
-    val += (tmp*tmp);
+    real_t error = label[i] - pred[i];
+    val += (error*error);
   }
   return val * 0.5;
 }
@@ -47,7 +47,7 @@ void squared_thread(const DMatrix* matrix,
     SparseRow* row = matrix->row[i];
     real_t norm = is_norm ? matrix->norm[i] : 1.0;
     real_t score = score_func->CalcScore(row, *model, norm);
-    // partial gradient
+    // partial gradient: -error
     real_t pg = score - matrix->Y[i];
     // real gradient and update
     score_func->CalcGrad(row, *model, pg, norm);

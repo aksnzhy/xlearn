@@ -45,11 +45,10 @@ class HingeLoss : public Loss {
 
   // Given data sample and current model, calculate gradient
   // and update current model parameters
-  void CalcGrad(const DMatrix* data_matrix,
-                Model& model);
+  void CalcGrad(const DMatrix* data_matrix, Model& model);
 
   // Return current loss type
-  std::string loss_type() { return "hinge_loss"; }
+  inline std::string loss_type() { return "hinge_loss"; }
 
  private:
   DISALLOW_COPY_AND_ASSIGN(HingeLoss);

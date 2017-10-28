@@ -118,6 +118,11 @@ TEST_F(LossTest, Predict_FM) {
   for (size_t i = 0; i < num_w; ++i) {
     w[i] = 2.0;
   }
+  real_t* v = model_fm.GetParameter_v();
+  index_t num_v = model_fm.GetNumParameter_v();
+  for (size_t i = 0; i < num_v; ++i) {
+    v[i] = 1.0;
+  }
   // Create Data matrix
   DMatrix matrix;
   matrix.ResetMatrix(kLine);
@@ -137,7 +142,8 @@ TEST_F(LossTest, Predict_FM) {
   std::vector<real_t> pred(kLine);
   loss.Predict(&matrix, model_fm, pred);
   for (int i = 0; i < kLine; ++i) {
-    EXPECT_FLOAT_EQ(pred[i], 288.0);
+    // 6 + 24*1*3
+    EXPECT_FLOAT_EQ(pred[i], 78);
   }
 }
 
@@ -154,6 +160,11 @@ TEST_F(LossTest, Predict_FFM) {
   index_t num_w = model_ffm.GetNumParameter_w();
   for (size_t i = 0; i < num_w; ++i) {
     w[i] = 2.0;
+  }
+  real_t* v = model_ffm.GetParameter_v();
+  index_t num_v = model_ffm.GetNumParameter_v();
+  for (size_t i = 0; i < num_v; ++i) {
+    v[i] = 1.0;
   }
   // Create Data matrix
   DMatrix matrix;
@@ -174,7 +185,8 @@ TEST_F(LossTest, Predict_FFM) {
   std::vector<real_t> pred(kLine);
   loss.Predict(&matrix, model_ffm, pred);
   for (int i = 0; i < kLine; ++i) {
-    EXPECT_FLOAT_EQ(pred[i], 288.0);
+    // 6 + 24*1*3
+    EXPECT_FLOAT_EQ(pred[i], 78);
   }
 }
 

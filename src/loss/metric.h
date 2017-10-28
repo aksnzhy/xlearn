@@ -16,6 +16,7 @@
 
 /*
 Author: Chao Ma (mctt90@gmail.com)
+
 This file defines the Metric class, which can be used for
 Accuracy, Precision, Recall, F1, MAE, MAPE, etc.
 */
@@ -39,6 +40,7 @@ class Metric {
         metric.compare("prec") != 0 &&    // Precision
         metric.compare("recall") != 0 &&
         metric.compare("f1") != 0 &&
+        metric.compare("auc") != 0 &&
         metric.compare("mae") != 0 &&
         metric.compare("mape") != 0) {
       LOG(FATAL) << "Unknow metric: " << metric;
@@ -53,7 +55,7 @@ class Metric {
   }
 
   // Get metric type
-  std::string type() {
+  std::string type() const {
     if (metric_type_.compare("acc") == 0) {
       return "accuracy";
     } else if (metric_type_.compare("prec") == 0) {
@@ -62,6 +64,8 @@ class Metric {
       return "recall";
     } else if (metric_type_.compare("f1") == 0) {
       return "F1";
+    } else if (metric_type_.compare("auc") == 0) {
+      return "AUC";
     } else if (metric_type_.compare("mae") == 0) {
       return "MAP";
     } else if (metric_type_.compare("mape") == 0) {
@@ -111,7 +115,7 @@ class Metric {
   }
 
   // Return metric value
-  real_t GetMetric() {
+  real_t GetMetric() const {
     if (metric_type_.compare("acc") == 0) {
       return Accuracy();
     } else if (metric_type_.compare("prec") == 0) {
@@ -120,6 +124,8 @@ class Metric {
       return Recall();
     } else if (metric_type_.compare("f1") == 0) {
       return F1();
+    } else if (metric_type_.compare("AUC") == 0) {
+      return AUC();
     } else if (metric_type_.compare("mae") == 0) {
       return MAE();
     } else if (metric_type_.compare("mape") == 0) {
@@ -146,12 +152,13 @@ protected:
   /* Sum of error for regression tasks */
   real_t error_accum_;
   // A set of metric funtions
-  real_t Accuracy();
-  real_t Precision();
-  real_t Recall();
-  real_t F1();
-  real_t MAE();
-  real_t MAPE();
+  real_t Accuracy() const;
+  real_t Precision() const;
+  real_t Recall() const;
+  real_t F1() const;
+  real_t AUC() const;
+  real_t MAE() const;
+  real_t MAPE() const;
 
   // Return the absolute value
   inline real_t abs(real_t a) { return a >= 0 ? a : -a; }

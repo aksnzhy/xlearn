@@ -30,12 +30,12 @@ namespace xLearn {
 //------------------------------------------------------------------------------
 // CrossEntropyLoss is used for classification tasks, which
 // has the following form:
-// loss = sum_all_example( log(1.0+exp(-y*pred)) )
+// loss = sum_all_example(log(1.0+exp(-y*pred)))
 //------------------------------------------------------------------------------
 class CrossEntropyLoss : public Loss {
  public:
   // Constructor and Desstructor
-  CrossEntropyLoss() { };
+  CrossEntropyLoss() { }
   ~CrossEntropyLoss() { }
 
   // Given predictions and labels, return cross-entropy loss
@@ -44,11 +44,10 @@ class CrossEntropyLoss : public Loss {
 
   // Given data sample and current model, calculate gradient
   // and update current model parameters
-  void CalcGrad(const DMatrix* data_matrix,
-                Model& model);
+  void CalcGrad(const DMatrix* data_matrix, Model& model);
 
   // Return current loss type
-  std::string loss_type() { return "log_loss"; }
+  inline std::string loss_type() { return "log_loss"; }
 
  private:
   DISALLOW_COPY_AND_ASSIGN(CrossEntropyLoss);

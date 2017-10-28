@@ -72,53 +72,52 @@ namespace xLearn {
 //------------------------------------------------------------------------------
 class Loss {
  public:
-   // Constructor and Desstructor
-   Loss() { };
-   virtual ~Loss() { }
+  // Constructor and Desstructor
+  Loss() { };
+  virtual ~Loss() { }
 
-   // This function needs to be invoked before using this class
-   void Initialize(Score* score, bool norm = true) {
-     score_func_ = score;
-     norm_ = norm;
-     threadNumber_ = std::thread::hardware_concurrency();
-     pool_ = new ThreadPool(threadNumber_);
-   }
+  // This function needs to be invoked before using this class
+  void Initialize(Score* score, bool norm = true) {
+    score_func_ = score;
+    norm_ = norm;
+    threadNumber_ = std::thread::hardware_concurrency();
+    pool_ = new ThreadPool(threadNumber_);
+  }
 
-   // Given predictions and labels, return loss value
-   virtual real_t Evalute(const std::vector<real_t>& pred,
-                          const std::vector<real_t>& label) = 0;
+  // Given predictions and labels, return loss value
+  virtual real_t Evalute(const std::vector<real_t>& pred,
+                         const std::vector<real_t>& label) = 0;
 
-   // Given data sample and current model, return predictions
-   virtual void Predict(const DMatrix* data_matrix,
-                        Model& model,
-                        std::vector<real_t>& pred);
+  // Given data sample and current model, return predictions
+  virtual void Predict(const DMatrix* data_matrix,
+                       Model& model,
+                       std::vector<real_t>& pred);
 
-   // Given data sample and current model, calculate gradient
-   // and update current model parameters
-   virtual void CalcGrad(const DMatrix* data_matrix,
-                         Model& model) = 0;
+  // Given data sample and current model, calculate gradient
+  // and update current model parameters
+  virtual void CalcGrad(const DMatrix* data_matrix, Model& model) = 0;
 
   // Return a current loss type
-  virtual std::string loss_type() = 0;
+  virtual inline std::string loss_type() = 0;
 
-   // The Sigmoid function, which mapping the output to 0~1
-   void Sigmoid(const std::vector<real_t>& pred,
+  // The Sigmoid function, which mapping the output to 0~1
+  void Sigmoid(const std::vector<real_t>& pred,
                 std::vector<real_t>& new_pred) {
-     CHECK_EQ(pred.size(), new_pred.size());
-     for (size_t i = 0; i < pred.size(); ++i) {
-       new_pred[i] = sigmoid(pred[i]);
-     }
-   }
+    CHECK_EQ(pred.size(), new_pred.size());
+    for (size_t i = 0; i < pred.size(); ++i) {
+      new_pred[i] = sigmoid(pred[i]);
+    }
+  }
 
-   // if pred[i] >= 0, new_pred -> 1
-   // else new_pred -> 0
-   void Sign(const std::vector<real_t>& pred,
-             std::vector<real_t>& new_pred) {
-     CHECK_EQ(pred.size(), new_pred.size());
-     for (size_t i = 0; i < pred.size(); ++i) {
-       new_pred[i] = pred[i] >= 0 ? 1 : 0;
-     }
-   }
+  // if pred[i] >= 0, new_pred -> 1
+  // else new_pred -> 0
+  void Sign(const std::vector<real_t>& pred,
+            std::vector<real_t>& new_pred) {
+    CHECK_EQ(pred.size(), new_pred.size());
+    for (size_t i = 0; i < pred.size(); ++i) {
+      new_pred[i] = pred[i] >= 0 ? 1 : 0;
+    }
+  }
 
  protected:
   // fast sigmoid function

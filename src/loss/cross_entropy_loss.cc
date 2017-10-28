@@ -30,8 +30,8 @@ namespace xLearn {
 // cross-entropy loss value
 real_t CrossEntropyLoss::Evalute(const std::vector<real_t>& pred,
                                  const std::vector<real_t>& label) {
-  CHECK_EQ(pred.empty(), false);
-  CHECK_EQ(label.empty(), false);
+  CHECK_NE(pred.empty(), true);
+  CHECK_NE(label.empty(), true);
   real_t val = 0.0;
   for (size_t i = 0; i < pred.size(); ++i) {
     real_t y = label[i] > 0 ? 1.0 : -1.0;

@@ -30,7 +30,7 @@ namespace xLearn {
 //------------------------------------------------------------------------------
 // SquaredLoss is used for regression tasks in machine learning, which
 // has the following form:
-// loss = sum_all_example( (pred - y) ^ 2 )
+// loss = sum_all_example( (y - pred) ^ 2 )
 //------------------------------------------------------------------------------
 class SquaredLoss : public Loss {
  public:
@@ -44,11 +44,10 @@ class SquaredLoss : public Loss {
 
   // Given data sample and current model, calculate gradient
   // and update current model parameters
-  void CalcGrad(const DMatrix* data_matrix,
-                Model& model);
+  void CalcGrad(const DMatrix* data_matrix, Model& model);
 
   // Return current loss type
-  std::string loss_type() { return "squared_loss"; }
+  inline std::string loss_type() { return "mse_loss"; }
 
  private:
   DISALLOW_COPY_AND_ASSIGN(SquaredLoss);
