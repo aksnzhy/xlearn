@@ -40,7 +40,7 @@ class LinearScoreTest : public ::testing::Test {
     param.learning_rate = 0.1;
     param.regu_lambda = 0;
     param.num_param = kLength;
-    param.loss_func = "sqaured";
+    param.loss_func = "squared";
     param.score_func = "linear";
     param.num_feature = kLength;
   }

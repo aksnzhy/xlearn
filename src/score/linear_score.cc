@@ -24,7 +24,7 @@ This file is the implementation of LinearScore class.
 
 namespace xLearn {
 
-// y = wTx (bias is added in w and x automitically)
+// y = wTx (incluing bias term)
 real_t LinearScore::CalcScore(const SparseRow* row,
                               Model& model,
                               real_t norm) {
