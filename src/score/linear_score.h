@@ -29,8 +29,8 @@ This file defines the LinearScore class.
 namespace xLearn {
 
 //------------------------------------------------------------------------------
-// LinearScore is used to implemente generalized linear models (GLMs), in
-// which the socre function is y = wTx.
+// LinearScore is used to implemente generalized linear
+// models (GLMs), where the socre function is y = wTx.
 //------------------------------------------------------------------------------
 class LinearScore : public Score {
  public:
