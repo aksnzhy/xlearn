@@ -47,9 +47,9 @@ real_t FFMScore::CalcScore(const SparseRow* row,
   /*********************************************************
    *  latent factor                                        *
    *********************************************************/
-  static index_t align0 = 2 * model.get_aligned_k();
-  static index_t align1 = model.GetNumField() * align0;
-  static int align = kAlign * 2;
+  index_t align0 = 2 * model.get_aligned_k();
+  index_t align1 = model.GetNumField() * align0;
+  int align = kAlign * 2;
   w = model.GetParameter_v();
   __m128 XMMt = _mm_setzero_ps();
   for (SparseRow::const_iterator iter_i = row->begin();
@@ -111,9 +111,9 @@ void FFMScore::CalcGrad(const SparseRow* row,
   /*********************************************************
    *  latent factor                                        *
    *********************************************************/
-  static index_t align0 = 2 * model.get_aligned_k();
-  static index_t align1 = model.GetNumField() * align0;
-  static int align = kAlign * 2;
+  index_t align0 = 2 * model.get_aligned_k();
+  index_t align1 = model.GetNumField() * align0;
+  int align = kAlign * 2;
   w = model.GetParameter_v();
   __m128 XMMpg = _mm_set1_ps(pg);
   __m128 XMMlr = _mm_set1_ps(learning_rate_);

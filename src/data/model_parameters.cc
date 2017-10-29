@@ -157,6 +157,13 @@ void Model::set_value() {
   }
 }
 
+// Free the allocated memory
+void Model::free_model() {
+  free(param_w_);
+  free(param_v_);
+  free(param_b_);
+}
+
 // Initialize model from a checkpoint file
 Model::Model(const std::string& filename) {
   CHECK_NE(filename.empty(), true);

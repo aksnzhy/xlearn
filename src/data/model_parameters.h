@@ -80,7 +80,7 @@ class Model {
  public:
   // Default Constructor and Destructor
   Model() { }
-  ~Model() { }
+  ~Model() { free_model(); }
 
   // Initialize model from a checkpoint file
   explicit Model(const std::string& filename);
@@ -193,6 +193,9 @@ class Model {
 
   // Deserialize w, v, b from disk file
   void deserialize_w_v_b(FILE* file);
+
+  // Free the allocated memory
+  void free_model();
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Model);
