@@ -31,8 +31,7 @@ This file tests the FMScore class.
 namespace xLearn {
 
 TEST(FMScoreTest, calc_score) {
-  for (int k = 16; k < 17; ++k) {
-    std::cout << "K: " << k << std::endl;
+  for (int k = 1; k < 100; ++k) {
     // Init hyper_param
     HyperParam param;
     param.learning_rate = 0.1;
@@ -63,18 +62,19 @@ TEST(FMScoreTest, calc_score) {
     real_t* v = model.GetParameter_v();
     index_t k_aligned = model.get_aligned_k();
     for (index_t j = 0; j < model.GetNumFeature(); ++j) {
-      for (index_t d = 0; d < k_aligned; ) {
-        for (index_t s = 0; s < kAlign; s++, v++, d++) {
-          v[0] = (d < model.GetNumK()) ? 1.0 : 0.0;
-          v[kAlign] = 1.0;
-        }
-        v += kAlign;
-      }
+      for(index_t d = 0; d < model.GetNumK(); d++, v++)
+        *v = 1.0;
+      for(index_t d = model.GetNumK(); d < k_aligned; d++, v++)
+        *v = 0;
+      for(index_t d = k_aligned; d < 2*k_aligned; d++, v++)
+        *v = 1.0;
     }
     model.GetParameter_b()[0] = 0.0;
     FMScore score;
-    real_t val = score.CalcScore(&row, model);
-    EXPECT_FLOAT_EQ(val, 6+k*4*3);
+    for (int i = 0; i < 10; ++i) {
+      real_t val = score.CalcScore(&row, model);
+      EXPECT_FLOAT_EQ(val, 6+k*4*3);
+    }
   }
 }
 
