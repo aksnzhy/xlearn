@@ -52,7 +52,7 @@ struct HyperParam {
   std::string score_func = "linear";
   /* Loss function. For now, it could
   be 'cross-entropy', 'squared', or 'hinge' */
-  std::string loss_func = "corss-entropy";
+  std::string loss_func = "cross-entropy";
   /* Metric function. For now, it could
   be 'acc', 'prec', 'recall', 'f1', 'auc',
   'mae', or 'mape' */
