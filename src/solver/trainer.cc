@@ -36,16 +36,20 @@ void Trainer::show_head_info(bool validate) {
   std::cout.width(20);
   std::string str = "Train " + loss_->loss_type();
   std::cout << str;
-  std::cout.width(20);
-  str = "Train " + metric_->type();
-  std::cout << str;
+  if (metric_->type().compare("NONE") != 0) {
+    std::cout.width(20);
+    str = "Train " + metric_->type();
+    std::cout << str;
+  }
   if (validate) {
     std::cout.width(20);
     str = "Test " + loss_->loss_type();
     std::cout << str;
-    std::cout.width(20);
-    str = "Test " + metric_->type();
-    std::cout << str;
+    if (metric_->type().compare("NONE") != 0) {
+      std::cout.width(20);
+      str = "Test " + metric_->type();
+      std::cout << str;
+    }
   }
   std::cout.width(20);
   std::cout << "Time cost (s)";
@@ -63,13 +67,17 @@ void Trainer::show_train_info(real_t tr_loss, real_t tr_metric,
   std::cout << epoch;
   std::cout.width(20);
   std::cout << std::fixed << std::setprecision(5) << tr_loss;
-  std::cout.width(20);
-  std::cout << std::fixed << std::setprecision(5) << tr_metric;
+  if (metric_->type().compare("NONE") != 0) {
+    std::cout.width(20);
+    std::cout << std::fixed << std::setprecision(5) << tr_metric;
+  }
   if (validate) {
     std::cout.width(20);
     std::cout << std::fixed << std::setprecision(5) << te_loss;
-    std::cout.width(20);
-    std::cout << std::fixed << std::setprecision(5) << te_metric;
+    if (metric_->type().compare("NONE") != 0) {
+      std::cout.width(20);
+      std::cout << std::fixed << std::setprecision(5) << te_metric;
+    }
   }
   std::cout.width(20);
   std::cout << std::fixed << std::setprecision(2) << time_cost;
@@ -144,12 +152,16 @@ MetricInfo Trainer::CalcLossMetric(std::vector<Reader*>& reader_list) {
       count_sample += tmp;
       loss_->Predict(matrix, *model_, pred);
       loss_val += loss_->Evalute(pred, matrix->Y);
-      metric_->Accumulate(matrix->Y, pred);
+      if (metric_->type().compare("NONE") != 0) {
+        metric_->Accumulate(matrix->Y, pred);
+      }
     }
   }
   MetricInfo info;
   info.loss_val = loss_val / count_sample;
-  info.metric_val = metric_->GetMetric();
+  if (metric_->type().compare("NONE") != 0) {
+    info.metric_val = metric_->GetMetric();
+  }
   return info;
 }
 

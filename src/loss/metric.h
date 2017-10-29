@@ -42,7 +42,8 @@ class Metric {
         metric.compare("f1") != 0 &&
         metric.compare("auc") != 0 &&
         metric.compare("mae") != 0 &&
-        metric.compare("mape") != 0) {
+        metric.compare("mape") != 0 &&
+        metric.compare("none") != 0) {
       LOG(FATAL) << "Unknow metric: " << metric;
     }
     metric_type_ = metric;
@@ -70,6 +71,8 @@ class Metric {
       return "MAP";
     } else if (metric_type_.compare("mape") == 0) {
       return "MAPE";
+    } else if (metric_type_.compare("none") == 0) {
+      return "NONE";
     }
     LOG(ERROR) << "Unknow metric: " << metric_type_;
     return 0;
