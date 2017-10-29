@@ -32,6 +32,7 @@ namespace xLearn {
 
 TEST(FFMScore_Test, calc_score) {
   for (int k = 1; k < 100; ++k) {
+    // Init hyper_param
     HyperParam param;
     param.learning_rate = 0.1;
     param.regu_lambda = 0;

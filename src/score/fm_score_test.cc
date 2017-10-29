@@ -30,87 +30,52 @@ This file tests the FMScore class.
 
 namespace xLearn {
 
-HyperParam param;
-
-class FMScoreTest : public ::testing::Test {
- protected:
-  virtual void SetUp() {
+TEST(FMScoreTest, calc_score) {
+  for (int k = 16; k < 17; ++k) {
+    std::cout << "K: " << k << std::endl;
+    // Init hyper_param
+    HyperParam param;
     param.learning_rate = 0.1;
     param.regu_lambda = 0;
     param.loss_func = "squared";
     param.score_func = "fm";
     param.num_feature = 3;
-    param.num_K = 17;
-  }
-};
-/*
-TEST_F(FMScoreTest, calc_score) {
-  // Init SparseRow
-  SparseRow row(param.num_feature);
-  for (index_t i = 0; i < param.num_feature; ++i) {
-    row[i].feat_id = i;
-    row[i].feat_val = 2.0;
-  }
-  // Init model
-  Model model;
-  model.Initialize(param.score_func,
-                param.loss_func,
-                param.num_feature,
-                param.num_field,
-                param.num_K);
-  real_t* w = model.GetParameter_w();
-  index_t num_w = model.GetNumParameter_w();
-  for (index_t i = 0; i < num_w; ++i) {
-    w[i] = 1.0;
-  }
-  real_t* v = model.GetParameter_v();
-  index_t num_v = model.GetNumParameter_v();
-  for (index_t i = 0; i < num_v; ++i) {
-    v[i] = 1.0;
-  }
-  model.GetParameter_b()[0] = 0.0;
-  FMScore score;
-  real_t val = score.CalcScore(&row, model);
-  // 6 + 8*4*3 = 102
-  EXPECT_FLOAT_EQ(val, 102);
-}*/
-
-TEST_F(FMScoreTest, calc_score_aligned) {
-  // Init SparseRow
-  SparseRow row(param.num_feature);
-  for (index_t i = 0; i < param.num_feature; ++i) {
-    row[i].feat_id = i;
-    row[i].feat_val = 2.0;
-  }
-  // Init model
-  param.num_K = 17;
-  Model model;
-  model.Initialize(param.score_func,
-                param.loss_func,
-                param.num_feature,
-                param.num_field,
-                param.num_K);
-  real_t* w = model.GetParameter_w();
-  index_t num_w = model.GetNumParameter_w();
-  for (index_t i = 0; i < num_w; ++i) {
-    w[i] = 1.0;
-  }
-  real_t* v = model.GetParameter_v();
-  index_t k_aligned = model.get_aligned_k();
-  for (index_t j = 0; j < model.GetNumFeature(); ++j) {
-    for (index_t d = 0; d < k_aligned; ) {
-      for (index_t s = 0; s < kAlign; s++, v++, d++) {
-        v[0] = (d < model.GetNumK()) ? 1.0 : 0.0;
-        v[kAlign] = 1.0;
-      }
-      v += kAlign;
+    param.num_K = k;
+    param.num_field = 3;
+    // Init SparseRow
+    SparseRow row(param.num_feature);
+    for (index_t i = 0; i < param.num_feature; ++i) {
+      row[i].feat_id = i;
+      row[i].feat_val = 2.0;
     }
+    // Init model
+    Model model;
+    model.Initialize(param.score_func,
+                param.loss_func,
+                param.num_feature,
+                param.num_field,
+                param.num_K);
+    real_t* w = model.GetParameter_w();
+    index_t num_w = model.GetNumParameter_w();
+    for (index_t i = 0; i < num_w; ++i) {
+      w[i] = 1.0;
+    }
+    real_t* v = model.GetParameter_v();
+    index_t k_aligned = model.get_aligned_k();
+    for (index_t j = 0; j < model.GetNumFeature(); ++j) {
+      for (index_t d = 0; d < k_aligned; ) {
+        for (index_t s = 0; s < kAlign; s++, v++, d++) {
+          v[0] = (d < model.GetNumK()) ? 1.0 : 0.0;
+          v[kAlign] = 1.0;
+        }
+        v += kAlign;
+      }
+    }
+    model.GetParameter_b()[0] = 0.0;
+    FMScore score;
+    real_t val = score.CalcScore(&row, model);
+    EXPECT_FLOAT_EQ(val, 6+k*4*3);
   }
-  model.GetParameter_b()[0] = 0.0;
-  FMScore score;
-  real_t val = score.CalcScore(&row, model);
-  // 6 + 17*4*3 = 246
-  EXPECT_FLOAT_EQ(val, 210);
 }
 
 } // namespace xLearn

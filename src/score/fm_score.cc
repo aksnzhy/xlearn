@@ -46,8 +46,8 @@ real_t FMScore::CalcScore(const SparseRow* row,
   /*********************************************************
    *  latent factor                                        *
    *********************************************************/
-  static index_t aligned_k = model.get_aligned_k();
-  static index_t align0 = model.get_aligned_k() * 2;
+  index_t aligned_k = model.get_aligned_k();
+  index_t align0 = model.get_aligned_k() * 2;
   std::vector<real_t> sv(aligned_k, 0);
   real_t* s = sv.data();
   for (SparseRow::const_iterator iter = row->begin();
@@ -116,8 +116,8 @@ void FMScore::CalcGrad(const SparseRow* row,
   /*********************************************************
    *  latent factor                                        *
    *********************************************************/
-  static index_t aligned_k = model.get_aligned_k();
-  static index_t align0 = model.get_aligned_k() * 2;
+  index_t aligned_k = model.get_aligned_k();
+  index_t align0 = model.get_aligned_k() * 2;
   __m128 XMMpg = _mm_set1_ps(pg);
   __m128 XMMlr = _mm_set1_ps(learning_rate_);
   __m128 XMMlamb = _mm_set1_ps(regu_lambda_);

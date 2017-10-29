@@ -117,7 +117,7 @@ class Model {
   inline index_t GetNumParameter_v() { return param_num_v_; }
 
   // Reset current model parameters
-  void Reset() { set_value(); }
+  inline void Reset() { set_value(); }
 
   // Get score function type
   inline std::string& GetScoreFunction() { return score_func_; }
