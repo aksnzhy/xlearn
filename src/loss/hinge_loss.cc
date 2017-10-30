@@ -32,7 +32,12 @@ real_t HingeLoss::Evalute(const std::vector<real_t>& pred,
   for (size_t i = 0; i < pred.size(); ++i) {
     real_t y = label[i] > 0 ? 1.0 : -1.0;
     real_t tmp = pred[i] * y;
-    if (tmp < 1.0) { val += (1.0-tmp); }
+    if (tmp <= 0) {
+      val += (0.5-tmp);
+    } else if (tmp > 0 && tmp <= 1) {
+      tmp = 1 - tmp;
+      val += (0.5 * tmp * tmp);
+    }
   }
   return val;
 }
@@ -51,10 +56,9 @@ void hinge_thread(const DMatrix* matrix,
     real_t score = score_func->CalcScore(row, *model, norm);
     // partial gradient
     real_t y = matrix->Y[i] > 0 ? 1.0 : -1.0;
-    if (score*y < 1.0) {
-      // real gradient and update
+    real_t tmp = score*y;
+    if (tmp <= 1.0) {
       real_t pg = -y;
-      // real gradient and update
       score_func->CalcGrad(row, *model, pg, norm);
     }
   }

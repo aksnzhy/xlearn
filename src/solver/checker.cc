@@ -176,7 +176,7 @@ bool Checker::Check(HyperParam& hyper_param) {
 bool Checker::check_train_options(HyperParam& hyper_param) {
   bool bo = true;
   /*********************************************************
-   *  Check the path of train file                         *
+   *  Check the file path of training data                 *
    *********************************************************/
   if (FileExist(args_[1].c_str())) {
     hyper_param.train_set_file = std::string(args_[1]);
@@ -191,7 +191,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
   StringList list(args_.begin()+2, args_.end());
   StrSimilar ss;
   for (int i = 0; i < list.size(); ) {
-    if (list[i].compare("-s") == 0) {
+    if (list[i].compare("-s") == 0) {  // task type
       int value = atoi(list[i+1].c_str());
       if (value < 0 || value > 6) {
         printf("[Error] -s can only be [0 - 6] : \n"
