@@ -35,7 +35,7 @@ namespace xLearn {
 std::string Checker::option_help() const {
   if (is_train_) {
     return std::string(
-"-----------------------------------------  Train task  ---------------------------------------\n"
+"----------------------------------------  Training task  -------------------------------------\n"
 "USAGE: \n"
 "     xlearn_train [ train_file_path ] [ OPTIONS ] \n"
 "                                                   \n"
@@ -43,7 +43,7 @@ std::string Checker::option_help() const {
 "  -s <type> : Type of machine learning model (default 0) \n"
 "     for classification task \n"
 "         0 -- logistic regression (LR) \n"
-"         1 -- linear support vectors machine (SVM) \n"
+"         1 -- linear support vectors machine (linear SVM) \n"
 "         2 -- factorization machines (FM) \n"
 "         3 -- field-aware factorization machines (FFM) \n"
 "     for regression task \n"
@@ -93,7 +93,7 @@ std::string Checker::option_help() const {
     );
   } else {
     return std::string(
-"--------------------------------------- Predict task -----------------------------------------\n"
+"-------------------------------------- Prediction task ---------------------------------------\n"
 "USAGE: \n"
 "     xlearn_predict [ predict_file_path ] [ options ] \n"
 "                                                     \n"
@@ -108,14 +108,6 @@ std::string Checker::option_help() const {
 "----------------------------------------------------------------------------------------------\n"
     );
   }
-}
-
-// Convert upercase to lowcase
-char easy_to_lower(char in) {
-  if(in <= 'Z' && in >= 'A') {
-    return in - ('Z'-'z');
-  }
-  return in;
 }
 
 // Initialize Checker
@@ -146,14 +138,6 @@ void Checker::Initialize(bool is_train, int argc, char* argv[]) {
   // Get the user input
   for (int i = 0; i < argc; ++i) {
     args_.push_back(std::string(argv[i]));
-  }
-  // Convert args to lower case
-  // Skip the program name and the file path
-  for (int i = 2; i < args_.size(); ++i) {
-    std::transform(args_[i].begin(),
-                   args_[i].end(),
-                   args_[i].begin(),
-                   easy_to_lower);
   }
 }
 
@@ -230,7 +214,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
         }
       }
       i += 2;
-    } else if (list[i].compare("-x") == 0) {
+    } else if (list[i].compare("-x") == 0) {  // metrics
       if (list[i+1].compare("acc") != 0 &&
           list[i+1].compare("prec") != 0 &&
           list[i+1].compare("recall") != 0 &&
@@ -248,7 +232,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
         hyper_param.metric = list[i+1];
       }
       i += 2;
-    } else if (list[i].compare("-t") == 0) {
+    } else if (list[i].compare("-t") == 0) {  // test file
       if (FileExist(list[i+1].c_str())) {
         hyper_param.test_set_file = list[i+1];
       } else {
@@ -257,13 +241,13 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
         bo = false;
       }
       i += 2;
-    } else if (list[i].compare("-m") == 0) {
+    } else if (list[i].compare("-m") == 0) {  // model file path
       hyper_param.model_file = list[i+1];
       i += 2;
-    } else if (list[i].compare("-l") == 0) {
+    } else if (list[i].compare("-l") == 0) {  // log file path
       hyper_param.log_file = list[i+1];
       i += 2;
-    } else if (list[i].compare("-k") == 0) {
+    } else if (list[i].compare("-k") == 0) {  // latent factor
       int value = atoi(list[i+1].c_str());
       if (value <= 0) {
         printf("[Error] Illegal -k '%i' \n"
@@ -274,7 +258,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
         hyper_param.num_K = value;
       }
       i += 2;
-    } else if (list[i].compare("-r") == 0) {
+    } else if (list[i].compare("-r") == 0) {  // learning rate
       real_t value = atof(list[i+1].c_str());
       if (value <= 0) {
         printf("[Error] Illegal -r : '%f' \n"
@@ -285,7 +269,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
         hyper_param.learning_rate = value;
       }
       i += 2;
-    } else if (list[i].compare("-b") == 0) {
+    } else if (list[i].compare("-b") == 0) {  // regu lambda
       real_t value = atof(list[i+1].c_str());
       if (value < 0) {
         printf("[Error] Illegal -b : '%f' \n"
@@ -296,7 +280,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
         hyper_param.regu_lambda = value;
       }
       i += 2;
-    } else if (list[i].compare("-u") == 0) {
+    } else if (list[i].compare("-u") == 0) {  // model scale fatcor
       real_t value = atof(list[i+1].c_str());
       if (value <= 0) {
         printf("[Error] Illegal -u : '%f' \n"
@@ -307,7 +291,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
         hyper_param.model_scale = value;
       }
       i += 2;
-    } else if (list[i].compare("-e") == 0) {
+    } else if (list[i].compare("-e") == 0) {  // number of epoch
       int value = atoi(list[i+1].c_str());
       if (value < 0) {
         printf("[Error] Illegal -e : '%i' \n"
@@ -318,7 +302,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
         hyper_param.num_epoch = value;
       }
       i += 2;
-    } else if (list[i].compare("-f") == 0) {
+    } else if (list[i].compare("-f") == 0) {  // number of folds
       int value = atoi(list[i+1].c_str());
       if (value < 0) {
         printf("[Error] Illegal -f : '%i' \n"
@@ -329,19 +313,19 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
         hyper_param.num_folds = value;
       }
       i += 2;
-    } else if (list[i].compare("--disk") == 0) {
+    } else if (list[i].compare("--disk") == 0) {  // on-disk training
       hyper_param.early_stop = true;
       i += 1;
-    } else if (list[i].compare("--cv") == 0) {
+    } else if (list[i].compare("--cv") == 0) {  // cross-validation
       hyper_param.cross_validation = true;
       i += 1;
-    } else if (list[i].compare("--es") == 0) {
+    } else if (list[i].compare("--es") == 0) {  // early-stop
       hyper_param.early_stop = true;
       i += 1;
-    } else if (list[i].compare("--no-norm") == 0) {
+    } else if (list[i].compare("--no-norm") == 0) {  // normalization
       hyper_param.norm = false;
       i += 1;
-    } else if (list[i].compare("--quiet") == 0) {
+    } else if (list[i].compare("--quiet") == 0) {  // quiet
       hyper_param.quiet = true;
       i += 1;
     } else {  // no match

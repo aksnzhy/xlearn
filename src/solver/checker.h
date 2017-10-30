@@ -49,18 +49,19 @@ class Checker {
   // Check and parse arguments
   bool Check(HyperParam& hyper_param);
 
- private:
-  StringList menu_;  // Store all the options
+ protected:
+  StringList menu_;  // Store all the possible options
   StringList args_;  // User input command line
   bool is_train_;    // train or predict
 
   // Print the help menu
   std::string option_help() const;
 
-  // Check options for train and predict
+  // Check options for training and prediction
   bool check_train_options(HyperParam& hyper_param);
   bool check_inference_options(HyperParam& hyper_param);
 
+ private:
   DISALLOW_COPY_AND_ASSIGN(Checker);
 };
 
