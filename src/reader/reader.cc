@@ -136,6 +136,7 @@ void InmemReader::init_from_binary() {
    *  Step 1: Init data_buf_                               *
    *********************************************************/
   data_buf_.Deserialize(filename_);
+  has_label_ = data_buf_.has_label;
   /*********************************************************
    *  Step 3: Init data_samples_                           *
    *********************************************************/
@@ -170,11 +171,12 @@ void InmemReader::init_from_txt() {
   parser_->Parse(buffer, file_size, data_buf_);
   data_buf_.SetHash(HashFile(filename_, true),
                     HashFile(filename_, false));
+  data_buf_.has_label = has_label_;
   /*********************************************************
    *  Step 3: Init data_samples_                           *
    *********************************************************/
   num_samples_ = data_buf_.row_length;
-  data_samples_.ResetMatrix(num_samples_);
+  data_samples_.ResetMatrix(num_samples_, has_label_);
   /*********************************************************
    *  Step 4: order_                                       *
    *********************************************************/

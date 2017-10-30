@@ -88,6 +88,9 @@ class Reader {
   // Return to the begining of the data
   virtual void Reset() = 0;
 
+  // If current dataset has label y
+  bool inline has_label() { return has_label_; }
+
  protected:
   /* Input file name */
   std::string filename_;

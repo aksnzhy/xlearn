@@ -32,18 +32,28 @@ void Predictor::Predict() {
   std::ofstream o_file(out_file_);
   static std::vector<real_t> out;
   DMatrix* matrix = nullptr;
+  index_t total_count = 0;
+  real_t loss_val = 0;
   reader_->Reset();
   for (;;) {
     index_t tmp = reader_->Samples(matrix);
     if (tmp == 0) { break; }
     if (tmp != out.size()) { out.resize(tmp); }
+    total_count += tmp;
     loss_->Predict(matrix, *model_, out);
+    if (reader_->has_label()) {
+      loss_val += loss_->Evalute(out, matrix->Y);
+    }
     if (loss_->loss_type().compare("corss-entropy")) {
       loss_->Sigmoid(out, out);
     }
     for (index_t i = 0; i < out.size(); ++i) {
       o_file << out[i] << "\n";
     }
+  }
+  if (reader_->has_label()) {
+    loss_val /= total_count;
+    printf("The tesl loss is: %.6f\n", loss_val);
   }
 }
 

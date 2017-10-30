@@ -107,7 +107,7 @@ struct DMatrix {
   // memory of the DMatrix, and then re-allocate memory
   // for that. In this function, Y will be initialized
   // to 0 and row will be initialized to a NULL pointer
-  void ResetMatrix(index_t length) {
+  void ResetMatrix(index_t length, bool label = true) {
     CHECK_GE(length, 0);
     this->Release();
     row_length = length;
@@ -116,6 +116,8 @@ struct DMatrix {
     // we set norm to 1.0 by default, which means
     // that we don't use normalization
     norm.resize(length, 1.0);
+    // Indicate if current dataset has label y
+    has_label = label;
   }
 
   // Release memory for DMatrix
@@ -184,6 +186,9 @@ struct DMatrix {
     WriteVectorToFile(file, Y);
     // Write norm
     WriteVectorToFile(file, norm);
+    // Write has_label
+    WriteDataToDisk(file,
+      (char*)&has_label, sizeof(has_label));
     Close(file);
   }
 
@@ -210,6 +215,9 @@ struct DMatrix {
     ReadVectorFromFile(file, Y);
     // Read norm
     ReadVectorFromFile(file, norm);
+    // Read has label
+    ReadDataFromDisk(file,
+      (char*)&has_label, sizeof(has_label));
     Close(file);
   }
 
@@ -228,6 +236,8 @@ struct DMatrix {
   std::vector<real_t> Y;
   /* Used for instance-wise normalization */
   std::vector<real_t> norm;
+  /* If current dataset has label y */
+  bool has_label;
 };
 
 }  // namespace xLearn
