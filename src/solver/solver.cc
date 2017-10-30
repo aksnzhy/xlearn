@@ -242,6 +242,10 @@ void Solver::init_predict() {
   /*********************************************************
    *  Read problem from model file                         *
    *********************************************************/
+   printf("Load model from %s ...\n",
+          hyper_param_.model_file.c_str());
+   Timer timer;
+   timer.tic();
    model_ = new Model(hyper_param_.model_file);
    hyper_param_.score_func = model_->GetScoreFunction();
    hyper_param_.loss_func = model_->GetLossFunction();
@@ -253,10 +257,26 @@ void Solver::init_predict() {
    if (hyper_param_.score_func.compare("ffm") == 0) {
      hyper_param_.num_field = model_->GetNumField();
    }
+   printf("  Loss function: %s \n", hyper_param_.loss_func.c_str());
+   printf("  Score function: %s \n", hyper_param_.score_func.c_str());
+   printf("  Number of Feature: %d \n", hyper_param_.num_feature);
+   if (hyper_param_.score_func.compare("fm") == 0 ||
+       hyper_param_.score_func.compare("ffm") == 0) {
+     printf("  Number of K: %d\n", hyper_param_.num_K);
+     if (hyper_param_.score_func.compare("ffm") == 0) {
+       printf("  Number of field: %d\n", hyper_param_.num_field);
+     }
+   }
+   real_t time_cost = timer.toc();
+   printf("  Time cost for loading model: %.2f (sec) \n",
+          time_cost);
    LOG(INFO) << "Initialize model.";
    /*********************************************************
     *  Init Reader and read problem                         *
     *********************************************************/
+   printf("Read problem ... \n");
+   timer.reset();
+   timer.tic();
    // Create Reader
    reader_.resize(1, create_reader());
    CHECK_NE(hyper_param_.predict_file.empty(), true);
@@ -267,7 +287,10 @@ void Solver::init_predict() {
             hyper_param_.predict_file.c_str());
     exit(0);
    }
-   LOG(INFO) << "Initialize Parser ans Reader.";
+   time_cost = timer.toc();
+   printf("  Time cost for reading problem: %.2f (sec) \n",
+          time_cost);
+   LOG(INFO) << "Initialize Reader: " << hyper_param_.predict_file;
    /*********************************************************
     *  Init score function                                  *
     *********************************************************/
@@ -334,7 +357,14 @@ void Solver::start_train_work() {
 
 // Inference
 void Solver::start_inference_work() {
-
+  printf("Start to predict ...\n");
+  Predictor pdc;
+  pdc.Initialize(reader_[0],
+            model_,
+            loss_,
+            hyper_param_.output_file);
+  // Predict and write output
+  pdc.Predict();
 }
 
 /******************************************************************************

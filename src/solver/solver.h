@@ -36,6 +36,7 @@ of the xLearn.
 #include "src/loss/metric.h"
 #include "src/solver/checker.h"
 #include "src/solver/trainer.h"
+#include "src/solver/inference.h"
 
 namespace xLearn {
 //------------------------------------------------------------------------------

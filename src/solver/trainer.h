@@ -39,11 +39,13 @@ struct MetricInfo {
 };
 
 //------------------------------------------------------------------------------
-// Trainer is the core class of xLearn, which can perform standard training
-// process (training set and test set) and cross_validation training process.
+// Trainer is the core class of xLearn, which can perform
+// standard training process (training set and test set), as well
+// as the cross-validation training process.
 //------------------------------------------------------------------------------
 class Trainer {
  public:
+  // Constructor and Destructor
   Trainer() {}
   ~Trainer() {}
 

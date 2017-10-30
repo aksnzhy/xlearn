@@ -1,5 +1,5 @@
 # Build library solver
-add_library(solver checker.cc trainer.cc solver.cc)
+add_library(solver checker.cc trainer.cc solver.cc inference.cc)
 
 # Build xlearn exe
 set(LIBS solver base data loss reader score)

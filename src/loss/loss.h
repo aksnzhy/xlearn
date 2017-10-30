@@ -101,8 +101,8 @@ class Loss {
   virtual inline std::string loss_type() = 0;
 
   // The Sigmoid function, which mapping the output to 0~1
-  void Sigmoid(const std::vector<real_t>& pred,
-                std::vector<real_t>& new_pred) {
+  void Sigmoid(std::vector<real_t>& pred,
+               std::vector<real_t>& new_pred) {
     CHECK_EQ(pred.size(), new_pred.size());
     for (size_t i = 0; i < pred.size(); ++i) {
       new_pred[i] = sigmoid(pred[i]);
@@ -111,7 +111,7 @@ class Loss {
 
   // if pred[i] >= 0, new_pred -> 1
   // else new_pred -> 0
-  void Sign(const std::vector<real_t>& pred,
+  void Sign(std::vector<real_t>& pred,
             std::vector<real_t>& new_pred) {
     CHECK_EQ(pred.size(), new_pred.size());
     for (size_t i = 0; i < pred.size(); ++i) {
