@@ -103,7 +103,7 @@ struct HyperParam {
   /* Filename of output result for prediction */
   std::string output_file = "./xlearn_out";
   /* Filename of log file */
-  std::string log_file = "./xlearn_log";
+  std::string log_file = "/tmp/xlearn_log";
 //------------------------------------------------------------------------------
 // Parameters for validation
 //------------------------------------------------------------------------------
