@@ -52,7 +52,7 @@ void Trainer::show_head_info(bool validate) {
     }
   }
   std::cout.width(20);
-  std::cout << "Time cost (s)";
+  std::cout << "Time cost (sec)";
   std::cout << std::endl;
 }
 

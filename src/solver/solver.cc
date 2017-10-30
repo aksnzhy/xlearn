@@ -112,8 +112,8 @@ void Solver::init_train() {
   /*********************************************************
    *  Init Reader                                          *
    *********************************************************/
-  clock_t start, end;
-  start = clock();
+  Timer timer;
+  timer.tic();
   printf("Read problem ... \n");
   LOG(INFO) << "Start to init Reader";
   // Split file if use -c
@@ -191,13 +191,14 @@ void Solver::init_train() {
     LOG(INFO) << "Number of field: " << hyper_param_.num_field;
     printf("  Number of Field: %d \n", hyper_param_.num_field);
   }
-  end = clock();
-  printf("  Time cost for reading problem: %.2f sec \n",
-    (float)(end-start) / CLOCKS_PER_SEC);
+  real_t time_cost = timer.toc();
+  printf("  Time cost for reading problem: %.2f (sec) \n",
+         time_cost);
   /*********************************************************
    *  Init Model                                           *
    *********************************************************/
-  start = clock();
+  timer.reset();
+  timer.tic();
   printf("Initialize model ...\n");
   // Initialize parameters
   model_ = new Model();
@@ -212,9 +213,9 @@ void Solver::init_train() {
   LOG(INFO) << "Number parameters: " << num_param;
   printf("  Model size: %.2f MB\n",
            (double) num_param / (1024.0 * 1024.0));
-  end = clock();
-  printf("  Time cost for model initial: %.2f sec \n",
-     (float)(end-start) / CLOCKS_PER_SEC);
+  time_cost = timer.toc();
+  printf("  Time cost for model initial: %.2f (sec) \n",
+         time_cost);
   /*********************************************************
    *  Init score function                                  *
    *********************************************************/
@@ -316,10 +317,15 @@ void Solver::start_train_work() {
   } else {
     trainer.Train();
     if (save_model) {
+      Timer timer;
+      timer.tic();
       printf("Finish training and start to save model ...\n"
-             "  Filename: %s\n",
+             "  Model file: %s\n",
              hyper_param_.model_file.c_str());
       trainer.SaveModel(hyper_param_.model_file);
+      real_t time_cost = timer.toc();
+      printf("  Time cost for saving model: %.2f (sec) \n",
+             time_cost);
     } else {
       printf("Finish training \n");
     }

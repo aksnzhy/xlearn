@@ -429,7 +429,7 @@ bool Checker::check_inference_options(HyperParam& hyper_param) {
    *********************************************************/
   StrSimilar ss;
   for (int i = 0; i < list.size(); i+=2) {
-    if (list[i].compare("-m") == 0) {
+    if (list[i].compare("-m") == 0) {  // path of the model file
       if (FileExist(list[i+1].c_str())) {
         hyper_param.model_file = list[i+1];
       } else {
@@ -437,9 +437,9 @@ bool Checker::check_inference_options(HyperParam& hyper_param) {
                list[i+1].c_str());
         bo = false;
       }
-    } else if (list[i].compare("-o") == 0) {
+    } else if (list[i].compare("-o") == 0) {  // path of the output
       hyper_param.output_file = list[i+1];
-    } else if (list[i].compare("-l") == 0) {
+    } else if (list[i].compare("-l") == 0) {  // path of the log file
       hyper_param.log_file = list[i+1];
     } else {  // no match
       std::string similar_str;
