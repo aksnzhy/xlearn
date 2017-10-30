@@ -319,7 +319,9 @@ void Solver::start_train_work() {
       printf("Finish training and start to save model ...\n"
              "  Filename: %s\n",
              hyper_param_.model_file.c_str());
-      trainer.SaveModel(hyper_param_.model_file);
+      if (model_file.compare("none") != 0) {
+        trainer.SaveModel(hyper_param_.model_file);
+      }
     } else {
       printf("Finish training \n");
     }

@@ -60,7 +60,7 @@ std::string Checker::option_help() const {
 "                                                                                              \n"
 "  -m <model_file_path> :  Path of the model checkpoint file. Using './xlearn_model' by default. \n"
 "                          If we set this value to 'none', the xLearn will not dump the model \n"
-"                          checkpoint during the training. \n"
+"                          checkpoint after the training. \n"
 "                                                              \n"
 "  -l <log_file_path>   :  Path of the log file. Using '/tmp/xlearn_log/' by default. \n"
 "                                                                                  \n"
