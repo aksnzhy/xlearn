@@ -96,8 +96,9 @@ TEST(MODEL_TEST, Init_fm) {
     EXPECT_FLOAT_EQ(w[i], 0.0);
     EXPECT_FLOAT_EQ(w[i+1], 1.0);
   }
-  for (index_t i = 0; i < model_fm.GetNumParameter_v(); i+=(kAlign*2)) {
-    EXPECT_FLOAT_EQ(v[i+kAlign], 1.0);
+  index_t k_aligned = model_fm.get_aligned_k();
+  for (index_t i = k_aligned; i < param_num_v; i+=(2*k_aligned)) {
+    EXPECT_FLOAT_EQ(v[i], 1.0);
   }
 }
 
@@ -129,7 +130,7 @@ TEST(MODEL_TEST, Init_lr) {
 }
 
 TEST(MODEL_TEST, Save_and_Load) {
-  // Init model (set all parameters to zero)
+  // Init model
   HyperParam hyper_param = Init();
   Model model_ffm;
   model_ffm.Initialize(hyper_param.score_func,
@@ -175,6 +176,49 @@ TEST(MODEL_TEST, Save_and_Load) {
     EXPECT_FLOAT_EQ(v[i], 3.5);
   }
   RemoveFile(hyper_param.model_file.c_str());
+}
+
+TEST(MODEL_TEST, BestModel) {
+  // Init model
+  HyperParam hyper_param = Init();
+  Model model_ffm;
+  model_ffm.Initialize(hyper_param.score_func,
+                    hyper_param.loss_func,
+                    hyper_param.num_feature,
+                    hyper_param.num_field,
+                    hyper_param.num_K);
+  real_t* w = model_ffm.GetParameter_w();
+  real_t* v = model_ffm.GetParameter_v();
+  real_t* b = model_ffm.GetParameter_b();
+  // Set best model
+  for (index_t i = 0; i < model_ffm.GetNumParameter_w(); ++i) {
+    w[i] = 1;
+  }
+  for (index_t i = 0; i < model_ffm.GetNumParameter_v(); ++i) {
+    v[i] = 2;
+  }
+  b[0] = 3;
+  b[1] = 3;
+  model_ffm.SetBestModel();
+  // Shrink bacj
+  for (index_t i = 0; i < model_ffm.GetNumParameter_w(); ++i) {
+    w[i] = 0;
+  }
+  for (index_t i = 0; i < model_ffm.GetNumParameter_v(); ++i) {
+    v[i] = 0;
+  }
+  b[0] = 0;
+  b[1] = 0;
+  model_ffm.Shrink();
+  // Test
+  for (index_t i = 0; i < model_ffm.GetNumParameter_w(); ++i) {
+    EXPECT_FLOAT_EQ(w[i], 1);
+  }
+  for (index_t i = 0; i < model_ffm.GetNumParameter_v(); ++i) {
+    EXPECT_FLOAT_EQ(v[i], 2);
+  }
+  EXPECT_FLOAT_EQ(b[0], 3);
+  EXPECT_FLOAT_EQ(b[1], 3);
 }
 
 }   // namespace xLearn

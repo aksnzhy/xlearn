@@ -213,6 +213,49 @@ bool Model::Deserialize(const std::string& filename) {
   return true;
 }
 
+// Take a record of the best model during training
+void Model::SetBestModel() {
+  if (param_best_w_ == nullptr) {
+    param_best_w_ = (real_t*)malloc(
+      param_num_w_*sizeof(real_t));
+  }
+  if (param_best_v_ == nullptr &&
+      score_func_.compare("linear") != 0) {
+#ifdef _WIN32
+    param_best_v_ = _aligned_malloc(
+      param_num_v_ * sizeof(real_t),
+      kAlignByte);
+#else
+    posix_memalign(
+      (void**)&param_best_v_,
+      kAlignByte,
+      param_num_v_ * sizeof(real_t));
+#endif
+  }
+  if (param_best_b_ == nullptr) {
+    param_best_b_ = (real_t*)malloc(
+      2 * sizeof(real_t));
+  }
+  // Copy current model parameters
+  memcpy(param_best_w_, param_w_, param_num_w_*sizeof(real_t));
+  memcpy(param_best_v_, param_v_, param_num_v_*sizeof(real_t));
+  memcpy(param_best_b_, param_b_, 2*sizeof(real_t));
+}
+
+// Shrink back for getting the best model
+void Model::Shrink() {
+  // Copy best model parameters
+  if (param_best_w_ != nullptr) {
+    memcpy(param_w_, param_best_w_, param_num_w_*sizeof(real_t));
+  }
+  if (param_best_v_ != nullptr) {
+    memcpy(param_v_, param_best_v_, param_num_v_*sizeof(real_t));
+  }
+  if (param_best_b_ != nullptr) {
+    memcpy(param_b_, param_best_b_, 2*sizeof(real_t));
+  }
+}
+
 // Serialize w,v,b to disk file
 void Model::serialize_w_v_b(FILE* file) {
   // Write size of w

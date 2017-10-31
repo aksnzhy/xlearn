@@ -75,6 +75,10 @@ namespace xLearn {
 //
 //    /* Also, we can load model from this file. */
 //    Model new_model("/tmp/model.txt");
+//
+// The Model class can support early-stopping technique. We can set
+// a record for the best model parameter by using SetBestModel() and
+// we can shrink back to find the best model by using Shrink() method.
 //------------------------------------------------------------------------------
 class Model {
  public:
@@ -99,6 +103,12 @@ class Model {
 
   // Deserialize model from a checkpoint file
   bool Deserialize(const std::string& filename);
+
+  // Shrink back for getting the best model
+  void Shrink();
+
+  // Take a record of the best model during training
+  void SetBestModel();
 
   // Get the pointer of linear term
   inline real_t* GetParameter_w() { return param_w_; }
@@ -173,11 +183,15 @@ class Model {
   User can get the aligned K by using get_aligned_k() */
   index_t  num_K_;
   /* Storing the parameter of linear term */
-  real_t*  param_w_;
+  real_t*  param_w_ = nullptr;
   /* Storing the parameter of latent factor */
-  real_t*  param_v_;
+  real_t*  param_v_ = nullptr;
   /* Storing the bias term */
-  real_t*  param_b_;
+  real_t*  param_b_ = nullptr;
+  /* The following varibles are used for early-stopping */
+  real_t* param_best_w_ = nullptr;
+  real_t* param_best_v_ = nullptr;
+  real_t* param_best_b_ = nullptr;
   /* Used for init model parameters */
   real_t scale_;
 
