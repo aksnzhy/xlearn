@@ -145,11 +145,11 @@ void Trainer::train(std::vector<Reader*> train_reader,
     }
   }
   if (early_stop_) {
-    printf(" --------------------------------------------------------------\n");
+    printf(" ---------------------------------------------------------------\n");
     printf("| Stopping at epoch %d and "
-           "the best validation loss is %.6f |\n",
+           "the best validation loss is %.6f  |\n",
            best_epoch, best_loss);
-    printf(" --------------------------------------------------------------\n");
+    printf(" ---------------------------------------------------------------\n");
     model_->Shrink();
   }
 }
