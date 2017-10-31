@@ -114,7 +114,7 @@ struct HyperParam {
   int num_folds = 5;
   /* True for using early-stop, and
   False for not */
-  bool early_stop = false;
+  bool early_stop = true;
 };
 
 }  // namespace XLEARN

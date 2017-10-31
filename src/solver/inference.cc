@@ -53,7 +53,7 @@ void Predictor::Predict() {
   }
   if (reader_->has_label()) {
     loss_val /= total_count;
-    printf("The tesl loss is: %.6f\n", loss_val);
+    printf("The test loss is: %.5f\n", loss_val);
   }
 }
 

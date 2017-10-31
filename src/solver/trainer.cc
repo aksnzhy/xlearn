@@ -27,6 +27,8 @@ This file is the implementation of the Trainer class.
 
 namespace xLearn {
 
+const int kStopWindow = 2;
+
 /*********************************************************
  *  Show head info                                       *
  *********************************************************/
@@ -90,6 +92,10 @@ void Trainer::show_train_info(real_t tr_loss, real_t tr_metric,
 void Trainer::train(std::vector<Reader*> train_reader,
                     std::vector<Reader*> test_reader) {
   bool validate = test_reader.empty() ? false : true;
+  real_t best_loss = kFloatMax;
+  real_t prev_loss = kFloatMax;
+  int best_epoch = 0;
+  int stop_window = 0;
   // Show header info
   if (!quiet_) {
     show_head_info(validate);
@@ -108,7 +114,7 @@ void Trainer::train(std::vector<Reader*> train_reader,
       //----------------------------------------------------
       MetricInfo tr_info = CalcLossMetric(train_reader);
       //----------------------------------------------------
-      // Calc Test loss
+      // Calc validation loss
       //----------------------------------------------------
       MetricInfo te_info;
       if (validate) {
@@ -119,7 +125,32 @@ void Trainer::train(std::vector<Reader*> train_reader,
       show_train_info(tr_info.loss_val, tr_info.metric_val,
                       te_info.loss_val, te_info.metric_val,
                       time_cost, validate, n);
+      // Early-stopping
+      if (early_stop_) {
+        if (te_info.loss_val <= best_loss) {
+          best_loss = te_info.loss_val;
+          best_epoch = n;
+          model_->SetBestModel();
+        }
+        if (te_info.loss_val >= prev_loss) {
+          stop_window++;
+          // If the validation loss decreses conntinuously
+          // in 3 epoch, we stop training
+          if (stop_window == kStopWindow) { break; }
+        } else {
+          stop_window = 0;
+        }
+        prev_loss = te_info.loss_val;
+      }
     }
+  }
+  if (early_stop_) {
+    printf(" -------------------------------------------------------------\n");
+    printf("| Stopping at epoch %d and "
+           "the best validation loss is %.5f |\n",
+           best_epoch, best_loss);
+    printf(" -------------------------------------------------------------\n");
+    model_->Shrink();
   }
 }
 

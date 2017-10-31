@@ -347,6 +347,11 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
   /*********************************************************
    *  Check some warnings and conflict                     *
    *********************************************************/
+  if (hyper_param.on_disk && hyper_param.cross_validation) {
+    printf("[Warning] On-disk training doesn't support "
+           "cross-validation. \n");
+    hyper_param.cross_validation = false;
+  }
   if (hyper_param.cross_validation &&
      !hyper_param.test_set_file.empty()) {
     printf("[Warning] -c (cross-validation) has be set, and "
