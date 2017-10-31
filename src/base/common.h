@@ -26,15 +26,11 @@ programming convenient.
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #ifndef _MSC_VER
 #include <stdint.h>  // Linux, MacOSX and Cygwin has this standard header.
 #else
 #include "base/stdint_msvc.h"  // Visual C++ use this header.
 #endif
-
-#include <limits>
-#include <chrono>  // for Timer
 
 #include "src/base/logging.h"
 
@@ -199,54 +195,5 @@ static const float kFloatMin = std::numeric_limits<float>::min();
 /* To avoid dividing by zero */
 static const float kVerySmallNumber = 1e-15;
 static const double kVerySmallNumberDouble = 1e-15;
-
-//------------------------------------------------------------------------------
-// Timer class:
-//
-//   Timer timer();
-//   timer.tic();
-//     ....
-//   float time = timer.toc();  // (sec)
-//
-// This class can be used to evaluate multi-thread code.
-//------------------------------------------------------------------------------
-class Timer {
- public:
-  Timer() {
-    reset();
-  }
-  ~Timer() {}
-
-  // Reset time start
-  void reset() {
-    begin = std::chrono::high_resolution_clock::now();
-    duration =
-     std::chrono::duration_cast<std::chrono::milliseconds>(begin-begin);
-  }
-
-  // Start
-  void tic() {
-    begin = std::chrono::high_resolution_clock::now();
-  }
-
-  // End
-  float toc() {
-    duration += std::chrono::duration_cast<std::chrono::milliseconds>
-                (std::chrono::high_resolution_clock::now()-begin);
-    return get();
-  }
-
-  // Get time duration
-  float get() {
-    return (float)duration.count() / 1000;
-  }
-
- protected:
-  std::chrono::high_resolution_clock::time_point begin;
-  std::chrono::milliseconds duration;
-
- private:
-   DISALLOW_COPY_AND_ASSIGN(Timer);
-};
 
 #endif  // XLEARN_BASE_COMMON_H_

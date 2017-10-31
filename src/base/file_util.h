@@ -17,16 +17,14 @@
 /*
 Author: Chao Ma (mctt90@gmail.com)
 
-This file contains facilitlies controlling the file.
+This file contains facilitlies to control the file.
 */
 
 #ifndef XLEARN_BASE_FILE_UTIL_H_
 #define XLEARN_BASE_FILE_UTIL_H_
 
-#include <sys/mman.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <stdio.h>  // for remove()
 
 #include "src/base/common.h"
 #include "src/base/stringprintf.h"
@@ -113,12 +111,12 @@ const size_t KB = 1024.0;
 const size_t MB = 1024.0 * 1024.0;
 const size_t GB = 1024.0 * 1024.0 * 1024.0;
 
-// 100 KB for one line of txt data
+/* 100 KB for one line of txt data */
 static const uint32 kMaxLineSize = 100 * 1024;
-// Chunk szie for hash
+/* Chunk size for hash */
 static const int kChunkSize = 10000000;
 
-// Check whether the file exists
+// Check whether the file exists.
 inline bool FileExist(const char* filename) {
   if (access(filename, F_OK) != -1) {
     return true;
@@ -126,7 +124,7 @@ inline bool FileExist(const char* filename) {
   return false;
 }
 
-// Open file using fopen() and return the file pointer
+// Open file using fopen() and return the file pointer.
 // model :
 //  "w" for write
 //  "r" for read
@@ -286,7 +284,7 @@ inline void ReadStringFromFile(FILE* file_ptr, std::string& str) {
 //------------------------------------------------------------------------------
 
 // Calculate the hash value of current txt file
-// If one_block == true, we just read a smalle chunk of data
+// If one_block == true, we just read a small chunk of data
 // If one_block == false, we read all the data from the file
 inline uint64_t HashFile(const std::string& filename, bool one_block=false) {
   std::ifstream f(filename, std::ios::ate | std::ios::binary);

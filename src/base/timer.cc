@@ -17,31 +17,35 @@
 /*
 Author: Chao Ma (mctt90@gmail.com)
 
-This file is the entry for training of the xLearn.
+This file is the implementation of the Timer class.
 */
 
-#include "src/base/common.h"
-#include "src/solver/solver.h"
 #include "src/base/timer.h"
 
-//------------------------------------------------------------------------------
-// The pre-defined main function
-//------------------------------------------------------------------------------
+Timer::Timer() {
+  reset();
+}
 
-int main(int argc, char* argv[]) {
-  Timer timer;
-  timer.tic();
+// Reset code start
+void Timer::reset() {
+  begin = std::chrono::high_resolution_clock::now();
+  duration =
+     std::chrono::duration_cast<std::chrono::milliseconds>(begin-begin);
+}
 
-  xLearn::Solver solver;
-  solver.SetTrain();
-  solver.Initialize(argc, argv);
-  solver.StartWork();
-  solver.FinalizeWork();
+// Code start
+void Timer::tic() {
+  begin = std::chrono::high_resolution_clock::now();
+}
 
-  real_t time_cost = timer.toc();
-  printf("------------------------------\n");
-  printf("| Total time cost: %.2f sec |\n", time_cost);
-  printf("------------------------------\n");
+// Code end
+float Timer::toc() {
+  duration += std::chrono::duration_cast<std::chrono::milliseconds>
+              (std::chrono::high_resolution_clock::now()-begin);
+  return get();
+}
 
-  return 0;
+// Get the time duration (seconds)
+float Timer::get() {
+  return (float)duration.count() / 1000;
 }

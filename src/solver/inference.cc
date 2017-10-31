@@ -20,6 +20,7 @@ This file is the implementation of the Predictor class.
 */
 
 #include "src/solver/inference.h"
+#include "src/base/timer.h"
 
 #include <vector>
 #include <sstream>

@@ -17,31 +17,46 @@
 /*
 Author: Chao Ma (mctt90@gmail.com)
 
-This file is the entry for training of the xLearn.
+This file define the Timer class.
 */
 
+#ifndef XLEARN_BASE_TIMER_H_
+#define XLEARN_BASE_TIMER_H_
+
+#include <chrono>
+
 #include "src/base/common.h"
-#include "src/solver/solver.h"
-#include "src/base/timer.h"
 
 //------------------------------------------------------------------------------
-// The pre-defined main function
+// We can use the Timer class like this:
+//
+//   Timer timer();
+//   timer.tic();
+//
+//     .... /* code we want to evaluate */
+//
+//   float time = timer.toc();  // (sec)
+//
+// This class can be used to evaluate multi-thread code.
 //------------------------------------------------------------------------------
+class Timer {
+ public:
+    Timer();
+    // Reset start time
+    void reset();
+    // Code start
+    void tic();
+    // Code end
+    float toc();
+    // Get the time duration
+    float get();
 
-int main(int argc, char* argv[]) {
-  Timer timer;
-  timer.tic();
+ protected:
+    std::chrono::high_resolution_clock::time_point begin;
+    std::chrono::milliseconds duration;
 
-  xLearn::Solver solver;
-  solver.SetTrain();
-  solver.Initialize(argc, argv);
-  solver.StartWork();
-  solver.FinalizeWork();
+ private:
+  DISALLOW_COPY_AND_ASSIGN(Timer);
+};
 
-  real_t time_cost = timer.toc();
-  printf("------------------------------\n");
-  printf("| Total time cost: %.2f sec |\n", time_cost);
-  printf("------------------------------\n");
-
-  return 0;
-}
+#endif  // XLEARN_BASE_TIMER_H_

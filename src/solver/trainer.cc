@@ -24,6 +24,7 @@ This file is the implementation of the Trainer class.
 
 #include "src/solver/trainer.h"
 #include "src/data/data_structure.h"
+#include "src/base/timer.h"
 
 namespace xLearn {
 

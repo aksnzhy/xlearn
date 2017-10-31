@@ -32,6 +32,7 @@ This file is the implementation of the Solver class.
 
 #include "src/base/stringprintf.h"
 #include "src/base/split_string.h"
+#include "src/base/timer.h"
 
 namespace xLearn {
 

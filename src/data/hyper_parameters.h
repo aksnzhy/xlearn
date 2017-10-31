@@ -56,7 +56,7 @@ struct HyperParam {
   /* Metric function. For now, it could
   be 'acc', 'prec', 'recall', 'f1', 'auc',
   'mae', 'rmsd', or 'mape' */
-  std::string metric = "acc";
+  std::string metric = "none";
 //------------------------------------------------------------------------------
 // Parameters for optimization method
 //------------------------------------------------------------------------------
