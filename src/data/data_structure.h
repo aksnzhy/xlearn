@@ -49,6 +49,15 @@ const int kAlign = 4;
 const int kAlignByte = 16;
 
 //------------------------------------------------------------------------------
+// MetricInfo stores the evaluation metric information, which
+// will be printed to users during the training
+//------------------------------------------------------------------------------
+struct MetricInfo {
+  real_t loss_val;    /* Loss info */
+  real_t metric_val;  /* Metric info */
+};
+
+//------------------------------------------------------------------------------
 // Node is used to store information for each feature
 // For tasks like lr and fm, we just need to store the feature id
 // and feature value, while we also need to store the field id for

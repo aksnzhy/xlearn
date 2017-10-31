@@ -33,11 +33,6 @@ This file defines the Trainer class.
 
 namespace xLearn {
 
-struct MetricInfo {
-  real_t loss_val;
-  real_t metric_val;
-};
-
 //------------------------------------------------------------------------------
 // Trainer is the core class of xLearn, which can perform
 // standard training process (training set and test set), as well
