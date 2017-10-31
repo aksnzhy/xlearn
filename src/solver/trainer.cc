@@ -68,17 +68,17 @@ void Trainer::show_train_info(real_t tr_loss, real_t tr_metric,
   std::cout.width(6);
   std::cout << epoch;
   std::cout.width(20);
-  std::cout << std::fixed << std::setprecision(5) << tr_loss;
+  std::cout << std::fixed << std::setprecision(6) << tr_loss;
   if (metric_->type().compare("NONE") != 0) {
     std::cout.width(20);
-    std::cout << std::fixed << std::setprecision(5) << tr_metric;
+    std::cout << std::fixed << std::setprecision(6) << tr_metric;
   }
   if (validate) {
     std::cout.width(20);
-    std::cout << std::fixed << std::setprecision(5) << te_loss;
+    std::cout << std::fixed << std::setprecision(6) << te_loss;
     if (metric_->type().compare("NONE") != 0) {
       std::cout.width(20);
-      std::cout << std::fixed << std::setprecision(5) << te_metric;
+      std::cout << std::fixed << std::setprecision(6) << te_metric;
     }
   }
   std::cout.width(20);
@@ -145,11 +145,11 @@ void Trainer::train(std::vector<Reader*> train_reader,
     }
   }
   if (early_stop_) {
-    printf(" -------------------------------------------------------------\n");
+    printf(" --------------------------------------------------------------\n");
     printf("| Stopping at epoch %d and "
-           "the best validation loss is %.5f |\n",
+           "the best validation loss is %.6f |\n",
            best_epoch, best_loss);
-    printf(" -------------------------------------------------------------\n");
+    printf(" --------------------------------------------------------------\n");
     model_->Shrink();
   }
 }
