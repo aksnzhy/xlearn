@@ -342,7 +342,9 @@ void Solver::start_train_work() {
   printf("----------------------\n");
   if (hyper_param_.cross_validation) {
     trainer.CVTrain();
-    printf("Finish training. \n");
+    printf("-------------------\n");
+    printf("| Finish training |\n");
+    printf("-------------------\n");
   } else {
     trainer.Train();
     if (save_model) {

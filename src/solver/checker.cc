@@ -354,7 +354,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
   }
   if (hyper_param.cross_validation &&
      !hyper_param.test_set_file.empty()) {
-    printf("[Warning] -c (cross-validation) has be set, and "
+    printf("[Warning] --cv (cross-validation) has be set, and "
            "xLearn will ignore the test file: %s \n",
            hyper_param.test_set_file.c_str());
     hyper_param.test_set_file.clear();
