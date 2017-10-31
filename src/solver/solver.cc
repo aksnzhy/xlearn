@@ -114,7 +114,9 @@ void Solver::init_train() {
    *********************************************************/
   Timer timer;
   timer.tic();
-  printf("Read problem ... \n");
+  printf("--------------------\n");
+  printf("| Read problem ... |\n");
+  printf("--------------------\n");
   LOG(INFO) << "Start to init Reader";
   // Split file if use -c
   if (hyper_param_.cross_validation) {
@@ -199,7 +201,9 @@ void Solver::init_train() {
    *********************************************************/
   timer.reset();
   timer.tic();
-  printf("Initialize model ...\n");
+  printf("------------------------\n");
+  printf("| Initialize model ... |\n");
+  printf("------------------------\n");
   // Initialize parameters
   model_ = new Model();
   model_->Initialize(hyper_param_.score_func,
@@ -333,7 +337,9 @@ void Solver::start_train_work() {
                      metric_,
                      early_stop,
                      quiet);
-  printf("Start to train ... \n");
+  printf("----------------------\n");
+  printf("| Start to train ... |\n");
+  printf("----------------------\n");
   if (hyper_param_.cross_validation) {
     trainer.CVTrain();
     printf("Finish training. \n");
@@ -342,15 +348,18 @@ void Solver::start_train_work() {
     if (save_model) {
       Timer timer;
       timer.tic();
-      printf("Finish training and start to save model ...\n"
-             "  Model file: %s\n",
-             hyper_param_.model_file.c_str());
+      printf("-----------------------------------------------\n");
+      printf("| Finish training and start to save model ... |\n");
+      printf("-----------------------------------------------\n");
       trainer.SaveModel(hyper_param_.model_file);
       real_t time_cost = timer.toc();
+      printf("  Model file: %s\n", hyper_param_.model_file.c_str());
       printf("  Time cost for saving model: %.2f (sec) \n",
              time_cost);
     } else {
-      printf("Finish training \n");
+      printf("-------------------\n");
+      printf("| Finish training |\n");
+      printf("-------------------\n");
     }
   }
 }

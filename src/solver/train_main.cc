@@ -38,7 +38,9 @@ int main(int argc, char* argv[]) {
   solver.FinalizeWork();
 
   real_t time_cost = timer.toc();
-  printf("Total time cost: %.2f sec\n", time_cost);
+  printf("------------------------------\n");
+  printf("| Total time cost: %.2f sec |\n", time_cost);
+  printf("------------------------------\n");
 
   return 0;
 }
