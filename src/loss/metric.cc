@@ -21,6 +21,8 @@ This file is the implementation of the Metric class.
 
 #include "src/loss/metric.h"
 
+#include <math.h>
+
 namespace xLearn {
 
 real_t Metric::Accuracy() const {
@@ -56,7 +58,11 @@ real_t Metric::MAE() const {
 }
 
 real_t Metric::MAPE() const {
-  return error_accum_ * 1.0 / counter_;;
+  return error_accum_ * 1.0 / counter_;
+}
+
+real_t Metric::RMSD() const {
+  return sqrt(error_accum_ * 1.0 / counter_);
 }
 
 }  // namespace xLearn

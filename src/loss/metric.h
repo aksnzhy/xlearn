@@ -43,6 +43,7 @@ class Metric {
         metric.compare("auc") != 0 &&
         metric.compare("mae") != 0 &&
         metric.compare("mape") != 0 &&
+        metric.compare("rmsd") != 0 &&
         metric.compare("none") != 0) {
       LOG(FATAL) << "Unknow metric: " << metric;
     }
@@ -71,6 +72,8 @@ class Metric {
       return "MAP";
     } else if (metric_type_.compare("mape") == 0) {
       return "MAPE";
+    } else if (metric_type_.compare("rmsd") == 0) {
+      return "RMSD";
     } else if (metric_type_.compare("none") == 0) {
       return "NONE";
     }
@@ -89,6 +92,9 @@ class Metric {
         error_accum_ += (abs(Y[i] - pred[i]));
       } else if (metric_type_.compare("mape") == 0) {
         error_accum_ += (abs(Y[i] - pred[i]) / Y[i]);
+      } else if (metric_type_.compare("rmsd") == 0) {
+        real_t tmp = abs(Y[i] - pred[i]);
+        error_accum_ += (tmp*tmp);
       } else {
         if (pred[i] >= 0) {  // for positive prediction
           if (Y[i] == 1) {
@@ -133,6 +139,8 @@ class Metric {
       return MAE();
     } else if (metric_type_.compare("mape") == 0) {
       return MAPE();
+    } else if (metric_type_.compare("rmsd") == 0) {
+      return RMSD();
     }
     LOG(ERROR) << "Unknow metric: " << metric_type_;
     return 0;
@@ -162,6 +170,7 @@ protected:
   real_t AUC() const;
   real_t MAE() const;
   real_t MAPE() const;
+  real_t RMSD() const;
 
   // Return the absolute value
   inline real_t abs(real_t a) { return a >= 0 ? a : -a; }

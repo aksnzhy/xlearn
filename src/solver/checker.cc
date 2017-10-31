@@ -52,7 +52,7 @@ std::string Checker::option_help() const {
 "         6 -- field-aware factorization machines (FFM) \n"
 "                                                                            \n"
 "  -x <metric>          :  The metric can be 'acc', 'prec', 'recall', 'f1', 'auc' (classification), \n"
-"                          and 'mae', 'mape' (regression). Using 'acc' - Accuracy by default. \n "
+"                          and 'mae', 'mape', 'rmsd' (regression). Using 'acc' - Accuracy by default. \n "
 "                          If we set this option to 'none', xlearn will not print any metric info. \n"
 "                                                                                              \n"
 "  -t <test_file_path>  :  Path of the test data file. This option will be empty by default, \n"
@@ -222,6 +222,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
           list[i+1].compare("auc") != 0 &&
           list[i+1].compare("mae") != 0 &&
           list[i+1].compare("mape") != 0 &&
+          list[i+1].compare("rmsd") != 0 &&
           list[i+1].compare("none") != 0) {
         printf("[Error] Unknow metric : %s \n"
                " -x can only be 'acc', 'prec', 'recall', "

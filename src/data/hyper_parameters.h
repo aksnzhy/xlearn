@@ -55,7 +55,7 @@ struct HyperParam {
   std::string loss_func = "cross-entropy";
   /* Metric function. For now, it could
   be 'acc', 'prec', 'recall', 'f1', 'auc',
-  'mae', or 'mape' */
+  'mae', 'rmsd', or 'mape' */
   std::string metric = "acc";
 //------------------------------------------------------------------------------
 // Parameters for optimization method
