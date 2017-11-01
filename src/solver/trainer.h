@@ -89,7 +89,8 @@ class Trainer {
 
   // Basic train function
   void train(std::vector<Reader*> train_reader,
-             std::vector<Reader*> test_reader);
+             std::vector<Reader*> test_reader,
+             MetricInfo* test_info = nullptr);
 
   void show_head_info(bool validate);
   void show_train_info(real_t tr_loss, real_t tr_metric,

@@ -91,7 +91,8 @@ void Trainer::show_train_info(real_t tr_loss, real_t tr_metric,
  *  Basic train function                                 *
  *********************************************************/
 void Trainer::train(std::vector<Reader*> train_reader,
-                    std::vector<Reader*> test_reader) {
+                    std::vector<Reader*> test_reader,
+                    MetricInfo* test_info) {
   bool validate = test_reader.empty() ? false : true;
   real_t best_loss = kFloatMax;
   real_t prev_loss = kFloatMax;
@@ -120,6 +121,9 @@ void Trainer::train(std::vector<Reader*> train_reader,
       MetricInfo te_info;
       if (validate) {
         te_info = CalcLossMetric(test_reader);
+        if (test_info != nullptr) {
+          test_info->loss_val = te_info.loss_val;
+        }
       }
       real_t time_cost = timer.toc();
       // show train info
@@ -146,12 +150,12 @@ void Trainer::train(std::vector<Reader*> train_reader,
     }
   }
   if (early_stop_) {
-    printf("----------------------------------------------------------------\n");
-    printf("| Stopping at epoch %d and "
-           "the best validation loss is %.6f |\n",
-           best_epoch, best_loss);
-    printf("----------------------------------------------------------------\n");
+    printf("----------------------------------------------------------------------\n");
+    printf("| Early-stopping at epoch %d and "
+           "the best validation loss is %.6f |\n", best_epoch, best_loss);
+    printf("----------------------------------------------------------------------\n");
     model_->Shrink();
+    test_info->loss_val = best_loss;
   }
 }
 
@@ -212,6 +216,8 @@ void Trainer::Train() {
 // Training using cross-validation
 void Trainer::CVTrain() {
   // Use the i-th reader as validation Reader
+  MetricInfo info;
+  real_t sum_loss = 0;
   for (int i = 0; i < reader_list_.size(); ++i) {
     printf("Cross-validation: %d/%lu: \n", i+1, reader_list_.size());
     // Get the train Reader and test Reader
@@ -226,8 +232,12 @@ void Trainer::CVTrain() {
       // Re-init current model parameters
       model_->Reset();
     }
-    this->train(tr_reader, te_reader);
+    this->train(tr_reader, te_reader, &info);
+    sum_loss += info.loss_val;
   }
+  sum_loss /= reader_list_.size();
+  printf(" Average %s: %.6f\n", 
+    loss_->loss_type().c_str(), sum_loss);
 }
 
 } // namespace xLearn
