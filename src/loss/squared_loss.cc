@@ -54,7 +54,19 @@ void squared_thread(const DMatrix* matrix,
   }
 }
 
+//------------------------------------------------------------------------------
 // Calculate gradient in multi-thread
+//
+//                         master_thread
+//                      /       |         \
+//                     /        |          \
+//                thread_1    thread_2    thread_3
+//                   |           |           |
+//                    \          |           /
+//                     \         |          /
+//                       \       |        /
+//                         master_thread
+//------------------------------------------------------------------------------
 void SquaredLoss::CalcGrad(const DMatrix* matrix,
                            Model& model) {
   CHECK_NOTNULL(matrix);

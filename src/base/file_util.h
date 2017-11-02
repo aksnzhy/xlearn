@@ -114,7 +114,7 @@ const size_t GB = 1024.0 * 1024.0 * 1024.0;
 /* 100 KB for one line of txt data */
 static const uint32 kMaxLineSize = 100 * 1024;
 /* Chunk size for hash */
-static const int kChunkSize = 10000000;
+static const uint32 kChunkSize = 10000000;
 
 // Check whether the file exists.
 inline bool FileExist(const char* filename) {
@@ -125,9 +125,7 @@ inline bool FileExist(const char* filename) {
 }
 
 // Open file using fopen() and return the file pointer.
-// model :
-//  "w" for write
-//  "r" for read
+// model : "w" for write and "r" for read
 inline FILE* OpenFileOrDie(const char* filename, const char* mode) {
   FILE* input_stream = fopen(filename, mode);
   if (input_stream == nullptr) {
@@ -137,14 +135,14 @@ inline FILE* OpenFileOrDie(const char* filename, const char* mode) {
   return input_stream;
 }
 
-// Close file using fclose()
+// Close file using fclose().
 inline void Close(FILE *file) {
   if (fclose(file) == -1) {
     LOG(FATAL) << "Error invoke fclose().";
   }
 }
 
-// Return the size (byte) of a target file
+// Return the size (byte) of a target file.
 inline uint64 GetFileSize(FILE* file) {
   if (fseek(file, 0L, SEEK_END) != 0) {
     LOG(FATAL) << "Error: invoke fseek().";
@@ -157,7 +155,7 @@ inline uint64 GetFileSize(FILE* file) {
   return total_size;
 }
 
-// Get one line of data from the file
+// Get one line of data from the file.
 inline void GetLine(FILE* file, std::string& str_line) {
   CHECK_NOTNULL(file);
   static char* line = new char[kMaxLineSize];
@@ -176,8 +174,8 @@ inline void GetLine(FILE* file, std::string& str_line) {
   str_line.assign(line);
 }
 
-// Write data from a buffer to disk file
-// Return the size of data we have written
+// Write data from a buffer to disk file.
+// Return the size (byte) of data we have written.
 inline size_t WriteDataToDisk(FILE* file, const char* buf, size_t len) {
   CHECK_NOTNULL(file);
   CHECK_NOTNULL(buf);
@@ -189,9 +187,9 @@ inline size_t WriteDataToDisk(FILE* file, const char* buf, size_t len) {
   return write_len;
 }
 
-// Read data from disk file to a buffer
-// Return the data size we have read
-// If we reach the end of the file, return 0
+// Read data from disk file to a buffer.
+// Return the data size (byte) we have read.
+// If we reach the end of the file, return 0.
 inline size_t ReadDataFromDisk(FILE* file, char* buf, size_t len) {
   CHECK_NOTNULL(file);
   CHECK_NOTNULL(buf);
@@ -207,7 +205,7 @@ inline size_t ReadDataFromDisk(FILE* file, char* buf, size_t len) {
   return ret;
 }
 
-// Delete target file from disk
+// Delete target file from disk.
 inline void RemoveFile(const char* filename) {
   CHECK_NOTNULL(filename);
   if (remove(filename) == -1) {
@@ -215,7 +213,7 @@ inline void RemoveFile(const char* filename) {
   }
 }
 
-// Print file size
+// Print file size.
 inline std::string PrintSize(uint64 file_size) {
   std::string res;
   if (file_size > GB) {
@@ -235,7 +233,7 @@ inline std::string PrintSize(uint64 file_size) {
 // Serialize or Deserialize for std::vector and std::string
 //------------------------------------------------------------------------------
 
-// Write a std::vector to disk file
+// Write a std::vector to disk file.
 template <typename T>
 void WriteVectorToFile(FILE* file_ptr, const std::vector<T>& vec) {
   CHECK_NOTNULL(file_ptr);
@@ -246,7 +244,7 @@ void WriteVectorToFile(FILE* file_ptr, const std::vector<T>& vec) {
   WriteDataToDisk(file_ptr, (char*)vec.data(), sizeof(T)*len);
 }
 
-// Read a std::vector from disk file
+// Read a std::vector from disk file.
 template <typename T>
 void ReadVectorFromFile(FILE* file_ptr, std::vector<T>& vec) {
   CHECK_NOTNULL(file_ptr);
@@ -258,7 +256,7 @@ void ReadVectorFromFile(FILE* file_ptr, std::vector<T>& vec) {
   ReadDataFromDisk(file_ptr, (char*)vec.data(), sizeof(T)*len);
 }
 
-// Write a string to disk file
+// Write a std::string to disk file.
 inline void WriteStringToFile(FILE* file_ptr, const std::string& str) {
   CHECK_NOTNULL(file_ptr);
   // We do not allow Serialize an empty string
@@ -268,7 +266,7 @@ inline void WriteStringToFile(FILE* file_ptr, const std::string& str) {
   WriteDataToDisk(file_ptr, (char*)str.data(), len);
 }
 
-// Read a string from disk file
+// Read a std::string from disk file.
 inline void ReadStringFromFile(FILE* file_ptr, std::string& str) {
   CHECK_NOTNULL(file_ptr);
   // First, read the size of vector
@@ -283,9 +281,9 @@ inline void ReadStringFromFile(FILE* file_ptr, std::string& str) {
 // Some tool functions used by Reader
 //------------------------------------------------------------------------------
 
-// Calculate the hash value of current txt file
-// If one_block == true, we just read a small chunk of data
-// If one_block == false, we read all the data from the file
+// Calculate the hash value of current txt file.
+// If one_block == true, we just read a small chunk of data.
+// If one_block == false, we read all the data from the file.
 inline uint64_t HashFile(const std::string& filename, bool one_block=false) {
   std::ifstream f(filename, std::ios::ate | std::ios::binary);
   if(f.bad()) { return 0; }
@@ -319,7 +317,8 @@ inline uint64_t HashFile(const std::string& filename, bool one_block=false) {
   return magic;
 }
 
-// Read the whole file to a memory buffer and Return size of current file
+// Read the whole file to a memory buffer and 
+// Return size (byte) of current file.
 inline uint64 ReadFileToMemory(const std::string& filename, char **buf) {
   CHECK(!filename.empty());
   FILE* file = OpenFileOrDie(filename.c_str(), "r");

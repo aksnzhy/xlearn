@@ -27,8 +27,6 @@ This file tests file_util.h
 
 #include "src/base/file_util.h"
 
-namespace xLearn {
-
 TEST(FileTest, File_Exist) {
   std::string filename = "/tmp/test";
   FILE* file = OpenFileOrDie(filename.c_str(), "w");
@@ -176,5 +174,3 @@ TEST(FileTest, ReadFile) {
   EXPECT_EQ((*(int*)ch_num), 999);
   RemoveFile("./tmp.bin");
 }
-
-}  // namespace xLearn

@@ -37,23 +37,19 @@ pool that used by xLearn.
 
 #include "src/base/common.h"
 
-namespace xLearn {
-
 //------------------------------------------------------------------------------
-//  Simple ThreadPool that creates N threads upon its creation,
-//  and pulls from a queue to get new jobs.
+// Simple ThreadPool that creates N threads upon its creation,
+// and pulls from a queue to get new jobs.
+// Basic Usage:
 //
-//  This class requires a number of c++11 features be present in your compiler.
-//
-//                         master_thread
-//                      /       |         \
-//                     /        |          \
-//                thread_1    thread_2    thread_3
-//                   |           |           |
-//                    \          |           /
-//                     \         |          /
-//                       \       |        /
-//                         master_thread
+//   /* Create thread pool with 4 threads */
+//   ThreadPool pool(4);  
+//   /* Enqueue and store future */
+//   auto result = pool.enqueue([](int answer) { return answer; }, 42);
+//   /* Get result from future*/
+//   std::cout << result.get() << std::endl;
+//  
+// This class requires a number of c++11 features be present in your compiler.
 //------------------------------------------------------------------------------
 class ThreadPool {
  public:
@@ -149,7 +145,5 @@ inline ThreadPool::~ThreadPool()
     for(std::thread &worker: workers)
         worker.join();
 }
-
-}  // namespace xLearn
 
 #endif  // XLEARN_BASE_THREAD_POOL_H_

@@ -71,7 +71,7 @@ std::string Checker::option_help() const {
 "                                                                                     \n"
 "  -b <lambda_for_regu> :  Lambda for regular. Using 0.00002 by default. We can disable the \n"
 "                          regular term by setting this value to 0.0 \n"
-"                                                                   \n"
+"                                                                      \n"
 "  -u <model_scale>     :  Hyper param used for initialize model parameters. Using 0.66 by default. \n"
 "                                                                             \n"
 "  -e <epoch_number>    :  Number of epoch for training. Using 10 by default. \n"

@@ -29,8 +29,6 @@ This file tests levenshtein_distance.h
 #include "src/base/common.h"
 #include "src/base/levenshtein_distance.h"
 
-namespace xLearn {
-
 typedef std::vector<std::string> StringList;
 
 TEST(LDISTANCE_TEST, Find) {
@@ -67,5 +65,3 @@ TEST(LDISTANCE_TEST, FindSimilar) {
   EXPECT_EQ(ss.FindSimilar(std::string("maccz"), list, result), 2);
   EXPECT_EQ(result, std::string("mac"));
 }
-
-}  // namespace xLearn

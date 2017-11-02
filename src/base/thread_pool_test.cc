@@ -24,8 +24,6 @@ This file tests thread_pool.h
 
 #include "src/base/thread_pool.h"
 
-namespace xLearn {
-
 void func(int id) {
   printf("Hello %i\n", id);
 }
@@ -69,5 +67,3 @@ TEST(ThreadPoolTest, Sum_test) {
   int sum = a1 + a2 + a3 + a4 + a5;
   EXPECT_EQ(sum, 75);
 }
-
-}  // namespace xLearn

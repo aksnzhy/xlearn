@@ -40,6 +40,7 @@ real_t CrossEntropyLoss::Evalute(const std::vector<real_t>& pred,
   return val;
 }
 
+
 // Calculate gradient in one thread
 void cross_entropy_thread(const DMatrix* matrix,
                         Model* model,
@@ -60,7 +61,19 @@ void cross_entropy_thread(const DMatrix* matrix,
   }
 }
 
+//------------------------------------------------------------------------------
 // Calculate gradient in multi-thread
+//
+//                         master_thread
+//                      /       |         \
+//                     /        |          \
+//                thread_1    thread_2    thread_3
+//                   |           |           |
+//                    \          |           /
+//                     \         |          /
+//                       \       |        /
+//                         master_thread
+//------------------------------------------------------------------------------
 void CrossEntropyLoss::CalcGrad(const DMatrix* matrix,
                                 Model& model) {
   CHECK_NOTNULL(matrix);

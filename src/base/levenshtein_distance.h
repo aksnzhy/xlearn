@@ -29,8 +29,6 @@ used to find similar strings.
 
 #include "src/base/common.h"
 
-namespace xLearn {
-
 //------------------------------------------------------------------------------
 // StrSimilar class is used to find the similar string from the
 // target string list. We can use this class like this:
@@ -59,12 +57,12 @@ class StrSimilar {
   StrSimilar() { }
   ~StrSimilar() { }
 
-  // Return true (false) if str is (not) in target string list
+  // Return true (false) if str is (not) in target string list.
   bool Find(const std::string& str,
             const std::vector<std::string>& list);
 
-  // Find the most similar string from string list
-  // Return the minimal levenshtein distance
+  // Find the most similar string from string list.
+  // Return the minimal levenshtein distance.
   int FindSimilar(const std::string& str,
                   const std::vector<std::string>& list,
                   std::string& result);
@@ -76,7 +74,5 @@ class StrSimilar {
 
   DISALLOW_COPY_AND_ASSIGN(StrSimilar);
 };
-
-}  // namespace xLearn
 
 #endif  // XLEARN_BASE_LEVEN_SHTEIN_DISTANCE_H_

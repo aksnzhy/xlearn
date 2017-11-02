@@ -24,12 +24,10 @@ This file if the implementation of StrSimilar class.
 
 #include "src/base/levenshtein_distance.h"
 
-namespace xLearn {
-
 #define  min(a,b) ((a<b)?a:b)
 
-// Find str in string list
-// Return true if we can find str in target string list
+// Find str in string list.
+// Return true if we can find str in target string list.
 bool StrSimilar::Find(const std::string& str,
                       const std::vector<std::string>& list) {
   std::vector<std::string>::const_iterator it;
@@ -40,8 +38,8 @@ bool StrSimilar::Find(const std::string& str,
   return false;
 }
 
-// Find the most similar string from string list
-// Return the minimal levenshtein distance
+// Find the most similar string from string list.
+// Return the minimal levenshtein distance.
 int StrSimilar::FindSimilar(const std::string& str,
                             const std::vector<std::string>& list,
                             std::string& result) {
@@ -57,7 +55,7 @@ int StrSimilar::FindSimilar(const std::string& str,
 }
 
 // Calculate Levenshtein distance by using
-// dynamic programing (DP)
+// dynamic programing (DP).
 int StrSimilar::ldistance(const std::string& source,
                           const std::string& target) {
   //step 1
@@ -92,5 +90,3 @@ int StrSimilar::ldistance(const std::string& source,
   //step7
   return matrix[n][m];
 }
-
-}  // namespace xLearn

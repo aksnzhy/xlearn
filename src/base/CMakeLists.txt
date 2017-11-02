@@ -1,5 +1,6 @@
 # Build library base
-add_library(base logging.cc split_string.cc stringprintf.cc levenshtein_distance.cc timer.cc)
+add_library(base logging.cc split_string.cc stringprintf.cc 
+levenshtein_distance.cc timer.cc)
 
 # Build unittests.
 set(LIBS base gtest)

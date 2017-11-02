@@ -69,7 +69,7 @@ class Metric {
     } else if (metric_type_.compare("auc") == 0) {
       return "AUC";
     } else if (metric_type_.compare("mae") == 0) {
-      return "MAP";
+      return "MAE";
     } else if (metric_type_.compare("mape") == 0) {
       return "MAPE";
     } else if (metric_type_.compare("rmsd") == 0) {
@@ -148,7 +148,7 @@ class Metric {
 
 protected:
   /* Can be 'acc', 'prec', 'recall', 'f1'
-     'mae', and 'mape' */
+  'mae', and 'mape' */
   std::string metric_type_;
   /* The number of total example */
   index_t counter_;

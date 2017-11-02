@@ -155,7 +155,9 @@ void Trainer::train(std::vector<Reader*> train_reader,
            "the best validation loss is %.6f |\n", best_epoch, best_loss);
     printf("----------------------------------------------------------------------\n");
     model_->Shrink();
-    test_info->loss_val = best_loss;
+    if (test_info != nullptr) {
+      test_info->loss_val = best_loss;
+    }
   }
 }
 
