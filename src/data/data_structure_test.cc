@@ -29,32 +29,47 @@ namespace xLearn {
 TEST(DMATRIX_TEST, Resize_and_Release) {
   DMatrix matrix;
   matrix.ResetMatrix(10);
-  for (int i = 0; i < 10; ++i) {
+  EXPECT_EQ(matrix.hash_value_1, 0);
+  EXPECT_EQ(matrix.hash_value_2, 0);
+  EXPECT_EQ(matrix.row_length, 10);
+  for (size_t i = 0; i < 10; ++i) {
     EXPECT_EQ(matrix.row[i], nullptr);
     EXPECT_FLOAT_EQ(matrix.Y[i], 0);
     EXPECT_FLOAT_EQ(matrix.norm[i], 1.0);
     EXPECT_EQ(matrix.has_label, true);
   }
   matrix.Release();
-  for (int i = 0; i < 10; ++i) {
-    EXPECT_EQ(matrix.row.empty(), true);
-    EXPECT_EQ(matrix.Y.empty(), true);
-    EXPECT_EQ(matrix.norm.empty(), true);
-  }
+  EXPECT_EQ(matrix.row_length, 0);
+  EXPECT_EQ(matrix.hash_value_1, 0);
+  EXPECT_EQ(matrix.hash_value_2, 0);
+  EXPECT_EQ(matrix.has_label, false);
+  EXPECT_EQ(matrix.row.empty(), true);
+  EXPECT_EQ(matrix.Y.empty(), true);
+  EXPECT_EQ(matrix.norm.empty(), true);
 }
 
 TEST(DMATRIX_TEST, Serialize_and_Deserialize) {
   DMatrix matrix;
+  // Init
   matrix.ResetMatrix(10);
-  for (int i = 0; i < 10; ++i) {
+  for (size_t i = 0; i < 10; ++i) {
     matrix.AddNode(i, i, 2.5, i);
     matrix.Y[i] = i;
     matrix.norm[i] = 0.25;
     matrix.has_label = false;
   }
   matrix.SetHash(1234, 5678);
+  // Serialize
   matrix.Serialize("/tmp/test.bin");
   matrix.Release();
+  EXPECT_EQ(matrix.row_length, 0);
+  EXPECT_EQ(matrix.hash_value_1, 0);
+  EXPECT_EQ(matrix.hash_value_2, 0);
+  EXPECT_EQ(matrix.has_label, false);
+  EXPECT_EQ(matrix.row.empty(), true);
+  EXPECT_EQ(matrix.Y.empty(), true);
+  EXPECT_EQ(matrix.norm.empty(), true);
+  // Deserialize
   matrix.Deserialize("/tmp/test.bin");
   EXPECT_EQ(matrix.row_length, 10);
   EXPECT_EQ(matrix.hash_value_1, 1234);
@@ -72,6 +87,20 @@ TEST(DMATRIX_TEST, Serialize_and_Deserialize) {
     }
   }
   RemoveFile("/tmp/test.bin");
+}
+
+TEST(DMATRIX_TEST, Find_max_feat_and_field) {
+  DMatrix matrix;
+  matrix.ResetMatrix(10);
+  for (size_t i = 0; i < 10; ++i) {
+    matrix.AddNode(i, i, 2.5, i);
+    matrix.Y[i] = i;
+    matrix.norm[i] = 0.25;
+    matrix.has_label = false;
+  }
+  matrix.SetHash(1234, 5678);
+  EXPECT_EQ(matrix.MaxFeat(), 9);
+  EXPECT_EQ(matrix.MaxField(), 9);
 }
 
 }  // namespace xLearn

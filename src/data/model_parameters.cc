@@ -70,8 +70,8 @@ void Model::Initialize(const std::string& score_func,
 }
 
 // To get the best performance for SSE, we need to
-// allocate memory for the model parameters in aligned way
-// For SSE, the align number should be 16 byte
+// allocate memory for the model parameters in aligned way.
+// For SSE, the align number should be 16 byte.
 void Model::initial(bool set_val) {
   try {
     // Conventional malloc for linear term and bias
