@@ -108,7 +108,7 @@ class AccMetric : public Metric {
                                index_t* true_pred,
                                size_t start_idx,
                                size_t end_idx) {
-    CHECK_GT(end_idx, start_idx);
+    CHECK_GE(end_idx, start_idx);
     *true_pred = 0;
     for (size_t i = start_idx; i < end_idx; ++i) {
       real_t p_label = (*pred)[i] > 0 ? 1 : -1;
@@ -188,7 +188,7 @@ class PrecMetric : public Metric {
                                 index_t* false_pos,
                                 size_t start_idx,
                                 size_t end_idx) {
-    CHECK_GT(end_idx, start_idx);
+    CHECK_GE(end_idx, start_idx);
     *true_pos = 0;
     *false_pos = 0;
     for (size_t i = start_idx; i < end_idx; ++i) {
@@ -276,7 +276,7 @@ class RecallMetric : public Metric {
                                 index_t* false_neg,
                                 size_t start_idx,
                                 size_t end_idx) {
-    CHECK_GT(end_idx, start_idx);
+    CHECK_GE(end_idx, start_idx);
     *true_pos = 0;
     *false_neg = 0;
     for (size_t i = start_idx; i < end_idx; ++i) {
@@ -366,7 +366,7 @@ class F1Metric : public Metric {
                               index_t* true_neg,
                               size_t start_idx,
                               size_t end_idx) {
-    CHECK_GT(end_idx, start_idx);
+    CHECK_GE(end_idx, start_idx);
     *true_pos = 0;
     *true_neg = 0;
     for (size_t i = start_idx; i < end_idx; ++i) {
@@ -462,7 +462,7 @@ class MAEMetric : public Metric {
                                real_t* error,
                                size_t start_idx,
                                size_t end_idx) {
-    CHECK_GT(end_idx, start_idx);
+    CHECK_GE(end_idx, start_idx);
     *error = 0;
     for (size_t i = start_idx; i < end_idx; ++i) {
       (*error) += abs((*Y)[i] - (*pred)[i]);
@@ -536,7 +536,7 @@ class MAPEMetric : public Metric {
                                real_t* error,
                                size_t start_idx,
                                size_t end_idx) {
-    CHECK_GT(end_idx, start_idx);
+    CHECK_GE(end_idx, start_idx);
     *error = 0;
     for (size_t i = start_idx; i < end_idx; ++i) {
       (*error) += abs((*Y)[i]-(*pred)[i]) / (*Y)[i];
@@ -611,7 +611,7 @@ class RMSDMetric : public Metric {
                                 real_t* error,
                                 size_t start_idx,
                                 size_t end_idx) {
-    CHECK_GT(end_idx, start_idx);
+    CHECK_GE(end_idx, start_idx);
     *error = 0;
     for (size_t i = start_idx; i < end_idx; ++i) {
       real_t tmp = (*Y)[i] - (*pred)[i];

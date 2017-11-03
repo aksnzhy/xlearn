@@ -29,7 +29,7 @@ static void sq_evalute_thread(const std::vector<real_t>* pred,
                               real_t* tmp_sum,
                               size_t start_idx,
                               size_t end_idx) {
-  CHECK_GT(end_idx, start_idx);
+  CHECK_GE(end_idx, start_idx);
   *tmp_sum = 0;
   for (size_t i = start_idx; i < end_idx; ++i) {
     real_t error = (*label)[i] - (*pred)[i];
@@ -83,7 +83,7 @@ void sq_gradient_thread(const DMatrix* matrix,
                         bool is_norm,
                         index_t start,
                         index_t end) {
-  CHECK_GT(end, start);
+  CHECK_GE(end, start);
   for (size_t i = start; i < end; ++i) {
     SparseRow* row = matrix->row[i];
     real_t norm = is_norm ? matrix->norm[i] : 1.0;

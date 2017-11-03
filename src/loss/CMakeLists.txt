@@ -13,6 +13,9 @@ target_link_libraries(squared_loss_test gtest_main ${LIBS})
 add_executable(cross_entropy_loss_test cross_entropy_loss_test.cc)
 target_link_libraries(cross_entropy_loss_test gtest_main ${LIBS})
 
+add_executable(metric_test metric_test.cc)
+target_link_libraries(metric_test gtest_main ${LIBS})
+
 # Install library and header files
 install(TARGETS loss DESTINATION lib/loss)
 FILE(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.h")

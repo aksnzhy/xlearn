@@ -40,6 +40,7 @@ void pred_thread(const DMatrix* matrix,
                  bool is_norm,
                  size_t start_idx,
                  size_t end_idx) {
+  CHECK_GE(end_idx, start_idx);
   for (size_t i = start_idx; i < end_idx; ++i) {
     SparseRow* row = matrix->row[i];
     real_t norm = is_norm ? matrix->norm[i] : 1.0;
