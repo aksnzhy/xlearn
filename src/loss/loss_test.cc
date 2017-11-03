@@ -91,11 +91,12 @@ TEST_F(LossTest, Predict_Linear) {
       matrix.AddNode(i, j, 1.0);
     }
   }
-  // Create score function
-  LinearScore score;
   // Create loss function
   TestLoss loss;
-  loss.Initialize(&score);
+  Score* score = new LinearScore;
+  size_t threadNumber = std::thread::hardware_concurrency();
+  ThreadPool* pool = new ThreadPool(threadNumber);
+  loss.Initialize(score, pool);
   // Test
   std::vector<real_t> pred(kLine);
   loss.Predict(&matrix, model_lr, pred);
@@ -133,11 +134,12 @@ TEST_F(LossTest, Predict_FM) {
       matrix.AddNode(i, j, 1.0);
     }
   }
-  // Create score function
-  FMScore score;
   // Create loss function
   TestLoss loss;
-  loss.Initialize(&score);
+  Score* score = new FMScore;
+  size_t threadNumber = std::thread::hardware_concurrency();
+  ThreadPool* pool = new ThreadPool(threadNumber);
+  loss.Initialize(score, pool);
   // Test
   std::vector<real_t> pred(kLine);
   loss.Predict(&matrix, model_fm, pred);
@@ -176,11 +178,12 @@ TEST_F(LossTest, Predict_FFM) {
       matrix.AddNode(i, j, 1.0, j);
     }
   }
-  // Create score function
-  FFMScore score;
   // Create loss function
   TestLoss loss;
-  loss.Initialize(&score);
+  Score* score = new FFMScore;
+  size_t threadNumber = std::thread::hardware_concurrency();
+  ThreadPool* pool = new ThreadPool(threadNumber);
+  loss.Initialize(score, pool);
   // Test
   std::vector<real_t> pred(kLine);
   loss.Predict(&matrix, model_ffm, pred);
@@ -190,59 +193,12 @@ TEST_F(LossTest, Predict_FFM) {
   }
 }
 
-TEST_F(LossTest, Sigmoid_Test) {
-  std::vector<real_t> pred(6);
-  pred[0] = 0.5;
-  pred[1] = 3;
-  pred[2] = 20;
-  pred[3] = -0.5;
-  pred[4] = -3;
-  pred[5] = -20;
-  std::vector<real_t> new_pred(pred.size());
-  // Create score function
-  LinearScore score;
-  // Create loss function
-  TestLoss loss;
-  loss.Initialize(&score);
-  loss.Sigmoid(pred, new_pred);
-  EXPECT_GT(new_pred[0], 0.5);
-  EXPECT_GT(new_pred[1], 0.5);
-  EXPECT_GT(new_pred[2], 0.5);
-  EXPECT_LT(new_pred[3], 0.5);
-  EXPECT_LT(new_pred[4], 0.5);
-  EXPECT_LT(new_pred[5], 0.5);
-}
-
-TEST_F(LossTest, Sign_Test) {
-  std::vector<real_t> pred(6);
-  pred[0] = 0.5;
-  pred[1] = 3;
-  pred[2] = 20;
-  pred[3] = -0.5;
-  pred[4] = -3;
-  pred[5] = -20;
-  std::vector<real_t> new_pred(pred.size());
-  // Create score function
-  LinearScore score;
-  // Create loss function
-  TestLoss loss;
-  loss.Initialize(&score);
-  loss.Sign(pred, new_pred);
-  EXPECT_FLOAT_EQ(new_pred[0], 1);
-  EXPECT_FLOAT_EQ(new_pred[1], 1);
-  EXPECT_FLOAT_EQ(new_pred[2], 1);
-  EXPECT_FLOAT_EQ(new_pred[3], 0);
-  EXPECT_FLOAT_EQ(new_pred[4], 0);
-  EXPECT_FLOAT_EQ(new_pred[5], 0);
-}
-
 Loss* CreateLoss(const char* format_name) {
   return CREATE_LOSS(format_name);
 }
 
 TEST_F(LossTest, Create_Loss) {
   EXPECT_TRUE(CreateLoss("squared") != NULL);
-  EXPECT_TRUE(CreateLoss("hinge") != NULL);
   EXPECT_TRUE(CreateLoss("cross-entropy") != NULL);
   EXPECT_TRUE(CreateLoss("") == NULL);
   EXPECT_TRUE(CreateLoss("unknow_name") == NULL);

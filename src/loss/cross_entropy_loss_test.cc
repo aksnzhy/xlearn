@@ -25,6 +25,7 @@ This file tests the CrossEntropyLoss class.
 #include <vector>
 
 #include "src/loss/cross_entropy_loss.h"
+#include "src/score/fm_score.h"
 
 namespace xLearn {
 
@@ -43,6 +44,10 @@ TEST(CROSS_ENTROPY_LOSS, Evalute) {
   }
   // Create loss
   CrossEntropyLoss loss;
+  Score* score = new FMScore;
+  size_t threadNumber = std::thread::hardware_concurrency();
+  ThreadPool* pool = new ThreadPool(threadNumber);
+  loss.Initialize(score, pool);
   real_t val = loss.Evalute(pred, label);
   EXPECT_LT(val, 0.000001);
   // Test2

@@ -65,11 +65,14 @@ class ThreadPool {
   // Sync threads
   void Sync();
 
+  // Return the number of threads
+  size_t ThreadNumber();
+
 private:
     // need to keep track of threads so we can join them
-    std::vector< std::thread > workers;
+    std::vector<std::thread> workers;
     // the task queue
-    std::queue< std::function<void()> > tasks;
+    std::queue<std::function<void()>> tasks;
 
     // synchronization
     std::mutex queue_mutex;
@@ -134,6 +137,11 @@ inline void ThreadPool::Sync() {
   sync = 0;
 }
 
+// Return the number of threads
+inline size_t ThreadPool::ThreadNumber() {
+  return workers.size();
+}
+
 // the destructor joins all threads
 inline ThreadPool::~ThreadPool()
 {
@@ -144,6 +152,23 @@ inline ThreadPool::~ThreadPool()
     condition.notify_all();
     for(std::thread &worker: workers)
         worker.join();
+}
+
+// Get start and end index used in multi-thread training
+inline size_t getStart(size_t count, size_t total, size_t id) {
+  size_t gap = count / total;
+  size_t start_id = id * gap;
+  return start_id;
+}
+
+inline size_t getEnd(size_t count, size_t total, size_t id) {
+  size_t gap = count / total;
+  size_t remain = count % total;
+  size_t end_index = (id+1) * gap;
+  if (id == total-1) {
+    end_index += remain;
+  }
+  return end_index;
 }
 
 #endif  // XLEARN_BASE_THREAD_POOL_H_

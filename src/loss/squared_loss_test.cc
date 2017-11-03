@@ -25,6 +25,7 @@ This file tests the SquaredLoss class.
 #include <vector>
 
 #include "src/loss/squared_loss.h"
+#include "src/score/fm_score.h"
 
 namespace xLearn {
 
@@ -43,6 +44,10 @@ TEST(SQUARED_LOSS, Evalute) {
   }
   // Create loss
   SquaredLoss loss;
+  Score* score = new FMScore;
+  size_t threadNumber = std::thread::hardware_concurrency();
+  ThreadPool* pool = new ThreadPool(threadNumber);
+  loss.Initialize(score, pool);
   real_t val = loss.Evalute(pred, label);
   EXPECT_FLOAT_EQ(val, 142.5);
 }

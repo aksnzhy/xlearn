@@ -16,8 +16,7 @@
 
 /*
 Author: Chao Ma (mctt90@gmail.com)
-This file defines the FFMScore (field-aware factorization
-machine) class.
+This file defines the FFMScore (field-aware factorization machine) class.
 */
 
 #ifndef XLEARN_LOSS_FFM_SCORE_H_
@@ -32,6 +31,7 @@ namespace xLearn {
 // FFMScore is used to implemente field-aware factorization machines,
 // in which the socre function is:
 //   y = sum( (V_i_fj*V_j_fi)(x_i * x_j) )
+// Here leave out the bias and linear term.
 //------------------------------------------------------------------------------
 class FFMScore : public Score {
 public:
@@ -39,14 +39,14 @@ public:
  FFMScore() { }
  ~FFMScore() { }
 
- // Given one exmaple and current model, and
- // return the ffm score
+ // Given one exmaple and current model, this method
+ // returns the ffm score.
  real_t CalcScore(const SparseRow* row,
                   Model& model,
                   real_t norm = 1.0);
 
  // Calculate gradient and update current
- // model parameters
+ // model parameters.
  void CalcGrad(const SparseRow* row,
                Model& model,
                real_t pg,

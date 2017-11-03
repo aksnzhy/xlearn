@@ -21,48 +21,15 @@ This file is the implementation of the Metric class.
 
 #include "src/loss/metric.h"
 
-#include <math.h>
-
 namespace xLearn {
 
-real_t Metric::Accuracy() const {
-  real_t res = 0;
-  res = (true_pos_ * 1.0 + true_neg_) / counter_;
-  return res;
-}
-
-real_t Metric::Precision() const {
-  real_t res = 0;
-  res = (true_pos_ * 1.0) / (true_pos_ + false_pos_);
-  return res;
-}
-
-real_t Metric::Recall() const {
-  real_t res = 0;
-  res = (true_pos_ * 1.0) / (true_pos_ + false_neg_);
-  return res;
-}
-
-real_t Metric::F1() const {
-  real_t res = 0;
-  res = (2.0 * true_pos_) / (counter_ + true_pos_ - true_neg_);
-  return res;
-}
-
-real_t Metric::AUC() const {
-  return 0;
-}
-
-real_t Metric::MAE() const {
-  return error_accum_ * 1.0 / counter_;
-}
-
-real_t Metric::MAPE() const {
-  return error_accum_ * 1.0 / counter_;
-}
-
-real_t Metric::RMSD() const {
-  return sqrt(error_accum_ * 1.0 / counter_);
-}
+CLASS_REGISTER_IMPLEMENT_REGISTRY(xLearn_metric_registry, Metric);
+REGISTER_METRIC("acc", AccMetric);
+REGISTER_METRIC("prec", PrecMetric);
+REGISTER_METRIC("recall", RecallMetric);
+REGISTER_METRIC("f1", F1Metric);
+REGISTER_METRIC("mae", MAEMetric);
+REGISTER_METRIC("mape", MAPEMetric);
+REGISTER_METRIC("rmsd", RMSDMetric);
 
 }  // namespace xLearn

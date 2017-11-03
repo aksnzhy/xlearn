@@ -21,7 +21,6 @@ This file is the implementation of the base Loss class.
 
 #include "src/loss/loss.h"
 #include "src/loss/squared_loss.h"
-#include "src/loss/hinge_loss.h"
 #include "src/loss/cross_entropy_loss.h"
 
 namespace xLearn {
@@ -31,7 +30,6 @@ namespace xLearn {
 //------------------------------------------------------------------------------
 CLASS_REGISTER_IMPLEMENT_REGISTRY(xLearn_loss_registry, Loss);
 REGISTER_LOSS("squared", SquaredLoss);
-REGISTER_LOSS("hinge", HingeLoss);
 REGISTER_LOSS("cross-entropy", CrossEntropyLoss);
 
 // Predict in one thread
@@ -40,9 +38,9 @@ void pred_thread(const DMatrix* matrix,
                  std::vector<real_t>* pred,
                  Score* score_func_,
                  bool is_norm,
-                 index_t start,
-                 index_t end) {
-  for (size_t i = start; i < end; ++i) {
+                 size_t start_idx,
+                 size_t end_idx) {
+  for (size_t i = start_idx; i < end_idx; ++i) {
     SparseRow* row = matrix->row[i];
     real_t norm = is_norm ? matrix->norm[i] : 1.0;
     (*pred)[i] = score_func_->CalcScore(row, *model, norm);
@@ -59,17 +57,18 @@ void Loss::Predict(const DMatrix* matrix,
   index_t row_len = matrix->row_length;
   // Predict in multi-thread
   for (int i = 0; i < threadNumber_; ++i) {
-    index_t start = getStart(row_len, threadNumber_, i);
-    index_t end = getEnd(row_len, threadNumber_, i);
+    size_t start_idx = getStart(row_len, threadNumber_, i);
+    size_t end_idx = getEnd(row_len, threadNumber_, i);
     pool_->enqueue(std::bind(pred_thread,
                              matrix,
                              &model,
                              &pred,
                              score_func_,
                              norm_,
-                             start,
-                             end));
+                             start_idx,
+                             end_idx));
   }
+  // Wait all of the threads finish their job
   pool_->Sync();
 }
 

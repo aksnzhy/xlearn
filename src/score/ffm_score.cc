@@ -27,12 +27,12 @@ This file is the implementation of FFMScore class.
 namespace xLearn {
 
 // y = sum( (V_i_fj*V_j_fi)(x_i * x_j) )
-// Using SSE for speedup vector operation
+// Using SSE to accelerate vector operation.
 real_t FFMScore::CalcScore(const SparseRow* row,
                            Model& model,
                            real_t norm) {
   /*********************************************************
-   *  linear and bias term                                 *
+   *  linear term and bias term                            *
    *********************************************************/
   real_t sum_w = 0;
   real_t sqrt_norm = sqrt(norm);
@@ -82,14 +82,14 @@ real_t FFMScore::CalcScore(const SparseRow* row,
   return sum_v + sum_w;
 }
 
-// Calculate gradient and update current model
-// Using the SSE for speedup vector operation
+// Calculate gradient and update current model.
+// Using the SSE to accelerate vector operation.
 void FFMScore::CalcGrad(const SparseRow* row,
                         Model& model,
                         real_t pg,
                         real_t norm) {
   /*********************************************************
-   *  linear and bias term                                 *
+   *  linear term and bias term                            *
    *********************************************************/
   real_t sqrt_norm = sqrt(norm);
   real_t *w = model.GetParameter_w();
@@ -113,7 +113,7 @@ void FFMScore::CalcGrad(const SparseRow* row,
    *********************************************************/
   index_t align0 = 2 * model.get_aligned_k();
   index_t align1 = model.GetNumField() * align0;
-  int align = kAlign * 2;
+  index_t align = kAlign * 2;
   w = model.GetParameter_v();
   __m128 XMMpg = _mm_set1_ps(pg);
   __m128 XMMlr = _mm_set1_ps(learning_rate_);

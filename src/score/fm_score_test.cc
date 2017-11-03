@@ -31,7 +31,7 @@ This file tests the FMScore class.
 namespace xLearn {
 
 TEST(FMScoreTest, calc_score) {
-  for (int k = 1; k < 100; ++k) {
+  for (index_t k = 1; k < 100; ++k) {
     // Init hyper_param
     HyperParam param;
     param.learning_rate = 0.1;
@@ -71,7 +71,7 @@ TEST(FMScoreTest, calc_score) {
     }
     model.GetParameter_b()[0] = 0.0;
     FMScore score;
-    for (int i = 0; i < 10; ++i) {
+    for (size_t i = 0; i < 10; ++i) {
       real_t val = score.CalcScore(&row, model);
       EXPECT_FLOAT_EQ(val, 6+k*4*3);
     }

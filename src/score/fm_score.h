@@ -30,6 +30,7 @@ namespace xLearn {
 //------------------------------------------------------------------------------
 // FMScore is used to implemente factorization machines, in which
 // the socre function is y = sum( (V_i*V_j)(x_i * x_j) )
+// Here we leave out the linear term and bias term.
 //------------------------------------------------------------------------------
 class FMScore : public Score {
  public:
@@ -37,14 +38,14 @@ class FMScore : public Score {
   FMScore() { }
   ~FMScore() { }
 
-  // Given one exmaple and current model, and
-  // return the score
+  // Given one exmaple and current model, this method
+  // returns the fm score.
   real_t CalcScore(const SparseRow* row,
                    Model& model,
                    real_t norm = 1.0);
 
   // Calculate gradient and update current
-  // model parameters
+  // model parameters.
   void CalcGrad(const SparseRow* row,
                 Model& model,
                 real_t pg,

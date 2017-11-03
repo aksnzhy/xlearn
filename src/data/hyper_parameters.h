@@ -166,7 +166,7 @@ struct HyperParam {
           this->metric.compare("rmsd") == 0 ||
           this->metric.compare("mape") == 0) {
         err_info += "[Warning] The " + this->metric + " can only be used "
-                    "regression tasks. Change it to -x acc .\n";
+                    "in regression tasks. Change it to -x acc .\n";
         this->metric = "acc";
         bo = false;
       }
@@ -177,7 +177,7 @@ struct HyperParam {
           this->metric.compare("recall") == 0 ||
           this->metric.compare("f1") == 0) {
         err_info += "[Warning] The " + this->metric + " can only be used "
-                    "classification tasks. Change it to -x mae .\n";
+                    "in classification tasks. Change it to -x mae .\n";
         this->metric = "mae";
         bo = false;
       }

@@ -38,14 +38,14 @@ class LinearScore : public Score {
   LinearScore() { }
   ~LinearScore() { }
 
-  // Given one exmaple and current model, and
-  // return the linear score wTx
+  // Given one exmaple and current model, this method
+  // returns the linear score wTx.
   real_t CalcScore(const SparseRow* row,
                    Model& model,
                    real_t norm = 1.0);
 
   // Calculate gradient and update current
-  // model parameters
+  // model parameters.
   void CalcGrad(const SparseRow* row,
                 Model& model,
                 real_t pg,

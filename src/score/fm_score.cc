@@ -27,11 +27,12 @@ This file is the implementation of FMScore class.
 namespace xLearn {
 
 // y = sum( (V_i*V_j)(x_i * x_j) )
+// Using SSE to accelerate vector operation.
 real_t FMScore::CalcScore(const SparseRow* row,
                           Model& model,
                           real_t norm) {
   /*********************************************************
-   *  linear and bias term                                 *
+   *  linear term and bias term                            *
    *********************************************************/
   real_t sqrt_norm = sqrt(norm);
   real_t *w = model.GetParameter_w();
@@ -87,14 +88,14 @@ real_t FMScore::CalcScore(const SparseRow* row,
   return t_all;
 }
 
-// Calculate gradient and update current
-// model parameters
+// Calculate gradient and update current model parameters.
+// Using SSE to accelerate vector operation.
 void FMScore::CalcGrad(const SparseRow* row,
                        Model& model,
                        real_t pg,
                        real_t norm) {
   /*********************************************************
-   *  linear and bias term                                 *
+   *  linear term and bias term                            *
    *********************************************************/
   real_t sqrt_norm = sqrt(norm);
   real_t *w = model.GetParameter_w();

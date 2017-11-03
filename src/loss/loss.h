@@ -45,7 +45,7 @@ namespace xLearn {
 //   // Create a squared loss with linear score function, which
 //   // is usually used for linear regression.
 //   Loss* sq_loss = new SquaredLoss();
-//   sq_loss->Initialize(linear_score);
+//   sq_loss->Initialize(linear_score, pool);
 //
 //   // Then, we can perform gradient descent like this:
 //   DMatrix* matrix = NULL;
@@ -77,54 +77,32 @@ class Loss {
   virtual ~Loss() { }
 
   // This function needs to be invoked before using this class
-  void Initialize(Score* score, bool norm = true) {
+  void Initialize(Score* score, ThreadPool* pool, bool norm = true) {
+    CHECK_NOTNULL(score);
+    CHECK_NOTNULL(pool);
     score_func_ = score;
+    pool_ = pool;
     norm_ = norm;
-    threadNumber_ = std::thread::hardware_concurrency();
-    pool_ = new ThreadPool(threadNumber_);
+    threadNumber_ = pool_->ThreadNumber();
   }
 
-  // Given predictions and labels, return loss value
+  // Given predictions and labels, return loss value.
   virtual real_t Evalute(const std::vector<real_t>& pred,
                          const std::vector<real_t>& label) = 0;
 
-  // Given data sample and current model, return predictions
+  // Given data sample and current model, return predictions.
   virtual void Predict(const DMatrix* data_matrix,
                        Model& model,
                        std::vector<real_t>& pred);
 
   // Given data sample and current model, calculate gradient
-  // and update current model parameters
+  // and update current model parameters.
   virtual void CalcGrad(const DMatrix* data_matrix, Model& model) = 0;
 
   // Return a current loss type
   virtual inline std::string loss_type() = 0;
 
-  // The Sigmoid function, which mapping the output to 0~1
-  void Sigmoid(std::vector<real_t>& pred,
-               std::vector<real_t>& new_pred) {
-    CHECK_EQ(pred.size(), new_pred.size());
-    for (size_t i = 0; i < pred.size(); ++i) {
-      new_pred[i] = sigmoid(pred[i]);
-    }
-  }
-
-  // if pred[i] >= 0, new_pred -> 1
-  // else new_pred -> 0
-  void Sign(std::vector<real_t>& pred,
-            std::vector<real_t>& new_pred) {
-    CHECK_EQ(pred.size(), new_pred.size());
-    for (size_t i = 0; i < pred.size(); ++i) {
-      new_pred[i] = pred[i] >= 0 ? 1 : 0;
-    }
-  }
-
  protected:
-  // fast sigmoid function
-  inline real_t sigmoid(real_t x) {
-    return 1.0f / (1.0f + exp(-x));
-  }
-
   /* The score function, including LinearScore,
   FMScore, FFMScore, etc */
   Score* score_func_;
@@ -138,23 +116,6 @@ class Loss {
  private:
   DISALLOW_COPY_AND_ASSIGN(Loss);
 };
-
-// Get start and end index used in multi-thread training
-inline index_t getStart(index_t count, int total, int id) {
-  index_t gap = count / total;
-  index_t start_id = id * gap;
-  return start_id;
-}
-
-inline index_t getEnd(index_t count, int total, int id) {
-  index_t gap = count / total;
-  index_t remain = count % total;
-  index_t end_index = (id+1) * gap;
-  if (id == total-1) {
-    end_index += remain;
-  }
-  return end_index;
-}
 
 //------------------------------------------------------------------------------
 // Class register
@@ -173,6 +134,6 @@ CLASS_REGISTER_DEFINE_REGISTRY(xLearn_loss_registry, Loss);
       xLearn_loss_registry,                                 \
       format_name)
 
-} // namespace xLearn
+}  // namespace xLearn
 
-#endif // XLEARN_LOSS_LOSS_H_
+#endif  // XLEARN_LOSS_LOSS_H_

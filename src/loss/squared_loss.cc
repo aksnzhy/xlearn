@@ -23,25 +23,66 @@ This file is the implementation of SquaredLoss class.
 
 namespace xLearn {
 
-// Given predictions and labels, return squared loss value
+// Calculate loss in one thread.
+static void sq_evalute_thread(const std::vector<real_t>* pred,
+                              const std::vector<real_t>* label,
+                              real_t* tmp_sum,
+                              size_t start_idx,
+                              size_t end_idx) {
+  CHECK_GT(end_idx, start_idx);
+  *tmp_sum = 0;
+  for (size_t i = start_idx; i < end_idx; ++i) {
+    real_t error = (*label)[i] - (*pred)[i];
+    (*tmp_sum) += (error*error);
+  }
+  *tmp_sum *= 0.5;
+}
+
+//------------------------------------------------------------------------------
+// Calculate loss in multi-thread:
+//
+//                         master_thread
+//                      /       |         \
+//                     /        |          \
+//                thread_1    thread_2    thread_3
+//                   |           |           |
+//                    \          |           /
+//                     \         |          /
+//                       \       |        /
+//                         master_thread
+//------------------------------------------------------------------------------
 real_t SquaredLoss::Evalute(const std::vector<real_t>& pred,
                             const std::vector<real_t>& label) {
-  CHECK_EQ(pred.empty(), false);
+  CHECK_NE(pred.empty(), true);
+  CHECK_NE(label.empty(), true);
   real_t val = 0.0;
-  for (size_t i = 0; i < pred.size(); ++i) {
-    real_t error = label[i] - pred[i];
-    val += (error*error);
+  // multi-thread training
+  std::vector<real_t> sum(threadNumber_, 0);
+  for (int i = 0; i < threadNumber_; ++i) {
+    size_t start_idx = getStart(pred.size(), threadNumber_, i);
+    size_t end_idx = getEnd(pred.size(), threadNumber_, i);
+    pool_->enqueue(std::bind(sq_evalute_thread,
+                             &pred,
+                             &label,
+                             &(sum[i]),
+                             start_idx,
+                             end_idx));
   }
-  return val * 0.5;
+  // Wait all of the threads finish their job
+  pool_->Sync();
+  for (size_t i = 0; i < sum.size(); ++i) {
+    val += sum[i];
+  }
+  return val;
 }
 
 // Calculate gradient in one thread
-void squared_thread(const DMatrix* matrix,
-                    Model* model,
-                    Score* score_func,
-                    bool is_norm,
-                    index_t start,
-                    index_t end) {
+void sq_gradient_thread(const DMatrix* matrix,
+                        Model* model,
+                        Score* score_func,
+                        bool is_norm,
+                        index_t start,
+                        index_t end) {
   CHECK_GT(end, start);
   for (size_t i = start; i < end; ++i) {
     SparseRow* row = matrix->row[i];
@@ -75,7 +116,7 @@ void SquaredLoss::CalcGrad(const DMatrix* matrix,
   for (int i = 0; i < threadNumber_; ++i) {
     size_t start = getStart(row_len, threadNumber_, i);
     size_t end = getEnd(row_len, threadNumber_, i);
-    pool_->enqueue(std::bind(squared_thread,
+    pool_->enqueue(std::bind(sq_gradient_thread,
                              matrix,
                              &model,
                              score_func_,
@@ -83,6 +124,7 @@ void SquaredLoss::CalcGrad(const DMatrix* matrix,
                              start,
                              end));
   }
+  // Wait all of the threads finish their job
   pool_->Sync();
 }
 

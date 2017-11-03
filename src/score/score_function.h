@@ -40,8 +40,8 @@ namespace xLearn {
 // pass its pointer to a Loss class like this:
 //
 //  Score* score = new FMScore();
-//  score->CalcScore(row, model);
-//  score->CalcGrad(row, model, pg);
+//  score->CalcScore(row, model, norm);
+//  score->CalcGrad(row, model, pg, norm);
 //
 // In general, the CalcGrad() will be used in loss function.
 //------------------------------------------------------------------------------
@@ -51,15 +51,15 @@ class Score {
   Score() { }
   virtual ~Score() { }
 
-  // Invoke this function before we use this class
+  // Invoke this function before we use this class.
   virtual void Initialize(real_t learning_rate,
                           real_t regu_lambda) {
     learning_rate_ = learning_rate;
     regu_lambda_ = regu_lambda;
   }
 
-  // Given one exmaple and current model, and
-  // return the score
+  // Given one exmaple and current model, this method
+  // returns the score
   virtual real_t CalcScore(const SparseRow* row,
                            Model& model,
                            real_t norm = 1.0) = 0;
