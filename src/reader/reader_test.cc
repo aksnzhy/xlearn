@@ -39,9 +39,7 @@ const string kStrFFM = "1 1:1:0.123 1:1:0.123 1:1:0.123\n";
 const string kStrCSV = "0.123 0.123 0.123 0\n";
 const string kStrNoy = "1:0.123 1:0.123 1:0.123\n";
 const string kStrFFMNoy = "1:1:0.123 1:1:0.123 1:1:0.123\n";
-//const index_t kFeatureNum = 3;
 const index_t kNumLines = 100000;
-const index_t kNumSamples = 200;
 const int iteration_num = 10;
 
 void write_data(const std::string& filename,
@@ -100,7 +98,7 @@ void delete_file() {
 
 void CheckLR(const DMatrix* matrix, bool has_label, bool disk) {
   if (disk) {
-    EXPECT_EQ(matrix->row_length, kNumSamples);
+    EXPECT_EQ(matrix->row_length, kNumLines);
   } else {
     EXPECT_EQ(matrix->row_length, kNumLines);
   }
@@ -127,7 +125,7 @@ void CheckLR(const DMatrix* matrix, bool has_label, bool disk) {
 
 void CheckFFM(const DMatrix* matrix, bool has_label, bool disk) {
   if (disk) {
-    EXPECT_EQ(matrix->row_length, kNumSamples);
+    EXPECT_EQ(matrix->row_length, kNumLines);
   } else {
     EXPECT_EQ(matrix->row_length, kNumLines);
   }
@@ -154,7 +152,7 @@ void CheckFFM(const DMatrix* matrix, bool has_label, bool disk) {
 
 void CheckCSV(const DMatrix* matrix, bool disk) {
   if (disk) {
-    EXPECT_EQ(matrix->row_length, kNumSamples);
+    EXPECT_EQ(matrix->row_length, kNumLines);
   } else {
     EXPECT_EQ(matrix->row_length, kNumLines);
   }
@@ -175,7 +173,7 @@ void CheckCSV(const DMatrix* matrix, bool disk) {
 
 void read_from_memory(const std::string& filename, int task_id) {
   InmemReader reader;
-  reader.Initialize(filename, kNumSamples);
+  reader.Initialize(filename);
   DMatrix* matrix = nullptr;
   for (int i = 0; i < iteration_num; ++i) {
     int record_num = reader.Samples(matrix);

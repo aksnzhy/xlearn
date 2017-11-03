@@ -38,9 +38,9 @@ REGISTER_READER("memory", InmemReader);
 REGISTER_READER("disk", OndiskReader);
 
 // Check current file format and
-// return 'libsvm', 'libffm', or 'csv'
+// return 'libsvm', 'libffm', or 'csv'.
 // This function will also check if current
-// data has the label y
+// data has the label y.
 std::string Reader::check_file_format() {
   FILE* file = OpenFileOrDie(filename_.c_str(), "r");
   // get the first line of data
@@ -79,20 +79,18 @@ std::string Reader::check_file_format() {
 // Implementation of InmemReader
 //------------------------------------------------------------------------------
 
-// Pre-load all the data into memory buffer (data_buf)
-// Note that this funtion will first check whether we can use
-// the binary file. If not, reader will generate one automatically
-void InmemReader::Initialize(const std::string& filename,
-                             int num_samples) {
+// Pre-load all the data into memory buffer (data_buf_).
+// Note that this funtion will first check whether we 
+// can use the existing binary file. If not, reader will 
+// generate one automatically.
+void InmemReader::Initialize(const std::string& filename) {
   CHECK_NE(filename.empty(), true)
-  CHECK_GE(num_samples, 0);
   filename_ = filename;
-  num_samples_ = num_samples;
   printf("First check if the text file (%s) has been already "
          "converted to binary format \n", filename.c_str());
   // HashBinary() will read the first two hash value
   // and then check it whether equal to the hash value generated
-  // by HashFile() function from current txt file
+  // by HashFile() function from current txt file.
   if (hash_binary(filename_)) {
     printf("Binary file found. Skip converting text to binary \n");
     filename_ += ".bin";
@@ -104,12 +102,12 @@ void InmemReader::Initialize(const std::string& filename,
   }
 }
 
-// Check wheter current path has a binary file
-// We use double check here. We first check a the hash value
-// of a small data block, then check the all file.
+// Check wheter current path has a binary file.
+// We use double check here, that is, we first check 
+// the hash value of a small data block, then check the whole file.
 bool InmemReader::hash_binary(const std::string& filename) {
   std::string bin_file = filename + ".bin";
-  // If the ".bin" file does not exists, return false
+  // If the ".bin" file does not exists, return false.
   if (!FileExist(bin_file.c_str())) { return false; }
   FILE* file = OpenFileOrDie(bin_file.c_str(), "r");
   // Check the first hash value
@@ -130,79 +128,54 @@ bool InmemReader::hash_binary(const std::string& filename) {
   return true;
 }
 
-// In-memory Reader can be initialized from binary file
+// In-memory Reader can be initialized from binary file.
 void InmemReader::init_from_binary() {
-  /*********************************************************
-   *  Step 1: Init data_buf_                               *
-   *********************************************************/
+  // Init data_buf_                               
   data_buf_.Deserialize(filename_);
   has_label_ = data_buf_.has_label;
-  /*********************************************************
-   *  Step 3: Init data_samples_                           *
-   *********************************************************/
-  // For in-memory Reader, the size of data sample is
-  // equals to the size of data buffer
+  // Init data_samples_
   num_samples_ = data_buf_.row_length;
   data_samples_.ResetMatrix(num_samples_);
-  /*********************************************************
-   *  Step 3: Init order_                                  *
-   *********************************************************/
+  // for shuffle
   order_.resize(num_samples_);
   for (int i = 0; i < order_.size(); ++i) {
     order_[i] = i;
   }
-  random_shuffle(order_.begin(), order_.end());
 }
 
-// Pre-load all the data to memory buffer from txt file
+// Pre-load all the data to memory buffer from txt file.
 void InmemReader::init_from_txt() {
-  /*********************************************************
-   *  Step 1: Init parser_                                 *
-   *********************************************************/
+  // Init parser_                                 
   parser_ = CreateParser(check_file_format().c_str());
   if (has_label_) parser_->setLabel(true);
   else parser_->setLabel(false);
-  /*********************************************************
-   *  Step 2: Init data_buf_                               *
-   *********************************************************/
+  // Init data_buf_
   char* buffer = nullptr;
   uint64 file_size = ReadFileToMemory(filename_, &buffer);
-  printf("%s", PrintSize(file_size).c_str());
   parser_->Parse(buffer, file_size, data_buf_);
   data_buf_.SetHash(HashFile(filename_, true),
                     HashFile(filename_, false));
   data_buf_.has_label = has_label_;
-  /*********************************************************
-   *  Step 3: Init data_samples_                           *
-   *********************************************************/
+  // Init data_samples_ 
   num_samples_ = data_buf_.row_length;
   data_samples_.ResetMatrix(num_samples_, has_label_);
-  /*********************************************************
-   *  Step 4: order_                                       *
-   *********************************************************/
+  // for shuffle
   order_.resize(num_samples_);
   for (int i = 0; i < order_.size(); ++i) {
     order_[i] = i;
   }
-  random_shuffle(order_.begin(), order_.end());
-  /*********************************************************
-   *  Step 5: Deserialize in-memory buffer to disk file    *
-   *********************************************************/
+  // Deserialize in-memory buffer to disk file.
   std::string bin_file = filename_ + ".bin";
-  this->serialize_buffer(bin_file);
-  /*********************************************************
-   *  Step 6: Finalize                                     *
-   *********************************************************/
+  data_buf_.Serialize(bin_file);
   delete [] buffer;
 }
 
 // Smaple data from memory buffer.
-int InmemReader::Samples(DMatrix* &matrix, bool shuffle) {
-  int num_line = 0;
+index_t InmemReader::Samples(DMatrix* &matrix) {
   for (int i = 0; i < num_samples_; ++i) {
     if (pos_ >= data_buf_.row_length) {
       // End of the data buffer
-      if (i == 0 && shuffle) {
+      if (i == 0 && shuffle_) {
         random_shuffle(order_.begin(), order_.end());
         matrix = nullptr;
         return 0;
@@ -214,35 +187,24 @@ int InmemReader::Samples(DMatrix* &matrix, bool shuffle) {
     data_samples_.Y[i] = data_buf_.Y[order_[pos_]];
     data_samples_.norm[i] = data_buf_.norm[order_[pos_]];
     pos_++;
-    num_line++;
   }
-  data_samples_.row_length = num_line;
   matrix = &data_samples_;
-  return num_line;
+  return num_samples_;
 }
 
 // Return to the begining of the data buffer.
 void InmemReader::Reset() { pos_ = 0; }
 
-// Serialize DMatrix to a binary file
-void InmemReader::serialize_buffer(const std::string& filename) {
-  data_buf_.Serialize(filename);
-}
-
 //------------------------------------------------------------------------------
 // Implementation of OndiskReader.
 //------------------------------------------------------------------------------
 
-void OndiskReader::Initialize(const std::string& filename,
-                              int num_samples) {
-}
+void OndiskReader::Initialize(const std::string& filename) { }
 
 // Sample data from disk file.
-int OndiskReader::Samples(DMatrix* &matrix, bool shuffle) {
-  return 0;
-}
+index_t OndiskReader::Samples(DMatrix* &matrix) { return 0; }
 
 // Return to the begining of the file.
-void OndiskReader::Reset() {}
+void OndiskReader::Reset() { }
 
 }  // namespace xLearn

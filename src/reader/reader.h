@@ -38,7 +38,7 @@ namespace xLearn {
 //------------------------------------------------------------------------------
 // Reader is an abstract class which can be implemented in different way,
 // such as the InmemReader that reads data from memory, and the OndiskReader
-// that reads data from disk file (for limited memory).
+// that reads data from disk file for large-scale machine learning.
 //
 // We can use the Reader class like this (Pseudo code):
 //
@@ -47,16 +47,23 @@ namespace xLearn {
 //   /* or new InmemReader() */
 //   Reader* reader = new OndiskReader();
 //
+//   /* For in-memory Reader, the buffer_size (MB) will not be used */
+//   /* For on-disk Reader, the shuffle will always be false */
+//  
 //   reader->Initialize(filename = "/tmp/testdata",
-//                      num_samples = 20000);  // size of the working set
-//
+//                      buffer_size = 200,
+//                      shuffle = false);
+//  
+//   DMatrix* matrix = nullptr;
+// 
 //   Loop {
 //
-//      int num_samples = reader->Sample(DMatrix);
+//      size_t num_samples = reader->Sample(DMatrix);
 //
 //      /* The reader will return 0 when reaching the end of
 //      data source, and then we can invoke Reset() to return
 //      to the begining of data */
+//  
 //      if (num_samples == 0) {
 //        reader->Reset()
 //      }
@@ -66,7 +73,7 @@ namespace xLearn {
 //   }
 //
 // For now, the Reader can parse three kinds of file format, including
-// libsvm format, libffm format, and CSV format.
+// the libsvm format, the libffm format, and the CSV format.
 //------------------------------------------------------------------------------
 class Reader {
  public:
@@ -75,41 +82,38 @@ class Reader {
   virtual ~Reader() {  }
 
   // We need to invoke the Initialize() function before
-  // we start to sample data
-  virtual void Initialize(const std::string& filename,
-                          int num_samples) = 0;
+  // we start to sample data. We can shuffle data before 
+  // training, and this is good for SGD.
+  virtual void Initialize(const std::string& filename) = 0;
 
-  // Sample data from disk or from memory buffer
-  // Return the number of record in each samplling
-  // Samples() return 0 when reaching end of the data
-  // We can shuffle data randomly, this is good for SGD
-  virtual int Samples(DMatrix* &matrix, bool shuffle = true) = 0;
+  // Sample data from disk or from memory buffer.
+  // Return the number of record in each samplling.
+  // Samples() will return 0 when reaching end of the data.
+  virtual index_t Samples(DMatrix* &matrix) = 0;
 
-  // Return to the begining of the data
+  // Return to the begining of the data.
   virtual void Reset() = 0;
 
-  // If current dataset has label y
+  // Wether current dataset has label y ?
   bool inline has_label() { return has_label_; }
 
  protected:
   /* Input file name */
   std::string filename_;
-  /* Number of data samples in working set */
-  int num_samples_;
-  /* Data sample */
+  /* Sample() returns this data sample */
   DMatrix data_samples_;
   /* Parser for a block of memory buffer */
   Parser* parser_;
-  /* If this data has label y?
+  /* If this data has label y ?
   This value will be set automitically
   in initialization */
   bool has_label_;
 
   // Check current file format and return
   // "libsvm", "ffm", or "csv".
-  // Program crashes for unknow format
+  // Program crashes for unknow format.
   // This function will also check if current
-  // data has the label y
+  // data has the label y.
   std::string check_file_format();
 
   // Create parser for different file format
@@ -124,46 +128,51 @@ class Reader {
 //------------------------------------------------------------------------------
 // Sampling data from memory buffer.
 // For in-memory smaplling, the Reader will automatically convert
-// txt data to binary data, and use this binary data in the next time.
-// Reader will randomly shuffle the data during samplling.
+// txt data to binary data, and uses this binary data in the next time.
 //------------------------------------------------------------------------------
 class InmemReader : public Reader {
  public:
-  InmemReader() { pos_ = 0; }
+  // Constructor and Destructor
+  InmemReader() 
+   : pos_(0),
+     shuffle_(false) { }
   ~InmemReader() { }
 
-  // Pre-load all the data into memory buffer
-  // The num_samples will be setted to the line size
-  // of current data automatically
-  virtual void Initialize(const std::string& filename,
-                          int num_samples = 0);
+  // Pre-load all the data into memory buffer.
+  virtual void Initialize(const std::string& filename);
 
-  // Sample data from the memory buffer
-  virtual int Samples(DMatrix* &matrix, bool shuffle = true);
+  // If shuffle data ?
+  virtual void inline SetShuffle(bool shuffle) {
+    shuffle_ = shuffle;
+  }
 
-  // Return to the begining of the data
+  // Sample data from the memory buffer.
+  virtual index_t Samples(DMatrix* &matrix);
+
+  // Return to the begining of the data.
   virtual void Reset();
 
  protected:
-  /* Reader will load all the data
+  /* Reader will load all the data 
   into this buffer */
   DMatrix data_buf_;
+  /* Number of record at each samplling */
+  index_t num_samples_;
   /* Position for samplling */
   index_t pos_;
   /* For random shuffle */
   std::vector<index_t> order_;
+  /* If shuffle data ? */
+  bool shuffle_;
 
-  // Check wheter current path has a binary file
+  // Check wheter current path has a binary file.
   bool hash_binary(const std::string& filename);
 
-  // Initialize Reader from existing binary file
+  // Initialize Reader from existing binary file.
   void init_from_binary();
 
-  // Initialize Reader from a new txt file
+  // Initialize Reader from a new txt file.
   void init_from_txt();
-
-  // Serialize in-memory buffer to disk file
-  void serialize_buffer(const std::string& filename);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(InmemReader);
@@ -172,20 +181,20 @@ class InmemReader : public Reader {
 //------------------------------------------------------------------------------
 // Samplling data from disk file.
 // OndiskReader is used to train very big data, which cannot be
-// loaded into main memory of current single machine.
-// We use multi-thread to support data pipeline reading for
-// better performance
+// loaded into main memory of current single machine. We use multi-thread 
+// to support data pipeline reading to accelerate reading.
 //------------------------------------------------------------------------------
 class OndiskReader : public Reader {
  public:
   OndiskReader() {  }
   ~OndiskReader() { }
 
-  virtual void Initialize(const std::string& filename,
-                          int num_samples);
+  // Create new thread as back-thread, which will read 
+  // and parse data asynchrously.
+  virtual void Initialize(const std::string& filename);
 
   // Sample data from disk file
-  virtual int Samples(DMatrix* &matrix, bool shuffle = true);
+  virtual index_t Samples(DMatrix* &matrix);
 
   // Return to the begining of the file
   virtual void Reset();

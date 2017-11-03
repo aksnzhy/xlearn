@@ -69,11 +69,8 @@ struct HyperParam {
   /* Number of epoch. 
   This value could be changed in early-stop */
   int num_epoch = 10;
-  /* Sample size for each working set, and
-  reader->Samples() will return this value to user in 
-  on-disk training. Note that in in-memory training, xlearn 
-  will always samples the whole dataset at each epoch */
-  int sample_size = 20000;
+  /* Size (MB) of memory buffer for on-disk training */
+  int working_set = 200;
   /* True for using instance-wise 
   normalization, and False for not */
   bool norm = true;

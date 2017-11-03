@@ -60,19 +60,19 @@ class Parser {
   Parser() { }
   virtual ~Parser() {  }
 
-  // This dataset contains label y
+  // Wether this dataset contains label y ?
   inline void setLabel(bool label) {
     has_label_ = label;
   }
 
-  // The real parse function invoked by user
+  // The real parse function invoked by users.
   virtual void Parse(char* buf, uint64 size, DMatrix& matrix) = 0;
 
  protected:
-   // Get how many lines in current memory buffer
+   // Get how many lines in current memory buffer.
    index_t get_line_number(char* buf, uint64 size);
 
-   // Get one line from memory buffer
+   // Get one line from memory buffer.
    uint64 get_line_from_buffer(char* line,
                          char* buf,
                          uint64 pos,
