@@ -60,6 +60,7 @@ TEST(AccMetricTest, acc_test) {
   metric.Accumulate(Y, pred);
   metric_val = metric.GetMetric();
   EXPECT_FLOAT_EQ(metric_val, (1.0 / 4.0));
+  EXPECT_EQ(metric.metric_type(), "Accuarcy");
 }
 
 TEST(PrecMetricTest, prec_test) {
@@ -92,6 +93,7 @@ TEST(PrecMetricTest, prec_test) {
   metric.Accumulate(Y, pred);
   metric_val = metric.GetMetric();
   EXPECT_FLOAT_EQ(metric_val, (1.0 / 3.0));
+  EXPECT_EQ(metric.metric_type(), "Precision");
 }
 
 TEST(RecallMetricTest, recall_test) {
@@ -124,6 +126,7 @@ TEST(RecallMetricTest, recall_test) {
   metric.Accumulate(Y, pred);
   metric_val = metric.GetMetric();
   EXPECT_FLOAT_EQ(metric_val, (1.0 / 2.0));
+  EXPECT_EQ(metric.metric_type(), "Recall");
 }
 
 TEST(F1MetricTest, f1_test) {
@@ -156,6 +159,7 @@ TEST(F1MetricTest, f1_test) {
   metric.Accumulate(Y, pred);
   metric_val = metric.GetMetric();
   EXPECT_FLOAT_EQ(metric_val, (2.0 / 4.0));
+  EXPECT_EQ(metric.metric_type(), "F1");
 }
 
 TEST(MAEMetricTest, mae_test) {
@@ -188,6 +192,7 @@ TEST(MAEMetricTest, mae_test) {
   metric.Accumulate(Y, pred);
   metric_val = metric.GetMetric();
   EXPECT_FLOAT_EQ(metric_val, 12.5);
+  EXPECT_EQ(metric.metric_type(), "MAE");
 }
 
 TEST(MAPEMetricTest, mape_test) {
@@ -220,26 +225,27 @@ TEST(MAPEMetricTest, mape_test) {
   metric.Accumulate(Y, pred);
   metric_val = metric.GetMetric();
   EXPECT_FLOAT_EQ(metric_val, 0.478260869);
+  EXPECT_EQ(metric.metric_type(), "MAPE");
 }
 
-TEST(RSMDMetricTest, rsmd_test) {
+TEST(RMSDMetricTest, rsmd_test) {
   std::vector<real_t> Y;
-  Y.push_back(12);
-  Y.push_back(12);
-  Y.push_back(12);
-  Y.push_back(12);
+  Y.push_back(2);
+  Y.push_back(2);
+  Y.push_back(2);
+  Y.push_back(2);
   std::vector<real_t> pred;
-  pred.push_back(11);
-  pred.push_back(11);
-  pred.push_back(11);
-  pred.push_back(11);
-  MAPEMetric metric;
+  pred.push_back(1);
+  pred.push_back(1);
+  pred.push_back(1);
+  pred.push_back(1);
+  RMSDMetric metric;
   size_t threadNumber = std::thread::hardware_concurrency();
   ThreadPool* pool = new ThreadPool(threadNumber);
   metric.Initialize(pool);
   metric.Accumulate(Y, pred);
   real_t metric_val = metric.GetMetric();
-  EXPECT_FLOAT_EQ(metric_val, sqrt(0.006944444444));
+  EXPECT_FLOAT_EQ(metric_val, 1.0);
   metric.Reset();
   Y[0] = 23;
   Y[1] = 23;
@@ -251,7 +257,24 @@ TEST(RSMDMetricTest, rsmd_test) {
   pred[3] = 12;
   metric.Accumulate(Y, pred);
   metric_val = metric.GetMetric();
-  EXPECT_FLOAT_EQ(metric_val, sqrt(0.228733459357));
+  EXPECT_FLOAT_EQ(metric_val, sqrt(121));
+  EXPECT_EQ(metric.metric_type(), "RMSD");
+}
+
+Metric* CreateMetric(const char* format_name) {
+  return CREATE_METRIC(format_name);
+}
+
+TEST(MetricTest, Create_Metric) {
+  EXPECT_TRUE(CreateMetric("acc") != NULL);
+  EXPECT_TRUE(CreateMetric("prec") != NULL);
+  EXPECT_TRUE(CreateMetric("recall") != NULL);
+  EXPECT_TRUE(CreateMetric("f1") != NULL);
+  EXPECT_TRUE(CreateMetric("mae") != NULL);
+  EXPECT_TRUE(CreateMetric("mape") != NULL);
+  EXPECT_TRUE(CreateMetric("rmsd") != NULL);
+  EXPECT_TRUE(CreateMetric("") == NULL);
+  EXPECT_TRUE(CreateMetric("unknow_name") == NULL);
 }
 
 }  // namespace xLearn

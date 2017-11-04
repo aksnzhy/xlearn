@@ -40,9 +40,10 @@ of the xLearn.
 
 namespace xLearn {
 //------------------------------------------------------------------------------
-// Solver is entry class of xLearn, which can perform training or inference
-// tasks. There are three important functions in this class, including the
-// Initialize(), StartWork(), and Finalize() funtions.
+// Solver is entry class of xLearn, which can perform training 
+// or prediction tasks. There are three important functions in this 
+// class, including the Initialize(), StartWork(), and Finalize() funtions.
+// 
 // We can use Solver class like this:
 //
 //  xLearn::Solver solver;
@@ -63,25 +64,32 @@ class Solver {
 
   // Initialize the xLearn environment, including checking
   // and parsing the commad line arguments, reading problem
-  // (training data or testing data), and create model parameters
+  // (training data or testing data), initialize model, loss, 
+  // metric, and score functions, etc.
   void Initialize(int argc, char* argv[]);
 
-  // Start a training task or start an inference task
+  // Start a training task or start an inference task.
   void StartWork();
 
-  // Finalize the xLearn environment
+  // Finalize the xLearn environment.
   void FinalizeWork();
 
  protected:
-  // Main classes used by Solver
+  /* Global hyper-parameters */
   xLearn::HyperParam hyper_param_;
+  /* Check the user input */
   xLearn::Checker checker_;
+  /* Global model parameters */
   xLearn::Model *model_;
-  /* One Reader corresponds one file */
+  /* One Reader corresponds one data file */
   std::vector<xLearn::Reader*> reader_;
+  /* Split file in cross-validation */
   xLearn::FileSpliter splitor_;
+  /* linear, fm or ffm ? */
   xLearn::Score* score_;
+  /* cross-entropy or squared ? */
   xLearn::Loss* loss_;
+  /* acc, prec, recall, mae, etc */
   xLearn::Metric* metric_;
 
   // Create object by name
@@ -90,32 +98,22 @@ class Solver {
   xLearn::Loss* create_loss();
   xLearn::Metric* create_metric();
 
+  // xLearn command line logo
+  void print_logo() const;
+
   // Initialize function
   void init_train();
   void init_predict();
-  void checker(int argc, char* argv[]);
   void init_log();
+  void checker(int argc, char* argv[]);
 
   // Start function
   void start_train_work();
-  void start_inference_work();
+  void start_prediction_work();
 
   // Finalize funcrion
   void finalize_train_work();
-  void finalize_inference_work();
-
-  // Read problem and set the feature size and field size
-  index_t find_max_feature(DMatrix* matrix, int num_samples);
-  index_t find_max_field(DMatrix* matrix, int num_samples);
-
-  // Used by log file suffix
-  std::string get_host_name();
-  std::string get_user_name();
-  std::string print_current_time();
-  std::string get_log_file();
-
-  // xLearn command line logo
-  void print_logo() const;
+  void finalize_prediction_work();
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Solver);

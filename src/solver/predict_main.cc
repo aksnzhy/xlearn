@@ -22,14 +22,17 @@ This file is the entry for prediction of the xLearn.
 
 #include "src/base/common.h"
 #include "src/solver/solver.h"
+#include "src/base/timer.h"
+#include "src/base/format_print.h"
+#include "src/base/stringprintf.h"
 
 //------------------------------------------------------------------------------
 // The pre-defined main function
 //------------------------------------------------------------------------------
 
 int main(int argc, char* argv[]) {
-  clock_t start, end;
-  start = clock();
+  Timer timer;
+  timer.tic();
 
   xLearn::Solver solver;
   solver.SetPredict();
@@ -37,9 +40,7 @@ int main(int argc, char* argv[]) {
   solver.StartWork();
   solver.FinalizeWork();
 
-  end = clock();
-  printf("Total time cost: %.2f sec",
-         (float)(end-start) / CLOCKS_PER_SEC);
+  print_block(StringPrintf("%.2f", timer.toc()));
 
   return 0;
 }

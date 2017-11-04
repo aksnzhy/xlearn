@@ -20,9 +20,13 @@ Author: Chao Ma (mctt90@gmail.com)
 This file is the entry for training of the xLearn.
 */
 
+#include <string>
+
 #include "src/base/common.h"
 #include "src/solver/solver.h"
 #include "src/base/timer.h"
+#include "src/base/format_print.h"
+#include "src/base/stringprintf.h"
 
 //------------------------------------------------------------------------------
 // The pre-defined main function
@@ -38,10 +42,7 @@ int main(int argc, char* argv[]) {
   solver.StartWork();
   solver.FinalizeWork();
 
-  real_t time_cost = timer.toc();
-  printf("------------------------------\n");
-  printf("| Total time cost: %.2f sec |\n", time_cost);
-  printf("------------------------------\n");
+  print_block(StringPrintf("%.2f", timer.toc()));
 
   return 0;
 }

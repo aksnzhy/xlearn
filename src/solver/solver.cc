@@ -21,9 +21,6 @@ This file is the implementation of the Solver class.
 
 #include "src/solver/solver.h"
 
-#include <sys/utsname.h>
-#include <unistd.h>
-
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -33,6 +30,7 @@ This file is the implementation of the Solver class.
 #include "src/base/stringprintf.h"
 #include "src/base/split_string.h"
 #include "src/base/timer.h"
+#include "src/base/system.h"
 
 namespace xLearn {
 
@@ -62,7 +60,56 @@ void Solver::print_logo() const {
 }
 
 /******************************************************************************
- * Functions for xlearn initialization                                        *
+ * Creater functions                                                          *
+ ******************************************************************************/
+
+// Create Reader by a given string
+Reader* Solver::create_reader() {
+  Reader* reader;
+  std::string str = hyper_param_.on_disk ? "disk" : "memory";
+  reader = CREATE_READER(str.c_str());
+  if (reader == nullptr) {
+    LOG(ERROR) << "Cannot create reader: " << str;
+  }
+  return reader;
+}
+
+// Create Score by a given string
+Score* Solver::create_score() {
+  Score* score;
+  score = CREATE_SCORE(hyper_param_.score_func.c_str());
+  if (score == nullptr) {
+    LOG(ERROR) << "Cannot create score: "
+               << hyper_param_.score_func;
+  }
+  return score;
+}
+
+// Create Loss by a given string
+Loss* Solver::create_loss() {
+  Loss* loss;
+  loss = CREATE_LOSS(hyper_param_.loss_func.c_str());
+  if (loss == nullptr) {
+    LOG(ERROR) << "Cannot create loss: "
+               << hyper_param_.loss_func;
+  }
+  return loss;
+}
+
+// Create Metric by a given string
+Metric* Solver::create_metric() {
+  Metric* metric;
+  metric = CREATE_METRIC(hyper_param_.metric.c_str());
+  if (metric == nullptr) {
+    LOG(ERROR) << "Cannot create metric: "
+               << hyper_param_.metric;
+  }
+  return metric;
+}
+
+
+/******************************************************************************
+ * Functions for xlearn initialize                                            *
  ******************************************************************************/
 
 // Initialize Solver
@@ -368,7 +415,7 @@ void Solver::start_train_work() {
 }
 
 // Inference
-void Solver::start_inference_work() {
+void Solver::start_prediction_work() {
   printf("Start to predict ...\n");
   Predictor pdc;
   pdc.Initialize(reader_[0],
@@ -396,7 +443,7 @@ void Solver::finalize_train_work() {
   LOG(INFO) << "Finalize training work.";
 }
 
-void Solver::finalize_inference_work() {
+void Solver::finalize_prediction_work() {
   LOG(INFO) << "Finalize inference work.";
 }
 
@@ -404,118 +451,6 @@ void Solver::finalize_inference_work() {
  * The other helper functions                                                 *
  ******************************************************************************/
 
-// Create Reader by a given string
-Reader* Solver::create_reader() {
-  Reader* reader;
-  std::string str = hyper_param_.on_disk ? "disk" : "memory";
-  reader = CREATE_READER(str.c_str());
-  if (reader == NULL) {
-    LOG(ERROR) << "Cannot create reader: " << str;
-  }
-  return reader;
-}
 
-// Create Score by a given string
-Score* Solver::create_score() {
-  Score* score;
-  score = CREATE_SCORE(hyper_param_.score_func.c_str());
-  if (score == NULL) {
-    LOG(ERROR) << "Cannot create score: "
-               << hyper_param_.score_func;
-  }
-  return score;
-}
-
-// Create Loss by a given string
-Loss* Solver::create_loss() {
-  Loss* loss;
-  loss = CREATE_LOSS(hyper_param_.loss_func.c_str());
-  if (loss == NULL) {
-    LOG(ERROR) << "Cannot create loss: "
-               << hyper_param_.loss_func;
-  }
-  return loss;
-}
-
-// Create Metric
-Metric* Solver::create_metric() {
-  Metric* metric;
-  metric = new Metric;
-  return metric;
-}
-
-// Find max feature in a data matrix
-index_t Solver::find_max_feature(DMatrix* matrix, int num_samples) {
-  index_t res = 0;
-  for (int i = 0; i < num_samples; ++i) {
-    SparseRow* row = matrix->row[i];
-    for (SparseRow::const_iterator iter = row->begin();
-         iter != row->end(); ++iter) {
-      if (iter->feat_id > res) {
-        res = iter->feat_id;
-      }
-    }
-  }
-  return res;
-}
-
-// Find max field in a data matrix
-index_t Solver::find_max_field(DMatrix* matrix, int num_samples) {
-  index_t res = 0;
-  for (int i = 0; i < num_samples; ++i) {
-    SparseRow* row = matrix->row[i];
-    for (SparseRow::const_iterator iter = row->begin();
-         iter != row->end(); ++iter) {
-      if (iter->field_id > res) {
-        res = iter->field_id;
-      }
-    }
-  }
-  return res;
-}
-
-// Get host name
-std::string Solver::get_host_name() {
-  struct utsname buf;
-  if (0 != uname(&buf)) {
-    *buf.nodename = '\0';
-  }
-  return std::string(buf.nodename);
-}
-
-// Get user name
-std::string Solver::get_user_name() {
-  const char* username = getenv("USER");
-  return username != NULL ? username : getenv("USERNAME");
-}
-
-// Get current system time
-std::string Solver::print_current_time() {
-  time_t current_time = time(NULL);
-  struct tm broken_down_time;
-  CHECK(localtime_r(&current_time, &broken_down_time) == &broken_down_time);
-  return StringPrintf("%04d%02d%02d-%02d%02d%02d",
-                      1900 + broken_down_time.tm_year,
-                      1 + broken_down_time.tm_mon,
-                      broken_down_time.tm_mday,
-                      broken_down_time.tm_hour,
-                      broken_down_time.tm_min,
-                      broken_down_time.tm_sec);
-}
-
-// The log file name = base + host_name + username +
-//                     date_time + process_id
-std::string Solver::get_log_file() {
-  CHECK(!hyper_param_.log_file.empty());
-  std::string filename_prefix;
-  SStringPrintf(&filename_prefix,
-                "%s.%s.%s.%s.%u",
-                hyper_param_.log_file.c_str(),
-                get_host_name().c_str(),
-                get_user_name().c_str(),
-                print_current_time().c_str(),
-                getpid());
-  return filename_prefix;
-}
 
 } // namespace xLearn

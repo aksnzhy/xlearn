@@ -37,56 +37,65 @@ std::string Checker::option_help() const {
     return std::string(
 "----------------------------------------  Training task  -------------------------------------\n"
 "USAGE: \n"
-"     xlearn_train [ train_file_path ] [ OPTIONS ] \n"
-"                                                   \n"
+"     xlearn_train <train_file_path> [OPTIONS] \n"
+"                                                    \n"
+" e.g.,  xlearn_train train_data.txt -s 0 -t validate_data.txt -r 0.1 \n"
+"                                                                      \n"
 "OPTIONS: \n"
 "  -s <type> : Type of machine learning model (default 0) \n"
-"     for classification task \n"
-"         0 -- logistic regression (LR) \n"
-"         1 -- linear support vectors machine (linear SVM) \n"
-"         2 -- factorization machines (FM) \n"
-"         3 -- field-aware factorization machines (FFM) \n"
-"     for regression task \n"
-"         4 -- linear regression (LR) \n"
-"         5 -- factorization machines (FM) \n"
-"         6 -- field-aware factorization machines (FFM) \n"
+"     for classification task: \n"
+"         0 -- linear model (GLM) \n"
+"         1 -- factorization machines (FM) \n"
+"         2 -- field-aware factorization machines (FFM) \n"
+"     for regression task: \n"
+"         3 -- linear model (GLM) \n"
+"         4 -- factorization machines (FM) \n"
+"         5 -- field-aware factorization machines (FFM) \n"
 "                                                                            \n"
-"  -x <metric>          :  The metric can be 'acc', 'prec', 'recall', 'f1', 'auc' (classification), \n"
-"                          and 'mae', 'mape', 'rmsd' (regression). Using 'acc' - Accuracy by default. \n "
-"                          If we set this option to 'none', xlearn will not print any metric info. \n"
+"  -x <metric>          :  The evaluation metric can be 'acc', 'prec', 'recall', 'f1' (classification), \n"
+"                          and 'mae', 'mape', 'rmsd' (regression). xLearn uses the Accuracy (acc) by default. \n "
+"                          If we set this option to 'none', xLearn will not print any metric information. \n"
 "                                                                                              \n"
-"  -t <test_file_path>  :  Path of the test data file. This option will be empty by default, \n"
+"  -v <validate_file>   :  Path of the validation data file. This option will be empty by default, \n"
 "                          and in this way, the xLearn will not perform validation. \n"
 "                                                                                              \n"
-"  -m <model_file_path> :  Path of the model checkpoint file. Using './xlearn_model' by default. \n"
-"                          If we set this value to 'none', the xLearn will not dump the model \n"
-"                          checkpoint after the training. \n"
-"                                                              \n"
-"  -l <log_file_path>   :  Path of the log file. Using '/tmp/xlearn_log/' by default. \n"
-"                                                                                  \n"
-"  -k <number_of_K>     :  Number of the latent factor for fm and ffm tasks. Using 4 by default. \n"
-"                          Note that, because we use SSE, the memory should be aligned. \n"
+"  -m <model_file>      :  Path of the model checkpoint file. On default, the model file name will be. \n"
+"                          set to 'train_file' + '.model'. If we set this value to 'none', the xLearn will \n"
+"                          not dump the model checkpoint after training. \n"
+"                                                                             \n"
+"  -l <log_file>        :  Path of the log file. Using '/tmp/xlearn_log/' by default. \n"
+"                                                                                       \n"
+"  -k <number_of_K>     :  Number of the latent factor used by fm and ffm tasks. Using 4 by default. \n"
+"                          Note that, we will get the same model size when setting k to 1 and 4. \n"
+"                          This is because we use SSE instruction and the memory need to be aligned. \n"
+"                          So even you assign k = 1, we still fill some dummy zeros from k = 2 to 4. \n"
 "                                                                                         \n"
-"  -r <learning_rate>   :  Learning rate for gradient descent. Using 0.2 by default. \n"
+"  -r <learning_rate>   :  Learning rate for stochastic gradient descent. Using 0.2 by default. \n"
+"                          xLearn uses adaptive gradient descent (AdaGrad) for optimization problem, \n"
+"                          and the learning rate will be changed adaptively. \n"
 "                                                                                     \n"
-"  -b <lambda_for_regu> :  Lambda for regular. Using 0.00002 by default. We can disable the \n"
+"  -b <lambda_for_regu> :  Lambda for L2 regular. Using 0.00002 by default. We can disable the \n"
 "                          regular term by setting this value to 0.0 \n"
 "                                                                      \n"
-"  -u <model_scale>     :  Hyper param used for initialize model parameters. Using 0.66 by default. \n"
-"                                                                             \n"
-"  -e <epoch_number>    :  Number of epoch for training. Using 10 by default. \n"
-"                                                                              \n"
-"  -f <fold_number>     :  Number of folds for cross-validation. Using 5 by default. \n"
-"                                                                                   \n"
-"  --disk               :  Open on-disk training for limited memory. \n"
+"  -u <model_scale>     :  Hyper parameter used for initialize model parameters. \n"
+"                          Using 0.66 by default. \n"
+"                                                                                  \n"
+"  -e <epoch_number>    :  Number of epoch for training. Using 10 by default. Note that, xLearn will \n"
+"                          perform early-stopping by default, so this value is just a upper bound. \n"
+"                                                                                       \n"
+"  -f <fold_number>     :  Number of folds for cross-validation. Using 5 by default.      \n"
+"                                                                                      \n"
+"  --disk               :  Open on-disk training for large-scale machine learning problems. \n"
 "                                                                    \n"
 "  --cv                 :  Open cross-validation in training tasks. If we use this option, xLearn \n"
 "                          will ignore the validation file (-t).  \n"
 "                                                                   \n"
-"  --es                 :  Open early-stopping in training. \n"
-"                                                           \n"
-"  --no-norm            :  Disable instance-wise normalization.  \n"
-"                                                              \n"
+"  --dis-es             :  Disable early-stopping in training. By default, xLearn will use early-stopping \n"
+"                          in training tasks, except for training in cross-validation. \n"
+"                                                                                          \n"
+"  --no-norm            :  Disable instance-wise normalization. By default, xLearn will use \n"
+"                          instance-wise normalization for both training and prediction. \n"
+"                                                                  \n"
 "  --quiet              :  Don't print any evaluation information during the training and \n"
 "                          just train the model quietly. \n"
 "----------------------------------------------------------------------------------------------\n"
@@ -95,16 +104,15 @@ std::string Checker::option_help() const {
     return std::string(
 "-------------------------------------- Prediction task ---------------------------------------\n"
 "USAGE: \n"
-"     xlearn_predict [ predict_file_path ] [ options ] \n"
-"                                                     \n"
+"     xlearn_predict <test_file> <model_file> [OPTIONS] \n"
+"                                                         \n"
+" e.g.,  xlearn_train ./test_data.txt ./train_data.txt.model -o ./out.txt  \n"
+"                                                                           \n"
 "OPTIONS: \n"
-"  -m <model_file_path>  :  Path of the trained model file. \n"
-"                           Using './xlearn_model' by default. \n"
-"                                                               \n"
-"  -o <output_file_path> :  Path of the output file \n"
-"                           Using './xlearn_out' by default. \n"
+"  -o <output_file>     :  Path of the output file. On default, this value will be set \n"
+"                          to 'test_file' + '.out'     \n"
 "                                                             \n"
-"  -l <log_file_path>    :  Path of the log file. Using '/tmp/xlearn_log' by default. \n"
+"  -l <log_file_path>   :  Path of the log file. Using '/tmp/xlearn_log' by default. \n"
 "----------------------------------------------------------------------------------------------\n"
     );
   }
@@ -113,10 +121,10 @@ std::string Checker::option_help() const {
 // Initialize Checker
 void Checker::Initialize(bool is_train, int argc, char* argv[]) {
   is_train_ = is_train;
-  if (is_train_) {
+  if (is_train_) {  // for training
     menu_.push_back(std::string("-s"));
     menu_.push_back(std::string("-x"));
-    menu_.push_back(std::string("-t"));
+    menu_.push_back(std::string("-v"));
     menu_.push_back(std::string("-m"));
     menu_.push_back(std::string("-l"));
     menu_.push_back(std::string("-k"));
@@ -127,21 +135,20 @@ void Checker::Initialize(bool is_train, int argc, char* argv[]) {
     menu_.push_back(std::string("-f"));
     menu_.push_back(std::string("--disk"));
     menu_.push_back(std::string("--cv"));
-    menu_.push_back(std::string("--es"));
+    menu_.push_back(std::string("--dis-es"));
     menu_.push_back(std::string("--no-norm"));
     menu_.push_back(std::string("--quiet"));
-  } else {  // for Predict
-    menu_.push_back(std::string("-m"));
+  } else {  // for Prediction
     menu_.push_back(std::string("-o"));
     menu_.push_back(std::string("-l"));
   }
-  // Get the user input
+  // Get the user's input
   for (int i = 0; i < argc; ++i) {
     args_.push_back(std::string(argv[i]));
   }
 }
 
-// Check and parse user input
+// Check and parse user's input
 bool Checker::Check(HyperParam& hyper_param) {
   // Do not have any args
   if (args_.size() == 1) {
@@ -152,7 +159,7 @@ bool Checker::Check(HyperParam& hyper_param) {
   if (is_train_) {
     return check_train_options(hyper_param);
   } else {
-    return check_inference_options(hyper_param);
+    return check_prediction_options(hyper_param);
   }
 }
 
@@ -160,12 +167,12 @@ bool Checker::Check(HyperParam& hyper_param) {
 bool Checker::check_train_options(HyperParam& hyper_param) {
   bool bo = true;
   /*********************************************************
-   *  Check the file path of training data                 *
+   *  Check the file path of the training data             *
    *********************************************************/
   if (FileExist(args_[1].c_str())) {
     hyper_param.train_set_file = std::string(args_[1]);
   } else {
-    printf("[Error] Training data file: %s does not exist \n",
+    printf("[Error] Training data file: %s does not exist. \n",
            args_[1].c_str());
     return false;
   }
@@ -177,40 +184,44 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
   for (int i = 0; i < list.size(); ) {
     if (list[i].compare("-s") == 0) {  // task type
       int value = atoi(list[i+1].c_str());
-      if (value < 0 || value > 6) {
-        printf("[Error] -s can only be [0 - 6] : \n"
-               "  for classification task \n"
-               "    0 -- logistic regression (LR) \n"
-               "    1 -- linear support vectors machine (SVM) \n"
-               "    2 -- factorization machines (FM) \n"
-               "    3 -- field-aware factorization machines (FFM) \n"
-               "  for regression task \n"
-               "    4 -- linear regression (LR) \n"
-               "    5 -- factorization machines (FM) \n"
-               "    6 -- field-aware factorization machines (FFM) \n");
+      if (value < 0 || value > 5) {
+        printf("[Error] -s can only be [0 - 5] : \n"
+               "  for classification task: \n"
+               "    0 -- linear model (GLM) \n"
+               "    1 -- factorization machines (FM) \n"
+               "    2 -- field-aware factorization machines (FFM) \n"
+               "  for regression task: \n"
+               "    3 -- linear model (GLM) \n"
+               "    4 -- factorization machines (FM) \n"
+               "    5 -- field-aware factorization machines (FFM) \n");
         bo = false;
       } else {
-        if (value == 0) {
-          hyper_param.loss_func = "cross-entropy";
-          hyper_param.score_func = "linear";
-        } else if (value == 1) {
-          hyper_param.loss_func = "hinge";
-          hyper_param.score_func = "linear";
-        } else if (value == 2) {
-          hyper_param.loss_func = "cross-entropy";
-          hyper_param.score_func = "fm";
-        } else if (value == 3) {
-          hyper_param.loss_func = "cross-entropy";
-          hyper_param.score_func = "ffm";
-        } else if (value == 4) {
-          hyper_param.loss_func = "sqaured";
-          hyper_param.score_func = "linear";
-        } else if (value == 5) {
-          hyper_param.loss_func = "squared";
-          hyper_param.score_func = "fm";
-        } else if (value == 6) {
-          hyper_param.loss_func = "squared";
-          hyper_param.score_func = "ffm";
+        switch (value) {
+          case 0:
+            hyper_param.loss_func = "cross-entropy";
+            hyper_param.score_func = "linear";
+            break;
+          case 1:
+            hyper_param.loss_func = "cross-entropy";
+            hyper_param.score_func = "fm";
+            break;
+          case 2:
+            hyper_param.loss_func = "cross-entropy";
+            hyper_param.score_func = "ffm";
+            break;
+          case 3:
+            hyper_param.loss_func = "squared";
+            hyper_param.score_func = "linear";
+            break;
+          case 4:
+            hyper_param.loss_func = "squared";
+            hyper_param.score_func = "fm";
+            break;
+          case 5:
+            hyper_param.loss_func = "squared";
+            hyper_param.score_func = "ffm";
+            break;
+          default: break;
         }
       }
       i += 2;
@@ -219,33 +230,32 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
           list[i+1].compare("prec") != 0 &&
           list[i+1].compare("recall") != 0 &&
           list[i+1].compare("f1") != 0 &&
-          list[i+1].compare("auc") != 0 &&
           list[i+1].compare("mae") != 0 &&
           list[i+1].compare("mape") != 0 &&
           list[i+1].compare("rmsd") != 0 &&
           list[i+1].compare("none") != 0) {
-        printf("[Error] Unknow metric : %s \n"
+        printf("[Error] Unknow metric: %s \n"
                " -x can only be 'acc', 'prec', 'recall', "
-               "'f1', 'auc', 'mae', 'mape', and 'none' \n",
+               "'f1', 'mae', 'mape', and 'none' \n",
                list[i+1].c_str());
         bo = false;
       } else {
         hyper_param.metric = list[i+1];
       }
       i += 2;
-    } else if (list[i].compare("-t") == 0) {  // test file
+    } else if (list[i].compare("-v") == 0) {  // validation file
       if (FileExist(list[i+1].c_str())) {
-        hyper_param.test_set_file = list[i+1];
+        hyper_param.validate_set_file = list[i+1];
       } else {
-        printf("[Error] Test set file: %s dose not exists \n",
+        printf("[Error] Validation set file: %s dose not exists \n",
                list[i+1].c_str());
         bo = false;
       }
       i += 2;
-    } else if (list[i].compare("-m") == 0) {  // model file path
+    } else if (list[i].compare("-m") == 0) {  // model file
       hyper_param.model_file = list[i+1];
       i += 2;
-    } else if (list[i].compare("-l") == 0) {  // log file path
+    } else if (list[i].compare("-l") == 0) {  // log file
       hyper_param.log_file = list[i+1];
       i += 2;
     } else if (list[i].compare("-k") == 0) {  // latent factor
@@ -270,18 +280,18 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
         hyper_param.learning_rate = value;
       }
       i += 2;
-    } else if (list[i].compare("-b") == 0) {  // regu lambda
+    } else if (list[i].compare("-b") == 0) {  // regular lambda
       real_t value = atof(list[i+1].c_str());
       if (value < 0) {
         printf("[Error] Illegal -b : '%f' \n"
-               " -b must be greater than zero \n",
+               " -b must be greater than or equal to zero \n",
                value);
         bo = false;
       } else {
         hyper_param.regu_lambda = value;
       }
       i += 2;
-    } else if (list[i].compare("-u") == 0) {  // model scale fatcor
+    } else if (list[i].compare("-u") == 0) {  // model scale
       real_t value = atof(list[i+1].c_str());
       if (value <= 0) {
         printf("[Error] Illegal -u : '%f' \n"
@@ -315,13 +325,13 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       }
       i += 2;
     } else if (list[i].compare("--disk") == 0) {  // on-disk training
-      hyper_param.early_stop = true;
+      hyper_param.on_disk = true;
       i += 1;
     } else if (list[i].compare("--cv") == 0) {  // cross-validation
       hyper_param.cross_validation = true;
       i += 1;
-    } else if (list[i].compare("--es") == 0) {  // early-stop
-      hyper_param.early_stop = true;
+    } else if (list[i].compare("--dis-es") == 0) {  // disable early-stop
+      hyper_param.early_stop = false;
       i += 1;
     } else if (list[i].compare("--no-norm") == 0) {  // normalization
       hyper_param.norm = false;
@@ -346,83 +356,98 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
   }
   if (!bo) { return false; }
   /*********************************************************
-   *  Check some warnings and conflict                     *
+   *  Check warning and fix conflict                       *
    *********************************************************/
   if (hyper_param.on_disk && hyper_param.cross_validation) {
-    printf("[Warning] On-disk training doesn't support "
-           "cross-validation. \n");
+    printf("[Warning] On-disk training doesn't support cross-validation. \n"
+           "xLearn has already disable the -cv option. \n");
     hyper_param.cross_validation = false;
   }
-  if (hyper_param.cross_validation &&
-     !hyper_param.test_set_file.empty()) {
-    printf("[Warning] --cv (cross-validation) has be set, and "
-           "xLearn will ignore the test file: %s \n",
+  if (hyper_param.cross_validation && hyper_param.early_stop) {
+    printf("[Warning] Cross-validation doesn't support early-stopping. \n"
+           "xLearn has already close early-stopping. \n");
+    hyper_param.early_stop = false;
+  }
+  if (hyper_param.cross_validation && !hyper_param.test_set_file.empty()) {
+    printf("[Warning] The --cv (cross-validation) has been set, and "
+           "xLearn will ignore the validation file: %s \n",
            hyper_param.test_set_file.c_str());
-    hyper_param.test_set_file.clear();
+    hyper_param.validate_set_file.clear();
   }
-  if (hyper_param.early_stop &&
-      hyper_param.test_set_file.empty() &&
-     !hyper_param.cross_validation) {
-    printf("[Error] To use early-stop, you need to "
-           "assign a test set via '-t' option, or using "
-           "cross-validation. \n");
-    exit(0);
-  }
-  if (hyper_param.cross_validation &&
-      !hyper_param.model_file.empty()) {
-    printf("[Warning] Training in cross-validation and will "
-           "not dump the final model checkpoint. \n");
-    hyper_param.model_file.clear();
-  }
-  if (hyper_param.cross_validation &&
-      hyper_param.quiet) {
-    printf("[Warning] Cannot use -quiet option in "
-           "cross-validation. \n");
+  if (hyper_param.cross_validation && hyper_param.quiet) {
+    printf("[Warning] The --cv (cross-validation) has been set, and "
+           "xLearn will ignore the --quiet option. \n");
     hyper_param.quiet = false;
   }
-  if (hyper_param.loss_func.compare("cross-entropy") == 0 ||
-      hyper_param.loss_func.compare("hinge") == 0) {
-    // for classification
-    if (hyper_param.metric.compare("mae") == 0 ||
-        hyper_param.metric.compare("mape") == 0) {
-      printf("[Error] The -x: %s metric can only be used "
-             "in regression tasks. \n",
-             hyper_param.metric.c_str());
-      exit(0);
-    }
-  } else if (hyper_param.loss_func.compare("squared") == 0) {
-    // for regression
+  if (hyper_param.cross_validation && !hyper_param.model_file.empty()) {
+    printf("[Warning] The --cv (cross-validation) has been set, and "
+           "xLearn will not dump model checkpoint to disk. \n");
+    hyper_param.model_file.clear();
+  }
+  if (hyper_param.loss_func.compare("squared") == 0) {
     if (hyper_param.metric.compare("acc") == 0 ||
         hyper_param.metric.compare("prec") == 0 ||
         hyper_param.metric.compare("recall") == 0 ||
         hyper_param.metric.compare("f1") == 0) {
-      printf("[Error] The -x: %s metric can only be used "
-             "in classification tasks. \n",
+      printf("[Warning] The -x: %s metric can only be used "
+             "in classification tasks. xLearn will ignore this option. \n",
               hyper_param.metric.c_str());
-      exit(0);
+      hyper_param.metric = "none";
     }
+  } else if (hyper_param.loss_func.compare("cross-entropy") == 0) {
+    if (hyper_param.metric.compare("mae") == 0 ||
+        hyper_param.metric.compare("mape") == 0 ||
+        hyper_param.metric.compare("rmsd") == 0) {
+      printf("[Warning] The -x: %s metric can only be used "
+             "in regression tasks. xLearn will ignore this option. \n",
+              hyper_param.metric.c_str());
+      hyper_param.metric = "none";
+    }
+  }
+  /*********************************************************
+   *  Set some default value                               *
+   *********************************************************/
+  if (hyper_param.model_file.empty() && !hyper_param.cross_validation) {
+    hyper_param.model_file = hyper_param.train_set_file + ".model";
   }
 
   return true;
 }
 
-// Check options for inference tasks
-bool Checker::check_inference_options(HyperParam& hyper_param) {
+// Check options for prediction tasks
+bool Checker::check_prediction_options(HyperParam& hyper_param) {
   bool bo = true;
   /*********************************************************
-   *  Check the path of predict file                       *
+   *  Check size                                           *
+   *********************************************************/
+  if (args_.size() < 3) {
+    printf("[Error] The test file and model file must be set. \n");
+    return false;
+  }
+  /*********************************************************
+   *  Check the path of test set file                      *
    *********************************************************/
   if (FileExist(args_[1].c_str())) {
-    hyper_param.predict_file = std::string(args_[1]);
+    hyper_param.test_set_file = std::string(args_[1]);
   } else {
-    printf("[Error] Predict data file: %s does not exist \n",
+    printf("[Error] Test set file: %s does not exist. \n",
            args_[1].c_str());
+    return false;
+  }
+  /*********************************************************
+   *  Check the path of model file                         *
+   *********************************************************/
+  if (FileExist(args_[2].c_str())) {
+    hyper_param.model_file = std::string(args_[2]);
+  } else {
+    printf("[Error] Model file: %s does not exist. \n",
+           args_[2].c_str());
     return false;
   }
   /*********************************************************
    *  Check the number of args                             *
    *********************************************************/
-  StringList list(args_.begin()+2, args_.end());
+  StringList list(args_.begin()+3, args_.end());
   if (list.size() % 2 != 0) {
     printf("[Error] Every options should have a value \n");
     for (int i = 0; i < list.size(); i+=2) {
@@ -435,15 +460,7 @@ bool Checker::check_inference_options(HyperParam& hyper_param) {
    *********************************************************/
   StrSimilar ss;
   for (int i = 0; i < list.size(); i+=2) {
-    if (list[i].compare("-m") == 0) {  // path of the model file
-      if (FileExist(list[i+1].c_str())) {
-        hyper_param.model_file = list[i+1];
-      } else {
-        printf("[Error] Model file: %s does not exist \n",
-               list[i+1].c_str());
-        bo = false;
-      }
-    } else if (list[i].compare("-o") == 0) {  // path of the output
+    if (list[i].compare("-o") == 0) {  // path of the output
       hyper_param.output_file = list[i+1];
     } else if (list[i].compare("-l") == 0) {  // path of the log file
       hyper_param.log_file = list[i+1];
@@ -458,6 +475,12 @@ bool Checker::check_inference_options(HyperParam& hyper_param) {
     }
   }
   if (!bo) { return false; }
+  /*********************************************************
+   *  Set some default value                               *
+   *********************************************************/
+  if (hyper_param.output_file.empty()) {
+    hyper_param.output_file = hyper_param.test_set_file + ".out";
+  }
 
   return true;
 }
