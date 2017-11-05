@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
   xLearn::Solver solver;
   solver.SetPredict();
   solver.Initialize(argc, argv);
-  solver.StartWork();
+  //solver.StartWork();
   solver.FinalizeWork();
 
   print_block(StringPrintf("%.2f", timer.toc()));

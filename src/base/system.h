@@ -29,7 +29,7 @@ This file defines several system functions.
 #include <string>
 
 #include "src/base/common.h"
-#include "src/base/stringprint.h"
+#include "src/base/stringprintf.h"
 
 // Get host name
 std::string get_host_name() {
@@ -62,12 +62,12 @@ std::string print_current_time() {
 
 // The log file name = base + host_name + username +
 //                     date_time + process_id
-std::string get_log_file() {
-  CHECK(!hyper_param_.log_file.empty());
+std::string get_log_file(const std::string& file_base) {
+  CHECK(!file_base.empty());
   std::string filename_prefix;
   SStringPrintf(&filename_prefix,
                 "%s.%s.%s.%s.%u",
-                hyper_param_.log_file.c_str(),
+                file_base.c_str(),
                 get_host_name().c_str(),
                 get_user_name().c_str(),
                 print_current_time().c_str(),

@@ -78,7 +78,7 @@ namespace xLearn {
 class Reader {
  public:
   // Constructor and Desstructor
-  Reader() {  }
+  Reader() : shuffle_(false) {  }
   virtual ~Reader() {  }
 
   // We need to invoke the Initialize() function before
@@ -97,6 +97,11 @@ class Reader {
   // Wether current dataset has label y ?
   bool inline has_label() { return has_label_; }
 
+  // If shuffle data ?
+  virtual void inline SetShuffle(bool shuffle) {
+    shuffle_ = shuffle;
+  }
+
  protected:
   /* Input file name */
   std::string filename_;
@@ -108,6 +113,8 @@ class Reader {
   This value will be set automitically
   in initialization */
   bool has_label_;
+  /* If shuffle data ? */
+  bool shuffle_;
 
   // Check current file format and return
   // "libsvm", "ffm", or "csv".
@@ -133,18 +140,11 @@ class Reader {
 class InmemReader : public Reader {
  public:
   // Constructor and Destructor
-  InmemReader() 
-   : pos_(0),
-     shuffle_(false) { }
+  InmemReader() : pos_(0) { }
   ~InmemReader() { }
 
   // Pre-load all the data into memory buffer.
   virtual void Initialize(const std::string& filename);
-
-  // If shuffle data ?
-  virtual void inline SetShuffle(bool shuffle) {
-    shuffle_ = shuffle;
-  }
 
   // Sample data from the memory buffer.
   virtual index_t Samples(DMatrix* &matrix);
@@ -162,8 +162,6 @@ class InmemReader : public Reader {
   index_t pos_;
   /* For random shuffle */
   std::vector<index_t> order_;
-  /* If shuffle data ? */
-  bool shuffle_;
 
   // Check wheter current path has a binary file.
   bool hash_binary(const std::string& filename);

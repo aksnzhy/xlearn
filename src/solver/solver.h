@@ -25,6 +25,7 @@ of the xLearn.
 #define XLEARN_SOLVER_SOLVER_H_
 
 #include "src/base/common.h"
+#include "Src/base/thread_pool.h"
 #include "src/data/hyper_parameters.h"
 #include "src/data/data_structure.h"
 #include "src/data/model_parameters.h"
@@ -91,6 +92,8 @@ class Solver {
   xLearn::Loss* loss_;
   /* acc, prec, recall, mae, etc */
   xLearn::Metric* metric_;
+  /* ThreadPool for multi-thread training */
+  ThreadPool* pool_;
 
   // Create object by name
   xLearn::Reader* create_reader();
