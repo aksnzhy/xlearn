@@ -20,13 +20,10 @@ Author: Chao Ma (mctt90@gmail.com)
 This file is the entry for training of the xLearn.
 */
 
-#include <string>
-
 #include "src/base/common.h"
-#include "src/solver/solver.h"
 #include "src/base/timer.h"
-#include "src/base/format_print.h"
 #include "src/base/stringprintf.h"
+#include "src/solver/solver.h"
 
 //------------------------------------------------------------------------------
 // The pre-defined main function
@@ -39,10 +36,10 @@ int main(int argc, char* argv[]) {
   xLearn::Solver solver;
   solver.SetTrain();
   solver.Initialize(argc, argv);
-  //solver.StartWork();
+  solver.StartWork();
   solver.FinalizeWork();
 
-  print_block(StringPrintf("%.2f", timer.toc()));
+  print_block(StringPrintf("Total time cost: %.2f", timer.toc()));
 
   return 0;
 }

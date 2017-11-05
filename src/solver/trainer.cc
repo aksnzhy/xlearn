@@ -21,11 +21,11 @@ This file is the implementation of the Trainer class.
 
 #include <stdio.h>
 #include <vector>
+#include <string>
 
 #include "src/solver/trainer.h"
 #include "src/data/data_structure.h"
 #include "src/base/timer.h"
-#include "src/base/format_print.h"
 
 namespace xLearn {
 
@@ -35,112 +35,161 @@ const int kStopWindow = 2;
  *  Show head info                                       *
  *********************************************************/
 void Trainer::show_head_info(bool validate) {
-  std::cout.width(6);
-  std::cout << "Epoch";
-  std::cout.width(20);
-  std::string str = "Train " + loss_->loss_type();
-  std::cout << str;
-  if (metric_->type().compare("NONE") != 0) {
-    std::cout.width(20);
-    str = "Train " + metric_->type();
-    std::cout << str;
+  std::vector<std::string> str_list;
+  std::vector<int> width_list;
+  str_list.push_back("Epoch");
+  width_list.push_back(6);
+  str_list.push_back("Train" + loss_->loss_type());
+  width_list.push_back(20);
+  if (metric_ != nullptr) {
+    str_list.push_back("Train" + metric_->metric_type());
+    width_list.push_back(20);
   }
   if (validate) {
-    std::cout.width(20);
-    str = "Test " + loss_->loss_type();
-    std::cout << str;
-    if (metric_->type().compare("NONE") != 0) {
-      std::cout.width(20);
-      str = "Test " + metric_->type();
-      std::cout << str;
+    str_list.push_back("Test" + loss_->loss_type());
+    width_list.push_back(20);
+    if (metric_ != nullptr) {
+      str_list.push_back("Test" + metric_->metric_type());
+      width_list.push_back(20);
     }
   }
-  std::cout.width(20);
-  std::cout << "Time cost (sec)";
-  std::cout << std::endl;
+  str_list.push_back("Time cost (sec)");
+  width_list.push_back(20);
+  print_row(str_list, width_list);
 }
 
 /*********************************************************
  *  Show train info                                      *
  *********************************************************/
-void Trainer::show_train_info(real_t tr_loss, real_t tr_metric,
-                              real_t te_loss, real_t te_metric,
-                              real_t time_cost, bool validate,
+void Trainer::show_train_info(const MetricInfo& tr_info, 
+                              const MetricInfo& te_info,
+                              real_t time_cost, 
+                              bool validate,
                               index_t epoch) {
-  std::cout.width(6);
-  std::cout << epoch;
-  std::cout.width(20);
-  std::cout << std::fixed << std::setprecision(6) << tr_loss;
-  if (metric_->type().compare("NONE") != 0) {
-    std::cout.width(20);
-    std::cout << std::fixed << std::setprecision(6) << tr_metric;
+  std::vector<std::string> str_list;
+  std::vector<int> width_list;
+  str_list.push_back(StringPrintf("%d", epoch));
+  width_list.push_back(6);
+  str_list.push_back(StringPrintf("%.6f", tr_info.loss_val));
+  width_list.push_back(20);
+  if (metric_ != nullptr) {
+    str_list.push_back(StringPrintf("%.6f", tr_info.metric_val));
+    width_list.push_back(20);
   }
   if (validate) {
-    std::cout.width(20);
-    std::cout << std::fixed << std::setprecision(6) << te_loss;
-    if (metric_->type().compare("NONE") != 0) {
-      std::cout.width(20);
-      std::cout << std::fixed << std::setprecision(6) << te_metric;
+    str_list.push_back(StringPrintf("%.6f", te_info.loss_val));
+    width_list.push_back(20);
+    if (metric_ != nullptr) {
+      str_list.push_back(StringPrintf("%.6f", te_info.metric_val));
+      width_list.push_back(20);
     }
   }
-  std::cout.width(20);
-  std::cout << std::fixed << std::setprecision(2) << time_cost;
-  std::cout << std::endl;
+  str_list.push_back(StringPrintf("%.2f", time_cost));
+  width_list.push_back(20);
+  print_row(str_list, width_list);
+}
+
+/*********************************************************
+ *  Basic train                                          *
+ *********************************************************/
+void Trainer::Train() {
+  // Get train Reader and test Reader
+  std::vector<Reader*> tr_reader;
+  tr_reader.push_back(reader_list_[0]);
+  std::vector<Reader*> te_reader;
+  if (reader_list_.size() == 2) {
+    te_reader.push_back(reader_list_[1]);
+  }
+  this->train(tr_reader, te_reader);
+}
+
+/*********************************************************
+ *  Cross-Validation                                     *
+ *********************************************************/
+void Trainer::CVTrain() {
+  // Use the i-th reader as validation Reader
+  for (int i = 0; i < reader_list_.size(); ++i) {
+    printf("Cross-validation: %d/%lu: \n", i+1, reader_list_.size());
+    // Get the train Reader and test Reader
+    std::vector<Reader*> tr_reader;
+    for (int j = 0; j < reader_list_.size(); ++j) {
+      if (i == j) { continue; }
+      tr_reader.push_back(reader_list_[j]);
+    }
+    std::vector<Reader*> te_reader;
+    te_reader.push_back(reader_list_[i]);
+    if (i != 0) {
+      // Re-init current model parameters.
+      model_->Reset();
+    }
+    this->train(tr_reader, te_reader);
+  }
+  // Average metric for cross-validation
+  show_average_metric();
+}
+
+/*********************************************************
+ *  Calc average evaluation metric for CV                *
+ *********************************************************/
+void Trainer::show_average_metric() {
+  real_t loss = 0;
+  real_t metric = 0;
+  for (size_t i = 0; i < metric_info_.size(); ++i) {
+    loss += metric_info_[i].loss_val;
+    if (metric_ != nullptr) {
+      metric += metric_info_[i].metric_val;
+    }
+  }
+  printf(" Average %s: %.6f\n", 
+    loss_->loss_type().c_str(), loss);
+  if (metric_ != nullptr) {
+    printf(" Average %s: %.6f\n", 
+      metric_->metric_type().c_str(), metric);
+  }
 }
 
 /*********************************************************
  *  Basic train function                                 *
  *********************************************************/
-void Trainer::train(std::vector<Reader*> train_reader,
-                    std::vector<Reader*> test_reader,
-                    MetricInfo* test_info) {
-  bool validate = test_reader.empty() ? false : true;
-  real_t best_loss = kFloatMax;
-  real_t prev_loss = kFloatMax;
+void Trainer::train(std::vector<Reader*>& train_reader,
+                    std::vector<Reader*>& test_reader) {
   int best_epoch = 0;
   int stop_window = 0;
+  real_t best_loss = kFloatMax;
+  real_t prev_loss = kFloatMax;
+  MetricInfo tr_info;
+  MetricInfo te_info;
   // Show header info
-  if (!quiet_) {
-    show_head_info(validate);
+  if (!quiet_) { 
+    show_head_info(!test_reader.empty()); 
   }
   for (int n = 0; n < epoch_; ++n) {
     Timer timer;
     timer.tic();
-    //----------------------------------------------------
     // Calc grad and update model
-    //----------------------------------------------------
-    CalcGradUpdate(train_reader);
+    calc_gradient(train_reader);
     // we don't do any evaluation in a quiet model
     if (!quiet_) {
-      //----------------------------------------------------
-      // Calc Train loss
-      //----------------------------------------------------
-      MetricInfo tr_info = CalcLossMetric(train_reader);
-      //----------------------------------------------------
-      // Calc validation loss
-      //----------------------------------------------------
-      MetricInfo te_info;
-      if (validate) {
-        te_info = CalcLossMetric(test_reader);
-        if (test_info != nullptr) {
-          test_info->loss_val = te_info.loss_val;
-        }
+      tr_info = calc_metric(train_reader);
+      if (!test_reader.empty()) { 
+        te_info = calc_metric(test_reader); 
       }
-      real_t time_cost = timer.toc();
-      // show train info
-      show_train_info(tr_info.loss_val, tr_info.metric_val,
-                      te_info.loss_val, te_info.metric_val,
-                      time_cost, validate, n);
+      // show evaludation metric info
+      show_train_info(tr_info, 
+                      te_info,
+                      timer.toc(), 
+                      !test_reader.empty(), 
+                      n);
       // Early-stopping
       if (early_stop_) {
-        if (te_info.loss_val <= best_loss) {
+        if (te_info.loss_val < best_loss) {
           best_loss = te_info.loss_val;
           best_epoch = n;
           model_->SetBestModel();
         }
         if (te_info.loss_val >= prev_loss) {
           stop_window++;
-          // If the validation loss decreses conntinuously
+          // If the validation loss goes up conntinuously
           // in 3 epoch, we stop training
           if (stop_window == kStopWindow) { break; }
         } else {
@@ -150,20 +199,18 @@ void Trainer::train(std::vector<Reader*> train_reader,
       }
     }
   }
-  if (early_stop_) {
-    printf("----------------------------------------------------------------------\n");
-    printf("| Early-stopping at epoch %d and "
-           "the best validation loss is %.6f |\n", best_epoch, best_loss);
-    printf("----------------------------------------------------------------------\n");
+  if (early_stop_) {  // not for cv
+    print_block(StringPrintf("Early-stopping at epoch %d\n", best_epoch));
     model_->Shrink();
-    if (test_info != nullptr) {
-      test_info->loss_val = best_loss;
-    }
+  } else {  // for cv
+    metric_info_.push_back(te_info);
   }
 }
 
-// Calculate gradient and update model
-void Trainer::CalcGradUpdate(std::vector<Reader*>& reader) {
+/*********************************************************
+ *  Calc gradient and update model                       *
+ *********************************************************/
+void Trainer::calc_gradient(std::vector<Reader*>& reader) {
   CHECK_NE(reader.empty(), true);
   for (int i = 0; i < reader.size(); ++i) {
     reader[i]->Reset();
@@ -174,8 +221,10 @@ void Trainer::CalcGradUpdate(std::vector<Reader*>& reader) {
   }
 }
 
-// Calculate loss value
-MetricInfo Trainer::CalcLossMetric(std::vector<Reader*>& reader_list) {
+/*********************************************************
+ *  Calc evaluation metric                               *
+ *********************************************************/
+MetricInfo Trainer::calc_metric(std::vector<Reader*>& reader_list) {
   CHECK_NE(reader_list.empty(), true);
   DMatrix* matrix = nullptr;
   index_t count_sample = 0;
@@ -191,56 +240,17 @@ MetricInfo Trainer::CalcLossMetric(std::vector<Reader*>& reader_list) {
       count_sample += tmp;
       loss_->Predict(matrix, *model_, pred);
       loss_val += loss_->Evalute(pred, matrix->Y);
-      if (metric_->type().compare("NONE") != 0) {
+      if (metric_ != nullptr) {
         metric_->Accumulate(matrix->Y, pred);
       }
     }
   }
   MetricInfo info;
   info.loss_val = loss_val / count_sample;
-  if (metric_->type().compare("NONE") != 0) {
+  if (metric_ != nullptr) {
     info.metric_val = metric_->GetMetric();
   }
   return info;
-}
-
-// The basic
-void Trainer::Train() {
-  // Get train Reader and test Reader
-  std::vector<Reader*> tr_reader;
-  tr_reader.push_back(reader_list_[0]);
-  std::vector<Reader*> te_reader;
-  if (reader_list_.size() == 2) {
-    te_reader.push_back(reader_list_[1]);
-  }
-  this->train(tr_reader, te_reader);
-}
-
-// Training using cross-validation
-void Trainer::CVTrain() {
-  // Use the i-th reader as validation Reader
-  MetricInfo info;
-  real_t sum_loss = 0;
-  for (int i = 0; i < reader_list_.size(); ++i) {
-    printf("Cross-validation: %d/%lu: \n", i+1, reader_list_.size());
-    // Get the train Reader and test Reader
-    std::vector<Reader*> tr_reader;
-    for (int j = 0; j < reader_list_.size(); ++j) {
-      if (i == j) { continue; }
-      tr_reader.push_back(reader_list_[j]);
-    }
-    std::vector<Reader*> te_reader;
-    te_reader.push_back(reader_list_[i]);
-    if (i != 0) {
-      // Re-init current model parameters
-      model_->Reset();
-    }
-    this->train(tr_reader, te_reader, &info);
-    sum_loss += info.loss_val;
-  }
-  sum_loss /= reader_list_.size();
-  printf(" Average %s: %.6f\n", 
-    loss_->loss_type().c_str(), sum_loss);
 }
 
 } // namespace xLearn

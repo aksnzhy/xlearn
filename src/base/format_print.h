@@ -29,9 +29,6 @@ This file defines the facilities for format printing.
 
 #include "src/base/common.h"
 
-typedef std::vector<std::string> StringList;
-typedef std::vector<int> IntList;
-
 //------------------------------------------------------------------------------
 // Example:
 //
@@ -45,7 +42,9 @@ typedef std::vector<int> IntList;
 //   Juice      0x102       20     8.73  
 //   Meat       0x104       30    10.13
 //------------------------------------------------------------------------------
-inline void print_row(const StringList& column, const IntList& width) {
+template <typename T>
+void print_row(const std::vector<T>& column, 
+	           const std::vector<int>& width) {
   CHECK_EQ(column.size(), width.size());
   for (size_t i = 0; i < column.size(); ++i) {
   	std::cout.width(width[i]);

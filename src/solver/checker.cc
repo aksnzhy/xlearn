@@ -53,7 +53,7 @@ std::string Checker::option_help() const {
 "         5 -- field-aware factorization machines (FFM) \n"
 "                                                                            \n"
 "  -x <metric>          :  The evaluation metric can be 'acc', 'prec', 'recall', 'f1' (classification), \n"
-"                          and 'mae', 'mape', 'rmsd' (regression). xLearn uses the Accuracy (acc) by default. \n "
+"                          and 'mae', 'mape', 'rmsd' (regression). xLearn uses the Accuracy (acc) by default. \n"
 "                          If we set this option to 'none', xLearn will not print any metric information. \n"
 "                                                                                              \n"
 "  -v <validate_file>   :  Path of the validation data file. This option will be empty by default, \n"
@@ -106,7 +106,7 @@ std::string Checker::option_help() const {
 "USAGE: \n"
 "     xlearn_predict <test_file> <model_file> [OPTIONS] \n"
 "                                                         \n"
-" e.g.,  xlearn_train ./test_data.txt ./train_data.txt.model -o ./out.txt  \n"
+" e.g.,  xlearn_train ./test_data.txt ./model_file -o ./out.txt  \n"
 "                                                                           \n"
 "OPTIONS: \n"
 "  -o <output_file>     :  Path of the output file. On default, this value will be set \n"
@@ -405,7 +405,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     }
   }
   /*********************************************************
-   *  Set some default value                               *
+   *  Set default value                                    *
    *********************************************************/
   if (hyper_param.model_file.empty() && !hyper_param.cross_validation) {
     hyper_param.model_file = hyper_param.train_set_file + ".model";
@@ -476,7 +476,7 @@ bool Checker::check_prediction_options(HyperParam& hyper_param) {
   }
   if (!bo) { return false; }
   /*********************************************************
-   *  Set some default value                               *
+   *  Set default value                                    *
    *********************************************************/
   if (hyper_param.output_file.empty()) {
     hyper_param.output_file = hyper_param.test_set_file + ".out";

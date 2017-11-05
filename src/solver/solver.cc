@@ -32,7 +32,6 @@ This file is the implementation of the Solver class.
 #include "src/base/split_string.h"
 #include "src/base/timer.h"
 #include "src/base/system.h"
-#include "src/base/format_print.h"
 
 namespace xLearn {
 
@@ -102,10 +101,9 @@ Loss* Solver::create_loss() {
 Metric* Solver::create_metric() {
   Metric* metric;
   metric = CREATE_METRIC(hyper_param_.metric.c_str());
-  if (metric == nullptr) {
-    LOG(ERROR) << "Cannot create metric: "
-               << hyper_param_.metric;
-  }
+  // Note that here we do not cheack metric == nullptr
+  // this is because we can set metric to "none", which 
+  // means that we don't print any metric info.
   return metric;
 }
 
@@ -169,7 +167,7 @@ void Solver::init_train() {
    *********************************************************/
   Timer timer;
   timer.tic();
-  print_block(std::string("Read Problem ..."));
+  print_block("Read Problem ...");
   LOG(INFO) << "Start to init Reader";
   // Split file
   if (hyper_param_.cross_validation) {
@@ -245,7 +243,7 @@ void Solver::init_train() {
    *********************************************************/
   timer.reset();
   timer.tic();
-  print_block(std::string("Initialize model ..."));
+  print_block("Initialize model ...");
   // Initialize parameters
   model_ = new Model();
   model_->Initialize(hyper_param_.score_func,
@@ -324,7 +322,7 @@ void Solver::init_predict() {
   /*********************************************************
    *  Initialize Reader and read problem                   *
    *********************************************************/
-  print_block(std::string("Read Problem ..."));
+  print_block("Read Problem ...");
   timer.reset();
   timer.tic();
   // Create Reader
@@ -371,9 +369,15 @@ void Solver::StartWork() {
 // Train
 void Solver::start_train_work() {
   int epoch = hyper_param_.num_epoch;
-  bool early_stop = hyper_param_.early_stop;
-  bool quiet = hyper_param_.quiet;
-  bool save_model = hyper_param_.model_file == "none" ? false: true;
+  bool early_stop = hyper_param_.early_stop &&
+                   !hyper_param_.cross_validation;
+  bool quiet = hyper_param_.quiet &&
+              !hyper_param_.cross_validation;
+  bool save_model = true;
+  if (hyper_param_.model_file.compare("none") == 0 ||
+      hyper_param_.cross_validation) {
+    save_model = false;
+  }
   Trainer trainer;
   trainer.Initialize(reader_,  /* Reader list */
                      epoch,
@@ -382,43 +386,41 @@ void Solver::start_train_work() {
                      metric_,
                      early_stop,
                      quiet);
-  printf("----------------------\n");
-  printf("| Start to train ... |\n");
-  printf("----------------------\n");
+  print_block("Start to train ...");
+/******************************************************************************
+ * Training under cross-validation                                            *
+ ******************************************************************************/
   if (hyper_param_.cross_validation) {
     trainer.CVTrain();
-    printf("-------------------\n");
-    printf("| Finish training |\n");
-    printf("-------------------\n");
-  } else {
+    print_block("Finish Cross-Validation");
+  } 
+/******************************************************************************
+ * Original training without cross-validation                                 *
+ ******************************************************************************/
+  else {
     trainer.Train();
     if (save_model) {
       Timer timer;
       timer.tic();
-      printf("-----------------------------------------------\n");
-      printf("| Finish training and start to save model ... |\n");
-      printf("-----------------------------------------------\n");
+      print_block("Finish training and start to save model ...");
       trainer.SaveModel(hyper_param_.model_file);
-      real_t time_cost = timer.toc();
       printf("  Model file: %s\n", hyper_param_.model_file.c_str());
       printf("  Time cost for saving model: %.2f (sec) \n",
-             time_cost);
+             timer.toc());
     } else {
-      printf("-------------------\n");
-      printf("| Finish training |\n");
-      printf("-------------------\n");
+      print_block("Finish training");
     }
   }
 }
 
 // Inference
 void Solver::start_prediction_work() {
-  printf("Start to predict ...\n");
+  print_block("Start to predict ...");
   Predictor pdc;
   pdc.Initialize(reader_[0],
-            model_,
-            loss_,
-            hyper_param_.output_file);
+                 model_,
+                 loss_,
+                 hyper_param_.output_file);
   // Predict and write output
   pdc.Predict();
 }
@@ -443,11 +445,5 @@ void Solver::finalize_train_work() {
 void Solver::finalize_prediction_work() {
   LOG(INFO) << "Finalize inference work.";
 }
-
-/******************************************************************************
- * The other helper functions                                                 *
- ******************************************************************************/
-
-
 
 } // namespace xLearn

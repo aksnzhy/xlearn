@@ -26,6 +26,7 @@ This file defines the Trainer class.
 #include <vector>
 
 #include "src/base/common.h"
+#include "src/base/format_print.h"
 #include "src/reader/reader.h"
 #include "src/data/model_parameters.h"
 #include "src/loss/loss.h"
@@ -35,8 +36,8 @@ namespace xLearn {
 
 //------------------------------------------------------------------------------
 // Trainer is the core class of xLearn, which can perform
-// standard training process (training set and test set), as well
-// as the cross-validation training process.
+// standard training process (training set and test set), as 
+// well as the cross-validation training process.
 //------------------------------------------------------------------------------
 class Trainer {
  public:
@@ -56,7 +57,7 @@ class Trainer {
     CHECK_GT(epoch, 0);
     CHECK_NOTNULL(model);
     CHECK_NOTNULL(loss);
-    CHECK_NOTNULL(metric);
+    // Do not check metric == nullptr
     reader_list_ = reader_list;
     epoch_ = epoch;
     model_ = model;
@@ -79,29 +80,44 @@ class Trainer {
   }
 
  protected:
+  /* The reader_list_ contains both of the 
+  training data and the validation data. */
   std::vector<Reader*> reader_list_;
+  /* Number of epoch */
   int epoch_;
-  Model* model_;
-  Loss* loss_;
-  Metric* metric_;
+  /* Using early-stopping ? */
   bool early_stop_;
+  /* quiet training ? */
   bool quiet_;
+  /* Model parameter */
+  Model* model_;
+  /* Loss function */
+  Loss* loss_;
+  /* Evaluation metric */
+  Metric* metric_;
+  /* Store each metric info of cross-validation */
+  std::vector<MetricInfo> metric_info_;
 
   // Basic train function
-  void train(std::vector<Reader*> train_reader,
-             std::vector<Reader*> test_reader,
-             MetricInfo* test_info = nullptr);
+  void train(std::vector<Reader*>& train_reader,
+             std::vector<Reader*>& test_reader);
 
+  // Caculate gradient and update model.
+  void calc_gradient(std::vector<Reader*>& reader_list);
+
+  // Calculate loss value and evaluation metric.
+  MetricInfo calc_metric(std::vector<Reader*>& reader_list);
+
+  // Calculate average metric for cross-validation
+  void show_average_metric();
+
+  // Print information during the training.
   void show_head_info(bool validate);
-  void show_train_info(real_t tr_loss, real_t tr_metric,
-                       real_t te_loss, real_t te_metric,
-                       real_t time_cost, bool validate,
-                       index_t n);
-
-  // Caculate gradient and update model
-  void CalcGradUpdate(std::vector<Reader*>& reader_list);
-  // Calculate loss value and evaluation metric
-  MetricInfo CalcLossMetric(std::vector<Reader*>& reader_list);
+  void show_train_info(const MetricInfo& tr_info, 
+                   const MetricInfo& te_info,
+                   real_t time_cost, 
+                   bool validate,
+                   index_t epoch);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Trainer);

@@ -45,9 +45,9 @@ void Predictor::Predict() {
     if (reader_->has_label()) {
       loss_val += loss_->Evalute(out, matrix->Y);
     }
-    if (loss_->loss_type().compare("corss-entropy")) {
-      loss_->Sigmoid(out, out);
-    }
+    //if (loss_->loss_type().compare("corss-entropy")) {
+    //  loss_->Sigmoid(out, out);
+    //}
     for (index_t i = 0; i < out.size(); ++i) {
       o_file << out[i] << "\n";
     }
