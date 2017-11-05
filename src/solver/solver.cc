@@ -276,7 +276,9 @@ void Solver::init_train() {
    *  Init metric                                          *
    *********************************************************/
   metric_ = create_metric();
-  metric_->Initialize(pool_);
+  if (metric_ != nullptr) {
+    metric_->Initialize(pool_);
+  }
   LOG(INFO) << "Initialize evaluation metric.";
 }
 

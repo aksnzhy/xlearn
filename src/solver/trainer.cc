@@ -39,17 +39,17 @@ void Trainer::show_head_info(bool validate) {
   std::vector<int> width_list;
   str_list.push_back("Epoch");
   width_list.push_back(6);
-  str_list.push_back("Train" + loss_->loss_type());
+  str_list.push_back("Train " + loss_->loss_type());
   width_list.push_back(20);
   if (metric_ != nullptr) {
-    str_list.push_back("Train" + metric_->metric_type());
+    str_list.push_back("Train " + metric_->metric_type());
     width_list.push_back(20);
   }
   if (validate) {
-    str_list.push_back("Test" + loss_->loss_type());
+    str_list.push_back("Test " + loss_->loss_type());
     width_list.push_back(20);
     if (metric_ != nullptr) {
-      str_list.push_back("Test" + metric_->metric_type());
+      str_list.push_back("Test " + metric_->metric_type());
       width_list.push_back(20);
     }
   }
@@ -141,10 +141,10 @@ void Trainer::show_average_metric() {
     }
   }
   printf(" Average %s: %.6f\n", 
-    loss_->loss_type().c_str(), loss);
+    loss_->loss_type().c_str(), loss / metric_info_.size());
   if (metric_ != nullptr) {
     printf(" Average %s: %.6f\n", 
-      metric_->metric_type().c_str(), metric);
+      metric_->metric_type().c_str(), metric / metric_info_.size());
   }
 }
 
@@ -200,7 +200,7 @@ void Trainer::train(std::vector<Reader*>& train_reader,
     }
   }
   if (early_stop_) {  // not for cv
-    print_block(StringPrintf("Early-stopping at epoch %d\n", best_epoch));
+    print_block(StringPrintf("Early-stopping at epoch %d", best_epoch));
     model_->Shrink();
   } else {  // for cv
     metric_info_.push_back(te_info);
@@ -230,7 +230,9 @@ MetricInfo Trainer::calc_metric(std::vector<Reader*>& reader_list) {
   index_t count_sample = 0;
   std::vector<real_t> pred;
   real_t loss_val = 0.0;
-  metric_->Reset();
+  if (metric_ != nullptr) {
+    metric_->Reset();
+  }
   for (int i = 0; i < reader_list.size(); ++i) {
     reader_list[i]->Reset();
     for (;;) {

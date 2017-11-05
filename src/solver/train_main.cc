@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
   solver.StartWork();
   solver.FinalizeWork();
 
-  print_block(StringPrintf("Total time cost: %.2f", timer.toc()));
+  print_block(StringPrintf("Total time cost: %.2f (sec)", timer.toc()));
 
   return 0;
 }

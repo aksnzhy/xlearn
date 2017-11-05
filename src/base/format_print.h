@@ -74,7 +74,7 @@ inline void print_block(const std::string& str) {
   std::cout << "\n";
   std::cout << "| ";
   std::cout << str;
-  std::cout << " |";
+  std::cout << " |\n";
   for (size_t i = 0; i < size; ++i) {
   	std::cout << "-";
   }

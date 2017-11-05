@@ -175,8 +175,10 @@ index_t InmemReader::Samples(DMatrix* &matrix) {
   for (int i = 0; i < num_samples_; ++i) {
     if (pos_ >= data_buf_.row_length) {
       // End of the data buffer
-      if (i == 0 && shuffle_) {
-        random_shuffle(order_.begin(), order_.end());
+      if (i == 0) {
+        if (shuffle_) {
+          random_shuffle(order_.begin(), order_.end());
+        }
         matrix = nullptr;
         return 0;
       }
