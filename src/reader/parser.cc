@@ -23,7 +23,6 @@ This file is the implementation of Parser.
 #include "src/reader/parser.h"
 
 #include "src/base/split_string.h"
-#include "src/base/split_string.cc"
 
 #include <stdlib.h>
 
