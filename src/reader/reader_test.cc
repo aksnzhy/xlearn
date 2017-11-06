@@ -36,7 +36,7 @@ namespace xLearn {
 const string kTestfilename = "./test_reader";
 const string kStr = "0 1:0.123 1:0.123 1:0.123\n";
 const string kStrFFM = "1 1:1:0.123 1:1:0.123 1:1:0.123\n";
-const string kStrCSV = "0.123 0.123 0.123 0\n";
+const string kStrCSV = "0 0.123 0.123 0.123\n";
 const string kStrNoy = "1:0.123 1:0.123 1:0.123\n";
 const string kStrFFMNoy = "1:1:0.123 1:1:0.123 1:1:0.123\n";
 const index_t kNumLines = 100000;

@@ -141,6 +141,8 @@ void Checker::Initialize(bool is_train, int argc, char* argv[]) {
   } else {  // for Prediction
     menu_.push_back(std::string("-o"));
     menu_.push_back(std::string("-l"));
+    menu_.push_back(std::string("--sign"));
+    menu_.push_back(std::string("--sigmoid"));
   }
   // Get the user's input
   for (int i = 0; i < argc; ++i) {
@@ -457,25 +459,23 @@ bool Checker::check_prediction_options(HyperParam& hyper_param) {
     return false;
   }
   /*********************************************************
-   *  Check the number of args                             *
-   *********************************************************/
-  StringList list(args_.begin()+3, args_.end());
-  if (list.size() % 2 != 0) {
-    printf("[Error] Every options should have a value \n");
-    for (int i = 0; i < list.size(); i+=2) {
-      printf("  %s : %s\n", list[i].c_str(), list[i+1].c_str());
-    }
-    return false;
-  }
-  /*********************************************************
    *  Check each input argument                            *
    *********************************************************/
+  StringList list(args_.begin()+3, args_.end());
   StrSimilar ss;
-  for (int i = 0; i < list.size(); i+=2) {
+  for (int i = 0; i < list.size(); ) {
     if (list[i].compare("-o") == 0) {  // path of the output
       hyper_param.output_file = list[i+1];
+      i += 2;
     } else if (list[i].compare("-l") == 0) {  // path of the log file
       hyper_param.log_file = list[i+1];
+      i += 2;
+    } else if (list[i].compare("--sign") == 0) {  // convert output to 0 and 1
+      hyper_param.sign = true;
+      i += 1;
+    } else if (list[i].compare("--sigmoid") == 0) {  // using sigmoid
+      hyper_param.sigmoid = true;
+      i += 1;
     } else {  // no match
       std::string similar_str;
       ss.FindSimilar(list[i], menu_, similar_str);
@@ -484,9 +484,23 @@ bool Checker::check_prediction_options(HyperParam& hyper_param) {
              list[i].c_str(),
              similar_str.c_str());
       bo = false;
+      if (list[i][1] == '-') {  // "--" options
+        i += 1;
+      } else {  // "-" options
+        i += 2;
+      }
     }
   }
   if (!bo) { return false; }
+  /*********************************************************
+   *  Check warning and fix conflict                       *
+   *********************************************************/
+  if (hyper_param.sign && hyper_param.sigmoid) {
+    printf("[Warning] Both of --sign and --sigmoid have been set. "
+           "xLearn has already disable --sign and --sigmoid. \n");
+    hyper_param.sign = false;
+    hyper_param.sigmoid = false;
+  }
   /*********************************************************
    *  Set default value                                    *
    *********************************************************/

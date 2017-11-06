@@ -422,7 +422,9 @@ void Solver::start_prediction_work() {
   pdc.Initialize(reader_[0],
                  model_,
                  loss_,
-                 hyper_param_.output_file);
+                 hyper_param_.output_file,
+                 hyper_param_.sign,
+                 hyper_param_.sigmoid);
   // Predict and write output
   pdc.Predict();
 }

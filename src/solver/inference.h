@@ -47,7 +47,9 @@ class Predictor {
   void Initialize(Reader* reader,
                   Model* model,
                   Loss* loss,
-                  const std::string& out) {
+                  const std::string& out,
+                  bool sign = false,
+                  bool sigmoid = false) {
     CHECK_NOTNULL(reader);
     CHECK_NOTNULL(model);
     CHECK_NOTNULL(loss);
@@ -56,6 +58,8 @@ class Predictor {
     model_ = model;
     loss_ = loss;
     out_file_ = out;
+    sign_ = sign;
+    sigmoid_ = sigmoid;
   }
 
   // The core function
@@ -66,6 +70,14 @@ class Predictor {
   Model* model_;
   Loss* loss_;
   std::string out_file_;
+  bool sign_;
+  bool sigmoid_;
+
+  // Convert output by using the sigmoid function.
+  void sigmoid(std::vector<real_t>& in, std::vector<real_t>& out);
+
+  // Convert output to 0 and 1.
+  void sign(std::vector<real_t>& in, std::vector<real_t>& out);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Predictor);

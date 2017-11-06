@@ -32,7 +32,7 @@ namespace xLearn {
 
 const std::string kStr = "1 0:0.12 1:0.12 2:0.12 3:0.12 4:0.12\n";
 const std::string kStrFFM = "1 0:0:0.12 1:1:0.12 2:2:0.12 3:3:0.12 4:4:0.12\n";
-const std::string kStrCSV = "0.12 0.12 0.12 0.12 0.12 1\n";
+const std::string kStrCSV = "1 0.12 0.12 0.12 0.12 0.12\n";
 const std::string kStrNoy = "0:0.12 1:0.12 2:0.12 3:0.12 4:0.12\n";
 const std::string kStrFFMNoy = "0:0:0.12 1:1:0.12 2:2:0.12 3:3:0.12 4:4:0.12\n";
 const std::string Kfilename = "./test_file.txt";

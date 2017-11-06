@@ -204,11 +204,11 @@ void CSVParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
     SplitStringUsing(line_buf, " \t", &str_vec);
     int size = str_vec.size();
     // Add Y
-    matrix.Y[i] = atof(str_vec[size-1].c_str());
+    matrix.Y[i] = atof(str_vec[0].c_str());
     // Add features
     real_t norm = 0.0;
-    for (int j = 0; j < size-1; ++j) {
-      index_t idx = j;
+    for (int j = 1; j < size; ++j) {
+      index_t idx = j-1;
       real_t value = atof(str_vec[j].c_str());
       // skip zero
       if (value < kVerySmallNumber) { continue; }

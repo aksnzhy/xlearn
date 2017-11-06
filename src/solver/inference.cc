@@ -45,9 +45,11 @@ void Predictor::Predict() {
     if (reader_->has_label()) {
       loss_val += loss_->Evalute(out, matrix->Y);
     }
-    //if (loss_->loss_type().compare("corss-entropy")) {
-    //  loss_->Sigmoid(out, out);
-    //}
+    if (sigmoid_) {
+      this->sigmoid(out, out);
+    } else if (sign_) {
+      this->sign(out, out);
+    }
     for (index_t i = 0; i < out.size(); ++i) {
       o_file << out[i] << "\n";
     }
@@ -55,6 +57,24 @@ void Predictor::Predict() {
   if (reader_->has_label()) {
     loss_val /= total_count;
     printf("The test loss is: %.6f\n", loss_val);
+  }
+}
+
+// Convert output by using the sigmoid function.
+void Predictor::sigmoid(std::vector<real_t>& in, 
+                        std::vector<real_t>& out) {
+  CHECK_EQ(in.size(), out.size());
+  for (size_t i = 0; i < in.size(); ++i) {
+    out[i] = 1.0 / (1.0 + exp(-in[i]));
+  }
+}
+
+// Convert output to 0 and 1.
+void Predictor::sign(std::vector<real_t>& in, 
+                     std::vector<real_t>& out) {
+  CHECK_EQ(in.size(), out.size());
+  for (size_t i = 0; i < in.size(); ++i) {
+    out[i] = in[i] > 0 ? 1 : 0;
   }
 }
 
