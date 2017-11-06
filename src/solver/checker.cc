@@ -384,6 +384,18 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
            "xLearn will not dump model checkpoint to disk. \n");
     hyper_param.model_file.clear();
   }
+  if (hyper_param.validate_set_file.empty() && hyper_param.early_stop) {
+    printf("[Warning] Validation file not found, xLearn has already "
+           "disable early-stopping. \n");
+    hyper_param.early_stop = false;
+  }
+  if (hyper_param.metric.compare("none") != 0 &&
+      hyper_param.validate_set_file.empty() &&
+      !hyper_param.cross_validation) {
+    printf("[Warning] Validation file not found, xLearn has already "
+           "disable (-x %s) option.\n", hyper_param.metric.c_str());
+    hyper_param.metric = "none";
+  }
   if (hyper_param.loss_func.compare("squared") == 0) {
     if (hyper_param.metric.compare("acc") == 0 ||
         hyper_param.metric.compare("prec") == 0 ||
