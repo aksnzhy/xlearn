@@ -32,6 +32,8 @@ programming convenient.
 #include "base/stdint_msvc.h"  // Visual C++ use this header.
 #endif
 
+#include <limits>
+
 #include "src/base/logging.h"
 
 //------------------------------------------------------------------------------
