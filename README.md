@@ -1,4 +1,4 @@
-<img src="https://github.com/aksnzhy/xLearn/raw/master/img/xlearn_logo.png" width = "400"/>
+<img src="https://github.com/aksnzhy/xLearn/raw/master/img/xlearn_logo.png" width = "400"/>  
 =========  
 [![GitHub license](http://dmlc.github.io/img/apache2.svg)](./LICENSE)
 
