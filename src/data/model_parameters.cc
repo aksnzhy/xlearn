@@ -27,7 +27,6 @@ This file is the implementation of the Model class.
 
 #include "src/base/file_util.h"
 #include "src/base/math.h"
-#include "src/base/logging.cc"
 
 namespace xLearn {
 
