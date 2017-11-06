@@ -2,7 +2,7 @@
 add_library(loss loss.cc squared_loss.cc cross_entropy_loss.cc metric.cc)
 
 # Build uinttests
-set(LIBS loss gtest base data score)
+set(LIBS base data loss gtest score)
 
 add_executable(loss_test loss_test.cc)
 target_link_libraries(loss_test gtest_main ${LIBS})

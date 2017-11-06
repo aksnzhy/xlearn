@@ -2,7 +2,7 @@
 add_library(data model_parameters.cc)
 
 # Build unittests.
-set(LIBS data base gtest)
+set(LIBS base data gtest)
 
 add_executable(data_structure_test data_structure_test.cc)
 target_link_libraries(data_structure_test gtest_main ${LIBS})
