@@ -27,6 +27,7 @@ This file is the implementation of the Model class.
 
 #include "src/base/file_util.h"
 #include "src/base/math.h"
+#include "src/base/logging.h"
 
 namespace xLearn {
 
@@ -95,9 +96,9 @@ void Model::initial(bool set_val) {
       param_v_ = nullptr;
     }
   } catch (std::bad_alloc&) {
-    //LOG(FATAL) << "Cannot allocate enough memory for current  \
-    //               model parameters. Parameter size: "
-    //           << GetNumParameter();
+    LOG(FATAL) << "Cannot allocate enough memory for current  \
+                   model parameters. Parameter size: "
+               << GetNumParameter();
   }
   // set value for model
   if (set_val) {
