@@ -25,7 +25,7 @@ of the xLearn.
 #define XLEARN_SOLVER_SOLVER_H_
 
 #include "src/base/common.h"
-#include "Src/base/thread_pool.h"
+#include "src/base/thread_pool.h"
 #include "src/data/hyper_parameters.h"
 #include "src/data/data_structure.h"
 #include "src/data/model_parameters.h"
