@@ -1,9 +1,9 @@
 # Build library base
-add_library(base stringprintf.cc logging.cc split_string.cc
+add_library(base stringprintf.cc logging.cc split_string.cc 
 levenshtein_distance.cc timer.cc)
 
 # Build unittests.
-set(LIBS base gtest)
+set(LIBS base pthread gtest)
 
 add_executable(levenshtein_distance_test levenshtein_distance_test.cc)
 target_link_libraries(levenshtein_distance_test gtest_main ${LIBS})
