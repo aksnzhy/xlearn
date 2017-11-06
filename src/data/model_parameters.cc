@@ -22,6 +22,7 @@ This file is the implementation of the Model class.
 
 #include "src/data/model_parameters.h"
 
+#include <string.h>
 #include <pmmintrin.h>  // for SSE
 
 #include "src/base/file_util.h"

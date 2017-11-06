@@ -25,6 +25,7 @@ This file contains facilitlies to control the file.
 
 #include <unistd.h>
 #include <fcntl.h>
+#include <string.h>
 
 #include "src/base/common.h"
 #include "src/base/stringprintf.h"
