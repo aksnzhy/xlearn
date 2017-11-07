@@ -8,8 +8,8 @@
 
 xLearn is a ***high performance***, ***easy-to-use***, and ***scalable*** machine learning package. 
 If you are the user of liblinear, libfm, or libffm, now xLearn is your better choice.
-  
-  
+\
+\
 <img src="https://github.com/aksnzhy/xLearn/raw/master/img/speed.png" width = "800"/>   
 
 Under developing and coming soon ...
