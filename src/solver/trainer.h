@@ -114,10 +114,10 @@ class Trainer {
   // Print information during the training.
   void show_head_info(bool validate);
   void show_train_info(const MetricInfo& tr_info, 
-                   const MetricInfo& te_info,
-                   real_t time_cost, 
-                   bool validate,
-                   index_t epoch);
+                    const MetricInfo& te_info,
+                    real_t time_cost, 
+                    bool validate,
+                    index_t epoch);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Trainer);

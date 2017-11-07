@@ -98,8 +98,8 @@ class Reader {
   bool inline has_label() { return has_label_; }
 
   // If shuffle data ?
-  virtual void inline SetShuffle(bool shuffle) {
-    shuffle_ = shuffle;
+  virtual void SetShuffle(bool shuffle) {
+    this->shuffle_ = shuffle;
   }
 
  protected:
@@ -151,6 +151,14 @@ class InmemReader : public Reader {
 
   // Return to the begining of the data.
   virtual void Reset();
+
+  // If shuffle data ?
+  virtual void SetShuffle(bool shuffle) {
+    this->shuffle_ = shuffle;
+    if (shuffle_ && !order_.empty()) {
+      random_shuffle(order_.begin(), order_.end());
+    }
+  }
 
  protected:
   /* Reader will load all the data 
