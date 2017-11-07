@@ -52,10 +52,10 @@ std::string Checker::option_help() const {
 "         4 -- factorization machines (FM) \n"
 "         5 -- field-aware factorization machines (FFM) \n"
 "                                                                            \n"
-"  -x <metric>          :  The evaluation metric can be 'acc', 'prec', 'recall', 'f1' (classification), \n"
-"                          and 'mae', 'mape', 'rmsd' (regression). xLearn uses the Accuracy (acc) by default. \n"
-"                          If we set this option to 'none', xLearn will not print any metric information. \n"
-"                                                                                              \n"
+"  -x <metric>          :  The metric can be 'acc', 'prec', 'recall', 'f1' (classification), and 'mae',\n"
+"                          'mape', 'rmsd (rmse)' (regression). xLearn uses the Accuracy (acc) by default.\n"
+"                          If we set this option to 'none', xLearn will not print any metric information.\n"
+"                                                                                                 \n"
 "  -v <validate_file>   :  Path of the validation data file. This option will be empty by default, \n"
 "                          and in this way, the xLearn will not perform validation. \n"
 "                                                                                              \n"
@@ -235,10 +235,11 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
           list[i+1].compare("mae") != 0 &&
           list[i+1].compare("mape") != 0 &&
           list[i+1].compare("rmsd") != 0 &&
+          list[i+1].compare("rmse") != 0 &&
           list[i+1].compare("none") != 0) {
         printf("[Error] Unknow metric: %s \n"
                " -x can only be 'acc', 'prec', 'recall', "
-               "'f1', 'mae', 'mape', and 'none' \n",
+               "'f1', 'mae', 'mape', 'rmsd', 'rmse' and 'none' \n",
                list[i+1].c_str());
         bo = false;
       } else {
@@ -411,7 +412,8 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
   } else if (hyper_param.loss_func.compare("cross-entropy") == 0) {
     if (hyper_param.metric.compare("mae") == 0 ||
         hyper_param.metric.compare("mape") == 0 ||
-        hyper_param.metric.compare("rmsd") == 0) {
+        hyper_param.metric.compare("rmsd") == 0 ||
+        hyper_param.metric.compare("rmse") == 0) {
       printf("[Warning] The -x: %s metric can only be used "
              "in regression tasks. xLearn will ignore this option. \n",
               hyper_param.metric.c_str());
@@ -423,6 +425,9 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
    *********************************************************/
   if (hyper_param.model_file.empty() && !hyper_param.cross_validation) {
     hyper_param.model_file = hyper_param.train_set_file + ".model";
+  }
+  if (hyper_param.metric.compare("rmse") == 0) {
+    hyper_param.metric = "rmsd";
   }
 
   return true;
