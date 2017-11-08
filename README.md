@@ -16,6 +16,8 @@ of liblinear, libfm, or libffm, now the xLearn is your another better choice.
 
 ### Ease-of-use
 
+<img src="https://github.com/aksnzhy/xLearn/raw/master/img/code.png"/>   
+
 ### Scalability
 
 Under developing and coming soon ...
