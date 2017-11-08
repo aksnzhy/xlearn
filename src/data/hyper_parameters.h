@@ -57,6 +57,9 @@ struct HyperParam {
   For now, it can be 'acc', 'prec', 'recall', 
   'f1', 'mae', 'rmsd', 'mape', or 'none' */
   std::string metric = "none";
+  /* Block size for on-disk training.
+  On default this value will be set to 500 MB */
+  uint64 block_size = 500;
 //------------------------------------------------------------------------------
 // Parameters for optimization method
 //------------------------------------------------------------------------------

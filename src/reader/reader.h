@@ -26,10 +26,12 @@ reading data from data source.
 
 #include <string>
 #include <vector>
+#include <thread>
 
 #include "src/base/common.h"
 #include "src/base/class_register.h"
 #include "src/base/scoped_ptr.h"
+#include "src/base/thread_pool.h"
 #include "src/data/data_structure.h"
 #include "src/reader/parser.h"
 
@@ -141,7 +143,7 @@ class InmemReader : public Reader {
  public:
   // Constructor and Destructor
   InmemReader() : pos_(0) { }
-  ~InmemReader() { }
+  ~InmemReader() { data_buf_.Release(); }
 
   // Pre-load all the data into memory buffer.
   virtual void Initialize(const std::string& filename);
@@ -188,14 +190,15 @@ class InmemReader : public Reader {
 // Samplling data from disk file.
 // OndiskReader is used to train very big data, which cannot be
 // loaded into main memory of current single machine. We use multi-thread 
-// to support data pipeline reading to accelerate reading.
+// to support data pipeline to accelerate reading.
 //------------------------------------------------------------------------------
 class OndiskReader : public Reader {
  public:
   OndiskReader() {  }
-  ~OndiskReader() { }
+  ~OndiskReader() { Close(file_ptr_); }
 
-  // Create new thread as back-thread, which will read 
+  // Allocate memory for block and pick up one thread 
+  // from thread pool as back-thread, which will read 
   // and parse data asynchrously.
   virtual void Initialize(const std::string& filename);
 
@@ -204,6 +207,60 @@ class OndiskReader : public Reader {
 
   // Return to the begining of the file
   virtual void Reset();
+
+  // We cannot set shuffle for OndiskReader
+  void SetShuffle(bool shuffle) {
+    if (shuffle == true) {
+      LOG(ERROR) << "Cannot set shuffle for OndiskReader.";
+    }
+    this->shuffle_ = false;
+  }
+
+  /*********************************************************
+   *  A set of get functions                               *
+   *********************************************************/
+  inline uint64 get_block_size() { return block_size_; }
+  inline char* get_block() { return block_; }
+  inline FILE* get_file_ptr() { return file_ptr_; }
+  inline DMatrix* get_data_sample() { return &data_samples_; }
+  inline Parser* get_parser() { return parser_; }
+
+  /*********************************************************
+   *  Note that we need to invoke these two functions      *
+   *  before invoking the Initialize() function.           *
+   *********************************************************/
+
+  // Set thread pool
+  void SetThreadPool(ThreadPool* pool) {
+    CHECK_NOTNULL(pool);
+    this->pool_ = pool;
+  }
+  // Set block size
+  void SetBlockSize(uint64 size) {
+    CHECK_GT(size, 0);
+    this->block_size_ = size;
+  }
+ 
+ protected:
+  /* Maintain the file pointer */
+  FILE* file_ptr_;
+  /* We pick up one thread from this pool
+  to read and parse data */
+  ThreadPool* pool_;
+  /* A block of memory to store the data */
+  char* block_;
+  /* Block size */
+  uint64 block_size_;
+  /* Protect all dat and condition */
+  std::mutex mutex_;
+  /* Condition when consumer should wait */
+  std::condition_variable cond_not_full_;
+  /* Condition when producer should wait */
+  std::condition_variable cond_not_empty_;
+
+  // Read a block of data from disk file and 
+  // parse the data to DMatrix in a loop. 
+  friend void read_block(OndiskReader* reader);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(OndiskReader);

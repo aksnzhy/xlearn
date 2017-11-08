@@ -201,12 +201,58 @@ void InmemReader::Reset() { pos_ = 0; }
 // Implementation of OndiskReader.
 //------------------------------------------------------------------------------
 
-void OndiskReader::Initialize(const std::string& filename) { }
+void OndiskReader::Initialize(const std::string& filename) { 
+  CHECK_NE(filename.empty(), true);
+  this->filename_ = filename;
+  // Init parser_                                 
+  parser_ = CreateParser(check_file_format().c_str());
+  if (has_label_) parser_->setLabel(true);
+  else parser_->setLabel(false);
+  // Allocate memory for block
+  this->block_ = (char*)malloc(block_size_);
+  file_ptr_ = OpenFileOrDie(filename_.c_str(), "r");
+  // Pick up one thread from thread pool as back-end thread
+
+}
 
 // Sample data from disk file.
-index_t OndiskReader::Samples(DMatrix* &matrix) { return 0; }
+index_t OndiskReader::Samples(DMatrix* &matrix) { 
+  return 0; 
+}
 
-// Return to the begining of the file.
-void OndiskReader::Reset() { }
+// Return to the begining of the file
+void OndiskReader::Reset() {
+  int ret = fseek(file_ptr_, 0, SEEK_SET);
+  if (ret != 0) {
+    LOG(FATAL) << "Fail to return to the head of file.";
+  }
+}
+
+// Read a block of data from disk file
+void read_block(OndiskReader* reader) {
+  // Convert MB to byte
+  uint64 read_byte = reader->get_block_size() * 1024 * 1024;
+  // Continuously read data in loop
+  for (;;) {
+    // We can set the length of data_sample_ to -1
+    // so that the reader will know that we have already
+    // finish our job, and then the reader can break.
+    if (reader->get_data_sample()->row_length == -1) {
+      break;
+    }
+    size_t ret = ReadDataFromDisk(reader->get_file_ptr(), 
+                                  reader->get_block(), 
+                                  read_byte);
+    // At the end of file
+    if (ret == 0) {
+      // Return to the head of file.
+      reader->Reset();
+      // Set the length of data_sample_ to zero
+      // so that we can know that we reach the end 
+      // of current file.
+      reader->get_data_sample()->row_length = 0;
+    }
+  }
+}
 
 }  // namespace xLearn
