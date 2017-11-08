@@ -14,7 +14,7 @@ of liblinear, libfm, or libffm, now the xLearn is your another better choice.
 
 <img src="https://github.com/aksnzhy/xLearn/raw/master/img/speed.png" width = "800"/>   
 
-### Easy-to-use
+### Ease-of-use
 
 ### Scalability
 
