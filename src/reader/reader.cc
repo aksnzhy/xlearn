@@ -213,7 +213,9 @@ void OndiskReader::Initialize(const std::string& filename) {
     this->block_ = (char*)malloc(block_size_*1024*1024);
   } catch (std::bad_alloc&) {
     LOG(FATAL) << "Cannot allocate enough memory for data  \
-                   block. Block size: " << block_size_ << "MB";
+                   block. Block size: " 
+               << block_size_ << "MB. "
+               << "You set change the block size via configuration.";
   }
   file_ptr_ = OpenFileOrDie(filename_.c_str(), "r");
   // Pick up one thread from thread pool as back-end thread
