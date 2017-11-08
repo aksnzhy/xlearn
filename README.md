@@ -8,7 +8,7 @@
 
 xLearn is a ***high performance***, ***easy-to-use***, and ***scalable*** machine learning package, 
 which can be used to solve large-scale classification and regression problems. If you are the user 
-of liblinear, libfm, or libffm, now xLearn is your better choice.
+of liblinear, libfm, or libffm, now the xLearn is your another better choice.
 
 ### Performance 
 
