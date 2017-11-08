@@ -33,3 +33,4 @@
 
 # vim temp file
 *.un~
+*.DS_Store
