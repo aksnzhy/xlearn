@@ -77,13 +77,17 @@ class Loss {
   virtual ~Loss() { }
 
   // This function needs to be invoked before using this class
-  void Initialize(Score* score, ThreadPool* pool, bool norm = true) {
+  void Initialize(Score* score, 
+                  ThreadPool* pool, 
+                  bool norm = true,
+                  bool lock_free = false) {
     CHECK_NOTNULL(score);
     CHECK_NOTNULL(pool);
     score_func_ = score;
     pool_ = pool;
     norm_ = norm;
     threadNumber_ = pool_->ThreadNumber();
+    lock_free_ = lock_free;
   }
 
   // Given predictions and labels, return loss value.
@@ -112,6 +116,8 @@ class Loss {
   ThreadPool* pool_;
   /* Number of thread in thread pool */
   size_t threadNumber_;
+  /* Open lock-free training ? */
+  bool lock_free_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Loss);

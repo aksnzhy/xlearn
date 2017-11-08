@@ -77,7 +77,9 @@ class Metric {
   virtual inline std::string metric_type() = 0;
 
  protected:
+  /* Pointer of thread pool */
   ThreadPool* pool_;
+  /* Thread number used by Metric */
   size_t threadNumber_;
 
  private:
@@ -137,7 +139,7 @@ class AccMetric : public Metric {
                                end_idx));
     }
     // Wait all of the threads finish their job
-    pool_->Sync();
+    pool_->Sync(threadNumber_);
     for (size_t i = 0; i < sum.size(); ++i) {
       true_pred_ += sum[i];
     }
@@ -221,7 +223,7 @@ class PrecMetric : public Metric {
                                end_idx));
     }
     // Wait all of the threads finish their job
-    pool_->Sync();
+    pool_->Sync(threadNumber_);
     for (size_t i = 0; i < sum_1.size(); ++i) {
       true_positive_ += sum_1[i];
     }
@@ -309,7 +311,7 @@ class RecallMetric : public Metric {
                                end_idx));
     }
     // Wait all of the threads finish their job
-    pool_->Sync();
+    pool_->Sync(threadNumber_);
     for (size_t i = 0; i < sum_1.size(); ++i) {
       true_positive_ += sum_1[i];
     }
@@ -400,7 +402,7 @@ class F1Metric : public Metric {
                                end_idx));
     }
     // Wait all of the threads finish their job
-    pool_->Sync();
+    pool_->Sync(threadNumber_);
     for (size_t i = 0; i < sum_1.size(); ++i) {
       true_positive_ += sum_1[i];
     }
@@ -487,7 +489,7 @@ class MAEMetric : public Metric {
                                end_idx));
     }
     // Wait all of the threads finish their job
-    pool_->Sync();
+    pool_->Sync(threadNumber_);
     for (size_t i = 0; i < sum.size(); ++i) {
       error_ += sum[i];
     }
@@ -561,7 +563,7 @@ class MAPEMetric : public Metric {
                                end_idx));
     }
     // Wait all of the threads finish their job
-    pool_->Sync();
+    pool_->Sync(threadNumber_);
     for (size_t i = 0; i < sum.size(); ++i) {
       error_ += sum[i];
     }
@@ -637,7 +639,7 @@ class RMSDMetric : public Metric {
                                end_idx));
     }
     // Wait all of the threads finish their job
-    pool_->Sync();
+    pool_->Sync(threadNumber_);
     for (size_t i = 0; i < sum.size(); ++i) {
       error_ += sum[i];
     }

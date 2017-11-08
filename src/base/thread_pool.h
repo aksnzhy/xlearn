@@ -63,7 +63,7 @@ class ThreadPool {
     -> std::future<typename std::result_of<F(Args...)>::type>;
 
   // Sync threads
-  void Sync();
+  void Sync(int wait_count);
 
   // Return the number of threads
   size_t ThreadNumber();
@@ -132,8 +132,8 @@ auto ThreadPool::enqueue(F&& f, Args&&... args)
 }
 
 // Wait all thread to finish their jobs
-inline void ThreadPool::Sync() {
-  while (sync != workers.size()) {}
+inline void ThreadPool::Sync(int wait_count) {
+  while (sync != wait_count) {}
   sync = 0;
 }
 

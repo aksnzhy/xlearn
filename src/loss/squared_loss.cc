@@ -69,7 +69,7 @@ real_t SquaredLoss::Evalute(const std::vector<real_t>& pred,
                              end_idx));
   }
   // Wait all of the threads finish their job
-  pool_->Sync();
+  pool_->Sync(threadNumber_);
   for (size_t i = 0; i < sum.size(); ++i) {
     val += sum[i];
   }
@@ -113,9 +113,10 @@ void SquaredLoss::CalcGrad(const DMatrix* matrix,
   CHECK_NOTNULL(matrix);
   CHECK_GT(matrix->row_length, 0);
   size_t row_len = matrix->row_length;
-  for (int i = 0; i < threadNumber_; ++i) {
-    size_t start = getStart(row_len, threadNumber_, i);
-    size_t end = getEnd(row_len, threadNumber_, i);
+  int count = lock_free_ ? threadNumber_ : 1;
+  for (int i = 0; i < count; ++i) {
+    size_t start = getStart(row_len, count, i);
+    size_t end = getEnd(row_len, count, i);
     pool_->enqueue(std::bind(sq_gradient_thread,
                              matrix,
                              &model,
@@ -125,7 +126,7 @@ void SquaredLoss::CalcGrad(const DMatrix* matrix,
                              end));
   }
   // Wait all of the threads finish their job
-  pool_->Sync();
+  pool_->Sync(count);
 }
 
 } // namespace xLearn

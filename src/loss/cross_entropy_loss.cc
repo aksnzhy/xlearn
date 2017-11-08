@@ -71,7 +71,7 @@ real_t CrossEntropyLoss::Evalute(const std::vector<real_t>& pred,
                              end_idx));
   }
   // Wait all of the threads finish their job
-  pool_->Sync();
+  pool_->Sync(threadNumber_);
   for (size_t i = 0; i < sum.size(); ++i) {
     val += sum[i];
   }
@@ -118,9 +118,10 @@ void CrossEntropyLoss::CalcGrad(const DMatrix* matrix,
   CHECK_GT(matrix->row_length, 0);
   size_t row_len = matrix->row_length;
   // multi-thread training
-  for (int i = 0; i < threadNumber_; ++i) {
-    index_t start_idx = getStart(row_len, threadNumber_, i);
-    index_t end_idx = getEnd(row_len, threadNumber_, i);
+  int count = lock_free_ ? threadNumber_ : 1;
+  for (int i = 0; i < count; ++i) {
+    index_t start_idx = getStart(row_len, count, i);
+    index_t end_idx = getEnd(row_len, count, i);
     pool_->enqueue(std::bind(ce_gradient_thread,
                              matrix,
                              &model,
@@ -130,7 +131,7 @@ void CrossEntropyLoss::CalcGrad(const DMatrix* matrix,
                              end_idx));
   }
   // Wait all of the threads finish their job
-  pool_->Sync();
+  pool_->Sync(count);
 }
 
 } // namespace xLearn

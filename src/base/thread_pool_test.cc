@@ -35,7 +35,7 @@ TEST(ThreadPoolTest, Print_test) {
     pool.enqueue(std::bind(func, 2));
     pool.enqueue(std::bind(func, 3));
     pool.enqueue(std::bind(func, 4));
-    pool.Sync();
+    pool.Sync(4);
     printf("Hello master\n");
   }
   printf("final\n");
@@ -62,7 +62,7 @@ TEST(ThreadPoolTest, Sum_test) {
     pool.enqueue(std::bind(Sum, &a3));
     pool.enqueue(std::bind(Sum, &a4));
     pool.enqueue(std::bind(Sum, &a5));
-    pool.Sync();
+    pool.Sync(5);
   }
   int sum = a1 + a2 + a3 + a4 + a5;
   EXPECT_EQ(sum, 75);

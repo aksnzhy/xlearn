@@ -160,8 +160,7 @@ void Solver::init_train() {
   /*********************************************************
    *  Initialize thread pool                               *
    *********************************************************/
-  size_t threadNumber = hyper_param_.lock_free ? 
-           std::thread::hardware_concurrency() : 1;
+  size_t threadNumber = std::thread::hardware_concurrency();
   pool_ = new ThreadPool(threadNumber);
   /*********************************************************
    *  Initialize Reader                                    *
@@ -271,7 +270,9 @@ void Solver::init_train() {
    *  Initialize loss function                             *
    *********************************************************/
   loss_ = create_loss();
-  loss_->Initialize(score_, pool_, hyper_param_.norm);
+  loss_->Initialize(score_, pool_, 
+         hyper_param_.norm, 
+         hyper_param_.lock_free);
   LOG(INFO) << "Initialize loss function.";
   /*********************************************************
    *  Init metric                                          *

@@ -70,7 +70,7 @@ void Loss::Predict(const DMatrix* matrix,
                              end_idx));
   }
   // Wait all of the threads finish their job
-  pool_->Sync();
+  pool_->Sync(threadNumber_);
 }
 
 } // xLearn
