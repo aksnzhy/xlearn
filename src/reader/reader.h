@@ -251,7 +251,7 @@ class OndiskReader : public Reader {
   char* block_;
   /* Block size */
   uint64 block_size_;
-  /* Protect all dat and condition */
+  /* Protect all data and condition */
   std::mutex mutex_;
   /* Condition when consumer should wait */
   std::condition_variable cond_not_full_;

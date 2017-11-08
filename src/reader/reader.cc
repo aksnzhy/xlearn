@@ -209,7 +209,12 @@ void OndiskReader::Initialize(const std::string& filename) {
   if (has_label_) parser_->setLabel(true);
   else parser_->setLabel(false);
   // Allocate memory for block
-  this->block_ = (char*)malloc(block_size_);
+  try {
+    this->block_ = (char*)malloc(block_size_*1024*1024);
+  } catch (std::bad_alloc&) {
+    LOG(FATAL) << "Cannot allocate enough memory for data  \
+                   block. Block size: " << block_size_ << "MB";
+  }
   file_ptr_ = OpenFileOrDie(filename_.c_str(), "r");
   // Pick up one thread from thread pool as back-end thread
 
