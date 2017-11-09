@@ -103,4 +103,37 @@ TEST(DMATRIX_TEST, Find_max_feat_and_field) {
   EXPECT_EQ(matrix.MaxField(), 9);
 }
 
+TEST(DMATRIX_TEST, CopyFrom) {
+  // Init matrix
+  DMatrix matrix;
+  matrix.ResetMatrix(10);
+  for (size_t i = 0; i < 10; ++i) {
+    matrix.AddNode(i, i, 2.5, i);
+    matrix.Y[i] = i;
+    matrix.norm[i] = 0.25;
+  }
+  matrix.has_label = false;
+  matrix.SetHash(1234, 5678);
+  // Copy matrix
+  DMatrix new_matrix;
+  new_matrix.CopyFrom(&matrix);
+  matrix.Release();
+  // Check
+  EXPECT_EQ(new_matrix.row_length, 10);
+  EXPECT_EQ(new_matrix.hash_value_1, 1234);
+  EXPECT_EQ(new_matrix.hash_value_2, 5678);
+  EXPECT_EQ(new_matrix.has_label, false);
+  for (int i = 0; i < 10; ++i) {
+    EXPECT_EQ(new_matrix.Y[i], i);
+    EXPECT_EQ(new_matrix.norm[i], 0.25);
+    SparseRow *row =new_matrix.row[i];
+    for (SparseRow::iterator iter = row->begin();
+         iter != row->end(); ++iter) {
+      EXPECT_EQ(iter->field_id, i);
+      EXPECT_EQ(iter->feat_id, i);
+      EXPECT_FLOAT_EQ(iter->feat_val, 2.5);
+    }
+  }
+}
+
 }  // namespace xLearn

@@ -194,7 +194,7 @@ class InmemReader : public Reader {
 //------------------------------------------------------------------------------
 class OndiskReader : public Reader {
  public:
-  OndiskReader() {  }
+  OndiskReader() :full_(false) {  }
   ~OndiskReader() { Close(file_ptr_); }
 
   // Allocate memory for block and pick up one thread 
@@ -222,7 +222,8 @@ class OndiskReader : public Reader {
   inline uint64 get_block_size() { return block_size_; }
   inline char* get_block() { return block_; }
   inline FILE* get_file_ptr() { return file_ptr_; }
-  inline DMatrix* get_data_sample() { return &data_samples_; }
+  inline DMatrix* get_buffer() { return &data_buf_; }
+  inline DMatrix* get_sample() { return &data_samples_; }
   inline Parser* get_parser() { return parser_; }
 
   /*********************************************************
@@ -244,6 +245,9 @@ class OndiskReader : public Reader {
  protected:
   /* Maintain the file pointer */
   FILE* file_ptr_;
+  /* Reader will load a part of the 
+  data into this buffer */
+  DMatrix data_buf_;
   /* We pick up one thread from this pool
   to read and parse data */
   ThreadPool* pool_;
@@ -257,10 +261,13 @@ class OndiskReader : public Reader {
   std::condition_variable cond_not_full_;
   /* Condition when producer should wait */
   std::condition_variable cond_not_empty_;
+  /* if has data in current DMatrix ? */
+  bool full_;
 
   // Read a block of data from disk file and 
   // parse the data to DMatrix in a loop. 
   friend void read_block(OndiskReader* reader);
+  friend void shrink_block(char* block, size_t ret, FILE* file_ptr);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(OndiskReader);

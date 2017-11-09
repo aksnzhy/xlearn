@@ -207,6 +207,37 @@ struct DMatrix {
     hash_value_2 = hash_2;
   }
 
+  // Copy another data matrix to this matrix.
+  // Note that here we do the deep copy and we will
+  // allocate memory if current matrix is empty.
+  void CopyFrom(const DMatrix* matrix) {
+    CHECK_NOTNULL(matrix);
+    this->Release();
+    // Copy hash value
+    this->hash_value_1 = matrix->hash_value_1;
+    this->hash_value_2 = matrix->hash_value_2;
+    // Copy row length
+    this->row_length = matrix->row_length;
+    this->row.resize(row_length, nullptr);
+    // Copy row
+    for (index_t i = 0; i < row_length; ++i) {
+      SparseRow* row = matrix->row[i];
+      for (SparseRow::iterator iter = row->begin();
+           iter != row->end(); ++iter) {
+        this->AddNode(i, 
+                iter->feat_id, 
+                iter->feat_val, 
+                iter->field_id);
+      }
+    }
+    // Copy y
+    this->Y = matrix->Y;
+    // Copy norm
+    this->norm = matrix->norm;
+    // Copy has label
+    this->has_label = matrix->has_label;
+  }
+
   // Serialize current DMatrix to disk file.
   void Serialize(const std::string& filename) {
     CHECK_NE(filename.empty(), true);
