@@ -199,7 +199,42 @@ void read_from_memory(const std::string& filename, int task_id) {
         CheckFFM(matrix, false, false);
         break;
     }
+    usleep(60000);
   }
+}
+
+void read_from_disk(const std::string& filename, int task_id) {
+  OndiskReader reader;
+  reader.SetBlockSize(100);
+  reader.Initialize(filename);
+  DMatrix* matrix = new DMatrix;
+  for (int i = 0; i < iteration_num; ++i) {
+    int record_num = reader.Samples(matrix);
+    //std::cout << i << std::endl;
+    if (record_num == 0) {
+      --i;
+      reader.Reset();
+      continue;
+    }
+    switch(task_id) {
+      case 0:
+        CheckLR(matrix, true, true);
+        break;
+      case 1:
+        CheckFFM(matrix, true, true);
+        break;
+      case 2:
+        CheckCSV(matrix, true);
+        break;
+      case 3:
+        CheckLR(matrix, false, true);
+        break;
+      case 4:
+        CheckFFM(matrix, false, true);
+        break;
+    }
+    usleep(60000);
+  } 
 }
 
 TEST(ReaderTest, SampleFromMemory) {
@@ -232,12 +267,31 @@ TEST(ReaderTest, ReadFromBinary) {
   read_from_memory(ffm_file, 1);
   read_from_memory(csv_file, 2);
   read_from_memory(lr_no_file, 3);
-  read_from_memory(ffm_no_file, 4);
+  read_from_memory(ffm_no_file, 4);  
+}
+
+TEST(ReaderTest, SampleFromDisk) { 
+  // has label
+  string lr_file = kTestfilename + "_LR.txt";
+  string ffm_file = kTestfilename + "_ffm.txt";
+  string csv_file = kTestfilename + "_csv.txt";
+  // has no label
+  string lr_no_file = kTestfilename + "_LR_no.txt";
+  string ffm_no_file = kTestfilename + "_ffm_no.txt";
+  // check
+  read_from_disk(lr_file, 0);
+  printf("check lr\n");
+  read_from_disk(ffm_file, 1);
+  printf("check ffm\n");
+  read_from_disk(csv_file, 2);
+  printf("check csv\n");
+  read_from_disk(lr_no_file, 3);
+  printf("check lr\n");
+  read_from_disk(ffm_no_file, 4);
+  printf("check ffm\n");
   // delete file
   delete_file();
 }
-
-//TEST_F(ReaderTest, SampleFromDisk) { }
 
 Reader* CreateReader(const char* format_name) {
   return CREATE_READER(format_name);

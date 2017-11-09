@@ -201,58 +201,7 @@ void InmemReader::Reset() { pos_ = 0; }
 // Implementation of OndiskReader.
 //------------------------------------------------------------------------------
 
-// Find the last '\n', and shrink back file pointer
-void shrink_block(char* block, size_t* ret, FILE* file_ptr) {
-  // Find the last '\n'
-  size_t index = *ret-1;
-  while (block[index] != '\n') { index--; }
-  // Shrink back file pointer
-  fseek(file_ptr, index - *ret, SEEK_CUR);
-  *ret = index + 1;
-}
-
-// Read a block of data from disk file
-void read_block(OndiskReader* reader) {
-  // Convert MB to byte
-  uint64 read_byte = reader->get_block_size() * 1024 * 1024;
-  // Continuously read data in loop
-  for (;;) {
-    std::unique_lock<std::mutex> lock(reader->mutex_);
-    // Wait until the consumer finish its job
-    while (!reader->full_) {
-      reader->cond_not_full_.wait(lock);
-    }
-    // We can set the length of data_sample_ to -1
-    // so that the reader will know that we have already
-    // finish our job, and then the reader can break the loop.
-    if (reader->get_sample()->row_length == -1) {
-      return;
-    }
-    size_t ret = ReadDataFromDisk(reader->get_file_ptr(), 
-                                  reader->get_block(), 
-                                  read_byte);
-    // At the end of file
-    if (ret == 0) {
-      // Return to the head of file.
-      reader->Reset();
-      // Set the length of data_sample_ to zero
-      // so that we can know that we reach the end 
-      // of current file.
-      reader->get_sample()->row_length = 0;
-    } else {
-      // Find the last '\n', and shrink back file pointer
-      shrink_block(reader->get_block(), &ret, reader->file_ptr_);
-      // Parse block to data_sample_
-      reader->parser_->Parse(reader->get_block(), 
-         ret, 
-         *reader->get_sample());
-    }
-    // notice the consumer thread
-    reader->full_ = true;
-    reader->cond_not_empty_.notify_one();
-  }
-}
-
+// Create parser and open file
 void OndiskReader::Initialize(const std::string& filename) { 
   CHECK_NE(filename.empty(), true);
   this->filename_ = filename;
@@ -269,10 +218,8 @@ void OndiskReader::Initialize(const std::string& filename) {
                << block_size_ << "MB. "
                << "You set change the block size via configuration.";
   }
+  // Open file
   file_ptr_ = OpenFileOrDie(filename_.c_str(), "r");
-  // Pick up one thread from thread pool as back-end thread
-  CHECK_NOTNULL(pool_);
-  pool_->enqueue(std::bind(read_block, this));
 }
 
 // Return to the begining of the file
@@ -283,21 +230,34 @@ void OndiskReader::Reset() {
   }
 }
 
+// Find the last '\n' in block, and shrink back file pointer
+void OndiskReader::shrink_block(char* block, size_t* ret, FILE* file) {
+  // Find the last '\n'
+  size_t index = *ret-1;
+  while (block[index] != '\n') { index--; }
+  // Shrink back file pointer
+  fseek(file, index-*ret+1, SEEK_CUR);
+  // The real size of block
+  *ret = index + 1;
+}
+
 // Sample data from disk file.
 index_t OndiskReader::Samples(DMatrix* &matrix) {
-  std::unique_lock<std::mutex> lock(mutex_);
-  // Wait until the producer finish its job
-  while (this->full_) {
-    cond_not_empty_.wait(lock);
-  }
-  if (data_samples_.row_length == 0) {
-    cond_not_full_.notify_one();
-    return 0; 
-  } else {
-    matrix->CopyFrom(&data_samples_);
-    cond_not_full_.notify_one();
-    return data_samples_.row_length;
-  }
+  // Convert MB to Byte
+  uint64 read_byte = block_size_ * 1024 * 1024;
+  // Read a block of data from disk file
+  size_t ret = ReadDataFromDisk(file_ptr_, block_, read_byte);
+  if (ret == 0) {
+    matrix = nullptr;
+    return 0;
+  } else if (ret == read_byte) {
+    // Find the last '\n', and shrink back file pointer
+    shrink_block(block_, &ret, file_ptr_);
+  } // else ret < read_byte: we don't need shrink_block()
+  // Parse block to data_sample_
+  parser_->Parse(block_, ret, data_samples_);
+  matrix = &data_samples_;
+  return data_samples_.row_length;
 }
 
 }  // namespace xLearn

@@ -155,7 +155,7 @@ class InmemReader : public Reader {
   virtual void Reset();
 
   // If shuffle data ?
-  virtual void SetShuffle(bool shuffle) {
+  virtual inline void SetShuffle(bool shuffle) {
     this->shuffle_ = shuffle;
     if (shuffle_ && !order_.empty()) {
       random_shuffle(order_.begin(), order_.end());
@@ -189,58 +189,37 @@ class InmemReader : public Reader {
 //------------------------------------------------------------------------------
 // Samplling data from disk file.
 // OndiskReader is used to train very big data, which cannot be
-// loaded into main memory of current single machine. We use multi-thread 
-// to support data pipeline to accelerate reading.
+// loaded into main memory of current single machine.
 //------------------------------------------------------------------------------
 class OndiskReader : public Reader {
  public:
-  OndiskReader() : pool_(nullptr), full_(false) {  }
+  // Constructor and Destructor
+  OndiskReader() 
+    : block_size_(500) {  }  /* 500 MB on default */
   ~OndiskReader() { 
-    // Notice the back-end thread finish its job
-    data_samples_.row_length = -1;
     Close(file_ptr_); 
   }
 
-  // Allocate memory for block and pick up one thread 
-  // from thread pool as back-thread, which will read 
-  // and parse data asynchrously.
+  // Create parser and open file
   virtual void Initialize(const std::string& filename);
 
   // Sample data from disk file
   virtual index_t Samples(DMatrix* &matrix);
 
-  // Return to the begining of the file
+  // Return to the head of file
   virtual void Reset();
 
   // We cannot set shuffle for OndiskReader
-  void SetShuffle(bool shuffle) {
+  void inline SetShuffle(bool shuffle) {
     if (shuffle == true) {
       LOG(ERROR) << "Cannot set shuffle for OndiskReader.";
     }
     this->shuffle_ = false;
   }
 
-  /*********************************************************
-   *  A set of get functions                               *
-   *********************************************************/
-  inline uint64 get_block_size() { return block_size_; }
-  inline char* get_block() { return block_; }
-  inline FILE* get_file_ptr() { return file_ptr_; }
-  inline DMatrix* get_sample() { return &data_samples_; }
-  inline Parser* get_parser() { return parser_; }
-
-  /*********************************************************
-   *  Note that we need to invoke these two functions      *
-   *  before invoking the Initialize() function.           *
-   *********************************************************/
-
-  // Set thread pool
-  void SetThreadPool(ThreadPool* pool) {
-    CHECK_NOTNULL(pool);
-    this->pool_ = pool;
-  }
-  // Set block size
-  void SetBlockSize(uint64 size) {
+  // Set block size. Note that we need to invoke this 
+  // function before invoking the Initialize() function.    
+  void SetBlockSize(size_t size) {
     CHECK_GT(size, 0);
     this->block_size_ = size;
   }
@@ -248,26 +227,14 @@ class OndiskReader : public Reader {
  protected:
   /* Maintain the file pointer */
   FILE* file_ptr_;
-  /* We pick up one thread from this pool
-  to read and parse data */
-  ThreadPool* pool_;
   /* A block of memory to store the data */
   char* block_;
   /* Block size */
-  uint64 block_size_;
-  /* Protect all data and condition */
-  std::mutex mutex_;
-  /* Condition when consumer should wait */
-  std::condition_variable cond_not_full_;
-  /* Condition when producer should wait */
-  std::condition_variable cond_not_empty_;
-  /* if has data in current DMatrix ? */
-  bool full_;
+  size_t block_size_;
 
-  // Read a block of data from disk file and 
-  // parse the data to DMatrix in a loop. 
-  friend void read_block(OndiskReader* reader);
-  friend void shrink_block(char* block, size_t ret, FILE* file_ptr);
+  // Find the last '\n' in block and 
+  // shrink back file pointer.
+  void shrink_block(char* block, size_t* ret, FILE* file);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(OndiskReader);

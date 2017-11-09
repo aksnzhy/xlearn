@@ -203,7 +203,9 @@ void Solver::init_train() {
   for (int i = 0; i < num_reader; ++i) {
     reader_[i] = create_reader();
     reader_[i]->Initialize(file_list[i]);
-    reader_[i]->SetShuffle(true);
+    if (!hyper_param_.on_disk) {
+      reader_[i]->SetShuffle(true);
+    }
     if (reader_[i] == nullptr) {
       printf("Cannot open the file %s\n",
              file_list[i].c_str());
