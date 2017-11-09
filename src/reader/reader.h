@@ -194,7 +194,7 @@ class InmemReader : public Reader {
 //------------------------------------------------------------------------------
 class OndiskReader : public Reader {
  public:
-  OndiskReader() : full_(false) {  }
+  OndiskReader() : pool_(nullptr), full_(false) {  }
   ~OndiskReader() { 
     // Notice the back-end thread finish its job
     data_samples_.row_length = -1;

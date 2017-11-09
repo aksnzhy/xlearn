@@ -201,57 +201,11 @@ void InmemReader::Reset() { pos_ = 0; }
 // Implementation of OndiskReader.
 //------------------------------------------------------------------------------
 
-void OndiskReader::Initialize(const std::string& filename) { 
-  CHECK_NE(filename.empty(), true);
-  this->filename_ = filename;
-  // Init parser_                                 
-  parser_ = CreateParser(check_file_format().c_str());
-  if (has_label_) parser_->setLabel(true);
-  else parser_->setLabel(false);
-  // Allocate memory for block
-  try {
-    this->block_ = (char*)malloc(block_size_*1024*1024);
-  } catch (std::bad_alloc&) {
-    LOG(FATAL) << "Cannot allocate enough memory for data  \
-                   block. Block size: " 
-               << block_size_ << "MB. "
-               << "You set change the block size via configuration.";
-  }
-  file_ptr_ = OpenFileOrDie(filename_.c_str(), "r");
-  // Pick up one thread from thread pool as back-end thread
-
-}
-
-// Return to the begining of the file
-void OndiskReader::Reset() {
-  int ret = fseek(file_ptr_, 0, SEEK_SET);
-  if (ret != 0) {
-    LOG(FATAL) << "Fail to return to the head of file.";
-  }
-}
-
-// Sample data from disk file.
-index_t OndiskReader::Samples(DMatrix* &matrix) {
-  std::unique_lock<std::mutex> lock(mutex_);
-  // Wait until the producer finish its job
-  while (this->full_) {
-    cond_not_empty_.wait(lock);
-  }
-  if (data_samples_.row_length == 0) {
-    cond_not_full_.notify_one();
-    return 0; 
-  } else {
-    matrix->CopyFrom(&data_samples_);
-    cond_not_full_.notify_one();
-    return data_samples_.row_length;
-  }
-}
-
 // Find the last '\n', and shrink back file pointer
 void shrink_block(char* block, size_t* ret, FILE* file_ptr) {
   // Find the last '\n'
   size_t index = *ret-1;
-  while (block[index] != '\n') {index--;}
+  while (block[index] != '\n') { index--; }
   // Shrink back file pointer
   fseek(file_ptr, index - *ret, SEEK_CUR);
   *ret = index + 1;
@@ -296,6 +250,53 @@ void read_block(OndiskReader* reader) {
     // notice the consumer thread
     reader->full_ = true;
     reader->cond_not_empty_.notify_one();
+  }
+}
+
+void OndiskReader::Initialize(const std::string& filename) { 
+  CHECK_NE(filename.empty(), true);
+  this->filename_ = filename;
+  // Init parser_                                 
+  parser_ = CreateParser(check_file_format().c_str());
+  if (has_label_) parser_->setLabel(true);
+  else parser_->setLabel(false);
+  // Allocate memory for block
+  try {
+    this->block_ = (char*)malloc(block_size_*1024*1024);
+  } catch (std::bad_alloc&) {
+    LOG(FATAL) << "Cannot allocate enough memory for data  \
+                   block. Block size: " 
+               << block_size_ << "MB. "
+               << "You set change the block size via configuration.";
+  }
+  file_ptr_ = OpenFileOrDie(filename_.c_str(), "r");
+  // Pick up one thread from thread pool as back-end thread
+  CHECK_NOTNULL(pool_);
+  pool_->enqueue(std::bind(read_block, this));
+}
+
+// Return to the begining of the file
+void OndiskReader::Reset() {
+  int ret = fseek(file_ptr_, 0, SEEK_SET);
+  if (ret != 0) {
+    LOG(FATAL) << "Fail to return to the head of file.";
+  }
+}
+
+// Sample data from disk file.
+index_t OndiskReader::Samples(DMatrix* &matrix) {
+  std::unique_lock<std::mutex> lock(mutex_);
+  // Wait until the producer finish its job
+  while (this->full_) {
+    cond_not_empty_.wait(lock);
+  }
+  if (data_samples_.row_length == 0) {
+    cond_not_full_.notify_one();
+    return 0; 
+  } else {
+    matrix->CopyFrom(&data_samples_);
+    cond_not_full_.notify_one();
+    return data_samples_.row_length;
   }
 }
 
