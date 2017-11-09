@@ -232,17 +232,29 @@ void OndiskReader::Reset() {
 
 // Sample data from disk file.
 index_t OndiskReader::Samples(DMatrix* &matrix) {
-  index_t ret = 0; 
-  std::unique_lock<std::mutex> lock(metux_);
+  std::unique_lock<std::mutex> lock(mutex_);
   // Wait until the producer finish its job
-  cond_not_empty_.Wait(&mutex_, []{return reader->full_});
+  while (this->full_) {
+    cond_not_empty_.wait(lock);
+  }
   if (data_samples_.row_length == 0) {
     cond_not_full_.notify_one();
     return 0; 
   } else {
-    matrix = &data_sample_;
+    matrix->CopyFrom(&data_samples_);
+    cond_not_full_.notify_one();
     return data_samples_.row_length;
   }
+}
+
+// Find the last '\n', and shrink back file pointer
+void shrink_block(char* block, size_t* ret, FILE* file_ptr) {
+  // Find the last '\n'
+  size_t index = *ret-1;
+  while (block[index] != '\n') {index--;}
+  // Shrink back file pointer
+  fseek(file_ptr, index - *ret, SEEK_CUR);
+  *ret = index + 1;
 }
 
 // Read a block of data from disk file
@@ -251,13 +263,15 @@ void read_block(OndiskReader* reader) {
   uint64 read_byte = reader->get_block_size() * 1024 * 1024;
   // Continuously read data in loop
   for (;;) {
-    std::unique_lock<std::mutex> lock(metux_);
+    std::unique_lock<std::mutex> lock(reader->mutex_);
     // Wait until the consumer finish its job
-    cond_not_full_.Wait(&mutex_, []{return (!reader->full_)});
+    while (!reader->full_) {
+      reader->cond_not_full_.wait(lock);
+    }
     // We can set the length of data_sample_ to -1
     // so that the reader will know that we have already
     // finish our job, and then the reader can break the loop.
-    if (reader->get_sample().row_length == -1) {
+    if (reader->get_sample()->row_length == -1) {
       return;
     }
     size_t ret = ReadDataFromDisk(reader->get_file_ptr(), 
@@ -270,27 +284,19 @@ void read_block(OndiskReader* reader) {
       // Set the length of data_sample_ to zero
       // so that we can know that we reach the end 
       // of current file.
-      reader->get_buffer().row_length = 0;
+      reader->get_sample()->row_length = 0;
     } else {
       // Find the last '\n', and shrink back file pointer
-      shrink_block(reader->get_block(), &ret, file_ptr_);
+      shrink_block(reader->get_block(), &ret, reader->file_ptr_);
       // Parse block to data_sample_
-      parser_->Parse(reader->get_block(), ret, reader->get_buffer());
+      reader->parser_->Parse(reader->get_block(), 
+         ret, 
+         *reader->get_sample());
     }
     // notice the consumer thread
-    full_ = true;
-    cond_not_empty_.notify_one();
+    reader->full_ = true;
+    reader->cond_not_empty_.notify_one();
   }
-}
-
-// Find the last '\n', and shrink back file pointer
-void shrink_block(char* block, size_t* ret, FILE* file_ptr) {
-  // Find the last '\n'
-  size_t index = *ret-1;
-  while (block[index] != '\n') {index--;}
-  // Shrink back file pointer
-  fseek(file_ptr, index - *ret, SEEK_CUR);
-  *ret = index + 1;
 }
 
 }  // namespace xLearn
