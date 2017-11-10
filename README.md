@@ -20,4 +20,6 @@ of liblinear, libfm, or libffm, now the xLearn is your another better choice.
 
 ### Scalability
 
+<img src="https://github.com/aksnzhy/xLearn/raw/master/img/scalability.png" width = "650"/>   
+
 Under developing and coming soon ...
