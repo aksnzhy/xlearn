@@ -25,6 +25,7 @@ This file is the implementation of the Checker class.
 #include <cstdio>
 
 #include "src/base/common.h"
+#include "src/base/format_print.h"
 #include "src/solver/checker.h"
 #include "src/base/levenshtein_distance.h"
 #include "src/base/file_util.h"
@@ -178,8 +179,10 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
   if (FileExist(args_[1].c_str())) {
     hyper_param.train_set_file = std::string(args_[1]);
   } else {
-    printf("[Error] Training data file: %s does not exist. \n",
-           args_[1].c_str());
+    print_error(
+      StringPrintf("Training data file: %s does not exist.", 
+                    args_[1].c_str())
+    );
     return false;
   }
   /*********************************************************
@@ -191,15 +194,16 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     if (list[i].compare("-s") == 0) {  // task type
       int value = atoi(list[i+1].c_str());
       if (value < 0 || value > 5) {
-        printf("[Error] -s can only be [0 - 5] : \n"
-               "  for classification task: \n"
-               "    0 -- linear model (GLM) \n"
-               "    1 -- factorization machines (FM) \n"
-               "    2 -- field-aware factorization machines (FFM) \n"
-               "  for regression task: \n"
-               "    3 -- linear model (GLM) \n"
-               "    4 -- factorization machines (FM) \n"
-               "    5 -- field-aware factorization machines (FFM) \n");
+        print_error(
+            "-s can only be [0 - 5] : \n"
+            "  for classification task: \n"
+            "    0 -- linear model (GLM) \n"
+            "    1 -- factorization machines (FM) \n"
+            "    2 -- field-aware factorization machines (FFM) \n"
+            "  for regression task: \n"
+            "    3 -- linear model (GLM) \n"
+            "    4 -- factorization machines (FM) \n"
+            "    5 -- field-aware factorization machines (FFM)");
         bo = false;
       } else {
         switch (value) {
@@ -241,10 +245,20 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
           list[i+1].compare("rmsd") != 0 &&
           list[i+1].compare("rmse") != 0 &&
           list[i+1].compare("none") != 0) {
-        printf("[Error] Unknow metric: %s \n"
-               " -x can only be 'acc', 'prec', 'recall', "
-               "'f1', 'mae', 'mape', 'rmsd', 'rmse' and 'none' \n",
-               list[i+1].c_str());
+        print_error(
+          StringPrintf("Unknow metric: %s \n"
+               " -x can only be: \n"
+               "   acc \n"
+               "   prec \n" 
+               "   recall \n"
+               "   f1 \n"
+               "   mae \n"
+               "   mape \n"
+               "   rmsd \n"
+               "   rmse \n"
+               "   none",
+               list[i+1].c_str())
+        );
         bo = false;
       } else {
         hyper_param.metric = list[i+1];
@@ -254,8 +268,10 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       if (FileExist(list[i+1].c_str())) {
         hyper_param.validate_set_file = list[i+1];
       } else {
-        printf("[Error] Validation set file: %s dose not exists \n",
-               list[i+1].c_str());
+        print_error(
+          StringPrintf("Validation set file: %s dose not exists.",
+                       list[i+1].c_str())
+        );
         bo = false;
       }
       i += 2;
@@ -268,9 +284,11 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-k") == 0) {  // latent factor
       int value = atoi(list[i+1].c_str());
       if (value <= 0) {
-        printf("[Error] Illegal -k '%i' \n"
-               " -k must be geater than zero \n",
-               value);
+        print_error(
+          StringPrintf("Illegal -k '%i' \n"
+               " -k must be geater than zero.",
+               value)
+        );
         bo = false;
       } else {
         hyper_param.num_K = value;
@@ -279,9 +297,11 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-r") == 0) {  // learning rate
       real_t value = atof(list[i+1].c_str());
       if (value <= 0) {
-        printf("[Error] Illegal -r : '%f' \n"
-               " -r must be greater than zero \n",
-               value);
+        print_error(
+          StringPrintf("Illegal -r : '%f' \n"
+               " -r must be greater than zero.",
+               value)
+        );
         bo = false;
       } else {
         hyper_param.learning_rate = value;
@@ -290,9 +310,11 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-b") == 0) {  // regular lambda
       real_t value = atof(list[i+1].c_str());
       if (value < 0) {
-        printf("[Error] Illegal -b : '%f' \n"
-               " -b must be greater than or equal to zero \n",
-               value);
+        print_error(
+          StringPrintf("Illegal -b : '%f' \n"
+               " -b must be greater than or equal to zero.",
+               value)
+        );
         bo = false;
       } else {
         hyper_param.regu_lambda = value;
@@ -301,9 +323,11 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-u") == 0) {  // model scale
       real_t value = atof(list[i+1].c_str());
       if (value <= 0) {
-        printf("[Error] Illegal -u : '%f' \n"
-               " -u must be greater than zero \n",
-               value);
+        print_error(
+          StringPrintf("Illegal -u : '%f' \n"
+               " -u must be greater than zero.",
+               value)
+        );
         bo = false;
       } else {
         hyper_param.model_scale = value;
@@ -312,9 +336,11 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-e") == 0) {  // number of epoch
       int value = atoi(list[i+1].c_str());
       if (value < 0) {
-        printf("[Error] Illegal -e : '%i' \n"
-               " -e must be greater than zero \n",
-               value);
+        print_error(
+          StringPrintf("Illegal -e : '%i' \n"
+               " -e must be greater than zero.",
+               value)
+        );
         bo = false;
       } else {
         hyper_param.num_epoch = value;
@@ -323,9 +349,11 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-f") == 0) {  // number of folds
       int value = atoi(list[i+1].c_str());
       if (value < 0) {
-        printf("[Error] Illegal -f : '%i' \n"
-               " -f must be greater than zero \n",
-               value);
+        print_error(
+          StringPrintf("Illegal -f : '%i' \n"
+               " -f must be greater than zero.",
+               value)
+        );
         bo = false;
       } else {
         hyper_param.num_folds = value;
@@ -352,10 +380,12 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else {  // no match
       std::string similar_str;
       ss.FindSimilar(list[i], menu_, similar_str);
-      printf("[Error] Unknow argument '%s'\n"
-             "  Do you mean '%s' ?\n",
+      print_error(
+        StringPrintf("Unknow argument '%s'\n"
+             "  Do you mean '%s' ?",
              list[i].c_str(),
-             similar_str.c_str());
+             similar_str.c_str())
+      );
       bo = false;
       if (list[i][1] == '-') {  // "--" options
         i += 1;
@@ -369,41 +399,46 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
    *  Check warning and fix conflict                       *
    *********************************************************/
   if (hyper_param.on_disk && hyper_param.cross_validation) {
-    printf("[Warning] On-disk training doesn't support cross-validation. \n"
-           "xLearn has already disable the -cv option. \n");
+    print_warning("On-disk training doesn't support cross-validation. \n"
+                  "xLearn has already disable the -cv option.");
     hyper_param.cross_validation = false;
   }
   if (hyper_param.cross_validation && hyper_param.early_stop) {
-    printf("[Warning] Cross-validation doesn't support early-stopping. \n"
-           "xLearn has already close early-stopping. \n");
+    print_warning("Cross-validation doesn't support early-stopping. \n"
+                  "xLearn has already close early-stopping.");
     hyper_param.early_stop = false;
   }
   if (hyper_param.cross_validation && !hyper_param.test_set_file.empty()) {
-    printf("[Warning] The --cv (cross-validation) has been set, and "
-           "xLearn will ignore the validation file: %s \n",
-           hyper_param.test_set_file.c_str());
+    print_warning(
+      StringPrintf("The --cv (cross-validation) has been set, and "
+                   "xLearn will ignore the validation file: %s",
+                   hyper_param.test_set_file.c_str())
+    );
     hyper_param.validate_set_file.clear();
   }
   if (hyper_param.cross_validation && hyper_param.quiet) {
-    printf("[Warning] The --cv (cross-validation) has been set, and "
-           "xLearn will ignore the --quiet option. \n");
+    print_warning("The --cv (cross-validation) has been set, and "
+                  "xLearn will ignore the --quiet option.");
     hyper_param.quiet = false;
   }
   if (hyper_param.cross_validation && !hyper_param.model_file.empty()) {
-    printf("[Warning] The --cv (cross-validation) has been set, and "
-           "xLearn will not dump model checkpoint to disk. \n");
+    print_warning("The --cv (cross-validation) has been set, and "
+                  "xLearn will not dump model checkpoint to disk.");
     hyper_param.model_file.clear();
   }
   if (hyper_param.validate_set_file.empty() && hyper_param.early_stop) {
-    printf("[Warning] Validation file not found, xLearn has already "
-           "disable early-stopping. \n");
+    print_warning("Validation file not found, xLearn has already "
+                  "disable early-stopping.");
     hyper_param.early_stop = false;
   }
   if (hyper_param.metric.compare("none") != 0 &&
       hyper_param.validate_set_file.empty() &&
       !hyper_param.cross_validation) {
-    printf("[Warning] Validation file not found, xLearn has already "
-           "disable (-x %s) option.\n", hyper_param.metric.c_str());
+    print_warning(
+      StringPrintf("Validation file not found, xLearn has already "
+                   "disable (-x %s) option.", 
+                   hyper_param.metric.c_str())
+    );
     hyper_param.metric = "none";
   }
   if (hyper_param.loss_func.compare("squared") == 0) {
@@ -411,9 +446,12 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
         hyper_param.metric.compare("prec") == 0 ||
         hyper_param.metric.compare("recall") == 0 ||
         hyper_param.metric.compare("f1") == 0) {
-      printf("[Warning] The -x: %s metric can only be used "
-             "in classification tasks. xLearn will ignore this option. \n",
-              hyper_param.metric.c_str());
+      print_warning(
+        StringPrintf("The -x: %s metric can only be used "
+                     "in classification tasks. xLearn will "
+                     "ignore this option.",
+                     hyper_param.metric.c_str())
+      );
       hyper_param.metric = "none";
     }
   } else if (hyper_param.loss_func.compare("cross-entropy") == 0) {
@@ -421,9 +459,12 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
         hyper_param.metric.compare("mape") == 0 ||
         hyper_param.metric.compare("rmsd") == 0 ||
         hyper_param.metric.compare("rmse") == 0) {
-      printf("[Warning] The -x: %s metric can only be used "
-             "in regression tasks. xLearn will ignore this option. \n",
-              hyper_param.metric.c_str());
+      print_warning(
+        StringPrintf("The -x: %s metric can only be used "
+                     "in regression tasks. xLearn will ignore "
+                     "this option.",
+                     hyper_param.metric.c_str())
+        );
       hyper_param.metric = "none";
     }
   }
@@ -447,7 +488,7 @@ bool Checker::check_prediction_options(HyperParam& hyper_param) {
    *  Check size                                           *
    *********************************************************/
   if (args_.size() < 3) {
-    printf("[Error] The test file and model file must be set. \n");
+    print_error("The test file and model file must be set.");
     return false;
   }
   /*********************************************************
@@ -456,8 +497,10 @@ bool Checker::check_prediction_options(HyperParam& hyper_param) {
   if (FileExist(args_[1].c_str())) {
     hyper_param.test_set_file = std::string(args_[1]);
   } else {
-    printf("[Error] Test set file: %s does not exist. \n",
-           args_[1].c_str());
+    print_error(
+      StringPrintf("Test set file: %s does not exist.",
+           args_[1].c_str())
+    );
     return false;
   }
   /*********************************************************
@@ -466,8 +509,10 @@ bool Checker::check_prediction_options(HyperParam& hyper_param) {
   if (FileExist(args_[2].c_str())) {
     hyper_param.model_file = std::string(args_[2]);
   } else {
-    printf("[Error] Model file: %s does not exist. \n",
-           args_[2].c_str());
+    print_error(
+      StringPrintf("Model file: %s does not exist.",
+           args_[2].c_str())
+    );
     return false;
   }
   /*********************************************************
@@ -491,10 +536,12 @@ bool Checker::check_prediction_options(HyperParam& hyper_param) {
     } else {  // no match
       std::string similar_str;
       ss.FindSimilar(list[i], menu_, similar_str);
-      printf("[Error] Unknow argument '%s'\n"
-             " Do you mean '%s' ?\n",
+      print_error(
+        StringPrintf("Unknow argument '%s'\n"
+             " Do you mean '%s' ?",
              list[i].c_str(),
-             similar_str.c_str());
+             similar_str.c_str())
+      );
       bo = false;
       if (list[i][1] == '-') {  // "--" options
         i += 1;
@@ -508,8 +555,8 @@ bool Checker::check_prediction_options(HyperParam& hyper_param) {
    *  Check warning and fix conflict                       *
    *********************************************************/
   if (hyper_param.sign && hyper_param.sigmoid) {
-    printf("[Warning] Both of --sign and --sigmoid have been set. "
-           "xLearn has already disable --sign and --sigmoid. \n");
+    print_warning("Both of --sign and --sigmoid have been set. "
+                  "xLearn has already disable --sign and --sigmoid.");
     hyper_param.sign = false;
     hyper_param.sigmoid = false;
   }

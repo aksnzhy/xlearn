@@ -27,6 +27,7 @@ This file is the implementation of Reader.
 
 #include "src/base/file_util.h"
 #include "src/base/split_string.h"
+#include "src/base/format_print.h"
 
 namespace xLearn {
 
@@ -71,7 +72,7 @@ std::string Reader::check_file_format() {
   } else if (count == 0){
     return "csv";
   }
-  printf("[Error] Unknow file format \n");
+  print_error("Unknow file format");
   exit(0);
 }
 
@@ -86,18 +87,18 @@ std::string Reader::check_file_format() {
 void InmemReader::Initialize(const std::string& filename) {
   CHECK_NE(filename.empty(), true)
   filename_ = filename;
-  printf("First check if the text file (%s) has been already "
-         "converted to binary format \n", filename.c_str());
+  print_info("First check if the text file has been already "
+             "converted to binary format.");
   // HashBinary() will read the first two hash value
   // and then check it whether equal to the hash value generated
   // by HashFile() function from current txt file.
   if (hash_binary(filename_)) {
-    printf("Binary file found. Skip converting text to binary \n");
+    print_info("Binary file found. Skip converting text to binary.");
     filename_ += ".bin";
     init_from_binary();
   } else {
-    printf("Binary file NOT found. Convert text "
-           "file to binary file \n");
+    print_info("Binary file NOT found. Convert text "
+               "file to binary file.");
     init_from_txt();
   }
 }

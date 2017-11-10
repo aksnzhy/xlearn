@@ -218,13 +218,13 @@ inline void RemoveFile(const char* filename) {
 inline std::string PrintSize(uint64 file_size) {
   std::string res;
   if (file_size > GB) {
-    SStringPrintf(&res, "File size: %.2f GB",
+    SStringPrintf(&res, "%.2f GB",
             (double) file_size / GB);
   } else if (file_size > MB) {
-    SStringPrintf(&res, "File size: %.2f MB\n",
+    SStringPrintf(&res, "%.2f MB\n",
             (double) file_size / MB);
   } else {
-    SStringPrintf(&res, "File size: %.2f KB\n",
+    SStringPrintf(&res, "%.2f KB\n",
             (double) file_size / KB);
   }
   return res;

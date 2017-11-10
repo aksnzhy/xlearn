@@ -102,7 +102,10 @@ void Trainer::Train() {
 void Trainer::CVTrain() {
   // Use the i-th reader as validation Reader
   for (int i = 0; i < reader_list_.size(); ++i) {
-    printf("Cross-validation: %d/%lu: \n", i+1, reader_list_.size());
+    print_action(
+      StringPrintf("Cross-validation: %d/%lu:", 
+        i+1, reader_list_.size())
+    );
     // Get the train Reader and test Reader
     std::vector<Reader*> tr_reader;
     for (int j = 0; j < reader_list_.size(); ++j) {
@@ -133,11 +136,17 @@ void Trainer::show_average_metric() {
       metric += metric_info_[i].metric_val;
     }
   }
-  printf(" Average %s: %.6f\n", 
-    loss_->loss_type().c_str(), loss / metric_info_.size());
+  print_info(
+    StringPrintf("Average %s: %.6f", 
+    loss_->loss_type().c_str(), 
+    loss / metric_info_.size())
+  );
   if (metric_ != nullptr) {
-    printf(" Average %s: %.6f\n", 
-      metric_->metric_type().c_str(), metric / metric_info_.size());
+    print_info(
+      StringPrintf("Average %s: %.6f", 
+      metric_->metric_type().c_str(),
+       metric / metric_info_.size())
+    );
   }
 }
 
@@ -192,7 +201,7 @@ void Trainer::train(std::vector<Reader*>& train_reader,
     }
   }
   if (early_stop_) {  // not for cv
-    print_block(StringPrintf("Early-stopping at epoch %d", best_epoch));
+    print_action(StringPrintf("Early-stopping at epoch %d", best_epoch));
     model_->Shrink();
   } else {  // for cv
     metric_info_.push_back(te_info);

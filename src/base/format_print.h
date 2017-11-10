@@ -29,6 +29,104 @@ This file defines the facilities for format printing.
 
 #include "src/base/common.h"
 
+namespace Color {
+
+// Color table
+enum Code {
+/*********************************************************
+ *  Color for front                                      *
+ *********************************************************/
+  FG_RED      = 31,
+  FG_GREEN    = 32,
+  FG_YELLOW   = 33,
+  FG_BLUE     = 34,
+  FG_MAGENTA  = 35,
+  FG_CYAN     = 36,
+  FG_WHITE    = 37,
+  FG_DEFAULT  = 39,
+/*********************************************************
+ *  Color for Background                                 *
+ *********************************************************/
+  BG_RED      = 41,
+  BG_GREEN    = 42,
+  BG_YELLOW   = 43,
+  BG_BLUE     = 44,
+  BG_MAGENTA  = 45,
+  BG_CYAN     = 46,
+  BG_WHITE    = 47,
+  BG_DEFAULT  = 49,
+/*********************************************************
+ *  Control code                                         *
+ *********************************************************/  
+  RESET          = 0,   // everything back to normal
+  BOLD           = 1,   // often a brighter shade of the same colour
+  UNDER_LINE     = 4,   
+  INVERSE        = 7,   // swap forground and background color
+  BOLD_OFF       = 21,
+  UNDER_LINE_OFF = 24,
+  INVERSE_OFF    = 27
+};
+
+//------------------------------------------------------------------------------
+// The Modifier class can be used to set the foreground and background
+// color of output. We can this class like this:
+// 
+//   Modifier red(Color::FG_RED);
+//   Modifier def(Color::FG_DEFAULT);
+//   cout << "This ->" << red << "word" << def "<- is red. " << endl;
+//------------------------------------------------------------------------------
+class Modifier {
+  Code code;
+ public:
+  Modifier(Code pCode) : code(pCode) {}
+  friend std::ostream&
+  operator<<(std::ostream& os, const Modifier& mod) {
+  	return os << "\033[" << mod.code << "m";
+  }
+ private:
+  DISALLOW_COPY_AND_ASSIGN(Modifier);
+};
+
+} // namespace Color
+
+
+// [Warning] blablabla ...
+inline void print_warning(const std::string& out) {
+  Color::Modifier mag(Color::FG_MAGENTA);
+  Color::Modifier bold(Color::BOLD);
+  Color::Modifier reset(Color::RESET);
+  std::cout << mag << bold << "[ WARNING    ] " 
+            << out << reset << std::endl;
+}
+
+inline void print_error(const std::string& out) {
+  Color::Modifier red(Color::FG_RED);
+  Color::Modifier bold(Color::BOLD);
+  Color::Modifier reset(Color::RESET);
+  std::cout << red << bold << "[ ERROR      ] "
+            << out << reset << std::endl;
+}
+
+inline void print_action(const std::string& out) {
+  Color::Modifier green(Color::FG_GREEN);
+  Color::Modifier bold(Color::BOLD);
+  Color::Modifier reset(Color::RESET);
+  std::cout << green << bold << "[ ACTION     ] "
+            << out << reset << std::endl;
+}
+
+inline void print_info(const std::string& out, bool imp = false) {
+  Color::Modifier green(Color::FG_GREEN);
+  Color::Modifier bold(Color::BOLD);
+  Color::Modifier reset(Color::RESET);
+  if (!imp) {
+    std::cout << green << "[------------] " << reset
+            << out << std::endl;
+  } else {
+  	std::cout << green << bold << "[------------] " << out << std::endl;
+  }
+}
+
 //------------------------------------------------------------------------------
 // Example:
 //
@@ -49,34 +147,6 @@ void print_row(const std::vector<T>& column,
   for (size_t i = 0; i < column.size(); ++i) {
   	std::cout.width(width[i]);
   	std::cout << column[i];
-  }
-  std::cout << "\n";
-}
-
-//------------------------------------------------------------------------------
-// Example:
-//
-//  std -> "Hello World !"
-//
-// Output:
-//
-//  -----------------
-//  | Hello World ! |
-//  -----------------
-//------------------------------------------------------------------------------
-inline void print_block(const std::string& str) {
-  CHECK_NE(str.empty(), true);
-  // Add two space and two lines
-  size_t size = str.size() + 4;
-  for (size_t i = 0; i < size; ++i) {
-  	std::cout << "-";
-  }
-  std::cout << "\n";
-  std::cout << "| ";
-  std::cout << str;
-  std::cout << " |\n";
-  for (size_t i = 0; i < size; ++i) {
-  	std::cout << "-";
   }
   std::cout << "\n";
 }
