@@ -41,10 +41,6 @@ void Trainer::show_head_info(bool validate) {
   width_list.push_back(6);
   str_list.push_back("Train " + loss_->loss_type());
   width_list.push_back(20);
-  if (metric_ != nullptr) {
-    str_list.push_back("Train " + metric_->metric_type());
-    width_list.push_back(20);
-  }
   if (validate) {
     str_list.push_back("Test " + loss_->loss_type());
     width_list.push_back(20);
@@ -61,8 +57,9 @@ void Trainer::show_head_info(bool validate) {
 /*********************************************************
  *  Show train info                                      *
  *********************************************************/
-void Trainer::show_train_info(const MetricInfo& tr_info, 
-                              const MetricInfo& te_info,
+void Trainer::show_train_info(real_t tr_loss, 
+                              real_t te_loss,
+                              real_t te_metric,
                               real_t time_cost, 
                               bool validate,
                               index_t epoch) {
@@ -70,17 +67,13 @@ void Trainer::show_train_info(const MetricInfo& tr_info,
   std::vector<int> width_list;
   str_list.push_back(StringPrintf("%d", epoch));
   width_list.push_back(6);
-  str_list.push_back(StringPrintf("%.6f", tr_info.loss_val));
+  str_list.push_back(StringPrintf("%.6f", tr_loss));
   width_list.push_back(20);
-  if (metric_ != nullptr) {
-    str_list.push_back(StringPrintf("%.6f", tr_info.metric_val));
-    width_list.push_back(20);
-  }
   if (validate) {
-    str_list.push_back(StringPrintf("%.6f", te_info.loss_val));
+    str_list.push_back(StringPrintf("%.6f", te_loss));
     width_list.push_back(20);
     if (metric_ != nullptr) {
-      str_list.push_back(StringPrintf("%.6f", te_info.metric_val));
+      str_list.push_back(StringPrintf("%.6f", te_metric));
       width_list.push_back(20);
     }
   }
@@ -157,7 +150,6 @@ void Trainer::train(std::vector<Reader*>& train_reader,
   int stop_window = 0;
   real_t best_loss = kFloatMax;
   real_t prev_loss = kFloatMax;
-  MetricInfo tr_info;
   MetricInfo te_info;
   // Show header info
   if (!quiet_) { 
@@ -167,16 +159,16 @@ void Trainer::train(std::vector<Reader*>& train_reader,
     Timer timer;
     timer.tic();
     // Calc grad and update model
-    calc_gradient(train_reader);
+    real_t tr_loss = calc_gradient(train_reader);
     // we don't do any evaluation in a quiet model
     if (!quiet_) {
-      tr_info = calc_metric(train_reader);
       if (!test_reader.empty()) { 
         te_info = calc_metric(test_reader); 
       }
       // show evaludation metric info
-      show_train_info(tr_info, 
-                      te_info,
+      show_train_info(tr_loss, 
+                      te_info.loss_val,
+                      te_info.metric_val,
                       timer.toc(), 
                       !test_reader.empty(), 
                       n);
@@ -210,15 +202,21 @@ void Trainer::train(std::vector<Reader*>& train_reader,
 /*********************************************************
  *  Calc gradient and update model                       *
  *********************************************************/
-void Trainer::calc_gradient(std::vector<Reader*>& reader) {
+real_t Trainer::calc_gradient(std::vector<Reader*>& reader) {
   CHECK_NE(reader.empty(), true);
+  real_t tr_loss = 0;
+  index_t count = 0;
   for (int i = 0; i < reader.size(); ++i) {
     reader[i]->Reset();
     DMatrix* matrix = nullptr;
-    while (reader[i]->Samples(matrix)) {
-      loss_->CalcGrad(matrix, *model_);
+    for (;;) {
+      index_t tmp = reader[i]->Samples(matrix);
+      if (tmp == 0) { break; }
+      tr_loss += loss_->CalcGrad(matrix, *model_);
+      count += tmp;
     }
   }
+  return tr_loss / count;
 }
 
 /*********************************************************

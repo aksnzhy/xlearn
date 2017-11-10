@@ -103,7 +103,8 @@ class Trainer {
              std::vector<Reader*>& test_reader);
 
   // Caculate gradient and update model.
-  void calc_gradient(std::vector<Reader*>& reader_list);
+  // Return training loss.
+  real_t calc_gradient(std::vector<Reader*>& reader_list);
 
   // Calculate loss value and evaluation metric.
   MetricInfo calc_metric(std::vector<Reader*>& reader_list);
@@ -113,11 +114,12 @@ class Trainer {
 
   // Print information during the training.
   void show_head_info(bool validate);
-  void show_train_info(const MetricInfo& tr_info, 
-                    const MetricInfo& te_info,
-                    real_t time_cost, 
-                    bool validate,
-                    index_t epoch);
+  void show_train_info(real_t tr_loss, 
+                       real_t te_loss,
+                       real_t te_metric,
+                       real_t time_cost, 
+                       bool validate,
+                       index_t epoch);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Trainer);

@@ -43,8 +43,8 @@ class TestLoss : public Loss {
   real_t Evalute(const std::vector<real_t>& pred,
                  const std::vector<real_t>& label) { return 0.0; }
 
-  void CalcGrad(const DMatrix* data_matrix,
-                Model& model) { return; }
+  real_t CalcGrad(const DMatrix* data_matrix,
+                  Model& model) { return 0; }
 
   std::string loss_type() { return "test"; }
 

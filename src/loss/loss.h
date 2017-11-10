@@ -101,7 +101,8 @@ class Loss {
 
   // Given data sample and current model, calculate gradient
   // and update current model parameters.
-  virtual void CalcGrad(const DMatrix* data_matrix, Model& model) = 0;
+  // This function will also return the loss value.
+  virtual real_t CalcGrad(const DMatrix* data_matrix, Model& model) = 0;
 
   // Return a current loss type
   virtual inline std::string loss_type() = 0;

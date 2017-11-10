@@ -44,7 +44,8 @@ class CrossEntropyLoss : public Loss {
 
   // Given data sample and current model, calculate gradient
   // and update current model parameters.
-  void CalcGrad(const DMatrix* data_matrix, Model& model);
+  // This function will also return the loss value.
+  real_t CalcGrad(const DMatrix* data_matrix, Model& model);
 
   // Return current loss type.
   inline std::string loss_type() { return "log_loss"; }

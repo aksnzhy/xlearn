@@ -84,16 +84,19 @@ static void ce_gradient_thread(const DMatrix* matrix,
                                Model* model,
                                Score* score_func,
                                bool is_norm,
+                               real_t* sum,
                                size_t start_idx,
                                size_t end_idx) {
   CHECK_GE(end_idx, start_idx);
+  *sum = 0;
   for (size_t i = start_idx; i < end_idx; ++i) {
     SparseRow* row = matrix->row[i];
     real_t norm = is_norm ? matrix->norm[i] : 1.0;
-    real_t score = score_func->CalcScore(row, *model, norm);
+    real_t pred = score_func->CalcScore(row, *model, norm);
     // partial gradient
     real_t y = matrix->Y[i] > 0 ? 1.0 : -1.0;
-    real_t pg = -y/(1.0+(1.0/exp(-y*score)));
+    *sum += log1p(exp(-y*pred));
+    real_t pg = -y/(1.0+(1.0/exp(-y*pred)));
     // real gradient and update
     score_func->CalcGrad(row, *model, pg, norm);
   }
@@ -112,13 +115,14 @@ static void ce_gradient_thread(const DMatrix* matrix,
 //                       \       |        /
 //                         master_thread
 //------------------------------------------------------------------------------
-void CrossEntropyLoss::CalcGrad(const DMatrix* matrix,
-                                Model& model) {
+real_t CrossEntropyLoss::CalcGrad(const DMatrix* matrix,
+                                  Model& model) {
   CHECK_NOTNULL(matrix);
   CHECK_GT(matrix->row_length, 0);
   size_t row_len = matrix->row_length;
   // multi-thread training
   int count = lock_free_ ? threadNumber_ : 1;
+  std::vector<real_t> sum(count, 0);
   for (int i = 0; i < count; ++i) {
     index_t start_idx = getStart(row_len, count, i);
     index_t end_idx = getEnd(row_len, count, i);
@@ -127,11 +131,18 @@ void CrossEntropyLoss::CalcGrad(const DMatrix* matrix,
                              &model,
                              score_func_,
                              norm_,
+                             &(sum[i]),
                              start_idx,
                              end_idx));
   }
   // Wait all of the threads finish their job
   pool_->Sync(count);
+  // accumulate sum
+  real_t sum_loss = 0;
+  for (int i = 0; i < sum.size(); ++i) {
+    sum_loss += sum[i];
+  }
+  return sum_loss;
 }
 
 } // namespace xLearn
