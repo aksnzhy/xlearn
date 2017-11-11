@@ -399,12 +399,12 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
    *  Check warning and fix conflict                       *
    *********************************************************/
   if (hyper_param.on_disk && hyper_param.cross_validation) {
-    print_warning("On-disk training doesn't support cross-validation. \n"
+    print_warning("On-disk training doesn't support cross-validation. "
                   "xLearn has already disable the -cv option.");
     hyper_param.cross_validation = false;
   }
   if (hyper_param.cross_validation && hyper_param.early_stop) {
-    print_warning("Cross-validation doesn't support early-stopping. \n"
+    print_warning("Cross-validation doesn't support early-stopping. "
                   "xLearn has already close early-stopping.");
     hyper_param.early_stop = false;
   }

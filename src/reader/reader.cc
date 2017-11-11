@@ -93,12 +93,19 @@ void InmemReader::Initialize(const std::string& filename) {
   // and then check it whether equal to the hash value generated
   // by HashFile() function from current txt file.
   if (hash_binary(filename_)) {
-    print_info("Binary file found. Skip converting text to binary.");
+    print_info(
+      StringPrintf("Binary file (%s.bin) found. "
+                   "Skip converting text to binary.",
+                   filename_.c_str())
+    );
     filename_ += ".bin";
     init_from_binary();
   } else {
-    print_info("Binary file NOT found. Convert text "
-               "file to binary file.");
+    print_info(
+      StringPrintf("Binary file (%s.bin) NOT found. Convert text "
+                   "file to binary file.",
+                   filename_.c_str())
+    );
     init_from_txt();
   }
 }

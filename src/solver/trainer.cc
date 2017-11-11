@@ -51,6 +51,9 @@ void Trainer::show_head_info(bool validate) {
   }
   str_list.push_back("Time cost (sec)");
   width_list.push_back(20);
+  Color::Modifier green(Color::FG_GREEN);
+  Color::Modifier reset(Color::RESET);
+  std::cout << green << "[------------]" << reset;
   print_row(str_list, width_list);
 }
 
@@ -79,6 +82,12 @@ void Trainer::show_train_info(real_t tr_loss,
   }
   str_list.push_back(StringPrintf("%.2f", time_cost));
   width_list.push_back(20);
+  Color::Modifier green(Color::FG_GREEN);
+  Color::Modifier reset(Color::RESET);
+  std::cout << green << "[ " << reset;
+  std::cout.width(4); 
+  std::cout << static_cast<int>(epoch*1.0/epoch_*100) 
+            << "%" << green << "      ]"  << reset;
   print_row(str_list, width_list);
 }
 
@@ -180,7 +189,7 @@ void Trainer::train(std::vector<Reader*>& train_reader,
                       te_info.metric_val,
                       timer.toc(), 
                       !test_reader.empty(), 
-                      n);
+                      n+1);
       // Early-stopping
       if (early_stop_) {
         if (te_info.loss_val < best_loss) {
