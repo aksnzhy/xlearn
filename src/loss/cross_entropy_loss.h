@@ -38,14 +38,14 @@ class CrossEntropyLoss : public Loss {
   CrossEntropyLoss() { }
   ~CrossEntropyLoss() { }
 
-  // Given predictions and labels, return cross-entropy loss.
-  real_t Evalute(const std::vector<real_t>& pred,
+  // Given predictions and labels, accumulate cross-entropy loss.
+  void Evalute(const std::vector<real_t>& pred,
                  const std::vector<real_t>& label);
 
   // Given data sample and current model, calculate gradient
   // and update current model parameters.
-  // This function will also return the loss value.
-  real_t CalcGrad(const DMatrix* data_matrix, Model& model);
+  // This function will also accumulate the loss value.
+  void CalcGrad(const DMatrix* data_matrix, Model& model);
 
   // Return current loss type.
   inline std::string loss_type() { return "log_loss"; }

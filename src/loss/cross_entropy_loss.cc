@@ -53,11 +53,11 @@ static void ce_evalute_thread(const std::vector<real_t>* pred,
 //                       \       |        /
 //                         master_thread
 //------------------------------------------------------------------------------
-real_t CrossEntropyLoss::Evalute(const std::vector<real_t>& pred,
-                                 const std::vector<real_t>& label) {
+void CrossEntropyLoss::Evalute(const std::vector<real_t>& pred,
+                               const std::vector<real_t>& label) {
   CHECK_NE(pred.empty(), true);
   CHECK_NE(label.empty(), true);
-  real_t val = 0.0;
+  total_example_ += pred.size();
   // multi-thread training
   std::vector<real_t> sum(threadNumber_, 0);
   for (int i = 0; i < threadNumber_; ++i) {
@@ -73,9 +73,8 @@ real_t CrossEntropyLoss::Evalute(const std::vector<real_t>& pred,
   // Wait all of the threads finish their job
   pool_->Sync(threadNumber_);
   for (size_t i = 0; i < sum.size(); ++i) {
-    val += sum[i];
+    loss_sum_ += sum[i];
   }
-  return val;
 }
 
 
@@ -115,11 +114,12 @@ static void ce_gradient_thread(const DMatrix* matrix,
 //                       \       |        /
 //                         master_thread
 //------------------------------------------------------------------------------
-real_t CrossEntropyLoss::CalcGrad(const DMatrix* matrix,
-                                  Model& model) {
+void CrossEntropyLoss::CalcGrad(const DMatrix* matrix,
+                                Model& model) {
   CHECK_NOTNULL(matrix);
   CHECK_GT(matrix->row_length, 0);
   size_t row_len = matrix->row_length;
+  total_example_ += row_len;
   // multi-thread training
   int count = lock_free_ ? threadNumber_ : 1;
   std::vector<real_t> sum(count, 0);
@@ -138,11 +138,9 @@ real_t CrossEntropyLoss::CalcGrad(const DMatrix* matrix,
   // Wait all of the threads finish their job
   pool_->Sync(count);
   // accumulate sum
-  real_t sum_loss = 0;
   for (int i = 0; i < sum.size(); ++i) {
-    sum_loss += sum[i];
+    loss_sum_ += sum[i];
   }
-  return sum_loss;
 }
 
 } // namespace xLearn

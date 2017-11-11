@@ -26,8 +26,10 @@ This file is the implementation of the Model class.
 #include <pmmintrin.h>  // for SSE
 
 #include "src/base/file_util.h"
+#include "src/base/format_print.h"
 #include "src/base/math.h"
 #include "src/base/logging.h"
+#include "src/base/stringprintf.h"
 
 namespace xLearn {
 
@@ -169,8 +171,10 @@ void Model::free_model() {
 Model::Model(const std::string& filename) {
   CHECK_NE(filename.empty(), true);
   if (this->Deserialize(filename) == false) {
-    printf("Cannot Load model from the file: %s\n",
-           filename.c_str());
+    print_error(
+      StringPrintf("Cannot Load model from the file: %s",
+           filename.c_str())
+    );
     exit(0);
   }
 }

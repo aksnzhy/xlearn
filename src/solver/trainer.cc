@@ -222,19 +222,17 @@ void Trainer::train(std::vector<Reader*>& train_reader,
  *********************************************************/
 real_t Trainer::calc_gradient(std::vector<Reader*>& reader) {
   CHECK_NE(reader.empty(), true);
-  real_t tr_loss = 0;
-  index_t count = 0;
+  loss_->Reset();
   for (int i = 0; i < reader.size(); ++i) {
     reader[i]->Reset();
     DMatrix* matrix = nullptr;
     for (;;) {
       index_t tmp = reader[i]->Samples(matrix);
       if (tmp == 0) { break; }
-      tr_loss += loss_->CalcGrad(matrix, *model_);
-      count += tmp;
+      loss_->CalcGrad(matrix, *model_);
     }
   }
-  return tr_loss / count;
+  return loss_->GetLoss();
 }
 
 /*********************************************************
@@ -243,28 +241,26 @@ real_t Trainer::calc_gradient(std::vector<Reader*>& reader) {
 MetricInfo Trainer::calc_metric(std::vector<Reader*>& reader_list) {
   CHECK_NE(reader_list.empty(), true);
   DMatrix* matrix = nullptr;
-  index_t count_sample = 0;
   std::vector<real_t> pred;
-  real_t loss_val = 0.0;
   if (metric_ != nullptr) {
     metric_->Reset();
   }
+  loss_->Reset();
   for (int i = 0; i < reader_list.size(); ++i) {
     reader_list[i]->Reset();
     for (;;) {
       index_t tmp = reader_list[i]->Samples(matrix);
       if (tmp == 0) { break; }
       if (tmp != pred.size()) { pred.resize(tmp); }
-      count_sample += tmp;
       loss_->Predict(matrix, *model_, pred);
-      loss_val += loss_->Evalute(pred, matrix->Y);
+      loss_->Evalute(pred, matrix->Y);
       if (metric_ != nullptr) {
         metric_->Accumulate(matrix->Y, pred);
       }
     }
   }
   MetricInfo info;
-  info.loss_val = loss_val / count_sample;
+  info.loss_val = loss_->GetLoss();
   if (metric_ != nullptr) {
     info.metric_val = metric_->GetMetric();
   }

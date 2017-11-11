@@ -73,7 +73,7 @@ namespace xLearn {
 class Loss {
  public:
   // Constructor and Desstructor
-  Loss() { };
+  Loss() : loss_sum_(0), total_example_ (0) { };
   virtual ~Loss() { }
 
   // This function needs to be invoked before using this class
@@ -90,8 +90,8 @@ class Loss {
     lock_free_ = lock_free;
   }
 
-  // Given predictions and labels, return loss value.
-  virtual real_t Evalute(const std::vector<real_t>& pred,
+  // Given predictions and labels, accumulate loss value.
+  virtual void Evalute(const std::vector<real_t>& pred,
                          const std::vector<real_t>& label) = 0;
 
   // Given data sample and current model, return predictions.
@@ -101,8 +101,19 @@ class Loss {
 
   // Given data sample and current model, calculate gradient
   // and update current model parameters.
-  // This function will also return the loss value.
-  virtual real_t CalcGrad(const DMatrix* data_matrix, Model& model) = 0;
+  // This function will also acummulate loss value.
+  virtual void CalcGrad(const DMatrix* data_matrix, Model& model) = 0;
+
+  // Return the calculated loss value
+  virtual real_t GetLoss() {
+    return loss_sum_ / total_example_;
+  }
+
+  // Reset loss_sum_ and total_example_
+  virtual void Reset() {
+    loss_sum_ = 0;
+    total_example_ = 0;
+  }
 
   // Return a current loss type
   virtual inline std::string loss_type() = 0;
@@ -119,6 +130,10 @@ class Loss {
   size_t threadNumber_;
   /* Open lock-free training ? */
   bool lock_free_;
+  /* Used to store the accumulate loss */
+  real_t loss_sum_;
+  /* Used to store the number of example */
+  index_t total_example_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Loss);

@@ -48,7 +48,8 @@ TEST(CROSS_ENTROPY_LOSS, Evalute) {
   size_t threadNumber = std::thread::hardware_concurrency();
   ThreadPool* pool = new ThreadPool(threadNumber);
   loss.Initialize(score, pool);
-  real_t val = loss.Evalute(pred, label);
+  loss.Evalute(pred, label);
+  real_t val = loss.GetLoss();
   EXPECT_LT(val, 0.000001);
   // Test2
   for (int i = 0; i < pred.size(); ++i) {
@@ -57,7 +58,8 @@ TEST(CROSS_ENTROPY_LOSS, Evalute) {
   for (int i = 0; i < label.size(); ++i) {
     label[i] = -1.0;
   }
-  val = loss.Evalute(pred, label);
+  loss.Evalute(pred, label);
+  val = loss.GetLoss();
   EXPECT_LT(val, 0.000001);
 }
 

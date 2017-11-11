@@ -33,17 +33,15 @@ void Predictor::Predict() {
   std::ofstream o_file(out_file_);
   static std::vector<real_t> out;
   DMatrix* matrix = nullptr;
-  index_t total_count = 0;
-  real_t loss_val = 0;
   reader_->Reset();
+  loss_->Reset();
   for (;;) {
     index_t tmp = reader_->Samples(matrix);
     if (tmp == 0) { break; }
     if (tmp != out.size()) { out.resize(tmp); }
-    total_count += tmp;
     loss_->Predict(matrix, *model_, out);
     if (reader_->has_label()) {
-      loss_val += loss_->Evalute(out, matrix->Y);
+      loss_->Evalute(out, matrix->Y);
     }
     if (sigmoid_) {
       this->sigmoid(out, out);
@@ -55,8 +53,7 @@ void Predictor::Predict() {
     }
   }
   if (reader_->has_label()) {
-    loss_val /= total_count;
-    printf("The test loss is: %.6f\n", loss_val);
+    printf("The test loss is: %.6f\n", loss_->GetLoss());
   }
 }
 

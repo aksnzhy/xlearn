@@ -48,8 +48,9 @@ TEST(SQUARED_LOSS, Evalute) {
   size_t threadNumber = std::thread::hardware_concurrency();
   ThreadPool* pool = new ThreadPool(threadNumber);
   loss.Initialize(score, pool);
-  real_t val = loss.Evalute(pred, label);
-  EXPECT_FLOAT_EQ(val, 142.5);
+  loss.Evalute(pred, label);
+  real_t val = loss.GetLoss();
+  EXPECT_FLOAT_EQ(val, 14.25);
 }
 
 } // namespace xLearn
