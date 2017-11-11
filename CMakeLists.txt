@@ -25,11 +25,10 @@ cmake_minimum_required(VERSION 2.8)
 
 #-------------------------------------------------------------------------------
 # Take almost all warnings;
-# Take warnings as errors;
 # Do not generate debug symbols;
 # Optimization level 3;
 # Using c++11;
-# Using AVX instructions for speedup;
+# Optimization on architecture
 #-------------------------------------------------------------------------------
 add_definitions("-Wall -Wno-sign-compare -O3 -std=c++11 -march=native")
 
