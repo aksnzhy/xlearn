@@ -70,6 +70,7 @@ void SquaredLoss::Evalute(const std::vector<real_t>& pred,
   }
   // Wait all of the threads finish their job
   pool_->Sync(threadNumber_);
+  // Accumulate loss
   for (size_t i = 0; i < sum.size(); ++i) {
     loss_sum_ += sum[i];
   }
@@ -135,7 +136,7 @@ void SquaredLoss::CalcGrad(const DMatrix* matrix,
   }
   // Wait all of the threads finish their job
   pool_->Sync(count);
-  // Accumulate sum
+  // Accumulate loss
   for (int i = 0; i < sum.size(); ++i) {
     loss_sum_ += sum[i];
   }

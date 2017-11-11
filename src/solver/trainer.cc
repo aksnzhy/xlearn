@@ -210,7 +210,9 @@ void Trainer::train(std::vector<Reader*>& train_reader,
     }
   }
   if (early_stop_) {  // not for cv
-    print_action(StringPrintf("Early-stopping at epoch %d", best_epoch));
+    print_action(
+      StringPrintf("Early-stopping at epoch %d", best_epoch)
+    );
     model_->Shrink();
   } else {  // for cv
     metric_info_.push_back(te_info);

@@ -21,6 +21,7 @@ This file is the implementation of the Predictor class.
 
 #include "src/solver/inference.h"
 #include "src/base/timer.h"
+#include "src/base/format_print.h"
 
 #include <vector>
 #include <sstream>
@@ -53,7 +54,10 @@ void Predictor::Predict() {
     }
   }
   if (reader_->has_label()) {
-    printf("The test loss is: %.6f\n", loss_->GetLoss());
+    print_info(
+      StringPrintf("The test loss is: %.6f", 
+        loss_->GetLoss())
+    );
   }
 }
 

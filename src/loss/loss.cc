@@ -73,4 +73,4 @@ void Loss::Predict(const DMatrix* matrix,
   pool_->Sync(threadNumber_);
 }
 
-} // xLearn
+}  // namespace xLearn

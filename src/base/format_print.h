@@ -87,7 +87,7 @@ class Modifier {
   DISALLOW_COPY_AND_ASSIGN(Modifier);
 };
 
-} // namespace Color
+}  // namespace Color
 
 
 // [Warning] blablabla ...

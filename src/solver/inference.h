@@ -74,10 +74,12 @@ class Predictor {
   bool sigmoid_;
 
   // Convert output by using the sigmoid function.
-  void sigmoid(std::vector<real_t>& in, std::vector<real_t>& out);
+  void sigmoid(std::vector<real_t>& in, 
+               std::vector<real_t>& out);
 
   // Convert output to 0 and 1.
-  void sign(std::vector<real_t>& in, std::vector<real_t>& out);
+  void sign(std::vector<real_t>& in, 
+            std::vector<real_t>& out);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Predictor);

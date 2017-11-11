@@ -110,7 +110,7 @@ creating them later per the registered name.
    typedef base_class_name* (*Creator)();                                    \
                                                                              \
    ObjectCreatorRegistry_##register_name()                                   \
-   : m_default_creator(NULL) {}                                              \
+   : m_default_creator(nullptr) {}                                           \
    ~ObjectCreatorRegistry_##register_name() {}                               \
                                                                              \
    void SetDefaultCreator(Creator creator) {                                 \
@@ -165,10 +165,10 @@ creating them later per the registered name.
       creator = it->second;                                                  \
     }                                                                        \
                                                                              \
-    if (creator != NULL) {                                                   \
+    if (creator != nullptr) {                                                \
       return (*creator)();                                                   \
      } else {                                                                \
-      return NULL;                                                           \
+      return nullptr;                                                        \
     }                                                                        \
   }
 

@@ -285,8 +285,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       int value = atoi(list[i+1].c_str());
       if (value <= 0) {
         print_error(
-          StringPrintf("Illegal -k '%i' \n"
-               " -k must be geater than zero.",
+          StringPrintf("Illegal -k '%i'. -k must be geater than zero.",
                value)
         );
         bo = false;
@@ -298,8 +297,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       real_t value = atof(list[i+1].c_str());
       if (value <= 0) {
         print_error(
-          StringPrintf("Illegal -r : '%f' \n"
-               " -r must be greater than zero.",
+          StringPrintf("Illegal -r : '%f'. -r must be greater than zero.",
                value)
         );
         bo = false;
@@ -311,8 +309,8 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       real_t value = atof(list[i+1].c_str());
       if (value < 0) {
         print_error(
-          StringPrintf("Illegal -b : '%f' \n"
-               " -b must be greater than or equal to zero.",
+          StringPrintf("Illegal -b : '%f' "
+               "-b must be greater than or equal to zero.",
                value)
         );
         bo = false;
@@ -324,8 +322,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       real_t value = atof(list[i+1].c_str());
       if (value <= 0) {
         print_error(
-          StringPrintf("Illegal -u : '%f' \n"
-               " -u must be greater than zero.",
+          StringPrintf("Illegal -u : '%f'. -u must be greater than zero.",
                value)
         );
         bo = false;
@@ -337,8 +334,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       int value = atoi(list[i+1].c_str());
       if (value < 0) {
         print_error(
-          StringPrintf("Illegal -e : '%i' \n"
-               " -e must be greater than zero.",
+          StringPrintf("Illegal -e : '%i'. -e must be greater than zero.",
                value)
         );
         bo = false;
@@ -350,8 +346,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       int value = atoi(list[i+1].c_str());
       if (value < 0) {
         print_error(
-          StringPrintf("Illegal -f : '%i' \n"
-               " -f must be greater than zero.",
+          StringPrintf("Illegal -f : '%i'. -f must be greater than zero.",
                value)
         );
         bo = false;
@@ -381,8 +376,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       std::string similar_str;
       ss.FindSimilar(list[i], menu_, similar_str);
       print_error(
-        StringPrintf("Unknow argument '%s'\n"
-             "  Do you mean '%s' ?",
+        StringPrintf("Unknow argument '%s'. Do you mean '%s' ?",
              list[i].c_str(),
              similar_str.c_str())
       );
@@ -537,8 +531,7 @@ bool Checker::check_prediction_options(HyperParam& hyper_param) {
       std::string similar_str;
       ss.FindSimilar(list[i], menu_, similar_str);
       print_error(
-        StringPrintf("Unknow argument '%s'\n"
-             " Do you mean '%s' ?",
+        StringPrintf("Unknow argument '%s'. Do you mean '%s' ?",
              list[i].c_str(),
              similar_str.c_str())
       );

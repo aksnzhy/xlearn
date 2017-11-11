@@ -30,7 +30,6 @@ using std::string;
 static void StringAppendV(string* dst, const char* format, va_list ap) {
   // First try with a small fixed size buffer
   char space[1024];
-
   // It's possible for methods that use a va_list to invalidate
   // the data in it upon use.  The fix is to make a copy
   // of the structure before using it and use that copy instead.

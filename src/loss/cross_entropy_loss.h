@@ -40,7 +40,7 @@ class CrossEntropyLoss : public Loss {
 
   // Given predictions and labels, accumulate cross-entropy loss.
   void Evalute(const std::vector<real_t>& pred,
-                 const std::vector<real_t>& label);
+               const std::vector<real_t>& label);
 
   // Given data sample and current model, calculate gradient
   // and update current model parameters.

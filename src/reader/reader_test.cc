@@ -199,7 +199,6 @@ void read_from_memory(const std::string& filename, int task_id) {
         CheckFFM(matrix, false, false);
         break;
     }
-    usleep(60000);
   }
 }
 
@@ -233,7 +232,6 @@ void read_from_disk(const std::string& filename, int task_id) {
         CheckFFM(matrix, false, true);
         break;
     }
-    usleep(60000);
   } 
 }
 

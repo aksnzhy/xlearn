@@ -59,16 +59,14 @@ namespace xLearn {
 //
 //   // After training, we can calculate the train loss
 //   real_t loss_val = 0;
-//   index_t count = 0;
 //   while (1) {
 //     int tmp = reader->Samples(matrix);
 //     if (tmp == 0) { break; }
 //     pred.resize(tmp);
-//     count += tmp;
 //     sq_loss->Predict(matrix, model, pred);
-//     loss_val += sq_loss->Evalute(pred, matrix->Y);
+//     sq_loss->Evalute(pred, matrix->Y);
 //   }
-//   loss_val /= count;
+//   loss_val = sq_loss->GetLoss()
 //------------------------------------------------------------------------------
 class Loss {
  public:
@@ -92,7 +90,7 @@ class Loss {
 
   // Given predictions and labels, accumulate loss value.
   virtual void Evalute(const std::vector<real_t>& pred,
-                         const std::vector<real_t>& label) = 0;
+                       const std::vector<real_t>& label) = 0;
 
   // Given data sample and current model, return predictions.
   virtual void Predict(const DMatrix* data_matrix,
@@ -102,7 +100,8 @@ class Loss {
   // Given data sample and current model, calculate gradient
   // and update current model parameters.
   // This function will also acummulate loss value.
-  virtual void CalcGrad(const DMatrix* data_matrix, Model& model) = 0;
+  virtual void CalcGrad(const DMatrix* data_matrix, 
+                        Model& model) = 0;
 
   // Return the calculated loss value
   virtual real_t GetLoss() {
@@ -124,12 +123,12 @@ class Loss {
   Score* score_func_;
   /* Use instance-wise normalization */
   bool norm_;
+  /* Open lock-free training ? */
+  bool lock_free_;
   /* Thread pool for multi-thread training */
   ThreadPool* pool_;
   /* Number of thread in thread pool */
   size_t threadNumber_;
-  /* Open lock-free training ? */
-  bool lock_free_;
   /* Used to store the accumulate loss */
   real_t loss_sum_;
   /* Used to store the number of example */
