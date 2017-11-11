@@ -173,7 +173,7 @@ void Trainer::train(std::vector<Reader*>& train_reader,
   if (!quiet_) { 
     show_head_info(!test_reader.empty()); 
   }
-  for (int n = 0; n < epoch_; ++n) {
+  for (int n = 1; n <= epoch_; ++n) {
     Timer timer;
     timer.tic();
     // Calc grad and update model
@@ -189,7 +189,7 @@ void Trainer::train(std::vector<Reader*>& train_reader,
                       te_info.metric_val,
                       timer.toc(), 
                       !test_reader.empty(), 
-                      n+1);
+                      n);
       // Early-stopping
       if (early_stop_) {
         if (te_info.loss_val < best_loss) {
@@ -209,7 +209,7 @@ void Trainer::train(std::vector<Reader*>& train_reader,
       }
     }
   }
-  if (early_stop_) {  // not for cv
+  if (early_stop_ && best_epoch != epoch_) {  // not for cv
     print_action(
       StringPrintf("Early-stopping at epoch %d", best_epoch)
     );

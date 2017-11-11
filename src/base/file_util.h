@@ -221,10 +221,10 @@ inline std::string PrintSize(uint64 file_size) {
     SStringPrintf(&res, "%.2f GB",
             (double) file_size / GB);
   } else if (file_size > MB) {
-    SStringPrintf(&res, "%.2f MB\n",
+    SStringPrintf(&res, "%.2f MB",
             (double) file_size / MB);
   } else {
-    SStringPrintf(&res, "%.2f KB\n",
+    SStringPrintf(&res, "%.2f KB",
             (double) file_size / KB);
   }
   return res;

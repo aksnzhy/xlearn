@@ -449,7 +449,7 @@ void Solver::start_train_work() {
     if (save_model) {
       Timer timer;
       timer.tic();
-      print_action("Finish training and start to save model ");
+      print_action("Finish training and start to save model ...");
       trainer.SaveModel(hyper_param_.model_file);
       print_info(
         StringPrintf("Model file: %s", 
