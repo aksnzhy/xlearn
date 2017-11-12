@@ -40,20 +40,26 @@ set(CMAKE_INSTALL_PREFIX "xLearn")
 #-------------------------------------------------------------------------------
 # Ensure executables are statically linked with libraries.
 #-------------------------------------------------------------------------------
-if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  set(CMAKE_EXE_LINKER_FLAGS "-static -static-libgcc")
-endif()
+#if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+#  set(CMAKE_EXE_LINKER_FLAGS "-static -static-libgcc")
+#endif()
 
 #-------------------------------------------------------------------------------
 # Set include paths and library paths.
 #-------------------------------------------------------------------------------
 include_directories(
   "${PROJECT_SOURCE_DIR}"
+  "${PROJECT_BINARY_DIR}"
   "${PROJECT_SOURCE_DIR}/gtest/include"
 )
 
 link_directories(
-  "${PROJECT_BINARY_DIR}"
+  "${PROJECT_BINARY_DIR}/src/base"
+  "${PROJECT_BINARY_DIR}/src/data"
+  "${PROJECT_BINARY_DIR}/src/reader"
+  "${PROJECT_BINARY_DIR}/src/score"
+  "${PROJECT_BINARY_DIR}/src/loss"
+  "${PROJECT_BINARY_DIR}/src/solver"
 )
 
 #-------------------------------------------------------------------------------

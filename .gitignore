@@ -34,3 +34,8 @@
 # vim temp file
 *.un~
 *.DS_Store
+
+# xlearn output
+.bin
+.out
+.model
