@@ -1,5 +1,5 @@
-# Build library reader
-add_library(reader parser.cc file_splitor.cc reader.cc)
+# Build static library
+add_library(reader STATIC parser.cc file_splitor.cc reader.cc)
 
 # Build uinttests.
 set(LIBS reader data base pthread gtest)

@@ -1,5 +1,5 @@
-# Build library data
-add_library(data model_parameters.cc)
+# Build static library
+add_library(data STATIC model_parameters.cc)
 
 # Build unittests.
 set(LIBS data base gtest)

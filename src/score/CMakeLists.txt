@@ -1,5 +1,6 @@
-# Build library loss
-add_library(score score_function.cc linear_score.cc fm_score.cc ffm_score.cc)
+# Build static library
+add_library(score STATIC score_function.cc 
+linear_score.cc fm_score.cc ffm_score.cc)
 
 # Build uinttests
 set(LIBS score data base gtest)

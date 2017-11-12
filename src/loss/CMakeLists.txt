@@ -1,5 +1,6 @@
-# Build library loss
-add_library(loss loss.cc squared_loss.cc cross_entropy_loss.cc metric.cc)
+# Build static library
+add_library(loss STATIC loss.cc squared_loss.cc 
+cross_entropy_loss.cc metric.cc)
 
 # Build uinttests
 set(LIBS loss score data base gtest)

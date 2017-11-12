@@ -1,13 +1,6 @@
-# Build library base
-add_library(base_static STATIC stringprintf.cc logging.cc split_string.cc 
+# Build static library
+add_library(base STATIC logging.cc stringprintf.cc split_string.cc 
 levenshtein_distance.cc timer.cc)
-
-add_library(base SHARED stringprintf.cc logging.cc split_string.cc 
-levenshtein_distance.cc timer.cc)
-
-# Set properties
-set_target_properties(base_static PROPERTIES OUTPUT_NAME "base")
-set_target_properties(base PROPERTIES OUTPUT_NAME "base")
 
 # Build unittests.
 set(LIBS base pthread gtest)
