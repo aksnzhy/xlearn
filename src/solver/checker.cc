@@ -381,11 +381,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
              similar_str.c_str())
       );
       bo = false;
-      if (list[i][1] == '-') {  // "--" options
-        i += 1;
-      } else {  // "-" options
-        i += 2;
-      }
+      break;
     }
   }
   if (!bo) { return false; }
@@ -536,11 +532,7 @@ bool Checker::check_prediction_options(HyperParam& hyper_param) {
              similar_str.c_str())
       );
       bo = false;
-      if (list[i][1] == '-') {  // "--" options
-        i += 1;
-      } else {  // "-" options
-        i += 2;
-      }
+      break;
     }
   }
   if (!bo) { return false; }
