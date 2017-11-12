@@ -1,6 +1,19 @@
 # Build static library
+set(STA_DEPS score data base)
 add_library(loss STATIC loss.cc squared_loss.cc 
 cross_entropy_loss.cc metric.cc)
+target_link_libraries(loss ${STA_DEPS})
+
+# Build shared library
+set(SHA_DEPS score_shared data_shared base_shared)
+add_library(loss_shared SHARED loss.cc squared_loss.cc
+cross_entropy_loss.cc metric.cc)
+target_link_libraries(loss_shared ${SHA_DEPS})
+
+# Set properties
+set_target_properties(loss_shared PROPERTIES OUTPUT_NAME "loss")
+set_target_properties(loss_shared PROPERTIES CLEAN_DIRECT_OUTPUT 1)
+set_target_properties(loss PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 
 # Build uinttests
 set(LIBS loss score data base gtest)

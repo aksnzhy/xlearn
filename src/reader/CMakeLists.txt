@@ -1,5 +1,17 @@
 # Build static library
+set(STA_DEPS data base)
 add_library(reader STATIC parser.cc file_splitor.cc reader.cc)
+target_link_libraries(reader ${STA_DEPS})
+
+# Build shared library
+set(SHA_DEPS data_shared base_shared)
+add_library(reader_shared SHARED parser.cc file_splitor.cc reader.cc)
+target_link_libraries(reader_shared ${SHA_DEPS})
+
+# Set properties
+set_target_properties(reader_shared PROPERTIES OUTPUT_NAME "reader")
+set_target_properties(reader_shared PROPERTIES CLEAN_DIRECT_OUTPUT 1)
+set_target_properties(reader PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 
 # Build uinttests.
 set(LIBS reader data base pthread gtest)

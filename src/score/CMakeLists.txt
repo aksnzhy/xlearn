@@ -1,6 +1,19 @@
 # Build static library
+set(STA_DEPS data base)
 add_library(score STATIC score_function.cc 
 linear_score.cc fm_score.cc ffm_score.cc)
+target_link_libraries(score ${STA_DEPS})
+
+# Build shared library
+set(SHA_DEPS data_shared base_shared)
+add_library(score_shared SHARED score_function.cc 
+linear_score.cc fm_score.cc ffm_score.cc)
+target_link_libraries(score_shared ${SHA_DEPS})
+
+# Set properties
+set_target_properties(score_shared PROPERTIES OUTPUT_NAME "score")
+set_target_properties(score_shared PROPERTIES CLEAN_DIRECT_OUTPUT 1)
+set_target_properties(score PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 
 # Build uinttests
 set(LIBS score data base gtest)
