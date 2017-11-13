@@ -156,7 +156,7 @@ void Checker::Initialize(bool is_train, int argc, char* argv[]) {
 }
 
 // Check and parse user's input
-bool Checker::Check(HyperParam& hyper_param) {
+bool Checker::check_cmd(HyperParam& hyper_param) {
   // Do not have any args
   if (args_.size() == 1) {
     printf("%s\n", option_help().c_str());
@@ -167,6 +167,15 @@ bool Checker::Check(HyperParam& hyper_param) {
     return check_train_options(hyper_param);
   } else {
     return check_prediction_options(hyper_param);
+  }
+}
+
+// Check hyper-param. Used by c_api
+bool Checker::check_param(HyperParam& hyper_param) {
+  if (hyper_param.is_train) {
+    return check_train_param(hyper_param);
+  } else {
+    return check_prediction_param(hyper_param);
   }
 }
 
@@ -471,6 +480,11 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
   return true;
 }
 
+// Check the given hyper-param. Used by c_api
+bool Checker::check_train_param(HyperParam& hyper_param) {
+
+}
+
 // Check options for prediction tasks
 bool Checker::check_prediction_options(HyperParam& hyper_param) {
   bool bo = true;
@@ -553,6 +567,11 @@ bool Checker::check_prediction_options(HyperParam& hyper_param) {
   }
 
   return true;
+}
+
+// Check the given param. Used by c_api
+bool Checker::check_prediction_param(HyperParam& hyper_param) {
+
 }
 
 } // namespace xLearn

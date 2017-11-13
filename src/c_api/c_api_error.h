@@ -46,7 +46,7 @@ This file defines the error handling for C API.
   } catch(std::runtime_error &_except_) {                    \
     Finalize;                                                \
     return XLAPIHandleException(_except_);                   \
-  } return 0
+} return 0
 
 // Set the last error message needed by C API
 void XLearnAPISetLastError(const char* msg);

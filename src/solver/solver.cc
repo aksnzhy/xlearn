@@ -132,17 +132,44 @@ void Solver::Initialize(int argc, char* argv[]) {
   }
 }
 
+// Initialize the xLearn environment through the
+// given hyper-parameters. This function will be 
+// used for python API.
+void Solver::Initialize(HyperParam& hyper_param) {
+  // Print logo
+  print_logo();
+  // Check the arguments
+  checker(hyper_param);
+  this->hyper_param_ = hyper_param;
+  // Initialize log file
+  init_log();
+  // Init train or predict
+  if (hyper_param_.is_train) {
+    init_train();
+  } else {
+    init_predict();
+  }
+}
+
 // Check and parse command line arguments
 void Solver::checker(int argc, char* argv[]) {
   try {
     checker_.Initialize(hyper_param_.is_train, argc, argv);
-    if (!checker_.Check(hyper_param_)) {
+    if (!checker_.check_cmd(hyper_param_)) {
       print_error("Arguments error");
       exit(0);
     }
   } catch (std::invalid_argument &e) {
     printf("%s\n", e.what());
     exit(1);
+  }
+}
+
+// Check the given hyper-parameters
+void Solver::checker(HyperParam& hyper_param) {
+  if (!checker_.check_param(hyper_param)) {
+    print_error("Arguments error");
+    exit(0);
   }
 }
 

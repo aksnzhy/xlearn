@@ -24,6 +24,10 @@ to other languages.
 #ifndef XLEARN_C_API_C_API_H_
 #define XLEARN_C_API_C_API_H_
 
+#include "src/base/common.h"
+#include "src/data/hyper_parameters.h"
+#include "src/solver/solver.h"
+
 #ifdef __cplusplus
 #define XL_EXTERN_C extern "C"
 #include <cstdio>
@@ -39,31 +43,47 @@ to other languages.
 #define XL_DLL XL_EXTERN_C
 #endif
 
-typedef void *SolverHandle;
-typedef void *HyperParamHandle;
+/* Handle to xlearn */
+typedef void* XLearnHandle;
 
-// Create a linear model
-XL_DLL int CreateLinear();
-
-// Create a factorization machine
-XL_DLL int CreateFM();
-
-// Create a field-aware factorization machine
-XL_DLL int CreateFFM();
+// Create xlearn handle
+XL_DLL int XLearnCreate(const char *model_type,
+	                    XLearnHandle *out);
 
 // Set file path of the training data
-XL_DLL int SetTrain();
+XL_DLL int XLearnSetTrain(XLearnHandle *out,
+	                      const char *train_path);
 
 // Set file path of the test data
-XL_DLL int SetTest();
+XL_DLL int XLearnSetTest(XLearnHandle *out,
+	                     const char *test_path);
 
 // Set file path of the validation data
-XL_DLL int SetValidation();
+XL_DLL int XLearnSetValidate(XLearnHandle *out,
+	                         const char *val_path);
 
 // Start to train
-XL_DLL int Train();
+XL_DLL int XLearnFit(XLearnHandle *out,
+	                 const char *model_path);
 
 // Start to predict
-XL_DLL int Predict();
+XL_DLL int XLearnPredict(XLearnHandle *out,
+	                     const char *model_path,
+	                     const char *out_path);
+
+// This is the entry class used by c_api.
+class XLearn {
+ public:
+  // Constructor and Destructor
+  XLearn() {}
+  ~XLearn() {}
+
+ protected:
+   xLearn::HyperParam hyper_param_;
+   xLearn::Solver solver_;
+
+ private:
+  DISALLOW_COPY_AND_ASSIGN(XLearn);
+};
 
 #endif  // XLEARN_C_API_C_API_H_

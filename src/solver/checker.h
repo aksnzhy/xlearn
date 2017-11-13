@@ -47,7 +47,10 @@ class Checker {
   void Initialize(bool is_train, int argc, char* argv[]);
 
   // Check and parse arguments
-  bool Check(HyperParam& hyper_param);
+  bool check_cmd(HyperParam& hyper_param);
+
+  // Check hyper-param. Used by c_api
+  bool check_param(HyperParam& hyper_param);
 
  protected:
   /* Store all the possible options */
@@ -62,7 +65,9 @@ class Checker {
 
   // Check options for training and prediction
   bool check_train_options(HyperParam& hyper_param);
+  bool check_train_param(HyperParam& hyper_param);
   bool check_prediction_options(HyperParam& hyper_param);
+  bool check_prediction_param(HyperParam& hyper_param);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Checker);

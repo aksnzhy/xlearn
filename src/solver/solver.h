@@ -69,6 +69,11 @@ class Solver {
   // metric, and score functions, etc.
   void Initialize(int argc, char* argv[]);
 
+  // Initialize the xLearn environment through the
+  // given hyper-parameters. This function will be 
+  // used for python API.
+  void Initialize(HyperParam& hyper_param);
+
   // Start a training task or start an inference task.
   void StartWork();
 
@@ -109,6 +114,7 @@ class Solver {
   void init_predict();
   void init_log();
   void checker(int argc, char* argv[]);
+  void checker(HyperParam& hyper_param);
 
   // Start function
   void start_train_work();
