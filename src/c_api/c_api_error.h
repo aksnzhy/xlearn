@@ -33,21 +33,20 @@ This file defines the error handling for C API.
 
 // Every function starts with API_BEGIN(); 
 // and finishes with API_END() or API_END_HANDLE_ERROR
-#define API_END()                                   \
-  } catch(std::runtime_error &_except_) {           \
-    return XLAPIHandleException(_except_);          \
+#define API_END()                                             \
+  } catch(std::runtime_error &_except_) {                     \
+    return XLAPIHandleException(_except_);                    \
 } return 0
 
 // Every function starts with API_BEGIN(); 
 // and finishes with API_END() or API_END_HANDLE_ERROR
 // The finally clause contains procedure to cleanup states
 // when an error happens.
-#define API_END_HANDLE_ERROR(Finalize)              \
-  } catch(std::runtime_error &_except_) {           \
-    Finalize;                                       \
-    return XLAPIHandleException(_except_);          \
-  } 
-  return 0
+#define API_END_HANDLE_ERROR(Finalize)                       \
+  } catch(std::runtime_error &_except_) {                    \
+    Finalize;                                                \
+    return XLAPIHandleException(_except_);                   \
+  } return 0
 
 // Set the last error message needed by C API
 void XLearnAPISetLastError(const char* msg);
