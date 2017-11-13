@@ -47,8 +47,7 @@ This file defines the error handling for C API.
 // Handle exception thrown out and return value
 // of API after exception is handled
 inline int XLAPIHandleException(const std::runtime_error &e) {
-  LOG(FATAL) << "API runtime error: " 
-             << e.what();
+  LOG(FATAL) << "API runtime error: " << e.what();
   return -1;
 }
 

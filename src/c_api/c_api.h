@@ -39,6 +39,31 @@ to other languages.
 #define XL_DLL XL_EXTERN_C
 #endif
 
-typedef void *XLearnHandle;
+typedef void *SolverHandle;
+typedef void *HyperParamHandle;
+
+// Create a linear model
+XL_DLL int CreateLinear();
+
+// Create a factorization machine
+XL_DLL int CreateFM();
+
+// Create a field-aware factorization machine
+XL_DLL int CreateFFM();
+
+// Set file path of the training data
+XL_DLL int SetTrain();
+
+// Set file path of the test data
+XL_DLL int SetTest();
+
+// Set file path of the validation data
+XL_DLL int SetValidation();
+
+// Start to train
+XL_DLL int Train();
+
+// Start to predict
+XL_DLL int Predict();
 
 #endif  // XLEARN_C_API_C_API_H_
