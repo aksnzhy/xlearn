@@ -20,18 +20,42 @@ Author: Chao Ma (mctt90@gmail.com)
 This file is the implementation of C API for xLearn.
 */
 
-XL_DLL int CreateLinear();
+// Create xlearn handle
+XL_DLL int XLearnCreate(const char *model_type,
+	                    XLearnHandle *out);
 
-XL_DLL int CreateFM();
+// Set file path of the training data
+XL_DLL int XLearnSetTrain(XLearnHandle *out,
+	                      const char *train_path);
 
-XL_DLL int CreateFFM();
+// Set file path of the test data
+XL_DLL int XLearnSetTest(XLearnHandle *out,
+	                     const char *test_path);
 
-XL_DLL int SetTrain();
+// Set file path of the validation data
+XL_DLL int XLearnSetValidate(XLearnHandle *out,
+	                         const char *val_path);
 
-XL_DLL int SetTest();
+// Start to train
+XL_DLL int XLearnFit(XLearnHandle *out,
+	                 const char *model_path);
 
-XL_DLL int SetValidation();
+// Start to predict
+XL_DLL int XLearnPredict(XLearnHandle *out,
+	                     const char *model_path,
+	                     const char *out_path);
 
-XL_DLL int Fit();
+// Set string param
+XL_DLL int XLearnSetStr(XLearnHandle *out,
+	                    const char *key,
+	                    const char *value);
 
-XL_DLL int Predict();
+// Set int param
+XL_DLL int XLearnSetInt(XLearnHandle *out,
+	                    const char *key,
+	                    const int value);
+
+// Set float param
+XL_DLL int XLearnSetFloat(XLearnHandle *out,
+	                      const char *key,
+	                      const float value);

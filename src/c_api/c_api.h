@@ -71,6 +71,21 @@ XL_DLL int XLearnPredict(XLearnHandle *out,
 	                     const char *model_path,
 	                     const char *out_path);
 
+// Set string param
+XL_DLL int XLearnSetStr(XLearnHandle *out,
+	                    const char *key,
+	                    const char *value);
+
+// Set int param
+XL_DLL int XLearnSetInt(XLearnHandle *out,
+	                    const char *key,
+	                    const int value);
+
+// Set float param
+XL_DLL int XLearnSetFloat(XLearnHandle *out,
+	                      const char *key,
+	                      const float value);
+
 // This is the entry class used by c_api.
 class XLearn {
  public:

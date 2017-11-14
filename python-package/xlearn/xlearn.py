@@ -2,38 +2,8 @@
 import sys
 import os
 import ctypes
-
-class XLearnError(Exception):
-	"""Error thrown by xlearn trainer"""
-    pass
-
-def _load_lib():
-	"""Load xlearn library"""
-	lib_path = find_lib_path()
-	if len(lib_path) == 0:
-		return None
-	lib = ctypes.cdll.Loadlibrary(lib_path[0])
-	return lib
-
-# load the xlearn library globally
-_LIB = _load_lib()
-
-def _check_call(ret):
-	"""Check the return value of C API call
-
-    This function will raise exception when error occurs.
-    Wrap every API call with this function
-
-    Parameters
-    ----------
-    ret : int
-        return value from API calls
-	"""
-	if ret != 0:
-		raise XLearnError(_LIB.XLearGetLastError())
-
-#type definitions
-XLearnHandle = ctypes.c_void_p
+from .base import _LIB
+from .base import _check_call, c_str
 
 class XLearn(object):
 	"""XLearn the core interface used by python API."""
@@ -50,6 +20,45 @@ class XLearn(object):
 
 	def __del__(self):
 		_check_call(_LIB.XLearnHandleFree(self.handle))
+
+	def __set_param(self, param):
+		"""Set hyper-parameter for xlearn handle
+
+		Parameters
+		----------
+		param : dict
+		    xlearn hyper-parameters
+		"""
+		for (key, value) in param.items():
+			if key == 'task':
+				__check_call(_LIB.XLearnSetStr(self.handle, 
+					c_str(key), c_str(value)))
+			elif key == 'metric':
+				__check_call(_LIB.XLearnSetStr(self.handle, 
+					c_str(key), c_str(value)))
+			elif key == 'log':
+				__check_call(_LIB.XLearnSetStr(self.handle, 
+					c_str(key), c_str(value)))
+			elif key == 'lr':
+				__check_call(_LIB.XLearnSetFloat(self.handle, 
+					c_str(key), c_float(value)))
+			elif key == 'k':
+				__check_call(_LIB.XLearnSetInt(self.handle, 
+					c_str(key), c_uint(value)))
+			elif key == 'lambda':
+				__check_call(_LIB.XLearnSetFloat(self.handle, 
+					c_str(key), c_float(value)))
+			elif key == 'init':
+				__check_call(_LIB.XLearnSetFloat(self.handle, 
+					c_str(key), c_uint(value)))
+			elif key == 'epoch':
+				__check_call(_LIB(XLearnSetInt(self.handle, 
+					c_str(key), c_uint(value))))
+			elif key == 'fold':
+				__check_call(_LIB(XLearnSetInt(self.handle, 
+					c_str(key), c_uint(value))))
+			else:
+				raise Exception("Invalid key!", key)
 
 	def setTrain(self, train_path):
 		"""Set file path of training data.
@@ -81,6 +90,48 @@ class XLearn(object):
 		"""
 		_check_call(_LIB.XLearnSetValidate(self.handle, c_str(val_path)))
 
+    def setOnDisk(self):
+    	"""Set xlearn to use on-disk training"""
+    	key = 'on_disk'
+    	__check_call(_LIB.XLearnSetBool(self.handle, 
+    		c_str(key), c_bool(True)))
+
+	def setQuiet(self):
+		"""Set xlearn to quiet model"""
+		key = 'quiet'
+		__check_call(_LIB.XLearnSetBool(self.handle, 
+			c_str(key), c_bool(True)))
+
+	def disableNorm(self):
+		"""Disable instance-wise normalization"""
+		key = 'norm'
+		__check_call(_LIB.XLearnSetBool(self.handle, 
+			c_str(key), c_bool(False)))
+
+	def setLockFree(self):
+		"""Set xlearn to use lock free training"""
+		key = 'lock_free'
+		__check_call(_LIB.XLearnSetBool(self.handle, 
+			c_str(key), c_bool(True)))
+
+	def disableEarlyStop(self):
+		"""Disable early-stopping"""
+		key = 'early_stop'
+		__check_call(_LIB.XLearnSetBool(self.handle, 
+			c_str(key), c_bool(False)))
+
+	def setSign(self):
+		"""Convert output to 0 and 1"""
+		key = 'sign'
+		__check_call(_LIB.XLearnSetBool(self.handle, 
+			c_str(key), c_bool(True)))
+
+	def setSigmoid(self):
+		"""Convert output by using sigmoid"""
+		key = 'sigmoid'
+		__check_call(_LIB.XLearnSetBool(self.handle, 
+			c_str(key), c_bool(True)))
+
 	def fit(self, param, model_path):
 		"""Check hyper-parameters, train model, and dump model.
 
@@ -91,7 +142,19 @@ class XLearn(object):
 		model_path : str
 		  path of model checkpoint.
 		"""
+		__set_Param(param)
 		_check_call(_LIB.XLearnFit(self.handle, c_str(model_path)))
+
+	def cv(self, param):
+		""" Do cross-validation
+
+		Parameters
+		----------
+		param : dict
+		  hyper-parameter used by xlearn
+		"""
+		__set_Param(param)
+		_check_call(_LIB.XLearnCV(self.handle))
 
 	def predict(self, model_path, out_path):
 		"""Predict output
