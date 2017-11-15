@@ -6,7 +6,7 @@ from .base import _LIB
 from .base import _check_call, c_str
 
 class XLearn(object):
-	"""XLearn the core interface used by python API."""
+	"""XLearn is the core interface used by python API."""
 	def __init__(self, handle):
 		"""Initalizes a new XLearn
 
