@@ -29,6 +29,5 @@ Also, xLearn supports very simple python API for users.
 
 <img src="https://github.com/aksnzhy/xLearn/raw/master/img/scalability.png" width = "650"/>   
 
-xLearn can be used for solving large-scale machine learning problems. First, xLearn supports on-disk training, which can handle 
-very large data (TB) by using the disk on a single machine. Moreover. xLearn support distributed training, which scales beyond billions
-of example across many machines. 
+xLearn can be used for solving large-scale machine learning problems. First, xLearn supports out-of-core training, which can handle 
+very large data (TB) by just leveraging the disk of a single machine. Moreover. Also, xLearn can support distributed training, which scales beyond billions of example across many machines. 
