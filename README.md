@@ -22,11 +22,13 @@ combining these insights, xLearn is 5x - 13x faster compared to the similar lear
 
 <img src="https://github.com/aksnzhy/xLearn/raw/master/img/code.png" width = "600"/>   
 
-xLearn does not rely on any third-party library, and users can just clone the code and compile it. Also, xLearn
-supports very simple python API for users.
+xLearn does not rely on any third-party library, and hence users can just clone the code and compile it by using cmake. 
+Also, xLearn supports very simple python API for users.
 
 ### Scalability
 
 <img src="https://github.com/aksnzhy/xLearn/raw/master/img/scalability.png" width = "650"/>   
 
-Under developing and coming soon ...
+xLearn can be used for solving large-scale machine learning problems. First, xLearn supports on-disk training, which can handle 
+very large data (TB) by using the disk on a single machine. Moreover. xLearn support distributed training, which scales beyond billions
+of example across many machines. 
