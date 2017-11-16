@@ -14,13 +14,16 @@ of liblinear, libfm, or libffm, now the xLearn is your another better choice.
 
 <img src="https://github.com/aksnzhy/xLearn/raw/master/img/speed.png" width = "800"/>   
 
-xLearn is developed in high-performance C++ with careful design and optimization. Our system is designed to 
-maximize CPU and memory utilizations, provide cache-aware computation, and support lock-free learning. By 
+xLearn is developed by high-performance C++ code with careful design and optimizations. Our system is designed to 
+maximize the CPU and memory utilizations, provide cache-aware computation, and support lock-free learning. By 
 combining these insights, xLearn is 5x - 13x faster compared to the similar learning systems.
 
 ### Ease-of-use
 
 <img src="https://github.com/aksnzhy/xLearn/raw/master/img/code.png" width = "600"/>   
+
+xLearn does not rely on any third-party library, and users can just clone the code and compile it. Also, xLearn
+supports very simple python API for users.
 
 ### Scalability
 
