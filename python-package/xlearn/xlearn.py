@@ -50,7 +50,7 @@ class XLearn(object):
 					c_str(key), c_float(value)))
 			elif key == 'init':
 				__check_call(_LIB.XLearnSetFloat(self.handle, 
-					c_str(key), c_uint(value)))
+					c_str(key), c_float(value)))
 			elif key == 'epoch':
 				__check_call(_LIB(XLearnSetInt(self.handle, 
 					c_str(key), c_uint(value))))

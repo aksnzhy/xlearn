@@ -50,6 +50,9 @@ typedef void* XLearnHandle;
 XL_DLL int XLearnCreate(const char *model_type,
 	                    XLearnHandle *out);
 
+// Free the xLearn handle
+XL_DLL int XLearnHandleFree(XLearnHandle *out);
+
 // Set file path of the training data
 XL_DLL int XLearnSetTrain(XLearnHandle *out,
 	                      const char *train_path);
@@ -65,6 +68,9 @@ XL_DLL int XLearnSetValidate(XLearnHandle *out,
 // Start to train
 XL_DLL int XLearnFit(XLearnHandle *out,
 	                 const char *model_path);
+
+// Cross-validation
+XL_DLL int XLearnCV(XLearnHandle *out);
 
 // Start to predict
 XL_DLL int XLearnPredict(XLearnHandle *out,
@@ -86,6 +92,11 @@ XL_DLL int XLearnSetFloat(XLearnHandle *out,
 	                      const char *key,
 	                      const float value);
 
+// Set bool param
+XL_DLL int XLearnSetBool(XLearnHandle *out,
+	                     const char *key,
+	                     const float value);
+
 // This is the entry class used by c_api.
 class XLearn {
  public:
@@ -94,8 +105,8 @@ class XLearn {
   ~XLearn() {}
 
  protected:
-   xLearn::HyperParam hyper_param_;
-   xLearn::Solver solver_;
+   xLearn::HyperParam hyper_param;
+   xLearn::Solver solver;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(XLearn);
