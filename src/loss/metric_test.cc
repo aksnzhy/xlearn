@@ -166,8 +166,8 @@ TEST(AUCMetricTest, auc_test) {
   std::vector<real_t> Y = {-1.0, -1.0, 1.0, 1.0};
   std::vector<real_t> pred = {0.1, 0.4, 0.35, 0.8};
   AUCMetric metric;
-  //size_t threadNumber = std::thread::hardware_concurrency();
-  size_t threadNumber = 2; 
+  size_t threadNumber = std::thread::hardware_concurrency();
+  //size_t threadNumber = 2; 
   ThreadPool* pool = new ThreadPool(threadNumber);
   metric.Initialize(pool);
   metric.Accumulate(Y, pred);

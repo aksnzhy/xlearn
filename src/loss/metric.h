@@ -542,7 +542,6 @@ class AUCMetric : public Metric {
 
  private:
   double auc_;
-  //const static int32_t MAX_BUCKET_SIZE = 2;
   std::vector<int32_t> all_noclick_number_;
   std::vector<int32_t> all_click_number_;
  private:
