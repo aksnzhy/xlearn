@@ -444,11 +444,11 @@ class AUCMetric : public Metric {
  public:
   struct Info {
     Info() {
-      click_vec_.resize(MAX_BUCKET_SIZE, 0);
-      noclick_vec_.resize(MAX_BUCKET_SIZE, 0);
+      positive_vec_.resize(MAX_BUCKET_SIZE, 0);
+      negative_vec_.resize(MAX_BUCKET_SIZE, 0);
     }
-    std::vector<int32_t> click_vec_;
-    std::vector<int32_t> noclick_vec_;
+    std::vector<int32_t> positive_vec_;
+    std::vector<int32_t> negative_vec_;
   };
 
  public:
@@ -459,8 +459,8 @@ class AUCMetric : public Metric {
   ~AUCMetric() { }
 
   void init() {
-    all_click_number_.resize(MAX_BUCKET_SIZE, 0);
-    all_noclick_number_.resize(MAX_BUCKET_SIZE, 0);
+    all_positive_number_.resize(MAX_BUCKET_SIZE, 0);
+    all_negative_number_.resize(MAX_BUCKET_SIZE, 0);
   }
 
   static void auc_accum_thread(const std::vector<real_t>* Y,
@@ -473,9 +473,9 @@ class AUCMetric : public Metric {
       real_t r_label = (*Y)[i] > 0 ? 1 : -1;
       int32_t bkt_id = int32_t((*pred)[i] * MAX_BUCKET_SIZE);
       if (r_label > 0) {
-        info->click_vec_[bkt_id] += 1;
+        info->positive_vec_[bkt_id] += 1;
       } else {
-        info->noclick_vec_[bkt_id] += 1;
+        info->negative_vec_[bkt_id] += 1;
       }
     }  // end for
   }  // end auc_accum_thread
@@ -499,37 +499,37 @@ class AUCMetric : public Metric {
     pool_->Sync(threadNumber_);
     for (size_t i = 0; i < info.size(); ++i) {
       for (int32_t j = 0; j < MAX_BUCKET_SIZE; ++j) {
-        all_click_number_[j] += info[i].click_vec_[j];
-        all_noclick_number_[j] += info[i].noclick_vec_[j];
+        all_positive_number_[j] += info[i].positive_vec_[j];
+        all_negative_number_[j] += info[i].negative_vec_[j];
       }  // end for
     }  // end for
-    auc_ = CalcAUC(all_click_number_, all_noclick_number_);
+    auc_ = CalcAUC(all_positive_number_, all_negative_number_);
   }
 
-  double CalcAUC(std::vector<int32_t> click_vec,
-                 std::vector<int32_t> noclick_vec) {
-    CHECK_EQ(click_vec.size(), noclick_vec.size());
-    int32_t click_sum = 0;
-    int32_t noclick_sum= 0;
-    int32_t pre_click_sum = 0.0;
-    int32_t clicksum_dot_noclicksum = 0;
+  double CalcAUC(std::vector<int32_t> positive_vec,
+                 std::vector<int32_t> negative_vec) {
+    CHECK_EQ(positive_vec.size(), negative_vec.size());
+    int32_t positive_sum = 0;
+    int32_t negative_sum= 0;
+    int32_t pre_positive_sum = 0.0;
+    int32_t positivesum_dot_negativesum = 0;
     double auc = 0.0;
     double auc_res = 0.0;
     for (int32_t i = 0; i < MAX_BUCKET_SIZE; ++i) {
-      pre_click_sum = click_sum;
-      click_sum += all_click_number_[i];
-      noclick_sum += all_noclick_number_[i];
-      auc += (pre_click_sum + click_sum) * all_noclick_number_[i] * 1.0 / 2;
+      pre_positive_sum = positive_sum;
+      positive_sum += all_positive_number_[i];
+      negative_sum += all_negative_number_[i];
+      auc += (pre_positive_sum + positive_sum) * all_negative_number_[i] * 1.0 / 2;
     }
-    clicksum_dot_noclicksum = click_sum * noclick_sum;
-    auc_res = auc / (clicksum_dot_noclicksum);
+    positivesum_dot_negativesum = positive_sum * negative_sum;
+    auc_res = auc / (positivesum_dot_negativesum);
     return 1.0 - auc_res;
   }
 
   inline void Reset() {
     auc_ = 0.0;
-    all_click_number_.resize(MAX_BUCKET_SIZE, 0);
-    all_noclick_number_.resize(MAX_BUCKET_SIZE, 0);
+    all_positive_number_.resize(MAX_BUCKET_SIZE, 0);
+    all_negative_number_.resize(MAX_BUCKET_SIZE, 0);
   }
 
   inline real_t GetMetric() {
@@ -542,8 +542,8 @@ class AUCMetric : public Metric {
 
  private:
   double auc_;
-  std::vector<int32_t> all_noclick_number_;
-  std::vector<int32_t> all_click_number_;
+  std::vector<int32_t> all_negative_number_;
+  std::vector<int32_t> all_positive_number_;
  private:
   DISALLOW_COPY_AND_ASSIGN(AUCMetric);
 };
