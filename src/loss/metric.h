@@ -503,10 +503,9 @@ class AUCMetric : public Metric {
         all_negative_number_[j] += info[i].negative_vec_[j];
       }  // end for
     }  // end for
-    auc_ = CalcAUC(all_positive_number_, all_negative_number_);
   }
 
-  double CalcAUC(std::vector<int32_t> positive_vec,
+  real_t CalcAUC(std::vector<int32_t> positive_vec,
                  std::vector<int32_t> negative_vec) {
     CHECK_EQ(positive_vec.size(), negative_vec.size());
     int32_t positive_sum = 0;
@@ -527,12 +526,12 @@ class AUCMetric : public Metric {
   }
 
   inline void Reset() {
-    auc_ = 0.0;
     all_positive_number_.resize(MAX_BUCKET_SIZE, 0);
     all_negative_number_.resize(MAX_BUCKET_SIZE, 0);
   }
 
   inline real_t GetMetric() {
+    auc_ = CalcAUC(all_positive_number_, all_negative_number_);
     return auc_;
   }
 
@@ -542,8 +541,8 @@ class AUCMetric : public Metric {
 
  private:
   double auc_;
-  std::vector<int32_t> all_negative_number_;
   std::vector<int32_t> all_positive_number_;
+  std::vector<int32_t> all_negative_number_;
  private:
   DISALLOW_COPY_AND_ASSIGN(AUCMetric);
 };
