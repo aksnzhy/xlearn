@@ -181,7 +181,6 @@ TEST(AUCMetricTest, auc_test) {
   EXPECT_EQ(metric.metric_type(), "AUC");
 }
 
-
 TEST(MAEMetricTest, mae_test) {
   std::vector<real_t> Y;
   Y.push_back(12);
@@ -290,6 +289,7 @@ TEST(MetricTest, Create_Metric) {
   EXPECT_TRUE(CreateMetric("prec") != NULL);
   EXPECT_TRUE(CreateMetric("recall") != NULL);
   EXPECT_TRUE(CreateMetric("f1") != NULL);
+  EXPECT_TRUE(CreateMetric("auc") != NULL);
   EXPECT_TRUE(CreateMetric("mae") != NULL);
   EXPECT_TRUE(CreateMetric("mape") != NULL);
   EXPECT_TRUE(CreateMetric("rmsd") != NULL);

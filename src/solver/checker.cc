@@ -249,6 +249,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
           list[i+1].compare("prec") != 0 &&
           list[i+1].compare("recall") != 0 &&
           list[i+1].compare("f1") != 0 &&
+          list[i+1].compare("auc") != 0 &&
           list[i+1].compare("mae") != 0 &&
           list[i+1].compare("mape") != 0 &&
           list[i+1].compare("rmsd") != 0 &&
@@ -261,6 +262,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
                "   prec \n" 
                "   recall \n"
                "   f1 \n"
+               "   auc\n"
                "   mae \n"
                "   mape \n"
                "   rmsd \n"
