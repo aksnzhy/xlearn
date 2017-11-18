@@ -167,12 +167,18 @@ TEST(AUCMetricTest, auc_test) {
   std::vector<real_t> pred = {0.1, 0.4, 0.35, 0.8};
   AUCMetric metric;
   size_t threadNumber = std::thread::hardware_concurrency();
-  //size_t threadNumber = 2; 
   ThreadPool* pool = new ThreadPool(threadNumber);
   metric.Initialize(pool);
   metric.Accumulate(Y, pred);
   real_t metric_val = metric.GetMetric();
   EXPECT_FLOAT_EQ(metric_val, 0.75);
+  metric.Reset();
+  Y = {-1.0, -1.0, 1.0, 1.0};
+  pred = {0.1, 0.4, 0.35, 0.8};
+  metric.Accumulate(Y, pred);
+  metric_val = metric.GetMetric();
+  EXPECT_FLOAT_EQ(metric_val, 0.75);
+  EXPECT_EQ(metric.metric_type(), "AUC");
 }
 
 
