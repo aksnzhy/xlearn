@@ -438,6 +438,111 @@ class F1Metric : public Metric {
   DISALLOW_COPY_AND_ASSIGN(F1Metric);
 };
 
+class AUCMetric : public Metric {
+ public:
+  struct Info {
+    Info() {
+      click_vec_.resize(MAX_BUCKET_SIZE, 0);
+      noclick_vec_.resize(MAX_BUCKET_SIZE, 0);
+    }
+    std::vector<int32_t> click_vec_;
+    std::vector<int32_t> noclick_vec_;
+  };
+
+ public:
+  AUCMetric()
+    : auc_(0.0) { 
+    init();
+  }
+  ~AUCMetric() { }
+
+  void init() {
+    glo_click_number_.resize(MAX_BUCKET_SIZE, 0);
+    glo_noclick_number_.resize(MAX_BUCKET_SIZE, 0);
+  }
+
+  static void auc_accum_thread(const std::vector<real_t>* Y,
+                               const std::vector<real_t>* pred,
+                               Info* info,
+                               size_t start_idx,
+                               size_t end_idx) {
+    CHECK_GE(end_idx, start_idx);
+    for (size_t i = start_idx; i < end_idx; ++i) {
+      real_t r_label = (*Y)[i] > 0 ? 1 : -1;
+      int32_t bkt_id = int32_t((*pred)[i] * MAX_BUCKET_SIZE);
+      if (r_label > 0) {
+        info->click_vec_[bkt_id] += 1;
+      } else {
+        info->noclick_vec_[bkt_id] += 1;
+      }
+    }  // end for
+  }  // end auc_accum_thread
+
+  void Accumulate(const std::vector<real_t>& Y,
+                  const std::vector<real_t>& pred) {
+    CHECK_EQ(Y.size(), pred.size());
+    // multi-thread
+    Info single_info;
+    std::vector<Info> info(threadNumber_, single_info);
+    for (int i = 0; i < threadNumber_; ++i) {
+      size_t start_idx = getStart(pred.size(), threadNumber_, i);
+      size_t end_idx = getEnd(pred.size(), threadNumber_, i);
+      pool_->enqueue(std::bind(auc_accum_thread,
+                               &Y,
+                               &pred,
+                               &info[i],
+                               start_idx,
+                               end_idx));
+    }
+    pool_->Sync(threadNumber_);
+    for (size_t i = 0; i < info.size(); ++i) {
+      for (int32_t j = 0; j < MAX_BUCKET_SIZE; ++j) {
+        glo_click_number_[j] += info[i].click_vec_[j];
+        glo_noclick_number_[j] += info[i].noclick_vec_[j];
+      }  // end for
+    }  // end for
+    auc_ = CalcAUC(glo_click_number_, glo_noclick_number_);
+  }
+
+  double CalcAUC(std::vector<int32_t> click_vec,
+                 std::vector<int32_t> noclick_vec) {
+    CHECK_EQ(click_vec.size(), noclick_vec.size());
+    int32_t click_sum = 0;
+    int32_t noclick_sum= 0;
+    int32_t pre_click_sum = 0.0;
+    int32_t clicksum_dot_noclicksum = 0;
+    double auc = 0.0;
+    double auc_res = 0.0;
+    for (int32_t i = 0; i < MAX_BUCKET_SIZE; ++i) {
+      pre_click_sum = click_sum;
+      click_sum += glo_click_number_[i];
+      noclick_sum += glo_noclick_number_[i];
+      auc += (pre_click_sum + click_sum) * glo_noclick_number_[i] * 1.0 / 2;
+    }
+    clicksum_dot_noclicksum = click_sum * noclick_sum;
+    auc_res = auc / (clicksum_dot_noclicksum);
+    return 1.0 - auc_res;
+  }
+
+  inline void Reset() {
+  }
+
+  inline real_t GetMetric() {
+    return auc_;
+  }
+
+  inline std::string metric_type() {
+    return "AUC";
+  }
+
+ private:
+  double auc_;
+  const static int32_t MAX_BUCKET_SIZE = 2;
+  std::vector<int32_t> glo_noclick_number_;
+  std::vector<int32_t> glo_click_number_;
+ private:
+  DISALLOW_COPY_AND_ASSIGN(AUCMetric);
+};
 
  /*********************************************************
   *  For regression                                       *
