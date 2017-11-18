@@ -451,14 +451,14 @@ class AUCMetric : public Metric {
 
  public:
   AUCMetric()
-    : auc_(0.0) { 
+    : auc_(0.0) {
     init();
   }
   ~AUCMetric() { }
 
   void init() {
-    glo_click_number_.resize(MAX_BUCKET_SIZE, 0);
-    glo_noclick_number_.resize(MAX_BUCKET_SIZE, 0);
+    all_click_number_.resize(MAX_BUCKET_SIZE, 0);
+    all_noclick_number_.resize(MAX_BUCKET_SIZE, 0);
   }
 
   static void auc_accum_thread(const std::vector<real_t>* Y,
@@ -497,11 +497,11 @@ class AUCMetric : public Metric {
     pool_->Sync(threadNumber_);
     for (size_t i = 0; i < info.size(); ++i) {
       for (int32_t j = 0; j < MAX_BUCKET_SIZE; ++j) {
-        glo_click_number_[j] += info[i].click_vec_[j];
-        glo_noclick_number_[j] += info[i].noclick_vec_[j];
+        all_click_number_[j] += info[i].click_vec_[j];
+        all_noclick_number_[j] += info[i].noclick_vec_[j];
       }  // end for
     }  // end for
-    auc_ = CalcAUC(glo_click_number_, glo_noclick_number_);
+    auc_ = CalcAUC(all_click_number_, all_noclick_number_);
   }
 
   double CalcAUC(std::vector<int32_t> click_vec,
@@ -515,9 +515,9 @@ class AUCMetric : public Metric {
     double auc_res = 0.0;
     for (int32_t i = 0; i < MAX_BUCKET_SIZE; ++i) {
       pre_click_sum = click_sum;
-      click_sum += glo_click_number_[i];
-      noclick_sum += glo_noclick_number_[i];
-      auc += (pre_click_sum + click_sum) * glo_noclick_number_[i] * 1.0 / 2;
+      click_sum += all_click_number_[i];
+      noclick_sum += all_noclick_number_[i];
+      auc += (pre_click_sum + click_sum) * all_noclick_number_[i] * 1.0 / 2;
     }
     clicksum_dot_noclicksum = click_sum * noclick_sum;
     auc_res = auc / (clicksum_dot_noclicksum);
@@ -538,8 +538,8 @@ class AUCMetric : public Metric {
  private:
   double auc_;
   const static int32_t MAX_BUCKET_SIZE = 2;
-  std::vector<int32_t> glo_noclick_number_;
-  std::vector<int32_t> glo_click_number_;
+  std::vector<int32_t> all_noclick_number_;
+  std::vector<int32_t> all_click_number_;
  private:
   DISALLOW_COPY_AND_ASSIGN(AUCMetric);
 };
