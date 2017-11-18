@@ -24,7 +24,7 @@ This file is the implementation of C error handling.
 
 struct XLearnAPIErrorEntry {
   std::string last_error;
-}
+};
 
 static XLearnAPIErrorEntry entry;
 
