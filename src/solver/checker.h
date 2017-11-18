@@ -68,7 +68,9 @@ class Checker {
   bool check_train_param(HyperParam& hyper_param);
   bool check_prediction_options(HyperParam& hyper_param);
   bool check_prediction_param(HyperParam& hyper_param);
-
+  void check_conflict_train(HyperParam& hyper_param);
+  void check_conflict_predict(HyperParam& hyper_param);
+  
  private:
   DISALLOW_COPY_AND_ASSIGN(Checker);
 };

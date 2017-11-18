@@ -19,3 +19,16 @@ Author: Chao Ma (mctt90@gmail.com)
 
 This file tests c_api.h
 */
+
+#include "gtest/gtest.h"
+
+#include "src/c_api/c_api.h"
+
+TEST(C_API_TEST, Initialize) {
+  XLearnHandle xlearn;
+  EXPECT_EQ(XLearnCreate("linear", &xlearn), 0);
+  EXPECT_EQ(XLearnSetTrain(&xlearn, "./data_train.txt"), 0);
+  EXPECT_EQ(XLearnSetTest(&xlearn, "./data_test.txt"), 0);
+  EXPECT_EQ(XLearnSetValidate(&xlearn, "./data_validate.txt"), 0);
+  EXPECT_EQ(XLearnFit(&xlearn, "./model.bin"), 0);
+}

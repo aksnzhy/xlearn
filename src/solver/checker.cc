@@ -397,6 +397,53 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
   /*********************************************************
    *  Check warning and fix conflict                       *
    *********************************************************/
+  check_conflict_train(hyper_param);
+  /*********************************************************
+   *  Set default value                                    *
+   *********************************************************/
+  if (hyper_param.model_file.empty() && !hyper_param.cross_validation) {
+    hyper_param.model_file = hyper_param.train_set_file + ".model";
+  }
+  if (hyper_param.metric.compare("rmse") == 0) {
+    hyper_param.metric = "rmsd";
+  }
+
+  return true;
+}
+
+// Check the given hyper-param. Used by c_api
+bool Checker::check_train_param(HyperParam& hyper_param) {
+  bool bo = true;
+  /*********************************************************
+   *  Check file path                                      *
+   *********************************************************/
+  if (!FileExist(hyper_param.train_set_file.c_str())) {
+    print_error(
+      StringPrintf("Training data file: %s does not exist.", 
+                    hyper_param.train_set_file.c_str())
+    );
+    bo = false;
+  }
+  if (!bo) return false;
+  /*********************************************************
+   *  Check warning and fix conflict                       *
+   *********************************************************/
+  check_conflict_train(hyper_param);
+  /*********************************************************
+   *  Set default value                                    *
+   *********************************************************/
+  if (hyper_param.model_file.empty() && !hyper_param.cross_validation) {
+    hyper_param.model_file = hyper_param.train_set_file + ".model";
+  }
+  if (hyper_param.metric.compare("rmse") == 0) {
+    hyper_param.metric = "rmsd";
+  }
+
+  return true;
+}
+
+// Check warning and fix conflict
+void Checker::check_conflict_train(HyperParam& hyper_param) {
   if (hyper_param.on_disk && hyper_param.cross_validation) {
     print_warning("On-disk training doesn't support cross-validation. "
                   "xLearn has already disable the -cv option.");
@@ -467,22 +514,6 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       hyper_param.metric = "none";
     }
   }
-  /*********************************************************
-   *  Set default value                                    *
-   *********************************************************/
-  if (hyper_param.model_file.empty() && !hyper_param.cross_validation) {
-    hyper_param.model_file = hyper_param.train_set_file + ".model";
-  }
-  if (hyper_param.metric.compare("rmse") == 0) {
-    hyper_param.metric = "rmsd";
-  }
-
-  return true;
-}
-
-// Check the given hyper-param. Used by c_api
-bool Checker::check_train_param(HyperParam& hyper_param) {
-
 }
 
 // Check options for prediction tasks
@@ -553,12 +584,7 @@ bool Checker::check_prediction_options(HyperParam& hyper_param) {
   /*********************************************************
    *  Check warning and fix conflict                       *
    *********************************************************/
-  if (hyper_param.sign && hyper_param.sigmoid) {
-    print_warning("Both of --sign and --sigmoid have been set. "
-                  "xLearn has already disable --sign and --sigmoid.");
-    hyper_param.sign = false;
-    hyper_param.sigmoid = false;
-  }
+  check_conflict_predict(hyper_param);
   /*********************************************************
    *  Set default value                                    *
    *********************************************************/
@@ -571,7 +597,50 @@ bool Checker::check_prediction_options(HyperParam& hyper_param) {
 
 // Check the given param. Used by c_api
 bool Checker::check_prediction_param(HyperParam& hyper_param) {
+ bool bo = true;
+ /*********************************************************
+  *  Check the path of test set file                      *
+  *********************************************************/
+ if (!FileExist(hyper_param.test_set_file.c_str())) {
+   print_error(
+      StringPrintf("Test set file: %s does not exist.",
+           hyper_param.test_set_file.c_str())
+    );
+    bo =  false;
+ }
+ /*********************************************************
+   *  Check the path of model file                         *
+   *********************************************************/
+ if (!FileExist(hyper_param.model_file.c_str())) {
+   print_error(
+      StringPrintf("Test set file: %s does not exist.",
+           hyper_param.model_file.c_str())
+    );
+    bo = false;
+ }
+ if (!bo) return false;
+ /*********************************************************
+  *  Check warning and fix conflict                       *
+  *********************************************************/
+ check_conflict_predict(hyper_param);
+ /*********************************************************
+  *  Set default value                                    *
+  *********************************************************/
+ if (hyper_param.output_file.empty()) {
+   hyper_param.output_file = hyper_param.test_set_file + ".out";
+ }
 
+ return true;
+}
+
+// Check warning and fix conflict
+void Checker::check_conflict_predict(HyperParam& hyper_param) {
+  if (hyper_param.sign && hyper_param.sigmoid) {
+    print_warning("Both of --sign and --sigmoid have been set. "
+                  "xLearn has already disable --sign and --sigmoid.");
+    hyper_param.sign = false;
+    hyper_param.sigmoid = false;
+  }
 }
 
 } // namespace xLearn
