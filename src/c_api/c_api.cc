@@ -128,6 +128,8 @@ XL_DLL int XLearnSetStr(XLearnHandle *out,
   	xl->GetHyperParam().metric = std::string(value);
   } else if (strcmp(key, "log") == 0) {
   	xl->GetHyperParam().log_file = std::string(value);
+  } else if (strcmp(key, "loss") == 0) {
+  	xl->GetHyperParam().loss_func = std::string(value);
   }
   API_END();
 }
@@ -144,6 +146,8 @@ XL_DLL int XLearnSetInt(XLearnHandle *out,
   	xl->GetHyperParam().num_epoch = value;
   } else if (strcmp(key, "fold") == 0) {
   	xl->GetHyperParam().num_folds = value;
+  } else if (strcmp(key, "block_size") == 0) {
+  	xl->GetHyperParam().block_size = value;
   }
   API_END();
 }

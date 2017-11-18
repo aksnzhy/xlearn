@@ -72,8 +72,6 @@ struct HyperParam {
   /* Number of epoch. 
   This value could be changed in early-stop */
   int num_epoch = 10;
-  /* Size (MB) of memory buffer for on-disk training */
-  int working_set = 200;
   /* True for using instance-wise 
   normalization, and False for not */
   bool norm = true;
