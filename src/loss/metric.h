@@ -30,6 +30,8 @@ This file defines the Metric class.
 #include "src/base/thread_pool.h"
 #include "src/data/data_structure.h"
 
+#define MAX_BUCKET_SIZE 2
+
 namespace xLearn {
 
 //------------------------------------------------------------------------------
@@ -525,6 +527,9 @@ class AUCMetric : public Metric {
   }
 
   inline void Reset() {
+    auc_ = 0.0;
+    all_click_number_.resize(MAX_BUCKET_SIZE, 0);
+    all_noclick_number_.resize(MAX_BUCKET_SIZE, 0);
   }
 
   inline real_t GetMetric() {
@@ -537,7 +542,7 @@ class AUCMetric : public Metric {
 
  private:
   double auc_;
-  const static int32_t MAX_BUCKET_SIZE = 2;
+  //const static int32_t MAX_BUCKET_SIZE = 2;
   std::vector<int32_t> all_noclick_number_;
   std::vector<int32_t> all_click_number_;
  private:
