@@ -1,3 +1,7 @@
+# Set output library.
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/test)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib/data)
+
 # Build static library
 set(STA_DEPS base)
 add_library(data STATIC model_parameters.cc)

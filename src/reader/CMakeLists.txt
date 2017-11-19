@@ -1,3 +1,7 @@
+# Set output library.
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/test)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib/reader)
+
 # Build static library
 set(STA_DEPS data base)
 add_library(reader STATIC parser.cc file_splitor.cc reader.cc)
