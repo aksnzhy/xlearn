@@ -198,3 +198,9 @@ def create_ffm():
 	_check_call(_LIB.XLearnCreate(c_str(model_type),
 		                          ctypes.byref(handle)))
 	return XLearn(handle)
+
+def hello():
+	"""
+	Say hello to user
+	"""
+	_check_call(_LIB.XLearnHello())

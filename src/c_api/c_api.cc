@@ -21,11 +21,35 @@ This file is the implementation of C API for xLearn.
 */
 
 #include <string>
+#include <iostream>
 
 #include <string.h>
 
 #include "src/c_api/c_api.h"
 #include "src/c_api/c_api_error.h"
+#include "src/base/format_print.h"
+
+// Say hello to user
+XL_DLL int XLearnHello() {
+  API_BEGIN();
+  std::string logo = 
+"----------------------------------------------------------------------------------------------\n"
+                    "           _\n"
+                    "          | |\n"
+                    "     __  _| |     ___  __ _ _ __ _ __\n"
+                    "     \\ \\/ / |    / _ \\/ _` | '__| '_ \\ \n"
+                    "      >  <| |___|  __/ (_| | |  | | | |\n"
+                    "     /_/\\_\\_____/\\___|\\__,_|_|  |_| |_|\n\n"
+                    "        xLearn   -- 0.10 Version --\n"
+"----------------------------------------------------------------------------------------------\n"
+"\n";
+  Color::Modifier green(Color::FG_GREEN);
+  Color::Modifier def(Color::FG_DEFAULT);
+  Color::Modifier bold(Color::BOLD);
+  Color::Modifier reset(Color::RESET);
+  std::cout << green << bold << logo << def << reset;
+  API_END();
+}
 
 // Create xlearn handle
 XL_DLL int XLearnCreate(const char *model_type,

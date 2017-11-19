@@ -20,6 +20,9 @@ set(LIBS xlearn solver reader loss score data base pthread gtest)
 add_executable(c_api_test c_api_test.cc)
 target_link_libraries(c_api_test gtest_main ${LIBS})
 
+# Copy Python file
+FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/c_api_test.py" 
+DESTINATION "${CMAKE_BINARY_DIR}/src/c_api/")
 
 # Install library and header files
 install(TARGETS xlearn DESTINATION lib/c_api)

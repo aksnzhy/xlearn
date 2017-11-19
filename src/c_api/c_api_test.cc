@@ -27,6 +27,7 @@ This file tests c_api.h
 TEST(C_API_TEST, Initialize) {
   XLearnHandle xlearn;
   // Set
+  EXPECT_EQ(XLearnHello(), 0);
   EXPECT_EQ(XLearnCreate("linear", &xlearn), 0);
   EXPECT_EQ(XLearnSetTrain(&xlearn, "./data_train.txt"), 0);
   EXPECT_EQ(XLearnSetTest(&xlearn, "./data_test.txt"), 0);
