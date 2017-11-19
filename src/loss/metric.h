@@ -462,6 +462,8 @@ class AUCMetric : public Metric {
  public:
   // Constrcutor and Destructor
   AUCMetric() {
+    all_positive_number_.clear();
+    all_negative_number_.clear();
     all_positive_number_.resize(kMaxBucketSize, 0);
     all_negative_number_.resize(kMaxBucketSize, 0);
   }
