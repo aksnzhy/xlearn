@@ -64,8 +64,7 @@ class Metric {
   void Initialize(ThreadPool* pool) {
     CHECK_NOTNULL(pool);
     pool_ = pool;
-    //threadNumber_ = pool_->ThreadNumber();
-    threadNumber_ = 2;
+    threadNumber_ = pool_->ThreadNumber();
   }
 
   // Accumulate counters during the training.
@@ -453,6 +452,8 @@ class AUCMetric : public Metric {
  public:
   struct Info {
     Info() {
+      positive_vec_.clear();
+      negative_vec_.clear();
       positive_vec_.resize(kMaxBucketSize, 0);
       negative_vec_.resize(kMaxBucketSize, 0);
     }
@@ -463,6 +464,8 @@ class AUCMetric : public Metric {
  public:
   // Constrcutor and Destructor
   AUCMetric() {
+    all_positive_number_.clear();
+    all_negative_number_.clear();
     all_positive_number_.resize(kMaxBucketSize, 0);
     all_negative_number_.resize(kMaxBucketSize, 0);
   }
@@ -478,7 +481,10 @@ class AUCMetric : public Metric {
     for (size_t i = start_idx; i < end_idx; ++i) {
       real_t r_label = (*Y)[i] > 0 ? 1 : -1;
       real_t sigmoid_score = Sigmoid((*pred)[i]);
+      CHECK_GE(sigmoid_score, 0.0);
+      CHECK_LT(sigmoid_score, 1.0);
       index_t bkt_id = index_t(sigmoid_score * kMaxBucketSize) % kMaxBucketSize;
+      CHECK_LT(bkt_id, kMaxBucketSize);
       if (r_label > 0) {
         info->positive_vec_[bkt_id] += 1;
       } else {
@@ -516,6 +522,8 @@ class AUCMetric : public Metric {
   
   // Reset counters
   inline void Reset() {
+    all_positive_number_.clear();
+    all_negative_number_.clear();
     all_positive_number_.resize(kMaxBucketSize, 0);
     all_negative_number_.resize(kMaxBucketSize, 0);
   }
