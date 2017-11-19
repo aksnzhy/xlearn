@@ -479,6 +479,7 @@ class AUCMetric : public Metric {
       real_t sigmoid_score = fastsigmoid((*pred)[i]);
       index_t bkt_id = index_t(sigmoid_score * kMaxBucketSize) 
                        % kMaxBucketSize;
+      CHECK_LT(bkt_id, kMaxBucketSize);
       if (r_label > 0) {
         info->positive_vec_[bkt_id] += 1;
       } else {
@@ -516,6 +517,8 @@ class AUCMetric : public Metric {
   
   // Reset counters
   inline void Reset() {
+    all_positive_number_.clear();
+    all_negative_number_.clear();
     all_positive_number_.resize(kMaxBucketSize, 0);
     all_negative_number_.resize(kMaxBucketSize, 0);
   }
