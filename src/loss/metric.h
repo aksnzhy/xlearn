@@ -26,15 +26,15 @@ This file defines the Metric class.
 #include <math.h>
 
 #include "src/base/common.h"
+#include "src/base/math.h"
 #include "src/base/class_register.h"
 #include "src/base/thread_pool.h"
 #include "src/data/data_structure.h"
 
-// Bucket size used by AUC
-const xLearn::index_t  kMaxBucketSize = 1e6;
-const xLearn::real_t e = 2.718281828;
-
 namespace xLearn {
+
+// Bucket size used by AUC
+const index_t kMaxBucketSize = 1e6;
 
 //------------------------------------------------------------------------------
 // A metric is a function that is used to judge the performance of 
@@ -64,8 +64,7 @@ class Metric {
   void Initialize(ThreadPool* pool) {
     CHECK_NOTNULL(pool);
     pool_ = pool;
-    //threadNumber_ = pool_->ThreadNumber();
-    threadNumber_ = 2;
+    threadNumber_ = pool_->ThreadNumber();
   }
 
   // Accumulate counters during the training.
@@ -477,8 +476,9 @@ class AUCMetric : public Metric {
     CHECK_GE(end_idx, start_idx);
     for (size_t i = start_idx; i < end_idx; ++i) {
       real_t r_label = (*Y)[i] > 0 ? 1 : -1;
-      real_t sigmoid_score = Sigmoid((*pred)[i]);
-      index_t bkt_id = index_t(sigmoid_score * kMaxBucketSize) % kMaxBucketSize;
+      real_t sigmoid_score = fastsigmoid((*pred)[i]);
+      index_t bkt_id = index_t(sigmoid_score * kMaxBucketSize) 
+                       % kMaxBucketSize;
       if (r_label > 0) {
         info->positive_vec_[bkt_id] += 1;
       } else {
@@ -554,17 +554,6 @@ class AUCMetric : public Metric {
     positivesum_dot_negativesum = positive_sum * negative_sum;
     auc_res = auc / (positivesum_dot_negativesum);
     return 1.0 - auc_res;
-  }
-
-  static real_t Sigmoid(real_t wx){
-    if (wx < -30) {
-      return 1e-6;
-    } else if (wx > 30) {
-      return 1.0;
-    } else {
-      double ewx = pow(e, wx);
-      return ewx / (1.0 + ewx);
-    }
   }
 
  private:
