@@ -27,6 +27,7 @@ reading data from data source.
 #include <string>
 #include <vector>
 #include <thread>
+#include <algorithm>
 
 #include "src/base/common.h"
 #include "src/base/class_register.h"
