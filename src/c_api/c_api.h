@@ -46,6 +46,9 @@ to other languages.
 /* Handle to xlearn */
 typedef void* XLearnHandle;
 
+// Say hello to user
+XL_DLL int XLearnHello();
+
 // Create xlearn handle
 XL_DLL int XLearnCreate(const char *model_type,
 	                    XLearnHandle *out);
