@@ -452,6 +452,8 @@ class AUCMetric : public Metric {
  public:
   struct Info {
     Info() {
+      positive_vec_.clear();
+      negative_vec_.clear();
       positive_vec_.resize(kMaxBucketSize, 0);
       negative_vec_.resize(kMaxBucketSize, 0);
     }
