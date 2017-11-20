@@ -1,0 +1,13 @@
+include *.md
+recursive-include xlearn *
+recursive-include xlearn/lib *
+recursive-include xlearn/src *
+recursive-include xlearn/test *
+#exclude pre-compiled .o and .a file for less confusions
+#make sure .a files are all removed for forcing compiling
+#include the pre-compiled .so is needed as a placeholder
+#since it will be copy after compiling on the fly
+global-exclude *.o
+global-exclude *.a
+global-exclude *.pyo
+global-exclude *.pyc

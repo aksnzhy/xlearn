@@ -1,5 +1,5 @@
 # Set output library.
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/test)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/test/base)
 
 # Build static library
 add_library(base STATIC logging.cc stringprintf.cc split_string.cc 

@@ -1,5 +1,5 @@
 # Set output library.
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/test)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/test/reader)
 
 # Build static library
 set(STA_DEPS data base)
