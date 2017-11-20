@@ -205,7 +205,7 @@ XL_DLL int XLearnSetFloat(XLearnHandle *out,
 // Set bool param
 XL_DLL int XLearnSetBool(XLearnHandle *out,
 	                     const char *key,
-	                     const float value) {
+	                     const bool value) {
   API_BEGIN();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   if (strcmp(key, "on_disk") == 0) {

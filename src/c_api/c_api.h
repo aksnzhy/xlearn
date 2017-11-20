@@ -101,7 +101,7 @@ XL_DLL int XLearnSetFloat(XLearnHandle *out,
 // Set bool param
 XL_DLL int XLearnSetBool(XLearnHandle *out,
 	                     const char *key,
-	                     const float value);
+	                     const bool value);
 
 // This is the entry class used by c_api.
 class XLearn {
