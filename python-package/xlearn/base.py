@@ -2,18 +2,18 @@
 import sys
 import os
 import ctypes
-from .libpath import find_lib_path
+from libpath import find_lib_path
 
 class XLearnError(Exception):
 	"""Error thrown by xlearn trainer"""
-    pass
+	pass
 
 def _load_lib():
 	"""Load xlearn shared library"""
 	lib_path = find_lib_path()
 	if len(lib_path) == 0:
 		return None
-	lib = ctypes.cdll.Loadlibrary(lib_path[0])
+	lib = ctypes.cdll.LoadLibrary(lib_path[0])
 	return lib
 
 # load the xlearn library globally

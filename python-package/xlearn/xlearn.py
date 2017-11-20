@@ -2,8 +2,8 @@
 import sys
 import os
 import ctypes
-from .base import _LIB
-from .base import _check_call, c_str
+from base import _LIB
+from base import _check_call, c_str
 
 class XLearn(object):
 	"""XLearn is the core interface used by python API."""
@@ -90,17 +90,17 @@ class XLearn(object):
 		"""
 		_check_call(_LIB.XLearnSetValidate(self.handle, c_str(val_path)))
 
-	def setOnDisk(self):
-    	"""Set xlearn to use on-disk training"""
-    	key = 'on_disk'
-    	__check_call(_LIB.XLearnSetBool(self.handle, 
-    		c_str(key), c_bool(True)))
-
 	def setQuiet(self):
 		"""Set xlearn to quiet model"""
 		key = 'quiet'
 		__check_call(_LIB.XLearnSetBool(self.handle, 
 			c_str(key), c_bool(True)))
+
+	def setOnDisk(self):
+		"""Set xlearn to use on-disk training"""
+		key = 'on_disk'
+		__check_call(_LIB.XLearnSetBool(self.handle, 
+    		c_str(key), c_bool(True)))
 
 	def disableNorm(self):
 		"""Disable instance-wise normalization"""
