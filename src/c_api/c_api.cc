@@ -68,6 +68,16 @@ XL_DLL int XLearnHandleFree(XLearnHandle *out) {
   API_END();
 }
 
+// Show the mode information
+XL_DLL int XLearnShow(XLearnHandle *out) {
+  API_BEGIN()
+  XLearn* xl = reinterpret_cast<XLearn*>(*out);
+  printf("Info: \n Model: %s\n Loss: %s\n", 
+  	xl->GetHyperParam().score_func.c_str(),
+  	xl->GetHyperParam().loss_func.c_str());
+  API_END()
+}
+
 // Set file path of the training data
 XL_DLL int XLearnSetTrain(XLearnHandle *out,
 	                      const char *train_path) {

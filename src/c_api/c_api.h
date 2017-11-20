@@ -56,6 +56,9 @@ XL_DLL int XLearnCreate(const char *model_type,
 // Free the xLearn handle
 XL_DLL int XLearnHandleFree(XLearnHandle *out);
 
+// Show the model information
+XL_DLL int XLearnShow(XLearnHandle *out);
+
 // Set file path of the training data
 XL_DLL int XLearnSetTrain(XLearnHandle *out,
 	                      const char *train_path);

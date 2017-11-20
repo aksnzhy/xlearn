@@ -2,7 +2,7 @@
 import sys
 import os
 import ctypes
-from base import _LIB
+from base import _LIB, XLearnHandle
 from base import _check_call, c_str
 
 class XLearn(object):
@@ -21,7 +21,7 @@ class XLearn(object):
 	def __del__(self):
 		_check_call(_LIB.XLearnHandleFree(self.handle))
 
-	def __set_param(self, param):
+	def _set_param(self, param):
 		"""Set hyper-parameter for xlearn handle
 
 		Parameters
@@ -31,34 +31,38 @@ class XLearn(object):
 		"""
 		for (key, value) in param.items():
 			if key == 'task':
-				__check_call(_LIB.XLearnSetStr(self.handle, 
+				_check_call(_LIB.XLearnSetStr(self.handle, 
 					c_str(key), c_str(value)))
 			elif key == 'metric':
-				__check_call(_LIB.XLearnSetStr(self.handle, 
+				_check_call(_LIB.XLearnSetStr(self.handle, 
 					c_str(key), c_str(value)))
 			elif key == 'log':
-				__check_call(_LIB.XLearnSetStr(self.handle, 
+				_check_call(_LIB.XLearnSetStr(self.handle, 
 					c_str(key), c_str(value)))
 			elif key == 'lr':
-				__check_call(_LIB.XLearnSetFloat(self.handle, 
+				_check_call(_LIB.XLearnSetFloat(self.handle, 
 					c_str(key), c_float(value)))
 			elif key == 'k':
-				__check_call(_LIB.XLearnSetInt(self.handle, 
+				_check_call(_LIB.XLearnSetInt(self.handle, 
 					c_str(key), c_uint(value)))
 			elif key == 'lambda':
-				__check_call(_LIB.XLearnSetFloat(self.handle, 
+				_check_call(_LIB.XLearnSetFloat(self.handle, 
 					c_str(key), c_float(value)))
 			elif key == 'init':
-				__check_call(_LIB.XLearnSetFloat(self.handle, 
+				_check_call(_LIB.XLearnSetFloat(self.handle, 
 					c_str(key), c_float(value)))
 			elif key == 'epoch':
-				__check_call(_LIB(XLearnSetInt(self.handle, 
+				_check_call(_LIB(XLearnSetInt(self.handle, 
 					c_str(key), c_uint(value))))
 			elif key == 'fold':
-				__check_call(_LIB(XLearnSetInt(self.handle, 
+				_check_call(_LIB(XLearnSetInt(self.handle, 
 					c_str(key), c_uint(value))))
 			else:
 				raise Exception("Invalid key!", key)
+	def show(self):
+		"""Show model information
+		"""
+		_check_call(_LIB.XLearnShow(self.handle))
 
 	def setTrain(self, train_path):
 		"""Set file path of training data.
@@ -93,43 +97,43 @@ class XLearn(object):
 	def setQuiet(self):
 		"""Set xlearn to quiet model"""
 		key = 'quiet'
-		__check_call(_LIB.XLearnSetBool(self.handle, 
+		_check_call(_LIB.XLearnSetBool(self.handle, 
 			c_str(key), c_bool(True)))
 
 	def setOnDisk(self):
 		"""Set xlearn to use on-disk training"""
 		key = 'on_disk'
-		__check_call(_LIB.XLearnSetBool(self.handle, 
+		_check_call(_LIB.XLearnSetBool(self.handle, 
     		c_str(key), c_bool(True)))
 
 	def disableNorm(self):
 		"""Disable instance-wise normalization"""
 		key = 'norm'
-		__check_call(_LIB.XLearnSetBool(self.handle, 
+		_check_call(_LIB.XLearnSetBool(self.handle, 
 			c_str(key), c_bool(False)))
 
 	def setLockFree(self):
 		"""Set xlearn to use lock free training"""
 		key = 'lock_free'
-		__check_call(_LIB.XLearnSetBool(self.handle, 
+		_check_call(_LIB.XLearnSetBool(self.handle, 
 			c_str(key), c_bool(True)))
 
 	def disableEarlyStop(self):
 		"""Disable early-stopping"""
 		key = 'early_stop'
-		__check_call(_LIB.XLearnSetBool(self.handle, 
+		_check_call(_LIB.XLearnSetBool(self.handle, 
 			c_str(key), c_bool(False)))
 
 	def setSign(self):
 		"""Convert output to 0 and 1"""
 		key = 'sign'
-		__check_call(_LIB.XLearnSetBool(self.handle, 
+		_check_call(_LIB.XLearnSetBool(self.handle, 
 			c_str(key), c_bool(True)))
 
 	def setSigmoid(self):
 		"""Convert output by using sigmoid"""
 		key = 'sigmoid'
-		__check_call(_LIB.XLearnSetBool(self.handle, 
+		_check_call(_LIB.XLearnSetBool(self.handle, 
 			c_str(key), c_bool(True)))
 
 	def fit(self, param, model_path):
@@ -142,7 +146,7 @@ class XLearn(object):
 		model_path : str
 		  path of model checkpoint.
 		"""
-		__set_Param(param)
+		_set_Param(param)
 		_check_call(_LIB.XLearnFit(self.handle, c_str(model_path)))
 
 	def cv(self, param):
@@ -153,7 +157,7 @@ class XLearn(object):
 		param : dict
 		  hyper-parameter used by xlearn
 		"""
-		__set_Param(param)
+		_set_Param(param)
 		_check_call(_LIB.XLearnCV(self.handle))
 
 	def predict(self, model_path, out_path):

@@ -49,6 +49,7 @@ TEST(C_API_TEST, Initialize) {
   EXPECT_EQ(XLearnSetBool(&xlearn, "early_stop", false), 0);
   EXPECT_EQ(XLearnSetBool(&xlearn, "sign", true), 0);
   EXPECT_EQ(XLearnSetBool(&xlearn, "sigmoid", true), 0);
+  EXPECT_EQ(XLearnShow(&xlearn), 0);
   // Test
   XLearn* xl = reinterpret_cast<XLearn*>(xlearn);
   EXPECT_EQ(xl->GetHyperParam().score_func, "linear");
