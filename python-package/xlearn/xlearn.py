@@ -90,7 +90,7 @@ class XLearn(object):
 		"""
 		_check_call(_LIB.XLearnSetValidate(self.handle, c_str(val_path)))
 
-    def setOnDisk(self):
+	def setOnDisk(self):
     	"""Set xlearn to use on-disk training"""
     	key = 'on_disk'
     	__check_call(_LIB.XLearnSetBool(self.handle, 
