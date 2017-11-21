@@ -20,7 +20,7 @@ combining these insights, xLearn is 5x - 13x faster compared to the similar lear
 
 ### Ease-of-use
 
-<img src="https://github.com/aksnzhy/xLearn/raw/master/img/code.png" width = "600"/>   
+<img src="https://github.com/aksnzhy/xLearn/raw/master/img/code.jpeg" width = "600"/>   
 
 xLearn does not rely on any third-party library, and hence users can just clone the code and compile it by using cmake. 
 Also, xLearn supports very simple python API for users.

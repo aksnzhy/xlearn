@@ -8,8 +8,8 @@ import xlearn as xl
 ffm_model = xl.create_ffm()
 
 # Set training data and validation data
-ffm_model.setTrain("small_train.txt")
-ffm_model.setValidate("small_test.txt")
+ffm_model.setTrain("./small_train.txt")
+ffm_model.setValidate("./small_test.txt")
 
 # Set hyper-parameters
 param = { 'task':'binary',
@@ -21,5 +21,5 @@ param = { 'task':'binary',
 ffm_model.fit(param, "model.out")
 
 # Predict
-ffm_model.setTest("small_test.txt")
+ffm_model.setTest("./small_test.txt")
 ffm_model.predict("model.out", "output")
