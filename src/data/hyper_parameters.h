@@ -76,7 +76,7 @@ struct HyperParam {
   normalization, and False for not */
   bool norm = true;
   /* Using lock-free AdaGard to accelerate training */
-  bool lock_free = false;
+  bool lock_free = true;
 //------------------------------------------------------------------------------
 // Parameters for dataset
 //------------------------------------------------------------------------------

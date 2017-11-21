@@ -113,11 +113,11 @@ class XLearn(object):
 		_check_call(_LIB.XLearnSetBool(ctypes.byref(self.handle), 
 			c_str(key), ctypes.c_bool(False)))
 
-	def setLockFree(self):
-		"""Set xlearn to use lock free training"""
+	def disLockFree(self):
+		"""Disable lock free training"""
 		key = 'lock_free'
 		_check_call(_LIB.XLearnSetBool(ctypes.byref(self.handle), 
-			c_str(key), ctypes.c_bool(True)))
+			c_str(key), ctypes.c_bool(False)))
 
 	def disableEarlyStop(self):
 		"""Disable early-stopping"""
