@@ -114,10 +114,10 @@ XL_DLL int XLearnFit(XLearnHandle *out,
   timer.tic();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   xl->GetHyperParam().model_file = std::string(model_path);
-  xl->GetSolver().SetTrain();
   xl->GetSolver().Initialize(xl->GetHyperParam());
+  xl->GetSolver().SetTrain();
   xl->GetSolver().StartWork();
-  xl->GetSolver().FinalizeWork();
+  xl->GetSolver().Clear();
   print_info(
     StringPrintf("Total time cost: %.2f (sec)", 
     timer.toc()), true);
@@ -131,10 +131,10 @@ XL_DLL int XLearnCV(XLearnHandle *out) {
   timer.tic();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   xl->GetHyperParam().cross_validation = true;
-  xl->GetSolver().SetTrain();
   xl->GetSolver().Initialize(xl->GetHyperParam());
+  xl->GetSolver().SetTrain();
   xl->GetSolver().StartWork();
-  xl->GetSolver().FinalizeWork();
+  xl->GetSolver().Clear();
   xl->GetHyperParam().cross_validation = false;
   print_info(
     StringPrintf("Total time cost: %.2f (sec)", 
@@ -152,10 +152,10 @@ XL_DLL int XLearnPredict(XLearnHandle *out,
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   xl->GetHyperParam().model_file = std::string(model_path);
   xl->GetHyperParam().output_file = std::string(out_path);
-  xl->GetSolver().SetPredict();
   xl->GetSolver().Initialize(xl->GetHyperParam());
+  xl->GetSolver().SetPredict();
   xl->GetSolver().StartWork();
-  xl->GetSolver().FinalizeWork();
+  xl->GetSolver().Clear();
   print_info(
     StringPrintf("Total time cost: %.2f (sec)", 
     timer.toc()), true);

@@ -165,6 +165,15 @@ void Model::free_model() {
   free(param_w_);
   free(param_v_);
   free(param_b_);
+  if (param_best_w_ != nullptr) {
+    free(param_best_w_);
+  }
+  if (param_best_v_ != nullptr) {
+    free(param_best_v_);
+  }
+  if (param_best_b_ != nullptr) {
+    free(param_best_b_);
+  }
 }
 
 // Initialize model from a checkpoint file

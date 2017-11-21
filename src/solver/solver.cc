@@ -511,20 +511,10 @@ void Solver::start_prediction_work() {
  ******************************************************************************/
 
 // Finalize xLearn
-void Solver::FinalizeWork() {
-  if (hyper_param_.is_train) {
-    finalize_train_work();
-  } else {
-    finalize_prediction_work();
-  }
-}
-
-void Solver::finalize_train_work() {
-  LOG(INFO) << "Finalize training work.";
-}
-
-void Solver::finalize_prediction_work() {
-  LOG(INFO) << "Finalize inference work.";
+void Solver::Clear() {
+  LOG(INFO) << "Clear the xLearn environment ...";
+  print_action("Clear the xLearn environment ...");
+  
 }
 
 } // namespace xLearn
