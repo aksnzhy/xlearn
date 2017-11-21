@@ -1,3 +1,4 @@
+# coding: utf-8
 """Setup xlearn package."""
 from __future__ import absolute_import
 import sys
