@@ -59,7 +59,7 @@ class Metric {
  public:
   // Constructor and Destrictor
   Metric() { }
-  ~Metric() { }
+  virtual ~Metric() { }
 
   void Initialize(ThreadPool* pool) {
     CHECK_NOTNULL(pool);

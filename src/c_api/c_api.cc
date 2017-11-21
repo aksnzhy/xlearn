@@ -114,8 +114,8 @@ XL_DLL int XLearnFit(XLearnHandle *out,
   timer.tic();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   xl->GetHyperParam().model_file = std::string(model_path);
+  xl->GetHyperParam().is_train = true;
   xl->GetSolver().Initialize(xl->GetHyperParam());
-  xl->GetSolver().SetTrain();
   xl->GetSolver().StartWork();
   xl->GetSolver().Clear();
   print_info(
@@ -131,8 +131,8 @@ XL_DLL int XLearnCV(XLearnHandle *out) {
   timer.tic();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   xl->GetHyperParam().cross_validation = true;
+  xl->GetHyperParam().is_train = true;
   xl->GetSolver().Initialize(xl->GetHyperParam());
-  xl->GetSolver().SetTrain();
   xl->GetSolver().StartWork();
   xl->GetSolver().Clear();
   xl->GetHyperParam().cross_validation = false;
@@ -152,6 +152,7 @@ XL_DLL int XLearnPredict(XLearnHandle *out,
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   xl->GetHyperParam().model_file = std::string(model_path);
   xl->GetHyperParam().output_file = std::string(out_path);
+  xl->GetHyperParam().is_train = false;
   xl->GetSolver().Initialize(xl->GetHyperParam());
   xl->GetSolver().SetPredict();
   xl->GetSolver().StartWork();

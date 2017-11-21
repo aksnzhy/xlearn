@@ -19,3 +19,7 @@ param = { 'task':'binary',
 
 # Tarin model
 ffm_model.fit(param, "model.out")
+
+# Predict
+ffm_model.setTest("small_test.txt")
+ffm_model.predict("model.out", "output")
