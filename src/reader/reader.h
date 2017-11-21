@@ -97,6 +97,9 @@ class Reader {
   // Return to the begining of the data.
   virtual void Reset() = 0;
 
+  // Free the memory of data matrix.
+  virtual void Clear() = 0;
+
   // Wether current dataset has label y ?
   bool inline has_label() { return has_label_; }
 
@@ -144,7 +147,7 @@ class InmemReader : public Reader {
  public:
   // Constructor and Destructor
   InmemReader() : pos_(0) { }
-  ~InmemReader() { data_buf_.Release(); }
+  ~InmemReader() { }
 
   // Pre-load all the data into memory buffer.
   virtual void Initialize(const std::string& filename);
@@ -154,6 +157,11 @@ class InmemReader : public Reader {
 
   // Return to the begining of the data.
   virtual void Reset();
+
+  // Free the memory of data matrix.
+  virtual void Clear() {
+    data_buf_.Release();
+  }
 
   // If shuffle data ?
   virtual inline void SetShuffle(bool shuffle) {
@@ -209,6 +217,12 @@ class OndiskReader : public Reader {
 
   // Return to the head of file
   virtual void Reset();
+
+  // Free the memory of data matrix.
+  virtual void Clear() {
+    data_samples_.Release();
+    delete [] block_;
+  }
 
   // We cannot set shuffle for OndiskReader
   void inline SetShuffle(bool shuffle) {

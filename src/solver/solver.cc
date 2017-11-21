@@ -514,7 +514,14 @@ void Solver::start_prediction_work() {
 void Solver::Clear() {
   LOG(INFO) << "Clear the xLearn environment ...";
   print_action("Clear the xLearn environment ...");
-  
+  // Clear model
+  delete this->model_;
+  // Clear Reader
+  for (size_t i = 0; i < this->reader_.size(); ++i) {
+    if (reader_[i] != nullptr) {
+      delete reader_[i];
+    }
+  }
 }
 
 } // namespace xLearn
