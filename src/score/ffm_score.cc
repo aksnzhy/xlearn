@@ -155,8 +155,7 @@ void FFMScore::CalcGrad(const SparseRow* row,
                 _mm_mul_ps(_mm_rsqrt_ps(XMMwg2), XMMg2)));
         _mm_store_ps(w1, XMMw1);
         _mm_store_ps(w2, XMMw2);
-        _mm_store_ps(wg1, XMMwg1);
-        _mm_store_ps(wg2, XMMwg2);
+        _mm_store_ps(wg1, XMMwg1); _mm_store_ps(wg2, XMMwg2);
       }
     }
   }
