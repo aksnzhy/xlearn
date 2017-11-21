@@ -56,7 +56,10 @@ namespace xLearn {
 class Solver {
  public:
   // Constructor and Desstructor
-  Solver() { }
+  Solver() 
+    : score_(nullptr),
+      loss_(nullptr),
+      metric_(nullptr) { }
   ~Solver() { }
 
   // Ser train or predict

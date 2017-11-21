@@ -140,14 +140,13 @@ void Solver::Initialize(HyperParam& hyper_param) {
   print_logo();
   // Check the arguments
   checker(hyper_param);
+  this->hyper_param_ = hyper_param;
   // Initialize log file
   init_log();
   // Init train or predict
   if (hyper_param_.is_train) {
-    this->hyper_param_ = hyper_param;
     init_train();
   } else {
-    this->hyper_param_ = hyper_param;
     init_predict();
   }
 }
@@ -524,12 +523,7 @@ void Solver::Clear() {
       delete reader_[i];
     }
   }
-  // Clear loss
-  delete this->loss_;
-  // Clear score
-  delete this->score_;
-  // Clear metric_;
-  delete this->metric_;
+  reader_.clear();
 }
 
 } // namespace xLearn
