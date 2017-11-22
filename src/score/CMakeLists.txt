@@ -4,13 +4,15 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/test/score)
 # Build static library
 set(STA_DEPS data base)
 add_library(score STATIC score_function.cc 
-linear_score.cc fm_score.cc ffm_score.cc)
+linear_score.cc fm_score.cc ffm_score.cc
+linear_score_ftrl.cc fm_score_ftrl.cc)
 target_link_libraries(score ${STA_DEPS})
 
 # Build shared library
 set(SHA_DEPS data_shared base_shared)
 add_library(score_shared SHARED score_function.cc 
-linear_score.cc fm_score.cc ffm_score.cc)
+linear_score.cc fm_score.cc ffm_score.cc 
+linear_score_ftrl.cc fm_score_ftrl.cc)
 target_link_libraries(score_shared ${SHA_DEPS})
 
 # Set properties
