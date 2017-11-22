@@ -32,11 +32,11 @@ namespace xLearn {
 // the socre function is y = sum( (V_i*V_j)(x_i * x_j) )
 // Here we leave out the linear term and bias term.
 //------------------------------------------------------------------------------
-class FMScore : public Score {
+class FMScoreFtrl : public Score {
  public:
   // Constructor and Desstructor
-  FMScore() { }
-  ~FMScore() { }
+  FMScoreFtrl() { }
+  ~FMScoreFtrl() { }
 
   // Given one exmaple and current model, this method
   // returns the fm score.
@@ -60,7 +60,7 @@ class FMScore : public Score {
                     real_t norm = 1.0);
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(FMScore);
+  DISALLOW_COPY_AND_ASSIGN(FMScoreFtrl);
 };
 
 } // namespace xLearn
