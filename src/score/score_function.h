@@ -64,12 +64,23 @@ class Score {
                            Model& model,
                            real_t norm = 1.0) = 0;
 
+  // for ftrl score
+  virtual real_t CalcScoreFtrl(const SparseRow* row,
+                               Model& model,
+                               real_t norm = 1.0) = 0;
+
   // Calculate gradient and update current
   // model parameters
   virtual void CalcGrad(const SparseRow* row,
                         Model& model,
                         real_t pg,
                         real_t norm = 1.0) = 0;
+
+  //for ftrl gradient
+  virtual void CalcGradFtrl(const SparseRow* row,
+                            Model& model,
+                            real_t pg,
+                            real_t norm = 1.0) = 0;
  protected:
   real_t learning_rate_;
   real_t regu_lambda_;
