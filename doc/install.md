@@ -43,5 +43,16 @@ You can also download binary or source package of [CMake](http://www.cmake.org/c
 
 #### Build xLearn
 
+Now you can build xLearn. First clone the repositpory:
+
+    git clone https://github.com/aksnzhy/xlearn.git
+
+and then build using the following commands:
+
+    cd xlearn; mkdir build; cd build
+    cmake ..
+    make -j4
+
 ### Build python package
 
+    
