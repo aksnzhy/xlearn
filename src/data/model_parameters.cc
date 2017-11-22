@@ -56,17 +56,19 @@ void Model::Initialize(const std::string& score_func,
   num_field_ = num_field;
   num_K_ = num_K;
   scale_ = scale;
+  algo_method_ = "ftrl";
+  auxiliary_size_ = 3;
   // Calculate the number of model parameters
-  param_num_w_ = num_feature * 2;
+  param_num_w_ = num_feature * auxiliary_size_;
   if (score_func == "linear") {
     param_num_v_ = 0;
   } else if (score_func == "fm") {
     param_num_v_ = num_feature *
-                   get_aligned_k() * 2;
+                   get_aligned_k() * auxiliary_size_;
   } else if (score_func == "ffm") {
     param_num_v_ = num_feature *
                    get_aligned_k() *
-                   num_field * 2;
+                   num_field * auxiliary_size_;
   } else {
     LOG(FATAL) << "Unknow score function: " << score_func;
   }
@@ -80,7 +82,7 @@ void Model::initial(bool set_val) {
   try {
     // Conventional malloc for linear term and bias
     param_w_ = (real_t*)malloc(param_num_w_*sizeof(real_t));
-    param_b_ = (real_t*)malloc(2*sizeof(real_t));
+    param_b_ = (real_t*)malloc(auxiliary_size_*sizeof(real_t));
     if (score_func_.compare("fm") == 0 ||
         score_func_.compare("ffm") == 0) {
       // Aligned malloc for latent factor
@@ -104,7 +106,11 @@ void Model::initial(bool set_val) {
   }
   // set value for model
   if (set_val) {
-    set_value();
+    if (algo_method_.compare("adagrad") == 0){
+      set_value();
+    } else if (algo_method_.compare("ftrl") == 0) {
+      set_ftrl_value();
+    }
   }
 }
 
@@ -158,6 +164,54 @@ void Model::set_value() {
       }
     }
   }
+}
+
+void Model::set_ftrl_value() {
+  std::default_random_engine generator;
+  std::uniform_real_distribution<real_t> dis(0.0, 1.0);
+
+  for (index_t i = 0; i < param_num_w_; i += 3) {
+    param_w_[i] = 0;
+    param_w_[i+1] = 1.0;
+    param_w_[i+2] = 0.0;
+  }
+  param_b_[0] = 0;
+  param_b_[1] = 1.0;
+  param_b_[2] = 0.0;
+
+  if (score_func_.compare("fm") == 0) {
+    index_t k_aligned = get_aligned_k();
+    real_t coef = 1.0f / sqrt(num_K_) * scale_;
+    real_t* w = param_v_;
+    for (index_t j = 0; j < num_feat_; ++j) {
+      for (index_t d = 0; d < num_K_; d++, w++)
+        *w = coef * dis(generator);
+      for (index_t d = num_K_; d < k_aligned; d++, w++)
+        *w = 0;
+      for (index_t d = k_aligned; d < 2*k_aligned; d++, w++)
+        *w = 1.0;
+      for (index_t d = 2*k_aligned; d < 3*k_aligned; d++, w++)
+        *w = 0.0;
+    }
+  }
+  else if (score_func_.compare("ffm") == 0) {
+    index_t k_aligned = get_aligned_k();
+    real_t* w = param_v_;
+    real_t coef = 1.0f / sqrt(num_K_) * scale_;
+    for (index_t j = 0; j < num_feat_; ++j) {
+      for (index_t f = 0; f < num_field_; ++f) {
+        for (index_t d = 0; d < num_K_; d++, w++)
+          *w = coef * dis(generator);
+        for (index_t d = num_K_; d < k_aligned; d++, w++)
+          *w = 0;
+        for (index_t d = k_aligned; d < 2*k_aligned; d++, w++)
+          *w = 1.0;
+        for (index_t d = 2*k_aligned; d < 3*k_aligned; d++, w++)
+          *w = 0.0;
+      }
+    }
+  }
+
 }
 
 // Free the allocated memory
