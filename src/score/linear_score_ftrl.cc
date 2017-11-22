@@ -19,7 +19,7 @@ Author: Chao Ma (mctt90@gmail.com)
 This file is the implementation of LinearScore class.
 */
 
-#include "src/score/linear_score.h"
+#include "src/score/linear_score_ftrl.h"
 #include "src/base/math.h"
 
 namespace xLearn {
@@ -68,18 +68,19 @@ void LinearScore::CalcGradFtrl(const SparseRow* row,
     } else {
       real_t smooth_lr = 1.0f 
                          / (lambda2 + (beta + std::sqrt(w[idx_n])) / alpha);
-      if (w[idx_z] < 0) w[idx_z] += lambda1;
-      else w[idx_z] -= lambda1;
-
+      if (w[idx_z] < 0) {
+        w[idx_z] += lambda1;
+      } else {
+        w[idx_z] -= lambda1;
+      }
       w[idx_g] = -1.0f * smooth_lr * w[idx_z];
     }
-
-
   }
   // bias
   w = model.GetParameter_b();
   real_t &wb = w[0];
   real_t &wbg = w[1];
+  real_t &wbz = w[2];
   real_t g = pg;
   wbg += g*g;
   wb -= learning_rate_ * g * InvSqrt(wbg);
