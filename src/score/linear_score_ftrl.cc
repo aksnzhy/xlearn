@@ -25,7 +25,7 @@ This file is the implementation of LinearScore class.
 namespace xLearn {
 
 // y = wTx (incluing bias term)
-real_t LinearScore::CalcScoreFtrl(const SparseRow* row,
+real_t LinearScoreFtrl::CalcScoreFtrl(const SparseRow* row,
                               Model& model,
                               real_t norm) {
   real_t* w = model.GetParameter_w();
@@ -41,7 +41,7 @@ real_t LinearScore::CalcScoreFtrl(const SparseRow* row,
 }
 
 // Calculate gradient and update current model
-void LinearScore::CalcGradFtrl(const SparseRow* row,
+void LinearScoreFtrl::CalcGradFtrl(const SparseRow* row,
                            Model& model,
                            real_t pg,
                            real_t norm) {

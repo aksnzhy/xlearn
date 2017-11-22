@@ -32,11 +32,11 @@ namespace xLearn {
 // LinearScore is used to implemente generalized linear
 // models (GLMs), where the socre function is y = wTx.
 //------------------------------------------------------------------------------
-class LinearScore : public Score {
+class LinearScoreFtrl : public Score {
  public:
   // Constructor and Desstructor
-  LinearScore() { }
-  ~LinearScore() { }
+  LinearScoreFtrl() { }
+  ~LinearScoreFtrl() { }
 
   // Given one exmaple and current model, this method
   // returns the linear score wTx.
@@ -50,17 +50,17 @@ class LinearScore : public Score {
 
   // Calculate gradient and update current
   // model parameters.
-  void CalcGradFtrl(const SparseRow* row,
+  void CalcGrad(const SparseRow* row,
                 Model& model,
                 real_t pg,
-                real_t norm = 1.0);
+                real_t norm = 1.0) {}
 
   void CalcGradFtrl(const SparseRow* row,
                     Model& model,
                     real_t pg,
-                    real_t norm = 1.0) {}
+                    real_t norm = 1.0);
  private:
-  DISALLOW_COPY_AND_ASSIGN(LinearScore);
+  DISALLOW_COPY_AND_ASSIGN(LinearScoreFtrl);
 };
 
 }  // namespace xLearn
