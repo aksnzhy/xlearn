@@ -62,7 +62,7 @@ For the useage of xlearn command line, please see this page:
 
 ### Python Package Installation
 
-Install xLearn is very simple. We can only set the environment variable `PYTHONPATH` to tell python where to find the library. For example assume we cloned `xLearn` on the home directory `~`, then we can added the following line in ~/.bashrc. It is ***recommended for developers*** who may change the code. The changes will be immediately reflected once you pulled the code and rebuild the project.
+Install the python package of xLearn is very simple. We can only set the environment variable `PYTHONPATH` to tell python where to find the library. For example assume we cloned `xLearn` on the home directory `~`, then we can added the following line in ~/.bashrc. It is ***recommended for developers*** who may change the code. The changes will be immediately reflected once you pulled the code and rebuild the project.
 
     export PYTHONPATH=~/xlearn/build/python-package/xlearn
     
