@@ -53,13 +53,18 @@ and then build using the following commands:
     cmake ..
     make -j4
 
-Actually you can just use the xLearn by command line now. You can use the follow script to test your building.
+Actually you can just use the xLearn by command line now. You can use the follow scripts to test your building.
 
-    ./test_xlearn_tarin
-    ./test_xlearn_predict
+    ./xlearn_train ./small_train.txt -v ./small_test.txt -s 2
+    ./xlearn_predict ./small_test.txt ./small_train.txt.model
 
 For the useage of xlearn command line, please see this page:
 
-### Build python package
+### Python Package Installation
 
+Install xLearn is very simple. We can only set the environment variable `PYTHONPATH` to tell python where to find the library. For example assume we cloned `xLearn` on the home directory `~`, then we can added the following line in ~/.bashrc. It is ***recommended for developers*** who may change the code. The changes will be immediately reflected once you pulled the code and rebuild the project.
+
+    export PYTHONPATH=~/xlearn/build/python-package/xlearn
+    
+For more details about the python interface, please see this page:
     
