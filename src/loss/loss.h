@@ -115,7 +115,7 @@ class Loss {
   }
 
   // Return a current loss type
-  virtual inline std::string loss_type() = 0;
+  virtual std::string loss_type() = 0;
 
  protected:
   /* The score function, including LinearScore,

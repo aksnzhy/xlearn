@@ -160,7 +160,8 @@ inline uint64 GetFileSize(FILE* file) {
 inline void GetLine(FILE* file, std::string& str_line) {
   CHECK_NOTNULL(file);
   static char* line = new char[kMaxLineSize];
-  fgets(line, kMaxLineSize, file);
+ char* ret = fgets(line, kMaxLineSize, file);
+ CHECK_NOTNULL(ret);
   int read_len = strlen(line);
   if (line[read_len - 1] != '\n') {
     LOG(FATAL) << "Encountered a too-long line.     \

@@ -48,7 +48,7 @@ class CrossEntropyLoss : public Loss {
   void CalcGrad(const DMatrix* data_matrix, Model& model);
 
   // Return current loss type.
-  inline std::string loss_type() { return "log_loss"; }
+  std::string loss_type() { return "log_loss"; }
 
  private:
   DISALLOW_COPY_AND_ASSIGN(CrossEntropyLoss);

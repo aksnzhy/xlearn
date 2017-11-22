@@ -170,9 +170,9 @@ static inline real_t fastersigmoid(real_t x) {
 //------------------------------------------------------------------------------
 static inline real_t InvSqrt(real_t x) {
   real_t xhalf = 0.5f*x;
-  int i = *(int*)&x;       // get bits for floating VALUE
+  int i = *reinterpret_cast<int*>(&x);  // get bits for floating VALUE
   i = 0x5f375a86- (i>>1);  // gives initial guess y0
-  x = *(real_t*)&i;        // convert bits BACK to float
+  x = *reinterpret_cast<real_t*>(&i);  // convert bits BACK to float
   x = x*(1.5f-xhalf*x*x);  // Newton step, repeating increases accuracy
   return x;
 }

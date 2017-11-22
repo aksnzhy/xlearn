@@ -72,13 +72,13 @@ class Metric {
                           const std::vector<real_t>& pred) = 0;
 
   // Reset counters
-  virtual inline void Reset() = 0;
+  virtual void Reset() = 0;
 
   // Return the final metric value.
-  virtual inline real_t GetMetric() = 0;
+  virtual real_t GetMetric() = 0;
 
   // Return the metric type.
-  virtual inline std::string metric_type() = 0;
+  virtual std::string metric_type() = 0;
 
  protected:
   /* Pointer of thread pool */
@@ -150,18 +150,18 @@ class AccMetric : public Metric {
   }
 
   // Reset counters
-  inline void Reset() {
+  void Reset() {
     total_example_ = 0;
     true_pred_ = 0;
   }
 
   // Return accuarcy
-  inline real_t GetMetric() {
+  real_t GetMetric() {
     return (true_pred_ * 1.0) / total_example_;
   }
 
   // Metric type
-  inline std::string metric_type() { 
+  std::string metric_type() { 
     return "Accuarcy"; 
   }
 
@@ -237,19 +237,19 @@ class PrecMetric : public Metric {
   }
 
   // Reset counters
-  inline void Reset() {
+  void Reset() {
     true_positive_ = 0;
     false_positive_ = 0;
   }
 
   // Return accuarcy
-  inline real_t GetMetric() {
+  real_t GetMetric() {
     return (true_positive_ * 1.0) / 
            (true_positive_ + false_positive_);
   }
 
   // Metric type
-  inline std::string metric_type() { 
+  std::string metric_type() { 
     return "Precision"; 
   }
 
@@ -325,19 +325,19 @@ class RecallMetric : public Metric {
   }
 
   // Reset counters
-  inline void Reset() {
+  void Reset() {
     true_positive_ = 0;
     false_negative_ = 0;
   }
 
   // Return accuarcy
-  inline real_t GetMetric() {
+  real_t GetMetric() {
     return (true_positive_ * 1.0) / 
            (true_positive_ + false_negative_);
   }
 
   // Metric type
-  inline std::string metric_type() { 
+  std::string metric_type() { 
     return "Recall"; 
   }
 
@@ -416,20 +416,20 @@ class F1Metric : public Metric {
   }
 
   // Reset counters
-  inline void Reset() {
+  void Reset() {
     true_positive_ = 0;
     true_negative_ = 0;
     total_example_ = 0;
   }
 
   // Return accuarcy
-  inline real_t GetMetric() {
+  real_t GetMetric() {
     return (true_positive_ * 2.0) / 
            (total_example_ + true_positive_ - true_negative_);
   }
 
   // Metric type
-  inline std::string metric_type() { 
+  std::string metric_type() { 
     return "F1"; 
   }
 
@@ -518,7 +518,7 @@ class AUCMetric : public Metric {
   }
   
   // Reset counters
-  inline void Reset() {
+  void Reset() {
     all_positive_number_.clear();
     all_negative_number_.clear();
     all_positive_number_.resize(kMaxBucketSize, 0);
@@ -526,13 +526,13 @@ class AUCMetric : public Metric {
   }
 
   // Return AUC
-  inline real_t GetMetric() {
+  real_t GetMetric() {
     return CalcAUC(all_positive_number_, 
                    all_negative_number_);
   }
 
   // Metric type
-  inline std::string metric_type() {
+  std::string metric_type() {
     return "AUC";
   }
 
@@ -622,18 +622,18 @@ class MAEMetric : public Metric {
   }
 
   // Reset counters
-  inline void Reset() {
+  void Reset() {
     error_ = 0;
     total_example_ = 0;
   }
 
   // Return accuarcy
-  inline real_t GetMetric() {
+  real_t GetMetric() {
     return error_ / total_example_;
   }
 
   // Metric type
-  inline std::string metric_type() { 
+  std::string metric_type() { 
     return "MAE"; 
   }
 
@@ -696,18 +696,18 @@ class MAPEMetric : public Metric {
   }
 
   // Reset counters
-  inline void Reset() {
+  void Reset() {
     error_ = 0;
     total_example_ = 0;
   }
 
   // Return accuarcy
-  inline real_t GetMetric() {
+  real_t GetMetric() {
     return error_ / total_example_;
   }
 
   // Metric type
-  inline std::string metric_type() { 
+  std::string metric_type() { 
     return "MAPE"; 
   }
 
@@ -772,18 +772,18 @@ class RMSDMetric : public Metric {
   }
 
   // Reset counters
-  inline void Reset() {
+  void Reset() {
     error_ = 0;
     total_example_ = 0;
   }
 
   // Return accuarcy
-  inline real_t GetMetric() {
+  real_t GetMetric() {
     return sqrt(error_ / total_example_);
   }
 
   // Metric type
-  inline std::string metric_type() { 
+  std::string metric_type() { 
     return "RMSD"; 
   }
 
