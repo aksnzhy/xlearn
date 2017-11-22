@@ -4,6 +4,11 @@
 ![Project Status](https://img.shields.io/badge/version-0.1.0-green.svg)
 [![Travis](https://img.shields.io/travis/rust-lang/rust.svg)]()
 
+[Installation](doc/install.md)) |
+[Toturial](doc/toturial.md) |
+[RoadMap](doc/roadmap.md) |
+[Release Notes](doc/news.md) 
+
 ## What is xLearn?
 
 xLearn is a ***high performance***, ***easy-to-use***, and ***scalable*** machine learning package, 
