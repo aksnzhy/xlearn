@@ -29,7 +29,7 @@ combining these insights, xLearn is 5x - 13x faster compared to the similar syst
 
 xLearn does not rely on any third-party library, and hence users can just clone the code and compile it by using cmake. 
 Also, xLearn supports very simple python API for users. Apart from this, xLearn supports many useful features that has been 
-widely used in the machine learning competitions, such as cross validation, early stopping, etc.
+widely used in the machine learning competitions like cross-validation, early-stop, etc.
 
 ### Scalability
 
