@@ -53,6 +53,13 @@ and then build using the following commands:
     cmake ..
     make -j4
 
+Actually you can just use the xLearn by command line now. You can use the follow script to test your building.
+
+    ./test_xlearn_tarin
+    ./test_xlearn_predict
+
+For the useage of xlearn command line, please see this page:
+
 ### Build python package
 
     
