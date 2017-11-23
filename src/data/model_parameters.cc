@@ -201,14 +201,13 @@ void Model::set_ftrl_value() {
     real_t coef = 1.0f / sqrt(num_K_) * scale_;
     for (index_t j = 0; j < num_feat_; ++j) {
       for (index_t f = 0; f < num_field_; ++f) {
-        for (index_t d = 0; d < num_K_; d++, w++)
-          *w = coef * dis(generator);
-        for (index_t d = num_K_; d < k_aligned; d++, w++)
-          *w = 0;
-        for (index_t d = k_aligned; d < 2*k_aligned; d++, w++)
-          *w = 1.0;
-        for (index_t d = 2*k_aligned; d < 3*k_aligned; d++, w++)
-          *w = 0.0;
+        for (index_t d = 0; d < k_aligned; ) {
+          for (index_t s = 0; s < kAlign; s++, w++, d++) {
+            w[0] = (d < num_K_) ? coef * dis(generator) : 0.0;
+            w[kAlign] = 1.0;
+          }
+          w += kAlign;
+        }
       }
     }
   }
