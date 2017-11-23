@@ -6,7 +6,7 @@ Make sure that you have already installed the executable file (`xlearn_train` an
 
 The training data - `small_train.txt` and testing data - `small_test.txt` (in the root directory of your xlearn build package) is a portion of the whole data of criteo ctr prediction challenge in [kaggle][2].
 
-### Quck start
+#### Quck start
 
 We can use `xlearn_train` to train our model.  Usage:  
 
@@ -15,6 +15,8 @@ We can use `xlearn_train` to train our model.  Usage:
 For example: 
 
     ./xlearn_train ./small_train.txt -s 2
+
+#### Choose machine learning model
 
 We use `-s` to specify the machine learning model we want. Here we use ffm.
 
@@ -28,17 +30,23 @@ We use `-s` to specify the machine learning model we want. Here we use ffm.
              4 -- factorization machines (FM)
              5 -- field-aware factorization machines (FFM)
 
+#### Set validation
+
 We can also use `-v` to specify the validation data, for example:
 
     ./xlearn_train ./small_train.txt -s 2 -v ./small_test.txt
+
+#### Early-stopping
     
 On default, xlearn adopts `early-stopping` when we set the validation data. You can disable early-stopping by using option `--dis-es`
+
+#### Evaluation metric
 
 Also, we can set specify evaluation metric by using `-x` option. For example:
 
     ./xlearn_train ./small_train.txt -s 2 -v ./small_test.txt -x auc
 
-, where xlearn will print the AUC value. xLearn support a set evaluation metric, including:
+where xlearn will print the AUC value. xLearn support a set evaluation metric, including:
 
     -x: 
      acc
@@ -50,6 +58,14 @@ Also, we can set specify evaluation metric by using `-x` option. For example:
      mape
      rmsd
      rmse
+
+#### Model output
+
+You can also specify your output file for trainned model by using `-m`. If you don't set this option, xlearn we dump the model to the file `small_train.txt.model`
+
+
+
+
 
 
 You can type ./xlearn_train, and then xlearn will print the complete command line usage formation:
