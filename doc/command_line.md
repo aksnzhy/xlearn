@@ -63,21 +63,35 @@ where xlearn will print the AUC value. xLearn support a set evaluation metric, i
 
 #### Model output
 
-You can also specify your output file for trainned model by using `-m`. If you don't set this option, xlearn we dump the model to the file `small_train.txt.model`
+You can also specify your output file for trainned model by using `-m`. If you don't set this option, xlearn we dump the model to the file `small_train.txt.model` by default.
 
     ./xlearn_train ./small_train.txt -s 2 -v ./small_test.txt -m ./model.out
 
 #### Set log
 
-Youo can specify the path of your log path by using `-l` option. On default, xlearn will save the log information in `/tmp/`
+You can specify the path of your log path by using `-l` option. On default, xlearn will save the log information in `/tmp/`
 
 #### Learning rate
 
+You can set the learning rate by using `-r` option. On default, the learning rate is 0.2.
+
+    ./xlearn_train ./small_train.txt -s 2 -v ./small_test.txt -r 0.1
+
 #### Regular lambda
+
+You can set the regular lambda by using `-b` option. On default, this option is set to 0.0002.
+
+    ./xlearn_train ./small_train.txt -s 2 -v ./small_test.txt -b 0.001
 
 #### Number of latent factor (K)
 
+For fm and ffm tasks, users can set the size of latent factor. On default this option is set to 4.
+
+    ./xlearn_train ./small_train.txt -s 2 -v ./small_test.txt -k 8
+
 #### Model scale
+
+
 
 #### Number of epoch
 
