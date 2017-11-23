@@ -56,7 +56,10 @@ namespace xLearn {
 class Solver {
  public:
   // Constructor and Desstructor
-  Solver() { }
+  Solver() 
+    : score_(nullptr),
+      loss_(nullptr),
+      metric_(nullptr) { }
   ~Solver() { }
 
   // Ser train or predict
@@ -77,8 +80,8 @@ class Solver {
   // Start a training task or start an inference task.
   void StartWork();
 
-  // Finalize the xLearn environment.
-  void FinalizeWork();
+  // Clear the xLearn environment.
+  void Clear();
 
  protected:
   /* Global hyper-parameters */
@@ -119,10 +122,6 @@ class Solver {
   // Start function
   void start_train_work();
   void start_prediction_work();
-
-  // Finalize funcrion
-  void finalize_train_work();
-  void finalize_prediction_work();
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Solver);

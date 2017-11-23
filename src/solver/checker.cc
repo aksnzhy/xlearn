@@ -91,9 +91,9 @@ std::string Checker::option_help() const {
 "  --cv                 :  Open cross-validation in training tasks. If we use this option, xLearn \n"
 "                          will ignore the validation file (-t).  \n"
 "                                                                   \n"
-"  --lock-free          :  Open lock-free training. Lock-free training can accelerate training but \n"
+"  --dis-lock-free      :  Disable lock-free training. Lock-free training can accelerate training but \n"
 "                          the result is non-deterministic. Our suggestion is that you can open this flag \n"
-"                          if the training data is bigger than 200MB. \n"
+"                          if the training data is big and sparse. \n"
 "                                                                        \n"
 "  --dis-es             :  Disable early-stopping in training. By default, xLearn will use early-stopping \n"
 "                          in training tasks, except for training in cross-validation. \n"
@@ -371,8 +371,8 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("--cv") == 0) {  // cross-validation
       hyper_param.cross_validation = true;
       i += 1;
-    } else if (list[i].compare("--lock-free") == 0) {  // lock-free training
-      hyper_param.lock_free = true;
+    } else if (list[i].compare("--dis-lock-free") == 0) {  // lock-free training
+      hyper_param.lock_free = false;
       i += 1;
     } else if (list[i].compare("--dis-es") == 0) {  // disable early-stop
       hyper_param.early_stop = false;

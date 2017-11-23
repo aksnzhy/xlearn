@@ -341,6 +341,7 @@ void Solver::init_predict() {
   /*********************************************************
    *  Read model file                                      *
    *********************************************************/
+  print_action("Load model ...");
   CHECK_NE(hyper_param_.model_file.empty(), true);
   print_info(
     StringPrintf("Load model from %s",
@@ -511,20 +512,18 @@ void Solver::start_prediction_work() {
  ******************************************************************************/
 
 // Finalize xLearn
-void Solver::FinalizeWork() {
-  if (hyper_param_.is_train) {
-    finalize_train_work();
-  } else {
-    finalize_prediction_work();
+void Solver::Clear() {
+  LOG(INFO) << "Clear the xLearn environment ...";
+  print_action("Clear the xLearn environment ...");
+  // Clear model
+  delete this->model_;
+  // Clear Reader
+  for (size_t i = 0; i < this->reader_.size(); ++i) {
+    if (reader_[i] != nullptr) {
+      delete reader_[i];
+    }
   }
-}
-
-void Solver::finalize_train_work() {
-  LOG(INFO) << "Finalize training work.";
-}
-
-void Solver::finalize_prediction_work() {
-  LOG(INFO) << "Finalize inference work.";
+  reader_.clear();
 }
 
 } // namespace xLearn

@@ -91,10 +91,11 @@ void Model::initial(bool set_val) {
           param_num_v_ * sizeof(real_t),
           kAlignByte);
 #else
-      posix_memalign(
-          (void**)&param_v_,
-          kAlignByte,
-          param_num_v_ * sizeof(real_t));
+      int ret = posix_memalign(
+                (void**)&param_v_,
+                kAlignByte,
+                param_num_v_ * sizeof(real_t));
+      CHECK_EQ(ret, 0);
 #endif
     } else {
       param_v_ = nullptr;
@@ -219,6 +220,15 @@ void Model::free_model() {
   free(param_w_);
   free(param_v_);
   free(param_b_);
+  if (param_best_w_ != nullptr) {
+    free(param_best_w_);
+  }
+  if (param_best_v_ != nullptr) {
+    free(param_best_v_);
+  }
+  if (param_best_b_ != nullptr) {
+    free(param_best_b_);
+  }
 }
 
 // Initialize model from a checkpoint file
@@ -275,26 +285,33 @@ bool Model::Deserialize(const std::string& filename) {
 
 // Take a record of the best model during training
 void Model::SetBestModel() {
-  if (param_best_w_ == nullptr) {
-    param_best_w_ = (real_t*)malloc(
-      param_num_w_*sizeof(real_t));
-  }
-  if (param_best_v_ == nullptr &&
-      score_func_.compare("linear") != 0) {
-#ifdef _WIN32
-    param_best_v_ = _aligned_malloc(
-      param_num_v_ * sizeof(real_t),
-      kAlignByte);
-#else
-    posix_memalign(
-      (void**)&param_best_v_,
-      kAlignByte,
-      param_num_v_ * sizeof(real_t));
-#endif
-  }
-  if (param_best_b_ == nullptr) {
-    param_best_b_ = (real_t*)malloc(
-      2 * sizeof(real_t));
+  try {
+    if (param_best_w_ == nullptr) {
+        param_best_w_ = (real_t*)malloc(
+        param_num_w_*sizeof(real_t));
+    }
+    if (param_best_v_ == nullptr &&
+        score_func_.compare("linear") != 0) {
+  #ifdef _WIN32
+        param_best_v_ = _aligned_malloc(
+        param_num_v_ * sizeof(real_t),
+        kAlignByte);
+  #else
+      int ret = posix_memalign(
+                (void**)&param_best_v_,
+                kAlignByte,
+                param_num_v_ * sizeof(real_t));
+      CHECK_EQ(ret, 0);
+  #endif
+    }
+    if (param_best_b_ == nullptr) {
+        param_best_b_ = (real_t*)malloc(
+        2 * sizeof(real_t));
+    }
+  } catch (std::bad_alloc&) {
+    LOG(FATAL) << "Cannot allocate enough memory for current  \
+                   model parameters. Parameter size: "
+               << GetNumParameter();
   }
   // Copy current model parameters
   memcpy(param_best_w_, param_w_, param_num_w_*sizeof(real_t));

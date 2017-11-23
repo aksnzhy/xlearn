@@ -4,6 +4,11 @@
 ![Project Status](https://img.shields.io/badge/version-0.1.0-green.svg)
 [![Travis](https://img.shields.io/travis/rust-lang/rust.svg)]()
 
+[Installation](doc/install.md) |
+[Toturial](doc/toturial.md) |
+[RoadMap](doc/roadmap.md) |
+[Release Notes](doc/news.md) 
+
 ## What is xLearn?
 
 xLearn is a ***high performance***, ***easy-to-use***, and ***scalable*** machine learning package, 
@@ -16,14 +21,15 @@ of liblinear, libfm, or libffm, now the xLearn is your another better choice.
 
 xLearn is developed by high-performance C++ code with careful design and optimizations. Our system is designed to 
 maximize the CPU and memory utilizations, provide cache-aware computation, and support lock-free learning. By 
-combining these insights, xLearn is 5x - 13x faster compared to the similar learning systems.
+combining these insights, xLearn is 5x - 13x faster compared to the similar systems.
 
 ### Ease-of-use
 
-<img src="https://github.com/aksnzhy/xLearn/raw/master/img/code.png" width = "600"/>   
+<img src="https://github.com/aksnzhy/xLearn/raw/master/img/code.jpeg" width = "600"/>   
 
 xLearn does not rely on any third-party library, and hence users can just clone the code and compile it by using cmake. 
-Also, xLearn supports very simple python API for users.
+Also, xLearn supports very simple python API for users. Apart from this, xLearn supports many useful features that has been 
+widely used in the machine learning competitions like cross-validation, early-stop, etc.
 
 ### Scalability
 

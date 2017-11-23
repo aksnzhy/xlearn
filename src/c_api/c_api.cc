@@ -28,6 +28,7 @@ This file is the implementation of C API for xLearn.
 #include "src/c_api/c_api.h"
 #include "src/c_api/c_api_error.h"
 #include "src/base/format_print.h"
+#include "src/base/timer.h"
 
 // Say hello to user
 XL_DLL int XLearnHello() {
@@ -68,6 +69,16 @@ XL_DLL int XLearnHandleFree(XLearnHandle *out) {
   API_END();
 }
 
+// Show the mode information
+XL_DLL int XLearnShow(XLearnHandle *out) {
+  API_BEGIN()
+  XLearn* xl = reinterpret_cast<XLearn*>(*out);
+  printf("Info: \n Model: %s\n Loss: %s\n", 
+  	xl->GetHyperParam().score_func.c_str(),
+  	xl->GetHyperParam().loss_func.c_str());
+  API_END()
+}
+
 // Set file path of the training data
 XL_DLL int XLearnSetTrain(XLearnHandle *out,
 	                      const char *train_path) {
@@ -99,25 +110,35 @@ XL_DLL int XLearnSetValidate(XLearnHandle *out,
 XL_DLL int XLearnFit(XLearnHandle *out,
 	                 const char *model_path) {
   API_BEGIN();
+  Timer timer;
+  timer.tic();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   xl->GetHyperParam().model_file = std::string(model_path);
-  xl->GetSolver().SetTrain();
+  xl->GetHyperParam().is_train = true;
   xl->GetSolver().Initialize(xl->GetHyperParam());
   xl->GetSolver().StartWork();
-  xl->GetSolver().FinalizeWork();
+  xl->GetSolver().Clear();
+  print_info(
+    StringPrintf("Total time cost: %.2f (sec)", 
+    timer.toc()), true);
   API_END();
 }
 
 // Cross-validation
 XL_DLL int XLearnCV(XLearnHandle *out) {
   API_BEGIN();
+  Timer timer;
+  timer.tic();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   xl->GetHyperParam().cross_validation = true;
-  xl->GetSolver().SetTrain();
+  xl->GetHyperParam().is_train = true;
   xl->GetSolver().Initialize(xl->GetHyperParam());
   xl->GetSolver().StartWork();
-  xl->GetSolver().FinalizeWork();
+  xl->GetSolver().Clear();
   xl->GetHyperParam().cross_validation = false;
+  print_info(
+    StringPrintf("Total time cost: %.2f (sec)", 
+    timer.toc()), true);
   API_END();
 }
 
@@ -126,13 +147,19 @@ XL_DLL int XLearnPredict(XLearnHandle *out,
 	                     const char *model_path,
 	                     const char *out_path) {
   API_BEGIN();
+  Timer timer;
+  timer.tic();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   xl->GetHyperParam().model_file = std::string(model_path);
   xl->GetHyperParam().output_file = std::string(out_path);
-  xl->GetSolver().SetPredict();
+  xl->GetHyperParam().is_train = false;
   xl->GetSolver().Initialize(xl->GetHyperParam());
+  xl->GetSolver().SetPredict();
   xl->GetSolver().StartWork();
-  xl->GetSolver().FinalizeWork();
+  xl->GetSolver().Clear();
+  print_info(
+    StringPrintf("Total time cost: %.2f (sec)", 
+    timer.toc()), true);
   API_END();
 }
 
@@ -195,7 +222,7 @@ XL_DLL int XLearnSetFloat(XLearnHandle *out,
 // Set bool param
 XL_DLL int XLearnSetBool(XLearnHandle *out,
 	                     const char *key,
-	                     const float value) {
+	                     const bool value) {
   API_BEGIN();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   if (strcmp(key, "on_disk") == 0) {

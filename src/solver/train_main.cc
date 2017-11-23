@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
   solver.SetTrain();
   solver.Initialize(argc, argv);
   solver.StartWork();
-  solver.FinalizeWork();
+  solver.Clear();
 
   print_info(
     StringPrintf("Total time cost: %.2f (sec)", 

@@ -53,7 +53,9 @@ void FileSpliter::split(const std::string& filename, int num_blocks) {
     std::string name = StringPrintf("%s_%d", filename.c_str(), i);
     file_ptr_write[i] = OpenFileOrDie(name.c_str(), "w+");
     file_desc_write[i] = fileno(file_ptr_write[i]);
-    ftruncate(file_desc_write[i], next_block_size + kMaxLineSize);
+    int ret = ftruncate(file_desc_write[i], 
+      next_block_size + kMaxLineSize);
+    CHECK_EQ(ret, 0);
   }
   char* map_ptr_read = (char*)mmap(NULL,
                                    file_size,
@@ -77,7 +79,8 @@ void FileSpliter::split(const std::string& filename, int num_blocks) {
       real_file_size--;
     }
     munmap(map_ptr_write, next_block_size);
-    ftruncate(file_desc_write[i], real_file_size);
+    int ret = ftruncate(file_desc_write[i], real_file_size);
+    CHECK_EQ(ret, 0);
     next_block_size =
         average_block_size + (next_block_size - real_file_size);
     offset += real_file_size;

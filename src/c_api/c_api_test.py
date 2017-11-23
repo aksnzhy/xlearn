@@ -3,7 +3,7 @@ import unittest
 import ctypes
 from ctypes import cdll, c_bool, c_int
 
-XLeaenHandle = ctypes.c_void_p
+XLearnHandle = ctypes.c_void_p
 
 def c_str(string):
 	return ctypes.c_char_p(string)
@@ -11,9 +11,9 @@ def c_str(string):
 class TestCAPI(unittest.TestCase):
 
 	def test_all_c_api(self):
-		xl = XLeaenHandle()
+		xl = XLearnHandle()
 		xl_handle = ctypes.byref(xl)
-		myLib = cdll.LoadLibrary("./libxlearn.dylib")
+		myLib = cdll.LoadLibrary("../../lib/libxlearn.dylib")
 		self.assertEqual(myLib.XLearnHello(), 0)
 		self.assertEqual(myLib.XLearnCreate(c_str("linear"), xl_handle), 0)
 		self.assertEqual(myLib.XLearnSetTrain(xl_handle, c_str("./data.txt")), 0)

@@ -56,6 +56,9 @@ XL_DLL int XLearnCreate(const char *model_type,
 // Free the xLearn handle
 XL_DLL int XLearnHandleFree(XLearnHandle *out);
 
+// Show the model information
+XL_DLL int XLearnShow(XLearnHandle *out);
+
 // Set file path of the training data
 XL_DLL int XLearnSetTrain(XLearnHandle *out,
 	                      const char *train_path);
@@ -98,7 +101,7 @@ XL_DLL int XLearnSetFloat(XLearnHandle *out,
 // Set bool param
 XL_DLL int XLearnSetBool(XLearnHandle *out,
 	                     const char *key,
-	                     const float value);
+	                     const bool value);
 
 // This is the entry class used by c_api.
 class XLearn {
