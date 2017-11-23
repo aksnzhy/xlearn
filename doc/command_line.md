@@ -90,11 +90,11 @@ We set the number of epoch by using `-e` option, for example:
 
 We can use cross-validation in xLearn by setting the `--cv` option, for example:
 
-./xlearn_train ./small_train.txt -s 2 --cv
+    ./xlearn_train ./small_train.txt -s 2 --cv
 
 On default, we use 4-fold cross-validation. We can also the fold number by using `-f` option. For example:
 
-./xlearn_train ./small_train.txt -s 2 -f 3 --cv
+    ./xlearn_train ./small_train.txt -s 2 -f 3 --cv
 
 #### Lock free learning
 
