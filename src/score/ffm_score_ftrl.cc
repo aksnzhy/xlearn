@@ -106,7 +106,7 @@ void FFMScoreFtrl::CalcGrad(const SparseRow* row,
     index_t idx_z = iter->feat_id * 3+2;
     real_t old_n = w[idx_n];
     w[idx_n] += gradient * gradient;
-    real_t sigma = 1.0f+
+    real_t sigma = 1.0f
                    * (std::sqrt(w[idx_n]) - std::sqrt(old_n))
                    / alpha;
     w[idx_z] += gradient - sigma * w[idx_w];
@@ -140,6 +140,12 @@ void FFMScoreFtrl::CalcGrad(const SparseRow* row,
   __m128 XMMpg = _mm_set1_ps(pg);
   __m128 XMMlr = _mm_set1_ps(learning_rate_);
   __m128 XMMlamb = _mm_set1_ps(regu_lambda_);
+  __m128 XMMcoef = _mm_set1_ps(1.0);
+  __m128 XMMalpha = _mm_set1_ps(alpha);
+  __m128 XMMbeta = _mm_set1_ps(beta);
+  __m128 XMMlambda1 = _mm_set1_ps(lambda1);
+  __m128 XMMlambda2 = _mm_set1_ps(lambda2);
+  __m128 XMMzero = _mm_set1_ps(0.0);
   for (SparseRow::const_iterator iter_i = row->begin();
        iter_i != row->end(); ++iter_i) {
     index_t j1 = iter_i->feat_id;
@@ -152,37 +158,94 @@ void FFMScoreFtrl::CalcGrad(const SparseRow* row,
       real_t v2 = iter_j->feat_val;
       real_t* w1_base = w + j1*align1 + f2*align0;
       real_t* w2_base = w + j2*align1 + f1*align0;
-      __m128 XMMv = _mm_set1_ps(v1*v2*norm);
+      __m128 XMMv = _mm_set1_ps(v1*v2);
       __m128 XMMpgv = _mm_mul_ps(XMMv, XMMpg);
       for (index_t d = 0; d < align0; d += align) {
         real_t *w1 = w1_base + d;
         real_t *w2 = w2_base + d;
-        real_t *wn1 = w1 + kAlign;
-        real_t *wn2 = w2 + kAlign;
-        real_t *wz1 = w1 + kAlign * 2;
-        real_t *wz2 = w2 + kAlign * 2;
+        real_t *n1 = w1 + kAlign;
+        real_t *n2 = w2 + kAlign;
+        real_t *z1 = w1 + kAlign * 2;
+        real_t *z2 = w2 + kAlign * 2;
         __m128 XMMw1 = _mm_load_ps(w1);
         __m128 XMMw2 = _mm_load_ps(w2);
-        __m128 XMMwn1 = _mm_load_ps(wn1);
-        __m128 XMMwn2 = _mm_load_ps(wn2);
-        __m128 XMMwz1 = _mm_load_ps(wz1);
-        __m128 XMMwz2 = _mm_load_ps(wz2);
-        __m128 XMMg1 = _mm_add_ps(
-                       _mm_mul_ps(XMMlamb, XMMw1),
-                       _mm_mul_ps(XMMpgv, XMMw2));
-        __m128 XMMg2 = _mm_add_ps(
-                       _mm_mul_ps(XMMlamb, XMMw2),
-                       _mm_mul_ps(XMMpgv, XMMw1));
-        XMMwg1 = _mm_add_ps(XMMwg1, _mm_mul_ps(XMMg1, XMMg1));
-        XMMwg2 = _mm_add_ps(XMMwg2, _mm_mul_ps(XMMg2, XMMg2));
-        XMMw1 = _mm_sub_ps(XMMw1, _mm_mul_ps(XMMlr,
-                _mm_mul_ps(_mm_rsqrt_ps(XMMwg1), XMMg1)));
-        XMMw2 = _mm_sub_ps(XMMw2, _mm_mul_ps(XMMlr,
-                _mm_mul_ps(_mm_rsqrt_ps(XMMwg2), XMMg2)));
+        __m128 XMMn1 = _mm_load_ps(n1);
+        __m128 XMMn2 = _mm_load_ps(n2);
+        __m128 XMMz1 = _mm_load_ps(z1);
+        __m128 XMMz2 = _mm_load_ps(z2);
+        __m128 XMMg1 = _mm_mul_ps(XMMpgv, XMMw2);
+        __m128 XMMg2 = _mm_mul_ps(XMMpgv, XMMw1);
+        __m128 XMMold_n1 = XMMn1;
+        __m128 XMMold_n2 = XMMn2;
+        XMMn1 = _mm_add_ps(XMMn1, _mm_mul_ps(XMMg1, XMMg1));
+        XMMn2 = _mm_add_ps(XMMn2, _mm_mul_ps(XMMg2, XMMg2));
+        
+        __m128 XMMsigma1 = _mm_div_ps(
+                          _mm_mul_ps(XMMcoef,
+                          _mm_sub_ps(_mm_rsqrt_ps(XMMn1),+
+                          _mm_rsqrt_ps(XMMold_n1))), XMMalpha);
+        __m128 XMMsigma2 = _mm_div_ps(
+                           _mm_mul_ps(XMMcoef,
+                           _mm_sub_ps(_mm_rsqrt_ps(XMMn2),+
+                           _mm_rsqrt_ps(XMMold_n2))), XMMalpha);
+        XMMz1 = _mm_add_ps(XMMz1, XMMsigma1);
+        XMMz2 = _mm_add_ps(XMMz2, XMMsigma2);
+        
+        static const union {
+          int i[4];
+          __m128 m;
+        } __mm_abs_mask_cheat_ps = {0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff};
+        __m128 XMMcomp_res1 = _mm_cmplt_ps(_mm_and_ps(XMMz1, __mm_abs_mask_cheat_ps.m), XMMlambda1);
+        __m128 XMMcomp_res2 = _mm_cmplt_ps(_mm_and_ps(XMMz2, __mm_abs_mask_cheat_ps.m), XMMlambda1);
+        real_t* comp_res1;
+        _mm_store_ps(comp_res1, XMMcomp_res1);
+        real_t* comp_res2;
+        _mm_store_ps(comp_res2, XMMcomp_res2);
+        if (comp_res1) {
+          XMMw1 = _mm_set1_ps(0.0);
+        } else {
+          __m128 XMMsmooth_lr =
+                             (_mm_div_ps(XMMcoef,+
+                              _mm_add_ps(XMMlambda2,
+                              _mm_div_ps(
+                              _mm_add_ps(XMMbeta,+
+                              _mm_rsqrt_ps(XMMn1)),XMMalpha))));
+          real_t* comp_z_zero;
+          _mm_store_ps(comp_z_zero, _mm_cmplt_ps(XMMz1, XMMzero));
+          if (comp_z_zero) {
+            XMMz1 = _mm_add_ps(XMMz1, XMMlambda1);
+          } else {
+            XMMz1 = _mm_sub_ps(XMMz1, XMMlambda1);
+          }
+          XMMw1 = _mm_mul_ps(XMMcoef,+
+          _mm_mul_ps(XMMsmooth_lr, XMMz1));
+        }
+
+        if (comp_res2) {
+          XMMw2 = _mm_set1_ps(0.0);
+        } else {
+          __m128 XMMsmooth_lr =
+            (_mm_div_ps(XMMcoef,+
+             _mm_add_ps(XMMlambda2,
+             _mm_div_ps(
+             _mm_add_ps(XMMbeta,+
+             _mm_rsqrt_ps(XMMn2)),XMMalpha))));
+          real_t* comp_z_zero;
+          _mm_store_ps(comp_z_zero, _mm_cmplt_ps(XMMz2, XMMzero));
+          if (comp_z_zero) {
+            XMMz2 = _mm_add_ps(XMMz2, XMMlambda1);
+          } else {
+            XMMz2 = _mm_sub_ps(XMMz2, XMMlambda1);
+          }
+          XMMw2 = _mm_mul_ps(XMMcoef,+
+                  _mm_mul_ps(XMMsmooth_lr, XMMz2));
+        }
         _mm_store_ps(w1, XMMw1);
         _mm_store_ps(w2, XMMw2);
-        _mm_store_ps(wg1, XMMwg1);
-        _mm_store_ps(wg2, XMMwg2);
+        _mm_store_ps(n1, XMMn1);
+        _mm_store_ps(n2, XMMn2);
+        _mm_store_ps(z1, XMMz1);
+        _mm_store_ps(z2, XMMz2);
       }
     }
   }

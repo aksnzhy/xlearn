@@ -184,10 +184,10 @@ void FMScoreFtrl::CalcGrad(const SparseRow* row,
                                                      _mm_mul_ps(XMMw, XMMv))));
       __m128 XMMold_n = XMMn;
       XMMn = _mm_add_ps(XMMn, _mm_mul_ps(XMMg, XMMg));
-      __m128 XMMsigma = _mm_div_ps(_mm_mul_ps(XMMcoef,
-                                                  _mm_sub_ps(_mm_rsqrt_ps(XMMn), 
-                                                             _mm_rsqrt_ps(XMMold_n)))
-                                        , XMMalpha);
+      __m128 XMMsigma = _mm_div_ps(
+                        _mm_mul_ps(XMMcoef,
+                        _mm_sub_ps(_mm_rsqrt_ps(XMMn), 
+                        _mm_rsqrt_ps(XMMold_n))), XMMalpha);
       XMMz = _mm_add_ps(XMMz, XMMsigma);
       static const union {
         int i[4]; 
@@ -201,9 +201,10 @@ void FMScoreFtrl::CalcGrad(const SparseRow* row,
       } else {
         __m128 XMMsmooth_lr =
                (_mm_div_ps(XMMcoef, 
-                           _mm_add_ps(XMMlambda2,
-                                      _mm_div_ps(_mm_add_ps(XMMbeta, _mm_rsqrt_ps(XMMn)), 
-                                                 XMMalpha))));
+                _mm_add_ps(XMMlambda2,
+                _mm_div_ps(
+                _mm_add_ps(XMMbeta, 
+                _mm_rsqrt_ps(XMMn)),XMMalpha))));
         real_t* comp_z_zero;
         _mm_store_ps(comp_z_zero, _mm_cmplt_ps(XMMz, XMMzero));
         if (comp_z_zero) {
