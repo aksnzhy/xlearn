@@ -61,16 +61,6 @@ where xlearn will print the AUC value. xLearn support a set evaluation metric, i
      rmsd
      rmse
 
-#### Model output
-
-You can also specify your output file for trainned model by using `-m`. If you don't set this option, xlearn we dump the model to the file `small_train.txt.model` by default.
-
-    ./xlearn_train ./small_train.txt -s 2 -v ./small_test.txt -m ./model.out
-
-#### Set log
-
-You can specify the path of your log path by using `-l` option. On default, xlearn will save the log information in `/tmp/`
-
 #### Learning rate
 
 You can set the learning rate by using `-r` option. On default, the learning rate is 0.2.
@@ -89,21 +79,48 @@ For fm and ffm tasks, users can set the size of latent factor. On default this o
 
     ./xlearn_train ./small_train.txt -s 2 -v ./small_test.txt -k 8
 
-#### Model scale
-
-
 
 #### Number of epoch
 
+We set the number of epoch by using `-e` option, for example:
+
+    ./xlearn_train ./small_train.txt -s 2 -v ./small_test.txt -e 15
+
 #### Corss-validation
 
-#### Number of fold
+We can use cross-validation in xLearn by setting the `--cv` option, for example:
+
+./xlearn_train ./small_train.txt -s 2 --cv
+
+On default, we use 4-fold cross-validation. We can also the fold number by using `-f` option. For example:
+
+./xlearn_train ./small_train.txt -s 2 -f 3 --cv
 
 #### Lock free learning
 
+On default, xLearn uses lock-free training (like Hogwild!). So when run our problem multiple times, the result could be non-deterministic. If you want to get a deterministic result, we can disable lock-free training by setting `--dis-lock-free` option.
+
 #### Normalization 
 
+On default, xLearn uses instance-wise normalization. You can disable this normalization by setting option `--dis-norm`
+
 #### Quite training
+
+We can set `--quiet` option to disable any evaluation output.
+
+#### Model scale
+
+Model scale is hyper-parameter used for initialize model parameters. The default value is 0.66 and we can change this value by using `-u` option.
+
+#### Model output
+
+You can also specify your output file for trainned model by using `-m`. If you don't set this option, xlearn we dump the model to the file `small_train.txt.model` by default.
+
+    ./xlearn_train ./small_train.txt -s 2 -v ./small_test.txt -m ./model.out
+
+#### Set log
+
+You can specify the path of your log path by using `-l` option. On default, xlearn will save the log information in `/tmp/`
 
 #### Help menu
 
