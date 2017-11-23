@@ -136,7 +136,7 @@ void FFMScore::CalcGrad(const SparseRow* row,
         real_t *w1 = w1_base + d;
         real_t *w2 = w2_base + d;
         real_t *wg1 = w1 + kAlign;
-        real_t *wg2 = w1 + kAlign;
+        real_t *wg2 = w2 + kAlign;
         __m128 XMMw1 = _mm_load_ps(w1);
         __m128 XMMw2 = _mm_load_ps(w2);
         __m128 XMMwg1 = _mm_load_ps(wg1);
