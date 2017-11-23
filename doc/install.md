@@ -73,5 +73,5 @@ Then you need to type source command to reset your profile:
 For more details about the python interface, please see this page:[python_package.md][2]
     
 
-  [1]: doc/command_line.md
-  [2]: doc/python_package.md
+  [1]: command_line.md
+  [2]: python_package.md
