@@ -38,7 +38,9 @@ We can also use `-v` to specify the validation data, for example:
 
 #### Early-stopping
     
-On default, xlearn adopts `early-stopping` when we set the validation data. You can disable early-stopping by using option `--dis-es`
+On default, xlearn adopts `early-stopping` when we set the validation data. You can disable early-stopping by using option `--dis-es`, for example:
+
+    ./xlearn_train ./small_train.txt -s 2 -v ./small_test.txt --dis-es
 
 #### Evaluation metric
 
@@ -63,10 +65,33 @@ where xlearn will print the AUC value. xLearn support a set evaluation metric, i
 
 You can also specify your output file for trainned model by using `-m`. If you don't set this option, xlearn we dump the model to the file `small_train.txt.model`
 
+    ./xlearn_train ./small_train.txt -s 2 -v ./small_test.txt -m ./model.out
 
+#### Set log
 
+Youo can specify the path of your log path by using `-l` option. On default, xlearn will save the log information in `/tmp/`
 
+#### Learning rate
 
+#### Regular lambda
+
+#### Number of latent factor (K)
+
+#### Model scale
+
+#### Number of epoch
+
+#### Corss-validation
+
+#### Number of fold
+
+#### Lock free learning
+
+#### Normalization 
+
+#### Quite training
+
+#### Help menu
 
 You can type ./xlearn_train, and then xlearn will print the complete command line usage formation:
 
