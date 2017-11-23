@@ -28,7 +28,7 @@ namespace xLearn {
 
 // y = sum( (V_i*V_j)(x_i * x_j) )
 // Using SSE to accelerate vector operation.
-real_t FMScoreFtrl::CalcScoreFtrl(const SparseRow* row,
+real_t FMScoreFtrl::CalcScore(const SparseRow* row,
                           Model& model,
                           real_t norm) {
   /*********************************************************
@@ -90,7 +90,7 @@ real_t FMScoreFtrl::CalcScoreFtrl(const SparseRow* row,
 
 // Calculate gradient and update current model parameters.
 // Using SSE to accelerate vector operation.
-void FMScoreFtrl::CalcGradFtrl(const SparseRow* row,
+void FMScoreFtrl::CalcGrad(const SparseRow* row,
                        Model& model,
                        real_t pg,
                        real_t norm) {
@@ -179,8 +179,9 @@ void FMScoreFtrl::CalcGradFtrl(const SparseRow* row,
       __m128 XMMn = _mm_load_ps(w+aligned_k+d);
       __m128 XMMz = _mm_load_ps(w+aligned_k*2+d);
       __m128 XMMg = _mm_add_ps(XMMw,
-                               _mm_mul_ps(XMMpgv, _mm_sub_ps(XMMs,
-                                                             _mm_mul_ps(XMMw, XMMv))));
+                               _mm_mul_ps(XMMpgv, 
+                                          _mm_sub_ps(XMMs,
+                                                     _mm_mul_ps(XMMw, XMMv))));
       __m128 XMMold_n = XMMn;
       XMMn = _mm_add_ps(XMMn, _mm_mul_ps(XMMg, XMMg));
       __m128 XMMsigma = _mm_div_ps(_mm_mul_ps(XMMcoef,
@@ -188,23 +189,24 @@ void FMScoreFtrl::CalcGradFtrl(const SparseRow* row,
                                                              _mm_rsqrt_ps(XMMold_n)))
                                         , XMMalpha);
       XMMz = _mm_add_ps(XMMz, XMMsigma);
-      static const union {int i[4]; __m128 m;} 
-      __mm_abs_mask_cheat_ps = {0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff};
-
+      static const union {
+        int i[4]; 
+        __m128 m;
+      } __mm_abs_mask_cheat_ps = {0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff};
       __m128 XMMcomp_res = _mm_cmplt_ps(_mm_and_ps(XMMz, __mm_abs_mask_cheat_ps.m), XMMlambda1);
-      unsigned int comp_res;
-      comp_res = _mm_movemask_epi8(XMMcomp_res);
-      if (comp_res == 0xffff) {
+      real_t* comp_res;
+      _mm_store_ps(comp_res, XMMcomp_res);
+      if (comp_res) {
         XMMw = _mm_set1_ps(0.0);
       } else {
         __m128 XMMsmooth_lr =
                (_mm_div_ps(XMMcoef, 
-                                      _mm_add_ps(XMMlambda2,
-                                                 _mm_div_ps(_mm_add_ps(XMMbeta, _mm_rsqrt_ps(XMMn)), 
-                                                            XMMalpha))));
-        unsigned int comp_z_zero;
-        comp_z_zero = _mm_movemask_epi8(_mm_cmplt_ps(XMMz, XMMzero));
-        if (comp_z_zero == 0xffff) {
+                           _mm_add_ps(XMMlambda2,
+                                      _mm_div_ps(_mm_add_ps(XMMbeta, _mm_rsqrt_ps(XMMn)), 
+                                                 XMMalpha))));
+        real_t* comp_z_zero;
+        _mm_store_ps(comp_z_zero, _mm_cmplt_ps(XMMz, XMMzero));
+        if (comp_z_zero) {
           XMMz = _mm_add_ps(XMMz, XMMlambda1);
         } else {
           XMMz = _mm_sub_ps(XMMz, XMMlambda1);

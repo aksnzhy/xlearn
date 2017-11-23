@@ -42,10 +42,6 @@ class LinearScoreFtrl : public Score {
   // returns the linear score wTx.
   real_t CalcScore(const SparseRow* row,
                    Model& model,
-                   real_t norm = 1.0) {}
-
-  real_t CalcScoreFtrl(const SparseRow* row,
-                   Model& model,
                    real_t norm = 1.0);
 
   // Calculate gradient and update current
@@ -53,12 +49,8 @@ class LinearScoreFtrl : public Score {
   void CalcGrad(const SparseRow* row,
                 Model& model,
                 real_t pg,
-                real_t norm = 1.0) {}
+                real_t norm = 1.0);
 
-  void CalcGradFtrl(const SparseRow* row,
-                    Model& model,
-                    real_t pg,
-                    real_t norm = 1.0);
  private:
   DISALLOW_COPY_AND_ASSIGN(LinearScoreFtrl);
 };
