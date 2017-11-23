@@ -39,7 +39,7 @@ real_t FFMScoreFtrl::CalcScore(const SparseRow* row,
   real_t *w = model.GetParameter_w();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
-    sum_w += (iter->feat_val * w[iter->feat_id*2] * sqrt_norm);
+    sum_w += (iter->feat_val * w[iter->feat_id*3] * sqrt_norm);
   }
   // bias
   w = model.GetParameter_b();
@@ -47,9 +47,9 @@ real_t FFMScoreFtrl::CalcScore(const SparseRow* row,
   /*********************************************************
    *  latent factor                                        *
    *********************************************************/
-  index_t align0 = 2 * model.get_aligned_k();
+  index_t align0 = 3 * model.get_aligned_k();
   index_t align1 = model.GetNumField() * align0;
-  int align = kAlign * 2;
+  int align = kAlign * 3;
   w = model.GetParameter_v();
   __m128 XMMt = _mm_setzero_ps();
   for (SparseRow::const_iterator iter_i = row->begin();
@@ -93,13 +93,35 @@ void FFMScoreFtrl::CalcGrad(const SparseRow* row,
    *********************************************************/
   real_t sqrt_norm = sqrt(norm);
   real_t *w = model.GetParameter_w();
+  real_t alpha = 1.0;
+  real_t beta = 1.0;
+  real_t lambda1 = 1.0;
+  real_t lambda2 = 1.0;
+
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
-    real_t &wl = w[iter->feat_id*2];
-    real_t &wlg = w[iter->feat_id*2+1];
-    real_t g = regu_lambda_*wl+pg*iter->feat_val*sqrt_norm;
-    wlg += g*g;
-    wl -= learning_rate_ * g * InvSqrt(wlg);
+    real_t gradient = pg * iter->feat_val;
+    index_t idx_w = iter->feat_id * 3;
+    index_t idx_n = iter->feat_id * 3+1;
+    index_t idx_z = iter->feat_id * 3+2;
+    real_t old_n = w[idx_n];
+    w[idx_n] += gradient * gradient;
+    real_t sigma = 1.0f+
+                   * (std::sqrt(w[idx_n]) - std::sqrt(old_n))
+                   / alpha;
+    w[idx_z] += gradient - sigma * w[idx_w];
+    if (std::abs(w[idx_z]) < lambda1) {
+      w[idx_w] = 0;
+    } else {
+      real_t smooth_lr = 1.0f
+        / (lambda2 + (beta + std::sqrt(w[idx_n])) / alpha);
+      if (w[idx_z] < 0.0) {
+        w[idx_z] += lambda1;
+      } else {
+        w[idx_z] -= lambda1;
+      }
+      w[idx_w] = -1.0f * smooth_lr * w[idx_z];
+    }
   }
   // bias
   w = model.GetParameter_b();
@@ -111,9 +133,9 @@ void FFMScoreFtrl::CalcGrad(const SparseRow* row,
   /*********************************************************
    *  latent factor                                        *
    *********************************************************/
-  index_t align0 = 2 * model.get_aligned_k();
+  index_t align0 = 3 * model.get_aligned_k();
   index_t align1 = model.GetNumField() * align0;
-  index_t align = kAlign * 2;
+  index_t align = kAlign * 3;
   w = model.GetParameter_v();
   __m128 XMMpg = _mm_set1_ps(pg);
   __m128 XMMlr = _mm_set1_ps(learning_rate_);
@@ -135,12 +157,16 @@ void FFMScoreFtrl::CalcGrad(const SparseRow* row,
       for (index_t d = 0; d < align0; d += align) {
         real_t *w1 = w1_base + d;
         real_t *w2 = w2_base + d;
-        real_t *wg1 = w1 + kAlign;
-        real_t *wg2 = w1 + kAlign;
+        real_t *wn1 = w1 + kAlign;
+        real_t *wn2 = w2 + kAlign;
+        real_t *wz1 = w1 + kAlign * 2;
+        real_t *wz2 = w2 + kAlign * 2;
         __m128 XMMw1 = _mm_load_ps(w1);
         __m128 XMMw2 = _mm_load_ps(w2);
-        __m128 XMMwg1 = _mm_load_ps(wg1);
-        __m128 XMMwg2 = _mm_load_ps(wg2);
+        __m128 XMMwn1 = _mm_load_ps(wn1);
+        __m128 XMMwn2 = _mm_load_ps(wn2);
+        __m128 XMMwz1 = _mm_load_ps(wz1);
+        __m128 XMMwz2 = _mm_load_ps(wz2);
         __m128 XMMg1 = _mm_add_ps(
                        _mm_mul_ps(XMMlamb, XMMw1),
                        _mm_mul_ps(XMMpgv, XMMw2));
