@@ -58,7 +58,7 @@ Actually you can just use the xLearn by command line now. You can use the follow
     ./xlearn_train ./small_train.txt -v ./small_test.txt -s 2
     ./xlearn_predict ./small_test.txt ./small_train.txt.model
 
-For the useage of xlearn command line, please see this page:[command_line.md][1]
+For the useage of xlearn command line, please see this page: [command_line.md][1]
 
 ### Python Package Installation
 
@@ -70,8 +70,9 @@ Then you need to type source command to reset your profile:
 
     source ~/.bashrc
 
-For more details about the python interface, please see this page:[python_package.md][2]
+For more details about the python interface, please see this page: [python_package.md][2]
     
+
 
   [1]: command_line.md
   [2]: python_package.md
