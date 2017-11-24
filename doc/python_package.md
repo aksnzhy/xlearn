@@ -57,7 +57,7 @@ We can set training data, validation data, and testing data by using the followi
 
 We can set hyper-parameters to xLearn by using a python `dictionary`:
 
-    param = { 'task':'binary',
+    param = { 'task':'binary',   # ‘reg’ for regression task
               'metric':'auc',
               'lr':0.2,
               'k':4,
