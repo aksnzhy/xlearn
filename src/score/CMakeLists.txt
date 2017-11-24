@@ -29,6 +29,9 @@ target_link_libraries(score_function_test gtest_main ${LIBS})
 add_executable(linear_score_test linear_score_test.cc)
 target_link_libraries(linear_score_test gtest_main ${LIBS})
 
+add_executable(linear_score_ftrl_test linear_score_ftrl_test.cc)
+target_link_libraries(linear_score_ftrl_test gtest_main ${LIBS})
+
 add_executable(fm_score_test fm_score_test.cc)
 target_link_libraries(fm_score_test gtest_main ${LIBS})
 

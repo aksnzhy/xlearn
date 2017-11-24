@@ -19,8 +19,8 @@ Author: Chao Ma (mctt90@gmail.com)
 This file defines the LinearScore class.
 */
 
-#ifndef XLEARN_LINEAR_SCORE_H_
-#define XLEARN_LINEAR_SCORE_H_
+#ifndef XLEARN_LINEAR_SCORE_FTRL_H_
+#define XLEARN_LINEAR_SCORE_FTRL_H_
 
 #include "src/base/common.h"
 #include "src/data/model_parameters.h"
@@ -57,4 +57,4 @@ class LinearScoreFtrl : public Score {
 
 }  // namespace xLearn
 
-#endif  // XLEARN_LINEAR_SCORE_H_
+#endif  // XLEARN_LINEAR_SCORE_FTRL_H_

@@ -19,8 +19,8 @@ Author: Chao Ma (mctt90@gmail.com)
 This file defines the FFMScore (field-aware factorization machine) class.
 */
 
-#ifndef XLEARN_LOSS_FFM_SCORE_H_
-#define XLEARN_LOSS_FFM_SCORE_H_
+#ifndef XLEARN_LOSS_FFM_SCORE_FTRL_H_
+#define XLEARN_LOSS_FFM_SCORE_FTRL_H_
 
 #include "src/base/common.h"
 #include "src/score/score_function.h"
@@ -58,4 +58,4 @@ public:
 
 }  // namespace xLearn
 
-#endif  // XLEARN_LOSS_FFM_SCORE_H_
+#endif  // XLEARN_LOSS_FFM_SCORE_FTRL_H_
