@@ -110,7 +110,7 @@ void FFMScoreFtrl::CalcGrad(const SparseRow* row,
                    * (std::sqrt(w[idx_n]) - std::sqrt(old_n))
                    / alpha;
     w[idx_z] += gradient - sigma * w[idx_w];
-    if (std::abs(w[idx_z]) < lambda1) {
+    if (std::abs(w[idx_z]) <= lambda1) {
       w[idx_w] = 0;
     } else {
       real_t smooth_lr = 1.0f
@@ -179,37 +179,36 @@ void FFMScoreFtrl::CalcGrad(const SparseRow* row,
         __m128 XMMold_n2 = XMMn2;
         XMMn1 = _mm_add_ps(XMMn1, _mm_mul_ps(XMMg1, XMMg1));
         XMMn2 = _mm_add_ps(XMMn2, _mm_mul_ps(XMMg2, XMMg2));
-        
+ 
         __m128 XMMsigma1 = _mm_div_ps(
                           _mm_mul_ps(XMMcoef,
-                          _mm_sub_ps(_mm_rsqrt_ps(XMMn1),+
+                          _mm_sub_ps(_mm_rsqrt_ps(XMMn1),
                           _mm_rsqrt_ps(XMMold_n1))), XMMalpha);
         __m128 XMMsigma2 = _mm_div_ps(
                            _mm_mul_ps(XMMcoef,
-                           _mm_sub_ps(_mm_rsqrt_ps(XMMn2),+
+                           _mm_sub_ps(_mm_rsqrt_ps(XMMn2),
                            _mm_rsqrt_ps(XMMold_n2))), XMMalpha);
         XMMz1 = _mm_add_ps(XMMz1, XMMsigma1);
         XMMz2 = _mm_add_ps(XMMz2, XMMsigma2);
-        
+
         static const union {
           int i[4];
           __m128 m;
         } __mm_abs_mask_cheat_ps = {0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff};
-        __m128 XMMcomp_res1 = _mm_cmplt_ps(_mm_and_ps(XMMz1, __mm_abs_mask_cheat_ps.m), XMMlambda1);
-        __m128 XMMcomp_res2 = _mm_cmplt_ps(_mm_and_ps(XMMz2, __mm_abs_mask_cheat_ps.m), XMMlambda1);
+        __m128 XMMcomp_res1 = _mm_cmplt_ps(XMMlambda1,
+                              _mm_and_ps(XMMz1, __mm_abs_mask_cheat_ps.m));
+        __m128 XMMcomp_res2 = _mm_cmplt_ps(XMMlambda2,
+                              _mm_and_ps(XMMz2, __mm_abs_mask_cheat_ps.m));
         real_t* comp_res1;
         _mm_store_ps(comp_res1, XMMcomp_res1);
         real_t* comp_res2;
         _mm_store_ps(comp_res2, XMMcomp_res2);
         if (comp_res1) {
-          XMMw1 = _mm_set1_ps(0.0);
-        } else {
-          __m128 XMMsmooth_lr =
-                             (_mm_div_ps(XMMcoef,+
-                              _mm_add_ps(XMMlambda2,
-                              _mm_div_ps(
-                              _mm_add_ps(XMMbeta,+
-                              _mm_rsqrt_ps(XMMn1)),XMMalpha))));
+          __m128 XMMsmooth_lr = _mm_rcp_ps(
+                                _mm_add_ps(XMMlambda2,
+                                _mm_div_ps(
+                                _mm_add_ps(XMMbeta,+
+                                _mm_rsqrt_ps(XMMn1)),XMMalpha)));
           real_t* comp_z_zero;
           _mm_store_ps(comp_z_zero, _mm_cmplt_ps(XMMz1, XMMzero));
           if (comp_z_zero) {
@@ -217,19 +216,18 @@ void FFMScoreFtrl::CalcGrad(const SparseRow* row,
           } else {
             XMMz1 = _mm_sub_ps(XMMz1, XMMlambda1);
           }
-          XMMw1 = _mm_mul_ps(XMMcoef,+
-          _mm_mul_ps(XMMsmooth_lr, XMMz1));
+          XMMw1 = _mm_mul_ps(XMMcoef,
+                  _mm_mul_ps(XMMsmooth_lr, XMMz1));
+        } else {
+          XMMw1 = _mm_set1_ps(0.0);
         }
 
         if (comp_res2) {
-          XMMw2 = _mm_set1_ps(0.0);
-        } else {
-          __m128 XMMsmooth_lr =
-            (_mm_div_ps(XMMcoef,+
-             _mm_add_ps(XMMlambda2,
-             _mm_div_ps(
-             _mm_add_ps(XMMbeta,+
-             _mm_rsqrt_ps(XMMn2)),XMMalpha))));
+          __m128 XMMsmooth_lr = _mm_rcp_ps(
+                                _mm_add_ps(XMMlambda2,
+                                _mm_div_ps(
+                                _mm_add_ps(XMMbeta,
+                                _mm_rsqrt_ps(XMMn2)),XMMalpha)));
           real_t* comp_z_zero;
           _mm_store_ps(comp_z_zero, _mm_cmplt_ps(XMMz2, XMMzero));
           if (comp_z_zero) {
@@ -237,8 +235,10 @@ void FFMScoreFtrl::CalcGrad(const SparseRow* row,
           } else {
             XMMz2 = _mm_sub_ps(XMMz2, XMMlambda1);
           }
-          XMMw2 = _mm_mul_ps(XMMcoef,+
+          XMMw2 = _mm_mul_ps(XMMcoef,
                   _mm_mul_ps(XMMsmooth_lr, XMMz2));
+        } else {
+          XMMw2 = _mm_set1_ps(0.0);
         }
         _mm_store_ps(w1, XMMw1);
         _mm_store_ps(w2, XMMw2);
