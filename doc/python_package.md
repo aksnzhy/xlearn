@@ -36,7 +36,64 @@ The training data - `small_train.txt` and testing data `small_test.txt` (in the 
 
 #### Create model
 
+We can creat a model by using `xlearn.create_xxx()` function:
 
+    # Create linear model
+    create_linear()
+    # Create factorization machine
+    create_fm()
+    # Create field-aware factorization machine
+    create_ffm()
+
+#### Set data
+
+We can set training data, validation data, and testing data by using the following functions:
+
+    setTrain("file_name")
+    setValidate("file_name")
+    setTest("file_name")
+
+#### Hyper-parameters
+
+We can set hyper-parameters to xLearn by using a python `dictionary`:
+
+    param = { 'task':'binary',
+              'metric':'auc',
+              'lr':0.2,
+              'k':4,
+              'lambda':0.0002
+              'init':0.66,
+              'epoch':10,
+              'fold':5}
+
+#### The other set funtions
+
+We can also use some other set funtions:
+
+    setQuiet()
+    disableNorm()
+    disableLockFree()
+    disableEarlyStop()
+    disableSign()
+    disableSigmoid()
+
+#### Train model
+
+We can train our model by using `fit()` function:
+
+    fit(param, "model_output")
+
+#### Cross-Validation
+
+We can also perform cross-validation by using `cv()` function:
+
+    cv(param)
+
+#### Predict
+
+We can perform prediction by using `predict()` function:
+
+    predict("model_file", "output_file")
 
   [1]: install.md
   [2]: https://www.kaggle.com/c/criteo-display-ad-challenge
