@@ -63,7 +63,7 @@ void LinearScoreFtrl::CalcGrad(const SparseRow* row,
     w[idx_z] += gradient - sigma * w[idx_w];
     // above had calculate n_i and z_i
     // below update gradient by n_i and z_i
-    if (std::abs(w[idx_z]) < lambda1) {
+    if (std::abs(w[idx_z]) <= lambda1) {
       w[idx_w] = 0.0;
     } else {
       real_t smooth_lr = 1.0f
@@ -84,7 +84,7 @@ void LinearScoreFtrl::CalcGrad(const SparseRow* row,
   real_t g = pg;
   wbn += g*g;
   wbz += g;
-  if (std::abs(wbz) < lambda1) {
+  if (std::abs(wbz) <= lambda1) {
     wb = 0.0f;
   } else {
     real_t smooth_lr = 1.0f

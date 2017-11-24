@@ -116,7 +116,7 @@ void FMScoreFtrl::CalcGrad(const SparseRow* row,
                    / alpha;
     w[idx_z] += gradient - sigma * w[idx_w];
 
-    if (std::abs(w[idx_z]) < lambda1) {
+    if (std::abs(w[idx_z]) <= lambda1) {
       w[idx_w] = 0;
     } else {
       real_t smooth_lr = 1.0f
@@ -137,7 +137,7 @@ void FMScoreFtrl::CalcGrad(const SparseRow* row,
   real_t g = pg;
   wbn += g*g;
   wbz += g;
-  if (std::abs(wbz) < lambda1) {
+  if (std::abs(wbz) <= lambda1) {
     wb = 0.0f;
   } else {
     real_t smooth_lr = 1.0f
