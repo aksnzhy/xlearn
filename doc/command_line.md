@@ -118,6 +118,12 @@ You can also specify your output file for trainned model by using `-m`. If you d
 
     ./xlearn_train ./small_train.txt -s 2 -v ./small_test.txt -m ./model.out
 
+#### Predict
+
+Now you can perform prediction on the trainned model. For example:
+
+    ./xlearn_predict ./small_test.txt ./small_train.txt.model
+
 #### Set log
 
 You can specify the path of your log path by using `-l` option. On default, xlearn will save the log information in `/tmp/`
