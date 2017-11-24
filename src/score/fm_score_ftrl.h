@@ -19,8 +19,8 @@ Author: Chao Ma (mctt90@gmail.com)
 This file defines the FMrScore (factorization machine) class.
 */
 
-#ifndef XLEARN_LOSS_FM_SCORE_H_
-#define XLEARN_LOSS_FM_SCORE_H_
+#ifndef XLEARN_LOSS_FM_SCORE_FTRL_H_
+#define XLEARN_LOSS_FM_SCORE_FTRL_H_
 
 #include "src/base/common.h"
 #include "src/score/score_function.h"
@@ -57,4 +57,4 @@ class FMScoreFtrl : public Score {
 
 } // namespace xLearn
 
-#endif // XLEARN_LOSS_FM_SCORE_H_
+#endif // XLEARN_LOSS_FM_SCORE_FTRL_H_
