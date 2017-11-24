@@ -1,4 +1,4 @@
-## Toturial
+## Tutorial
 
 Before using xLearn, make sure that you have already build it successfully. See the page [install.md][1] for installing xLearn.
  
