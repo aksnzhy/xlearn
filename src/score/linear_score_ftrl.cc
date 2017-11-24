@@ -78,24 +78,23 @@ void LinearScoreFtrl::CalcGrad(const SparseRow* row,
   }
   // bias
   w = model.GetParameter_b();
-  real_t &bw = w[0];
-  real_t &bn = w[1];
-  real_t &bz = w[2];
+  real_t &wb = w[0];
+  real_t &wbn = w[1];
+  real_t &wbz = w[2];
   real_t g = pg;
-  bn += g*g;
-  bz += g;
-  if (std::abs(bz) < lambda1) {
-    bw = 0.0f;
+  wbn += g*g;
+  wbz += g;
+  if (std::abs(wbz) < lambda1) {
+    wb = 0.0f;
   } else {
     real_t smooth_lr = 1.0f
-                       / (lambda2 + (beta + std::sqrt(bn)) / alpha);
-
-    if (bz < 0) {
-      bz += lambda1;
+                       / (lambda2 + (beta + std::sqrt(wbn)) / alpha);
+    if (wbz < 0) {
+      wbz += lambda1;
     } else {
-      bz -= lambda1;
+      wbz -= lambda1;
     }
-    bw = -1.0f * smooth_lr * bz;
+    wb = -1.0f * smooth_lr * wbz;
   }
 }
 
