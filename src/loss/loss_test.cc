@@ -30,6 +30,7 @@ This file tests the Loss class.
 #include "src/data/model_parameters.h"
 #include "src/data/hyper_parameters.h"
 #include "src/score/linear_score.h"
+#include "src/score/linear_score_ftrl.h"
 #include "src/score/fm_score.h"
 #include "src/score/ffm_score.h"
 
@@ -93,7 +94,8 @@ TEST_F(LossTest, Predict_Linear) {
   }
   // Create loss function
   TestLoss loss;
-  Score* score = new LinearScore;
+  //Score* score = new LinearScore;
+  Score* score = new LinearScoreFtrl;
   size_t threadNumber = std::thread::hardware_concurrency();
   ThreadPool* pool = new ThreadPool(threadNumber);
   loss.Initialize(score, pool);
