@@ -32,7 +32,11 @@ The training data - `small_train.txt` and testing data `small_test.txt` (in the 
     ffm_model.setTest("./small_test.txt")
     ffm_model.predict("model.out", "output")
 
- The above code shows how to use xLearn python API to train model and make prediction.
+ The above code shows how to use xLearn python API to train model and make prediction. In this example, we use ffm to solve the binary classification problem.
+
+#### Create model
+
+
 
   [1]: install.md
   [2]: https://www.kaggle.com/c/criteo-display-ad-challenge
