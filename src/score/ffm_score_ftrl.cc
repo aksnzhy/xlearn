@@ -93,10 +93,10 @@ void FFMScoreFtrl::CalcGrad(const SparseRow* row,
    *********************************************************/
   real_t sqrt_norm = sqrt(norm);
   real_t *w = model.GetParameter_w();
-  real_t alpha = 1.0;
+  real_t alpha = 0.01;
   real_t beta = 1.0;
-  real_t lambda1 = 1.0;
-  real_t lambda2 = 1.0;
+  real_t lambda1 = 2.0;
+  real_t lambda2 = 4.0;
 
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
@@ -111,13 +111,13 @@ void FFMScoreFtrl::CalcGrad(const SparseRow* row,
                    / alpha;
     w[idx_z] += gradient - sigma * w[idx_w];
     if (std::abs(w[idx_z]) <= lambda1) {
-      w[idx_w] = 0;
+      w[idx_w] = 0.0;
     } else {
       real_t smooth_lr = 1.0f
-        / (lambda2 + (beta + std::sqrt(w[idx_n])) / alpha);
+                         / (lambda2 + (beta + std::sqrt(w[idx_n])) / alpha);
       if (w[idx_z] < 0.0) {
         w[idx_z] += lambda1;
-      } else {
+      } else if (w[idx_z] > 0.0) {
         w[idx_z] -= lambda1;
       }
       w[idx_w] = -1.0f * smooth_lr * w[idx_z];
@@ -126,10 +126,23 @@ void FFMScoreFtrl::CalcGrad(const SparseRow* row,
   // bias
   w = model.GetParameter_b();
   real_t &wb = w[0];
-  real_t &wbg = w[1];
+  real_t &wbn = w[1];
+  real_t &wbz = w[2];
   real_t g = pg;
-  wbg += g*g;
-  wb -= learning_rate_ * g * InvSqrt(wbg);
+  wbn += g*g;
+  if (std::abs(wbz) <= lambda1) {
+    wb = 0.0f;
+  } else {
+    real_t smooth_lr = 1.0f
+      / (lambda2 + (beta + std::sqrt(wbn)) / alpha);
+    if (wbz < 0.0) {
+      wbz += lambda1;
+    } else if (wbz > 0.0) {
+      wbz -= lambda1;
+    }
+    wb = -1.0f * smooth_lr * wbz;
+  }
+
   /*********************************************************
    *  latent factor                                        *
    *********************************************************/
@@ -138,9 +151,7 @@ void FFMScoreFtrl::CalcGrad(const SparseRow* row,
   index_t align = kAlign * 3;
   w = model.GetParameter_v();
   __m128 XMMpg = _mm_set1_ps(pg);
-  __m128 XMMlr = _mm_set1_ps(learning_rate_);
-  __m128 XMMlamb = _mm_set1_ps(regu_lambda_);
-  __m128 XMMcoef = _mm_set1_ps(1.0);
+  __m128 XMMcoef = _mm_set1_ps(-1.0);
   __m128 XMMalpha = _mm_set1_ps(alpha);
   __m128 XMMbeta = _mm_set1_ps(beta);
   __m128 XMMlambda1 = _mm_set1_ps(lambda1);
@@ -179,17 +190,20 @@ void FFMScoreFtrl::CalcGrad(const SparseRow* row,
         __m128 XMMold_n2 = XMMn2;
         XMMn1 = _mm_add_ps(XMMn1, _mm_mul_ps(XMMg1, XMMg1));
         XMMn2 = _mm_add_ps(XMMn2, _mm_mul_ps(XMMg2, XMMg2));
- 
-        __m128 XMMsigma1 = _mm_div_ps(
-                          _mm_mul_ps(XMMcoef,
-                          _mm_sub_ps(_mm_rsqrt_ps(XMMn1),
-                          _mm_rsqrt_ps(XMMold_n1))), XMMalpha);
-        __m128 XMMsigma2 = _mm_div_ps(
-                           _mm_mul_ps(XMMcoef,
-                           _mm_sub_ps(_mm_rsqrt_ps(XMMn2),
-                           _mm_rsqrt_ps(XMMold_n2))), XMMalpha);
-        XMMz1 = _mm_add_ps(XMMz1, XMMsigma1);
-        XMMz2 = _mm_add_ps(XMMz2, XMMsigma2);
+        __m128 XMMsigma1 = _mm_mul_ps(XMMw1,
+                           _mm_div_ps(
+                           _mm_sub_ps(
+                           _mm_rsqrt_ps(XMMn1),
+                           _mm_rsqrt_ps(XMMold_n1)), XMMalpha));
+        __m128 XMMsigma2 = _mm_mul_ps(XMMw2,
+                           _mm_div_ps(
+                           _mm_sub_ps(
+                           _mm_rsqrt_ps(XMMn2),
+                           _mm_rsqrt_ps(XMMold_n2)), XMMalpha));
+        XMMz1 = _mm_sub_ps(
+                _mm_add_ps(XMMz1,XMMg1),  XMMsigma1);
+        XMMz2 = _mm_sub_ps(
+                _mm_add_ps(XMMz2,XMMg2),  XMMsigma2);
 
         static const union {
           int i[4];
@@ -207,13 +221,15 @@ void FFMScoreFtrl::CalcGrad(const SparseRow* row,
           __m128 XMMsmooth_lr = _mm_rcp_ps(
                                 _mm_add_ps(XMMlambda2,
                                 _mm_div_ps(
-                                _mm_add_ps(XMMbeta,+
+                                _mm_add_ps(XMMbeta,
                                 _mm_rsqrt_ps(XMMn1)),XMMalpha)));
-          real_t* comp_z_zero;
-          _mm_store_ps(comp_z_zero, _mm_cmplt_ps(XMMz1, XMMzero));
-          if (comp_z_zero) {
+          real_t* comp_z_lt_zero;
+          _mm_store_ps(comp_z_lt_zero, _mm_cmplt_ps(XMMz1, XMMzero));
+          real_t* comp_z_gt_zero;
+          _mm_store_ps(comp_z_gt_zero, _mm_cmplt_ps(XMMzero, XMMz1));
+          if (comp_z_lt_zero) {
             XMMz1 = _mm_add_ps(XMMz1, XMMlambda1);
-          } else {
+          } else if(comp_z_gt_zero) {
             XMMz1 = _mm_sub_ps(XMMz1, XMMlambda1);
           }
           XMMw1 = _mm_mul_ps(XMMcoef,
@@ -228,11 +244,13 @@ void FFMScoreFtrl::CalcGrad(const SparseRow* row,
                                 _mm_div_ps(
                                 _mm_add_ps(XMMbeta,
                                 _mm_rsqrt_ps(XMMn2)),XMMalpha)));
-          real_t* comp_z_zero;
-          _mm_store_ps(comp_z_zero, _mm_cmplt_ps(XMMz2, XMMzero));
-          if (comp_z_zero) {
+          real_t* comp_z_lt_zero;
+          _mm_store_ps(comp_z_lt_zero, _mm_cmplt_ps(XMMz2, XMMzero));
+          real_t* comp_z_gt_zero;
+          _mm_store_ps(comp_z_gt_zero, _mm_cmplt_ps(XMMzero, XMMz2));
+          if (comp_z_lt_zero) {
             XMMz2 = _mm_add_ps(XMMz2, XMMlambda1);
-          } else {
+          } else if (comp_z_gt_zero) {
             XMMz2 = _mm_sub_ps(XMMz2, XMMlambda1);
           }
           XMMw2 = _mm_mul_ps(XMMcoef,
