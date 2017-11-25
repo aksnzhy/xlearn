@@ -44,12 +44,10 @@ real_t FMScoreFtrl::CalcScore(const SparseRow* row,
   // bias
   w = model.GetParameter_b();
   t += w[0];
-  std::cout << "t = " << t << std::endl;
   /*********************************************************
    *  latent factor                                        *
    *********************************************************/
   index_t aligned_k = model.get_aligned_k();
-  std::cout << "aligned_k = " << aligned_k << std::endl;
   index_t align0 = model.get_aligned_k() * 3;
   std::vector<real_t> sv(aligned_k, 0);
   real_t* s = sv.data();
@@ -78,7 +76,7 @@ real_t FMScoreFtrl::CalcScore(const SparseRow* row,
       __m128 XMMw = _mm_load_ps(w+d);
       __m128 XMMwv = _mm_mul_ps(XMMw, XMMv);
       XMMt = _mm_add_ps(XMMt,
-         _mm_mul_ps(XMMwv, _mm_sub_ps(XMMs, XMMwv)));
+             _mm_mul_ps(XMMwv, _mm_sub_ps(XMMs, XMMwv)));
     }
   }
   XMMt = _mm_hadd_ps(XMMt, XMMt);

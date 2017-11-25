@@ -67,7 +67,9 @@ TEST(FMScoreFtrlTest, calc_score) {
       for(index_t d = model.GetNumK(); d < k_aligned; d++, v++)
         *v = 0.0;
       for(index_t d = k_aligned; d < 2*k_aligned; d++, v++)
-        *v = 0.0;
+        *v = 1.0;
+      for(index_t d = 2*k_aligned; d < 3*k_aligned; d++, v++)
+        *v = 1.0;
     }
     model.GetParameter_b()[0] = 0.0;
     FMScoreFtrl score;
