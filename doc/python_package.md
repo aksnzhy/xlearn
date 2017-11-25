@@ -32,7 +32,68 @@ The training data - `small_train.txt` and testing data `small_test.txt` (in the 
     ffm_model.setTest("./small_test.txt")
     ffm_model.predict("model.out", "output")
 
- The above code shows how to use xLearn python API to train model and make prediction.
+ The above code shows how to use xLearn python API to train model and make prediction. In this example, we use ffm to solve the binary classification problem.
+
+#### Create model
+
+We can creat a model by using `xlearn.create_xxx()` function:
+
+    # Create linear model
+    create_linear()
+    # Create factorization machine
+    create_fm()
+    # Create field-aware factorization machine
+    create_ffm()
+
+#### Set data
+
+We can set training data, validation data, and testing data by using the following functions:
+
+    setTrain("file_name")
+    setValidate("file_name")
+    setTest("file_name")
+
+#### Hyper-parameters
+
+We can set hyper-parameters to xLearn by using a python `dictionary`:
+
+    param = { 'task':'binary',   # ‘reg’ for regression task
+              'metric':'auc',
+              'lr':0.2,
+              'k':4,
+              'lambda':0.0002
+              'init':0.66,
+              'epoch':10,
+              'fold':5}
+
+#### The other set funtions
+
+We can also use some other set funtions:
+
+    setQuiet()
+    disableNorm()
+    disableLockFree()
+    disableEarlyStop()
+    disableSign()
+    disableSigmoid()
+
+#### Train model
+
+We can train our model by using `fit()` function:
+
+    fit(param, "model_output")
+
+#### Cross-Validation
+
+We can also perform cross-validation by using `cv()` function:
+
+    cv(param)
+
+#### Predict
+
+We can perform prediction by using `predict()` function:
+
+    predict("model_file", "output_file")
 
   [1]: install.md
   [2]: https://www.kaggle.com/c/criteo-display-ad-challenge

@@ -5,7 +5,7 @@
 [![Travis](https://img.shields.io/travis/rust-lang/rust.svg)]()
 
 [Installation](doc/install.md) |
-[Toturial](doc/toturial.md) |
+[Tutorial](doc/tutorial.md) |
 [RoadMap](doc/roadmap.md) |
 [Release Notes](doc/news.md) 
 
