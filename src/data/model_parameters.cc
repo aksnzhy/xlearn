@@ -107,10 +107,10 @@ void Model::initial(bool set_val) {
   }
   // set value for model
   if (set_val) {
-    if (algo_method_.compare("adagrad") == 0){
-      set_value();
-    } else if (algo_method_.compare("ftrl") == 0) {
+    if (algo_method_.compare("ftrl") == 0) {
       set_ftrl_value();
+    } else if (algo_method_.compare("adagrad") == 0) {
+      set_value();
     }
   }
 }
@@ -170,29 +170,29 @@ void Model::set_value() {
 void Model::set_ftrl_value() {
   std::default_random_engine generator;
   std::uniform_real_distribution<real_t> dis(0.0, 1.0);
+  real_t coef = 1.0f / sqrt(num_K_) * scale_;
 
   for (index_t i = 0; i < param_num_w_; i += 3) {
-    param_w_[i] = 0;
+    param_w_[i] = 0.0;
     param_w_[i+1] = 1.0;
-    param_w_[i+2] = 0.0;
+    param_w_[i+2] = 1.0;
   }
-  param_b_[0] = 0;
+  param_b_[0] = 0.0;
   param_b_[1] = 1.0;
-  param_b_[2] = 0.0;
+  param_b_[2] = 1.0;
 
   if (score_func_.compare("fm") == 0) {
     index_t k_aligned = get_aligned_k();
-    real_t coef = 1.0f / sqrt(num_K_) * scale_;
     real_t* w = param_v_;
     for (index_t j = 0; j < num_feat_; ++j) {
       for (index_t d = 0; d < num_K_; d++, w++)
         *w = coef * dis(generator);
       for (index_t d = num_K_; d < k_aligned; d++, w++)
-        *w = 0;
+        *w = 0.0;
       for (index_t d = k_aligned; d < 2*k_aligned; d++, w++)
         *w = 1.0;
       for (index_t d = 2*k_aligned; d < 3*k_aligned; d++, w++)
-        *w = 0.0;
+        *w = 1.0;
     }
   }
   else if (score_func_.compare("ffm") == 0) {
@@ -204,14 +204,16 @@ void Model::set_ftrl_value() {
         for (index_t d = 0; d < k_aligned; ) {
           for (index_t s = 0; s < kAlign; s++, w++, d++) {
             w[0] = (d < num_K_) ? coef * dis(generator) : 0.0;
-            w[kAlign] = 1.0;
+            w[kAlign] = 0.001 * coef * dis(generator);
+            //w[kAlign] = 1.0;
+            w[kAlign * 2] = 0.001 * coef * dis(generator);
+            //w[kAlign * 2] = 1.0; 
           }
-          w += kAlign;
+          w += 2 * kAlign;
         }
       }
     }
   }
-
 }
 
 // Free the allocated memory
