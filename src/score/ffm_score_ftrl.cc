@@ -35,11 +35,10 @@ real_t FFMScoreFtrl::CalcScore(const SparseRow* row,
    *  linear term and bias term                            *
    *********************************************************/
   real_t sum_w = 0;
-  real_t sqrt_norm = sqrt(norm);
   real_t *w = model.GetParameter_w();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
-    sum_w += (iter->feat_val * w[iter->feat_id*3] * sqrt_norm);
+    sum_w += (iter->feat_val * w[iter->feat_id*3]);
   }
   // bias
   w = model.GetParameter_b();
@@ -64,7 +63,7 @@ real_t FFMScoreFtrl::CalcScore(const SparseRow* row,
       real_t v2 = iter_j->feat_val;
       real_t* w1_base = w + j1*align1 + f2*align0;
       real_t* w2_base = w + j2*align1 + f1*align0;
-      __m128 XMMv = _mm_set1_ps(v1*v2*norm);
+      __m128 XMMv = _mm_set1_ps(v1*v2);
       for (index_t d = 0; d < align0; d += align) {
         __m128 XMMw1 = _mm_load_ps(w1_base + d);
         __m128 XMMw2 = _mm_load_ps(w2_base + d);
@@ -91,11 +90,10 @@ void FFMScoreFtrl::CalcGrad(const SparseRow* row,
   /*********************************************************
    *  linear term and bias term                            *
    *********************************************************/
-  real_t sqrt_norm = sqrt(norm);
   real_t *w = model.GetParameter_w();
-  real_t alpha = .01;
-  real_t beta = 0.1;
-  real_t lambda1 = 1.0;
+  real_t alpha = 0.1;
+  real_t beta = 2.0;
+  real_t lambda1 = 0.0001;
   real_t lambda2 = 0.0;
 
   for (SparseRow::const_iterator iter = row->begin();

@@ -34,12 +34,11 @@ real_t FMScoreFtrl::CalcScore(const SparseRow* row,
   /*********************************************************
    *  linear term and bias term                            *
    *********************************************************/
-  real_t sqrt_norm = sqrt(norm);
   real_t *w = model.GetParameter_w();
   real_t t = 0;
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
-    t += (iter->feat_val * w[iter->feat_id*3] * sqrt_norm);
+    t += (iter->feat_val * w[iter->feat_id*3]);
   }
   // bias
   w = model.GetParameter_b();
@@ -56,7 +55,7 @@ real_t FMScoreFtrl::CalcScore(const SparseRow* row,
     index_t j1 = iter->feat_id;
     real_t v1 = iter->feat_val;
     real_t *w = model.GetParameter_v() + j1 * align0;
-    __m128 XMMv = _mm_set1_ps(v1*norm);
+    __m128 XMMv = _mm_set1_ps(v1);
     for (index_t d = 0; d < aligned_k; d += kAlign) {
       __m128 XMMs = _mm_load_ps(s+d);
       __m128 const XMMw = _mm_load_ps(w+d);
@@ -70,7 +69,7 @@ real_t FMScoreFtrl::CalcScore(const SparseRow* row,
     index_t j1 = iter->feat_id;
     real_t v1 = iter->feat_val;
     real_t *w = model.GetParameter_v() + j1 * align0;
-    __m128 XMMv = _mm_set1_ps(v1*norm);
+    __m128 XMMv = _mm_set1_ps(v1);
     for (index_t d = 0; d < aligned_k; d += kAlign) {
       __m128 XMMs = _mm_load_ps(s+d);
       __m128 XMMw = _mm_load_ps(w+d);
@@ -97,11 +96,10 @@ void FMScoreFtrl::CalcGrad(const SparseRow* row,
   /*********************************************************
    *  linear term and bias term                            *
    *********************************************************/
-  real_t sqrt_norm = sqrt(norm);
   real_t *w = model.GetParameter_w();
-  real_t alpha = 0.01;
-  real_t beta = 0.1;
-  real_t lambda1 = 1.0;
+  real_t alpha = 0.1;
+  real_t beta = 2.0;
+  real_t lambda1 = 0.0001;
   real_t lambda2 = 0.0;
   for (SparseRow::const_iterator iter = row->begin();
       iter != row->end(); ++iter) {
@@ -162,7 +160,7 @@ void FMScoreFtrl::CalcGrad(const SparseRow* row,
     index_t j1 = iter->feat_id;
     real_t v1 = iter->feat_val;
     real_t *w = model.GetParameter_v() + j1 * align0;
-    __m128 XMMv = _mm_set1_ps(v1*norm);
+    __m128 XMMv = _mm_set1_ps(v1);
     for (index_t d = 0; d < aligned_k; d += kAlign) {
       __m128 XMMs = _mm_load_ps(s+d);
       __m128 const XMMw = _mm_load_ps(w+d);
@@ -181,7 +179,7 @@ void FMScoreFtrl::CalcGrad(const SparseRow* row,
     index_t j1 = iter->feat_id;
     real_t v1 = iter->feat_val;
     real_t *w = model.GetParameter_v() + j1 * align0;
-    __m128 XMMv = _mm_set1_ps(v1*norm);
+    __m128 XMMv = _mm_set1_ps(v1);
     __m128 XMMpgv = _mm_mul_ps(XMMpg, XMMv);
     for(index_t d = 0; d < aligned_k; d += kAlign) {
       __m128 XMMs = _mm_load_ps(s+d);

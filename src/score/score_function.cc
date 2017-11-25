@@ -34,7 +34,7 @@ namespace xLearn {
 //------------------------------------------------------------------------------
 CLASS_REGISTER_IMPLEMENT_REGISTRY(xLearn_score_registry, Score);
 REGISTER_SCORE("linear", LinearScore);
-REGISTER_SCORE("linear", LinearScoreFtrl);
+//REGISTER_SCORE("linear", LinearScoreFtrl);
 REGISTER_SCORE("fm", FMScore);
 REGISTER_SCORE("fm", FMScoreFtrl);
 REGISTER_SCORE("ffm", FFMScore);

@@ -45,10 +45,10 @@ void LinearScoreFtrl::CalcGrad(const SparseRow* row,
                            Model& model,
                            real_t pg,
                            real_t norm) {
-  real_t alpha = 1.0;
-  real_t beta = 1.0;
-  real_t lambda1 = 1.0;
-  real_t lambda2 = 1.0;
+  real_t alpha = 0.1;
+  real_t beta = 2.0;
+  real_t lambda1 = 0.0001;
+  real_t lambda2 = 0.0;
   real_t* w = model.GetParameter_w();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
@@ -61,8 +61,6 @@ void LinearScoreFtrl::CalcGrad(const SparseRow* row,
     real_t sigma = 1.0f * (std::sqrt(w[idx_n]) - sqrt(old_n))
                     / alpha;
     w[idx_z] += gradient - sigma * w[idx_w];
-    // above had calculate n_i and z_i
-    // below update gradient by n_i and z_i
     if (std::abs(w[idx_z]) <= lambda1) {
       w[idx_w] = 0.0;
     } else {
