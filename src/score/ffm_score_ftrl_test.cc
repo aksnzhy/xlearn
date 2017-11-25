@@ -68,8 +68,9 @@ TEST(FFMScoreFtrl_Test, calc_score) {
           for (index_t s = 0; s < kAlign; s++, v++, d++) {
             v[0] = (d < model.GetNumK()) ? 1.0 : 0.0;
             v[kAlign] = 1.0;
+            v[kAlign] = 1.0;
           }
-          v += kAlign;
+          v += 2*kAlign;
         }
       }
     }
