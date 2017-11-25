@@ -86,7 +86,7 @@ We set the number of epoch by using `-e` option, for example:
 
     ./xlearn_train ./small_train.txt -s 2 -v ./small_test.txt -e 15
 
-#### Corss-validation
+#### Cross-validation
 
 We can use cross-validation in xLearn by setting the `--cv` option, for example:
 
