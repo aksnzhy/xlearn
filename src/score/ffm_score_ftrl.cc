@@ -94,9 +94,9 @@ void FFMScoreFtrl::CalcGrad(const SparseRow* row,
   real_t sqrt_norm = sqrt(norm);
   real_t *w = model.GetParameter_w();
   real_t alpha = .01;
-  real_t beta = 1.0;
+  real_t beta = 0.1;
   real_t lambda1 = 1.0;
-  real_t lambda2 = 1.0;
+  real_t lambda2 = 0.0;
 
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
