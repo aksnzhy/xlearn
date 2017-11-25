@@ -218,7 +218,7 @@ void FMScoreFtrl::CalcGrad(const SparseRow* row,
         real_t* comp_z_lt_zero;
         _mm_store_ps(comp_z_lt_zero, _mm_cmplt_ps(XMMz, XMMzero));
         real_t* comp_z_gt_zero;
-        _mm_store_ps(comp_z_gt_zero, _mm_cmpgt_ps(XMMz, XMMzero));
+        _mm_store_ps(comp_z_gt_zero, _mm_cmpgt_ps(XMMzero, XMMz));
         if (comp_z_lt_zero) {
           XMMz = _mm_add_ps(XMMz, XMMlambda1);
         } else if(comp_z_gt_zero) {
