@@ -93,10 +93,10 @@ void FFMScoreFtrl::CalcGrad(const SparseRow* row,
    *********************************************************/
   real_t sqrt_norm = sqrt(norm);
   real_t *w = model.GetParameter_w();
-  real_t alpha = 0.01;
+  real_t alpha = .01;
   real_t beta = 1.0;
-  real_t lambda1 = 2.0;
-  real_t lambda2 = 4.0;
+  real_t lambda1 = 1.0;
+  real_t lambda2 = 1.0;
 
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
@@ -213,23 +213,21 @@ void FFMScoreFtrl::CalcGrad(const SparseRow* row,
                               _mm_and_ps(XMMz1, __mm_abs_mask_cheat_ps.m));
         __m128 XMMcomp_res2 = _mm_cmplt_ps(XMMlambda2,
                               _mm_and_ps(XMMz2, __mm_abs_mask_cheat_ps.m));
-        real_t* comp_res1;
+
+
         _mm_store_ps(comp_res1, XMMcomp_res1);
-        real_t* comp_res2;
         _mm_store_ps(comp_res2, XMMcomp_res2);
-        if (comp_res1) {
+        if (*comp_res1) {
           __m128 XMMsmooth_lr = _mm_rcp_ps(
                                 _mm_add_ps(XMMlambda2,
                                 _mm_div_ps(
                                 _mm_add_ps(XMMbeta,
                                 _mm_rsqrt_ps(XMMn1)),XMMalpha)));
-          real_t* comp_z_lt_zero;
           _mm_store_ps(comp_z_lt_zero, _mm_cmplt_ps(XMMz1, XMMzero));
-          real_t* comp_z_gt_zero;
           _mm_store_ps(comp_z_gt_zero, _mm_cmplt_ps(XMMzero, XMMz1));
-          if (comp_z_lt_zero) {
+          if (*comp_z_lt_zero) {
             XMMz1 = _mm_add_ps(XMMz1, XMMlambda1);
-          } else if(comp_z_gt_zero) {
+          } else if(*comp_z_gt_zero) {
             XMMz1 = _mm_sub_ps(XMMz1, XMMlambda1);
           }
           XMMw1 = _mm_mul_ps(XMMcoef,
@@ -238,19 +236,17 @@ void FFMScoreFtrl::CalcGrad(const SparseRow* row,
           XMMw1 = _mm_set1_ps(0.0);
         }
 
-        if (comp_res2) {
+        if (*comp_res2) {
           __m128 XMMsmooth_lr = _mm_rcp_ps(
                                 _mm_add_ps(XMMlambda2,
                                 _mm_div_ps(
                                 _mm_add_ps(XMMbeta,
                                 _mm_rsqrt_ps(XMMn2)),XMMalpha)));
-          real_t* comp_z_lt_zero;
           _mm_store_ps(comp_z_lt_zero, _mm_cmplt_ps(XMMz2, XMMzero));
-          real_t* comp_z_gt_zero;
           _mm_store_ps(comp_z_gt_zero, _mm_cmplt_ps(XMMzero, XMMz2));
-          if (comp_z_lt_zero) {
+          if (*comp_z_lt_zero) {
             XMMz2 = _mm_add_ps(XMMz2, XMMlambda1);
-          } else if (comp_z_gt_zero) {
+          } else if (*comp_z_gt_zero) {
             XMMz2 = _mm_sub_ps(XMMz2, XMMlambda1);
           }
           XMMw2 = _mm_mul_ps(XMMcoef,
