@@ -35,8 +35,14 @@ target_link_libraries(linear_score_ftrl_test gtest_main ${LIBS})
 add_executable(fm_score_test fm_score_test.cc)
 target_link_libraries(fm_score_test gtest_main ${LIBS})
 
+add_executable(fm_score_ftrl_test fm_score_ftrl_test.cc)
+target_link_libraries(fm_score_ftrl_test gtest_main ${LIBS})
+
 add_executable(ffm_score_test ffm_score_test.cc)
 target_link_libraries(ffm_score_test gtest_main ${LIBS})
+
+add_executable(ffm_score_ftrl_test ffm_score_ftrl_test.cc)
+target_link_libraries(ffm_score_ftrl_test gtest_main ${LIBS})
 
 # Install library and header files
 install(TARGETS score DESTINATION lib/score)
