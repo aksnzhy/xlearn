@@ -99,10 +99,10 @@ void FMScoreFtrl::CalcGrad(const SparseRow* row,
    *********************************************************/
   real_t sqrt_norm = sqrt(norm);
   real_t *w = model.GetParameter_w();
-  real_t alpha = .01;
-  real_t beta = 1.0;
-  real_t lambda1 = 2.0;
-  real_t lambda2 = 4.0;
+  real_t alpha = 0.01;
+  real_t beta = 0.1;
+  real_t lambda1 = 1.0;
+  real_t lambda2 = 0.0;
   for (SparseRow::const_iterator iter = row->begin();
       iter != row->end(); ++iter) {
     real_t gradient = pg * iter->feat_val;
@@ -207,7 +207,6 @@ void FMScoreFtrl::CalcGrad(const SparseRow* row,
       __m128 XMMcomp_res = _mm_cmplt_ps(XMMlambda1,
                            _mm_and_ps(XMMz,
                           __mm_abs_mask_cheat_ps.m));
-      real_t* comp_res;
       _mm_store_ps(comp_res, XMMcomp_res);
       if (comp_res) {
         __m128 XMMsmooth_lr = _mm_rcp_ps(
@@ -215,9 +214,7 @@ void FMScoreFtrl::CalcGrad(const SparseRow* row,
                               _mm_div_ps(
                               _mm_add_ps(XMMbeta,
                               _mm_rsqrt_ps(XMMn)),XMMalpha)));
-        real_t* comp_z_lt_zero;
         _mm_store_ps(comp_z_lt_zero, _mm_cmplt_ps(XMMz, XMMzero));
-        real_t* comp_z_gt_zero;
         _mm_store_ps(comp_z_gt_zero, _mm_cmpgt_ps(XMMzero, XMMz));
         if (comp_z_lt_zero) {
           XMMz = _mm_add_ps(XMMz, XMMlambda1);
