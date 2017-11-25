@@ -44,7 +44,7 @@ class XLearn(object):
 					c_str(key), ctypes.c_float(value)))
 			elif key == 'k':
 				_check_call(_LIB.XLearnSetInt(ctypes.byref(self.handle), 
-					c_str(key), ctype.c_uint(value)))
+					c_str(key), ctypes.c_uint(value)))
 			elif key == 'lambda':
 				_check_call(_LIB.XLearnSetFloat(ctypes.byref(self.handle), 
 					c_str(key), ctypes.c_float(value)))
