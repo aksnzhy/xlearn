@@ -52,11 +52,11 @@ class XLearn(object):
 				_check_call(_LIB.XLearnSetFloat(ctypes.byref(self.handle), 
 					c_str(key), ctypes.c_float(value)))
 			elif key == 'epoch':
-				_check_call(_LIB(XLearnSetInt(ctypes.byref(self.handle), 
-					c_str(key), ctypes.c_uint(value))))
+				_check_call(_LIB.XLearnSetInt(ctypes.byref(self.handle), 
+					c_str(key), ctypes.c_uint(value)))
 			elif key == 'fold':
-				_check_call(_LIB(XLearnSetInt(ctypes.byref(self.handle), 
-					c_str(key), ctypes.c_uint(value))))
+				_check_call(_LIB.XLearnSetInt(ctypes.byref(self.handle), 
+					c_str(key), ctypes.c_uint(value)))
 			else:
 				raise Exception("Invalid key!", key)
 
