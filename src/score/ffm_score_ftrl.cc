@@ -38,7 +38,7 @@ real_t FFMScoreFtrl::CalcScore(const SparseRow* row,
   real_t *w = model.GetParameter_w();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
-    sum_w += (iter->feat_val * w[iter->feat_id*3]);
+    sum_w += iter->feat_val * w[iter->feat_id*3];
   }
   // bias
   w = model.GetParameter_b();
@@ -91,10 +91,10 @@ void FFMScoreFtrl::CalcGrad(const SparseRow* row,
    *  linear term and bias term                            *
    *********************************************************/
   real_t *w = model.GetParameter_w();
-  real_t alpha = 0.1;
-  real_t beta = 2.0;
-  real_t lambda1 = 0.0001;
-  real_t lambda2 = 0.0;
+  real_t alpha = 0.05;
+  real_t beta = 1.0;
+  real_t lambda1 = 0.00005;
+  real_t lambda2 = 15.0;
 
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {

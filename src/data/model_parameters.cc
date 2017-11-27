@@ -204,10 +204,8 @@ void Model::set_ftrl_value() {
         for (index_t d = 0; d < k_aligned; ) {
           for (index_t s = 0; s < kAlign; s++, w++, d++) {
             w[0] = (d < num_K_) ? coef * dis(generator) : 0.0;
-            w[kAlign] = 0.001 * coef * dis(generator);
-            //w[kAlign] = 1.0;
-            w[kAlign * 2] = 0.001 * coef * dis(generator);
-            //w[kAlign * 2] = 1.0; 
+            w[kAlign] = 1.0;
+            w[kAlign * 2] = 1.0;
           }
           w += 2 * kAlign;
         }

@@ -97,10 +97,10 @@ void FMScoreFtrl::CalcGrad(const SparseRow* row,
    *  linear term and bias term                            *
    *********************************************************/
   real_t *w = model.GetParameter_w();
-  real_t alpha = 0.1;
-  real_t beta = 2.0;
-  real_t lambda1 = 0.0001;
-  real_t lambda2 = 0.0;
+  real_t alpha = 2e-3;
+  real_t beta = 1.0;
+  real_t lambda1 = 0.000001;
+  real_t lambda2 = 1.0;
   for (SparseRow::const_iterator iter = row->begin();
       iter != row->end(); ++iter) {
     real_t gradient = pg * iter->feat_val;
