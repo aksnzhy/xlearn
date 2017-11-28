@@ -22,8 +22,8 @@ For now, xLearn can support three data format, including `libsvm`, `libffm`, and
        feat_1 feat_2 feat_3 ... feat_n y1
        feat_1 feat_2 feat_3 ... feat_n y2
 
-Note that the CSV format can only be used in linear amd fm model. For ffm, users need to convert their data to libffm format.
-Also, when using csv, users need to add a dummy `y` at the end of the test data in every line. 
+Note that the CSV format can only be used in linear amd fm model. For ffm, users need to convert their data to libffm format. 
+*Also, when using csv, users need to add a dummy `y` at the end of the test data in every line.*
    
 #### Quck start
 
