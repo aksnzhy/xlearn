@@ -51,7 +51,7 @@ and then build using the following commands:
 
     cd xlearn; mkdir build; cd build
     cmake ..
-    make -j4
+    make
 
 Actually you can just use the xLearn by command line now. You can use the follow scripts to test your building.
 
