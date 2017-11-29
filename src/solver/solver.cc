@@ -289,11 +289,17 @@ void Solver::init_train() {
   print_action("Initialize model ...");
   // Initialize parameters
   model_ = new Model();
+  if (hyper_param_.opt_type.compare("adagrad") == 0) {
+    hyper_param_.auxiliary_size = 2;
+  } else if (hyper_param_.opt_type.compare("ftrl") == 0) {
+    hyper_param_.auxiliary_size = 3;
+  }
   model_->Initialize(hyper_param_.score_func,
                    hyper_param_.loss_func,
                    hyper_param_.num_feature,
                    hyper_param_.num_field,
                    hyper_param_.num_K,
+                   hyper_param_.auxiliary_size,
                    hyper_param_.model_scale);
   index_t num_param = model_->GetNumParameter();
   hyper_param_.num_param = num_param;
@@ -311,7 +317,8 @@ void Solver::init_train() {
    *********************************************************/
   score_ = create_score();
   score_->Initialize(hyper_param_.learning_rate,
-                     hyper_param_.regu_lambda);
+                     hyper_param_.regu_lambda,
+                     hyper_param_.opt_type);
   LOG(INFO) << "Initialize score function.";
   /*********************************************************
    *  Initialize loss function                             *

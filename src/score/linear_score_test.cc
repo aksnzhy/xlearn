@@ -52,7 +52,7 @@ TEST_F(LinearScoreTest, calc_score) {
   model.Initialize(param.score_func,
                 param.loss_func,
                 param.num_feature,
-                0, 0);
+                0, 0, 2);
   real_t* w = model.GetParameter_w();
   index_t num_w = model.GetNumParameter_w();
   for (index_t i = 0; i < num_w; ++i) {

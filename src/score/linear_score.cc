@@ -45,6 +45,21 @@ void LinearScore::CalcGrad(const SparseRow* row,
                            Model& model,
                            real_t pg,
                            real_t norm) {
+  // Using adagrad
+  if (opt_type_.compare("adagrad") == 0) {
+    this->calc_grad_adagrad(row, model, pg, norm);
+  }
+  // Using ftrl 
+  else if (opt_type_.compare("ftrl") == 0) {
+    this->calc_grad_ftrl(row, model, pg, norm);
+  }
+}
+
+// Calculate gradient and update current model using adagrad
+void LinearScore::calc_grad_adagrad(const SparseRow* row,
+                                    Model& model,
+                                    real_t pg,
+                                    real_t norm) {
   real_t* w = model.GetParameter_w();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
@@ -63,6 +78,14 @@ void LinearScore::CalcGrad(const SparseRow* row,
   real_t g = pg;
   wbg += g*g;
   wb -= learning_rate_ * g * InvSqrt(wbg);
+}
+
+// Calculate gradient and update current model using ftrl
+void LinearScore::calc_grad_ftrl(const SparseRow* row,
+                                 Model& model,
+                                 real_t pg,
+                                 real_t norm) {
+  // TODO(xswang)
 }
 
 } // namespace xLearn

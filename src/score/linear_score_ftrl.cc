@@ -45,10 +45,10 @@ void LinearScoreFtrl::CalcGrad(const SparseRow* row,
                            Model& model,
                            real_t pg,
                            real_t norm) {
-  real_t alpha = 0.01;
+  real_t alpha = 0.003;
   real_t beta = 1.0;
-  real_t lambda1 = 0.1;
-  real_t lambda2 = 1.0;
+  real_t lambda1 = .00005;
+  real_t lambda2 = 15.0;
   real_t* w = model.GetParameter_w();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {

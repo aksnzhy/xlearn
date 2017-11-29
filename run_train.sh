@@ -17,5 +17,5 @@ echo "=====================================BigDataLR============================
 echo "=====================================BigDataFM================================="
 /Users/xiaoshuwang/documents/oneflow/opensource/xlearn/xlearn_build/xlearn_train ~/documents/data/libffm_toy/criteo.tr.r100.gbdt0.ffm -v ~/documents/data/libffm_toy/criteo.va.r100.gbdt0.ffm -s 1 -x auc --dis-es
 echo "=====================================BigDataFFM==============================="
-/Users/xiaoshuwang/documents/oneflow/opensource/xlearn/xlearn_build/xlearn_train ~/documents/data/libffm_toy/criteo.tr.r100.gbdt0.ffm -v ~/documents/data/libffm_toy/criteo.va.r100.gbdt0.ffm -s 2 -x auc --dis-es
+#/Users/xiaoshuwang/documents/oneflow/opensource/xlearn/xlearn_build/xlearn_train ~/documents/data/libffm_toy/criteo.tr.r100.gbdt0.ffm -v ~/documents/data/libffm_toy/criteo.va.r100.gbdt0.ffm -s 2 -x auc --dis-es
 

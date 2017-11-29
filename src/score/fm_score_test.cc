@@ -53,7 +53,7 @@ TEST(FMScoreTest, calc_score) {
                 param.loss_func,
                 param.num_feature,
                 param.num_field,
-                param.num_K);
+                param.num_K, 2);
     real_t* w = model.GetParameter_w();
     index_t num_w = model.GetNumParameter_w();
     for (index_t i = 0; i < num_w; ++i) {

@@ -37,6 +37,7 @@ HyperParam Init() {
   hyper_param.loss_func = "squared";
   hyper_param.num_feature = 10;
   hyper_param.num_K = 8;
+  hyper_param.auxiliary_size = 2;
   hyper_param.num_field = 10;
   hyper_param.model_file = "./test_model.bin";
   return hyper_param;
@@ -49,7 +50,8 @@ TEST(MODEL_TEST, Init_ffm) {
                     hyper_param.loss_func,
                     hyper_param.num_feature,
                     hyper_param.num_field,
-                    hyper_param.num_K);
+                    hyper_param.num_K,
+                    hyper_param.auxiliary_size);
   real_t* b = model_ffm.GetParameter_b();
   real_t* w = model_ffm.GetParameter_w();
   index_t param_num_w = hyper_param.num_feature * 2;
@@ -62,12 +64,20 @@ TEST(MODEL_TEST, Init_ffm) {
   EXPECT_EQ(param_num_v+param_num_w+2, model_ffm.GetNumParameter());
   EXPECT_FLOAT_EQ(b[0], 0);
   EXPECT_FLOAT_EQ(b[1], 1.0);
-  for (index_t i = 0; i < model_ffm.GetNumParameter_w(); i+=2) {
+  index_t len = model_ffm.GetNumParameter_w();
+  index_t aux_size = hyper_param.auxiliary_size;
+  for (index_t i = 0; i < len; i += aux_size) {
     EXPECT_FLOAT_EQ(w[i], 0.0);
-    EXPECT_FLOAT_EQ(w[i+1], 1.0);
+    for (index_t j = 1; j < aux_size; ++j) {
+      EXPECT_FLOAT_EQ(w[i+j], 1.0);
+    }
+
   }
-  for (index_t i = 0; i < model_ffm.GetNumParameter_v(); i+=(kAlign*2)) {
-    EXPECT_FLOAT_EQ(v[i+kAlign], 1.0);
+  len = model_ffm.GetNumParameter_v();
+  for (index_t i = 0; i < len; i+=(kAlign*aux_size)) {
+    for (index_t j = 1; j < aux_size; ++j) {
+      EXPECT_FLOAT_EQ(v[i+kAlign*j], 1.0);
+    }
   }
 }
 
@@ -79,7 +89,8 @@ TEST(MODEL_TEST, Init_fm) {
                     hyper_param.loss_func,
                     hyper_param.num_feature,
                     hyper_param.num_field,
-                    hyper_param.num_K,
+                    hyper_param.num_K, 
+                    hyper_param.auxiliary_size, 
                     0.5);
   real_t* b = model_fm.GetParameter_b();
   real_t* w = model_fm.GetParameter_w();
@@ -92,12 +103,16 @@ TEST(MODEL_TEST, Init_fm) {
   EXPECT_EQ(param_num_v+param_num_w+2, model_fm.GetNumParameter());
   EXPECT_FLOAT_EQ(b[0], 0);
   EXPECT_FLOAT_EQ(b[1], 1.0);
-  for (index_t i = 0; i < model_fm.GetNumParameter_w(); i+=2) {
+  index_t len = model_fm.GetNumParameter_w();
+  index_t aux_size = hyper_param.auxiliary_size;
+  for (index_t i = 0; i < len; i+=aux_size) {
     EXPECT_FLOAT_EQ(w[i], 0.0);
-    EXPECT_FLOAT_EQ(w[i+1], 1.0);
+    for (index_t j = 1; j < aux_size; ++j) {
+      EXPECT_FLOAT_EQ(w[i+j], 1.0);
+    }
   }
   index_t k_aligned = model_fm.get_aligned_k();
-  for (index_t i = k_aligned; i < param_num_v; i+=(2*k_aligned)) {
+  for (index_t i = k_aligned; i < param_num_v; i+=(aux_size*k_aligned)) {
     EXPECT_FLOAT_EQ(v[i], 1.0);
   }
 }
@@ -111,6 +126,7 @@ TEST(MODEL_TEST, Init_lr) {
                     hyper_param.num_feature,
                     hyper_param.num_field,
                     hyper_param.num_K,
+                    hyper_param.auxiliary_size, 
                     0.5);
   real_t* b = model_lr.GetParameter_b();
   real_t* w = model_lr.GetParameter_w();
@@ -122,9 +138,12 @@ TEST(MODEL_TEST, Init_lr) {
   EXPECT_EQ(param_num_v+param_num_w+2, model_lr.GetNumParameter());
   EXPECT_FLOAT_EQ(b[0], 0);
   EXPECT_FLOAT_EQ(b[1], 1.0);
-  for (index_t i = 0; i < model_lr.GetNumParameter_w(); i+=2) {
+  index_t aux_size = hyper_param.auxiliary_size;
+  for (index_t i = 0; i < model_lr.GetNumParameter_w(); i+=aux_size) {
     EXPECT_FLOAT_EQ(w[i], 0.0);
-    EXPECT_FLOAT_EQ(w[i+1], 1.0);
+    for (index_t j = 1; j < aux_size; ++j) {
+      EXPECT_FLOAT_EQ(w[i+j], 1.0);
+    }
   }
   EXPECT_EQ(v, nullptr);
 }
@@ -137,7 +156,8 @@ TEST(MODEL_TEST, Save_and_Load) {
                     hyper_param.loss_func,
                     hyper_param.num_feature,
                     hyper_param.num_field,
-                    hyper_param.num_K);
+                    hyper_param.num_K, 
+                    hyper_param.auxiliary_size);
   real_t* w = model_ffm.GetParameter_w();
   index_t w_len = model_ffm.GetNumParameter_w();
   for (int i = 0; i < w_len; ++i) {
@@ -167,6 +187,7 @@ TEST(MODEL_TEST, Save_and_Load) {
   EXPECT_EQ(hyper_param.num_K, new_model.GetNumK());
   EXPECT_EQ(hyper_param.num_feature, new_model.GetNumFeature());
   EXPECT_EQ(hyper_param.num_field, new_model.GetNumField());
+  EXPECT_EQ(hyper_param.auxiliary_size, new_model.GetAuxilarySize());
   EXPECT_FLOAT_EQ(b[0], 0);
   EXPECT_FLOAT_EQ(b[1], 1.0);
   for (int i = 0; i < w_len; ++i) {
@@ -186,7 +207,7 @@ TEST(MODEL_TEST, BestModel) {
                     hyper_param.loss_func,
                     hyper_param.num_feature,
                     hyper_param.num_field,
-                    hyper_param.num_K);
+                    hyper_param.num_K, 2);
   real_t* w = model_ffm.GetParameter_w();
   real_t* v = model_ffm.GetParameter_v();
   real_t* b = model_ffm.GetParameter_b();

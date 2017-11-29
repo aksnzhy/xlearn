@@ -94,6 +94,21 @@ void FMScore::CalcGrad(const SparseRow* row,
                        Model& model,
                        real_t pg,
                        real_t norm) {
+  // Using adagrad
+  if (opt_type_.compare("adagrad") == 0) {
+    this->calc_grad_adagrad(row, model, pg, norm);
+  }
+  // Using ftrl 
+  else if (opt_type_.compare("ftrl") == 0) {
+    this->calc_grad_ftrl(row, model, pg, norm);
+  }
+}
+
+// Calculate gradient and update current model using adagrad
+void FMScore::calc_grad_adagrad(const SparseRow* row,
+                                Model& model,
+                                real_t pg,
+                                real_t norm) {
   /*********************************************************
    *  linear term and bias term                            *
    *********************************************************/
@@ -159,6 +174,14 @@ void FMScore::CalcGrad(const SparseRow* row,
       _mm_store_ps(w+aligned_k+d, XMMwg);
     }
   }
+}
+
+// Calculate gradient and update current model using ftrl
+void FMScore::calc_grad_ftrl(const SparseRow* row,
+                             Model& model,
+                             real_t pg,
+                             real_t norm) {
+ // TODO(xswang)
 }
 
 } // namespace xLearn

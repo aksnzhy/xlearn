@@ -53,9 +53,11 @@ class Score {
 
   // Invoke this function before we use this class.
   virtual void Initialize(real_t learning_rate,
-                          real_t regu_lambda) {
+                          real_t regu_lambda,
+                          std::string& opt_type) {
     learning_rate_ = learning_rate;
     regu_lambda_ = regu_lambda;
+    opt_type_ = opt_type;
   }
 
   // Given one exmaple and current model, this method
@@ -74,6 +76,7 @@ class Score {
  protected:
   real_t learning_rate_;
   real_t regu_lambda_;
+  std::string opt_type_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Score);
