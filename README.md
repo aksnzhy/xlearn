@@ -7,7 +7,7 @@
 [Installation](doc/install.md) |
 [Tutorial](doc/tutorial.md) |
 [RoadMap](doc/roadmap.md) |
-[Release Notes](doc/news.md) 
+[News](doc/news.md) 
 
 ## What is xLearn?
 
