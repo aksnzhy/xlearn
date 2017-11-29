@@ -132,7 +132,7 @@ void FMScoreFtrl::CalcGrad(const SparseRow* row,
   real_t &wb = w[0];
   real_t &wbn = w[1];
   real_t &wbz = w[2];
-  real_t g = pg; // g = pg * iter->feat_val; ?
+  real_t g = -1.0 * pg; // g = pg * iter->feat_val; ?
   wbn += g*g;
   wbz += g;
   if (std::abs(wbz) <= lambda1) {

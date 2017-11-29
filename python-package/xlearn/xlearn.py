@@ -44,7 +44,7 @@ class XLearn(object):
 					c_str(key), ctypes.c_float(value)))
 			elif key == 'k':
 				_check_call(_LIB.XLearnSetInt(ctypes.byref(self.handle), 
-					c_str(key), ctype.c_uint(value)))
+					c_str(key), ctypes.c_uint(value)))
 			elif key == 'lambda':
 				_check_call(_LIB.XLearnSetFloat(ctypes.byref(self.handle), 
 					c_str(key), ctypes.c_float(value)))
@@ -52,11 +52,11 @@ class XLearn(object):
 				_check_call(_LIB.XLearnSetFloat(ctypes.byref(self.handle), 
 					c_str(key), ctypes.c_float(value)))
 			elif key == 'epoch':
-				_check_call(_LIB(XLearnSetInt(ctypes.byref(self.handle), 
-					c_str(key), ctypes.c_uint(value))))
+				_check_call(_LIB.XLearnSetInt(ctypes.byref(self.handle), 
+					c_str(key), ctypes.c_uint(value)))
 			elif key == 'fold':
-				_check_call(_LIB(XLearnSetInt(ctypes.byref(self.handle), 
-					c_str(key), ctypes.c_uint(value))))
+				_check_call(_LIB.XLearnSetInt(ctypes.byref(self.handle), 
+					c_str(key), ctypes.c_uint(value)))
 			else:
 				raise Exception("Invalid key!", key)
 
@@ -113,7 +113,7 @@ class XLearn(object):
 		_check_call(_LIB.XLearnSetBool(ctypes.byref(self.handle), 
 			c_str(key), ctypes.c_bool(False)))
 
-	def disLockFree(self):
+	def disableLockFree(self):
 		"""Disable lock free training"""
 		key = 'lock_free'
 		_check_call(_LIB.XLearnSetBool(ctypes.byref(self.handle), 

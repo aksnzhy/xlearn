@@ -6,6 +6,25 @@ Make sure that you have already installed the executable file (`xlearn_train` an
 
 The training data - `small_train.txt` and testing data - `small_test.txt` (in the root directory of your xlearn build package) is a portion of the whole data of criteo ctr prediction challenge in [kaggle][2].
 
+#### Data format
+
+For now, xLearn can support three data format, including `libsvm`, `libffm`, and `csv`. 
+
+    libsvm : 
+       y1 idx:value idx:value ...
+       y2 idx:value idx:value ...
+    
+    libffm:
+       y1 field:idx:value field:idx:value ...
+       y2 field:idx:value field:idx:value ...
+    
+    csv:
+       feat_1 feat_2 feat_3 ... feat_n y1
+       feat_1 feat_2 feat_3 ... feat_n y2
+
+Note that the CSV format can only be used in linear amd fm model. For ffm, users need to convert their data to libffm format. 
+**Also, when using csv, users need to add a dummy `y` at the end of the test data in every line.**
+   
 #### Quck start
 
 We can use `xlearn_train` to train our model.  Usage:  
@@ -86,13 +105,13 @@ We set the number of epoch by using `-e` option, for example:
 
     ./xlearn_train ./small_train.txt -s 2 -v ./small_test.txt -e 15
 
-#### Corss-validation
+#### Cross-validation
 
 We can use cross-validation in xLearn by setting the `--cv` option, for example:
 
     ./xlearn_train ./small_train.txt -s 2 --cv
 
-On default, we use 4-fold cross-validation. We can also the fold number by using `-f` option. For example:
+On default, we use 5-fold cross-validation. We can also the fold number by using `-f` option. For example:
 
     ./xlearn_train ./small_train.txt -s 2 -f 3 --cv
 
