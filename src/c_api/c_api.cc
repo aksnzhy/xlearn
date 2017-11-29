@@ -187,8 +187,8 @@ XL_DLL int XLearnSetStr(XLearnHandle *out,
 
 // Set int param
 XL_DLL int XLearnSetInt(XLearnHandle *out,
-	                    const char *key,
-	                    const int value) {
+	                      const char *key,
+	                      const int value) {
   API_BEGIN();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   if (strcmp(key, "k") == 0) {
