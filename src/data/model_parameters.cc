@@ -43,30 +43,33 @@ void Model::Initialize(const std::string& score_func,
                   index_t num_feature,
                   index_t num_field,
                   index_t num_K,
+                  index_t aux_size,
                   real_t scale) {
   CHECK(!score_func.empty());
   CHECK(!loss_func.empty());
   CHECK_GT(num_feature, 0);
   CHECK_GE(num_field, 0);
   CHECK_GE(num_K, 0);
+  CHECK_GE(aux_size, 0);
   CHECK_GT(scale, 0);
   score_func_ = score_func;
   loss_func_ = loss_func;
   num_feat_ = num_feature;
   num_field_ = num_field;
   num_K_ = num_K;
+  auxiliary_size_ = aux_size;
   scale_ = scale;
   // Calculate the number of model parameters
-  param_num_w_ = num_feature * 2;
+  param_num_w_ = num_feature * auxiliary_size_;
   if (score_func == "linear") {
     param_num_v_ = 0;
   } else if (score_func == "fm") {
     param_num_v_ = num_feature *
-                   get_aligned_k() * 2;
+                   get_aligned_k() * auxiliary_size_;
   } else if (score_func == "ffm") {
     param_num_v_ = num_feature *
                    get_aligned_k() *
-                   num_field * 2;
+                   num_field * auxiliary_size_;
   } else {
     LOG(FATAL) << "Unknow score function: " << score_func;
   }
@@ -79,15 +82,15 @@ void Model::Initialize(const std::string& score_func,
 void Model::initial(bool set_val) {
   try {
     // Conventional malloc for linear term and bias
-    param_w_ = (real_t*)malloc(param_num_w_*sizeof(real_t));
-    param_b_ = (real_t*)malloc(2*sizeof(real_t));
+    param_w_ = (real_t*)malloc(param_num_w_ * sizeof(real_t));
+    param_b_ = (real_t*)malloc(auxiliary_size_ * sizeof(real_t));
     if (score_func_.compare("fm") == 0 ||
         score_func_.compare("ffm") == 0) {
       // Aligned malloc for latent factor
 #ifdef _WIN32
       param_v_ = _aligned_malloc(
-          param_num_v_ * sizeof(real_t),
-          kAlignByte);
+                 param_num_v_ * sizeof(real_t),
+                 kAlignByte);
 #else
       int ret = posix_memalign(
                 (void**)&param_v_,
@@ -120,10 +123,14 @@ void Model::set_value() {
    *********************************************************/
   for (index_t i = 0; i < param_num_w_; i += 2) {
     param_w_[i] = 0;      /* model */
-    param_w_[i+1] = 1.0;  /* gradient cache */
+    for (index_t j = 1; j < auxiliary_size_; ++j) {
+      param_w_[i+j] = 1.0;  /* gradient cache */
+    }
   }
   param_b_[0] = 0;    /* model */
-  param_b_[1] = 1.0;  /* gradient cache */
+  for (index_t j = 1; j < auxiliary_size_; ++j) {
+    param_b_[j] = 1.0;  /* gradient cache */
+  }
   /*********************************************************
    *  Initialize latent factor for fm                      *
    *********************************************************/
@@ -136,7 +143,7 @@ void Model::set_value() {
         *w = coef * dis(generator);
       for(index_t d = num_K_; d < k_aligned; d++, w++)
         *w = 0;
-      for(index_t d = k_aligned; d < 2*k_aligned; d++, w++)
+      for(index_t d = k_aligned; d < auxiliary_size_*k_aligned; d++, w++)
         *w = 1.0;
     }
   }
@@ -152,9 +159,11 @@ void Model::set_value() {
         for (index_t d = 0; d < k_aligned; ) {
           for (index_t s = 0; s < kAlign; s++, w++, d++) {
             w[0] = (d < num_K_) ? coef * dis(generator) : 0.0;
-            w[kAlign] = 1.0;
+            for (index_t j = 1; j < auxiliary_size_; ++j) {
+              w[kAlign * j] = 1.0;
+            }
           }
-          w += kAlign;
+          w += (auxiliary_size_-1) * kAlign;
         }
       }
     }
@@ -203,6 +212,8 @@ void Model::Serialize(const std::string& filename) {
   WriteDataToDisk(file, (char*)&num_field_, sizeof(num_field_));
   // Write K
   WriteDataToDisk(file, (char*)&num_K_, sizeof(num_K_));
+  // Write aux_size
+  WriteDataToDisk(file, (char*)&auxiliary_size_, sizeof(auxiliary_size_));
   // Write w
   this->serialize_w_v_b(file);
   Close(file);
@@ -223,6 +234,8 @@ bool Model::Deserialize(const std::string& filename) {
   ReadDataFromDisk(file, (char*)&num_field_, sizeof(num_field_));
   // Read K
   ReadDataFromDisk(file, (char*)&num_K_, sizeof(num_K_));
+  // Read aux_size
+  ReadDataFromDisk(file, (char*)&auxiliary_size_, sizeof(auxiliary_size_));
   // Read w
   this->deserialize_w_v_b(file);
   Close(file);

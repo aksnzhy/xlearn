@@ -65,6 +65,7 @@ class LossTest : public ::testing::Test {
     param.num_feature = 3;
     param.num_field = 3;
     param.num_K = 24;
+    param.auxiliary_size = 2;
   }
 };
 
@@ -75,7 +76,8 @@ TEST_F(LossTest, Predict_Linear) {
                   param.loss_func,
                   param.num_feature,
                   param.num_field,
-                  param.num_K);
+                  param.num_K,
+                  param.auxiliary_size);
   real_t* w = model_lr.GetParameter_w();
   index_t num_w = model_lr.GetNumParameter_w();
   for (size_t i = 0; i < num_w; ++i) {
@@ -113,7 +115,8 @@ TEST_F(LossTest, Predict_FM) {
                   param.loss_func,
                   param.num_feature,
                   param.num_field,
-                  param.num_K);
+                  param.num_K,
+                  param.auxiliary_size);
   real_t* w = model_fm.GetParameter_w();
   index_t num_w = model_fm.GetNumParameter_w();
   for (size_t i = 0; i < num_w; ++i) {
@@ -157,7 +160,8 @@ TEST_F(LossTest, Predict_FFM) {
                    param.loss_func,
                    param.num_feature,
                    param.num_field,
-                   param.num_K);
+                   param.num_K,
+                   param.auxiliary_size);
   real_t* w = model_ffm.GetParameter_w();
   index_t num_w = model_ffm.GetNumParameter_w();
   for (size_t i = 0; i < num_w; ++i) {

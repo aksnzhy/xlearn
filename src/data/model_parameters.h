@@ -45,9 +45,10 @@ namespace xLearn {
 //    hyper_param.score_func = "ffm";
 //    hyper_param.loss_func = "squared";
 //    hyper_param.num_feature = 10;
-//    hyper_param.num_K = 8;
+//    hyper_param.num_K = 8;  
 //    hyper_param.num_field = 10;
 //    hyper_param.model_scale = 0.66;
+//    hyper_param.auxiliary_size = 2;
 //
 //    Model model;
 //    model_ffm.Initialize(hyper_param.score_func,
@@ -55,6 +56,7 @@ namespace xLearn {
 //                     hyper_param.num_feature,
 //                     hyper_param.num_field,
 //                     hyper_param.num_K,
+//                     hyper_param.auxiliary_size,
 //                     hyper_param.model_scale);
 //
 //    /* We can get the parameter of the linear term: */
@@ -97,6 +99,7 @@ class Model {
               index_t num_feature,
               index_t num_field,
               index_t num_K,
+              index_t aux_size,
               real_t scale = 1.0);
 
   // Serialize model to a checkpoint file.
@@ -145,6 +148,9 @@ class Model {
   // Get the number of k.
   inline index_t GetNumK() { return num_K_; }
 
+  // Get the auxiliary cache size.
+  inline index_t GetAuxilarySize() { return auxiliary_size_; }
+
   // Get the aligned size of K.
   inline index_t get_aligned_k() {
     return (index_t)ceil((real_t)num_K_/kAlign)*kAlign;
@@ -184,6 +190,9 @@ class Model {
   Becasue we use SSE, so the real k should be aligned.
   User can get the aligned K by using get_aligned_k() */
   index_t  num_K_;
+  /* Auxiliary memory size for different optimization method
+  For 'adagrad' it equals 2 and 'ftrl' it equals 3 */
+  index_t auxiliary_size_;
   /* Storing the parameter of linear term */
   real_t*  param_w_ = nullptr;
   /* Storing the parameter of latent factor */

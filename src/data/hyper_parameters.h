@@ -65,6 +65,8 @@ struct HyperParam {
 //------------------------------------------------------------------------------
   /* Optimization method */
   std::string opt_type = "adagrad";
+  /* auxiliary size for gradient cache */
+  index_t auxiliary_size = 2;
   /* Learning rate */
   real_t learning_rate = 0.2;
   /* lambda for regularize. xLearn uses L2-regular */
