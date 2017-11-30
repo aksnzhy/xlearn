@@ -187,8 +187,8 @@ void FFMScore::calc_grad_ftrl(const SparseRow* row,
   **********************************************************/
   real_t alpha = 0.05;
   real_t beta = 1.0;
-  real_t lambda1 = 0.0;
-  real_t lambda2 = 0.0;
+  real_t lambda1 = 5e-5;
+  real_t lambda2 = 15.0;
   real_t *w = model.GetParameter_w();
 
   for (SparseRow::const_iterator iter = row->begin();
