@@ -182,7 +182,9 @@ void FFMScore::calc_grad_ftrl(const SparseRow* row,
                               Model& model,
                               real_t pg,
                               real_t norm) {
-  // TODO(xswang)
+  /*********************************************************
+  *    *  linear term and bias term                            *
+  **********************************************************/
   real_t alpha = 0.05;
   real_t beta = 1.0;
   real_t lambda1 = 0.0;
@@ -211,7 +213,7 @@ void FFMScore::calc_grad_ftrl(const SparseRow* row,
       w[idx_w] = -1.0f * smooth_lr * w[idx_z];
     }
   }
-
+  // bias
   w = model.GetParameter_b();
   real_t &wb = w[0];
   real_t &wbn = w[1];
@@ -231,6 +233,9 @@ void FFMScore::calc_grad_ftrl(const SparseRow* row,
     wb = -1.0f * smooth_lr * wbz;
   }
 
+  /*********************************************************
+  *    *  latent factor                                        *
+  **********************************************************/
   index_t align0 = 3 * model.get_aligned_k();
   index_t align1 = model.GetNumField() * align0;
   index_t align = kAlign * 3;

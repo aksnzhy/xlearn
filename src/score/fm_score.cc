@@ -181,7 +181,9 @@ void FMScore::calc_grad_ftrl(const SparseRow* row,
                              Model& model,
                              real_t pg,
                              real_t norm) {
- // TODO(xswang)
+  /*********************************************************
+  *    *  linear term and bias term                            *
+  **********************************************************/
   real_t alpha = .001;
   real_t beta = 1.0;
   real_t lambda1 = 2.0;
@@ -198,7 +200,6 @@ void FMScore::calc_grad_ftrl(const SparseRow* row,
     w[idx_n] += gradient * gradient;
     real_t sigma = 1.0f * (std::sqrt(w[idx_n]) - std::sqrt(old_n)) / alpha;
     w[idx_z] += gradient - sigma * w[idx_w];
-
     if (std::abs(w[idx_z]) <= lambda1) {
       w[idx_w] = 0;
     } else {
@@ -211,7 +212,7 @@ void FMScore::calc_grad_ftrl(const SparseRow* row,
       w[idx_w] = -1.0f * smooth_lr * w[idx_z];
     }
   }
-
+  // bias
   w = model.GetParameter_b();
   real_t &wb = w[0];
   real_t &wbn = w[1];
@@ -260,8 +261,6 @@ void FMScore::calc_grad_ftrl(const SparseRow* row,
   __m128 XMMlambda1 = _mm_set1_ps(lambda1);
   __m128 XMMlambda2 = _mm_set1_ps(lambda2);
   __m128 XMMzero = _mm_set1_ps(0.0);
-
-
   for (SparseRow::const_iterator iter = row->begin();
     iter != row->end(); ++iter) {
     index_t j1 = iter->feat_id;
@@ -275,17 +274,17 @@ void FMScore::calc_grad_ftrl(const SparseRow* row,
       __m128 XMMn = _mm_load_ps(w+aligned_k+d);
       __m128 XMMz = _mm_load_ps(w+aligned_k*2+d);
       __m128 XMMg = _mm_mul_ps(XMMpgv,
-          _mm_sub_ps(XMMs,
-            _mm_mul_ps(XMMw, XMMv)));
+                    _mm_sub_ps(XMMs,
+                    _mm_mul_ps(XMMw, XMMv)));
       __m128 XMMold_n = XMMn;
       XMMn = _mm_add_ps(XMMn,
-          _mm_mul_ps(XMMg, XMMg));
+             _mm_mul_ps(XMMg, XMMg));
       __m128 XMMsigma = _mm_mul_ps(
-          _mm_div_ps(
-            _mm_sub_ps(_mm_rsqrt_ps(XMMn),
-              _mm_rsqrt_ps(XMMold_n)), XMMalpha), XMMw);
+                        _mm_div_ps(
+                        _mm_sub_ps(_mm_rsqrt_ps(XMMn),
+                        _mm_rsqrt_ps(XMMold_n)), XMMalpha), XMMw);
       XMMz = _mm_sub_ps(
-          _mm_add_ps(XMMz, XMMg), XMMsigma);
+             _mm_add_ps(XMMz, XMMg), XMMsigma);
       static const union {
         int i[4];
         __m128 m;

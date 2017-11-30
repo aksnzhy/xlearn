@@ -85,7 +85,6 @@ void LinearScore::calc_grad_ftrl(const SparseRow* row,
                                  Model& model,
                                  real_t pg,
                                  real_t norm) {
-  // TODO(xswang)
   real_t alpha = 0.003;
   real_t beta = 1.0;
   real_t lambda1 = .00005;
