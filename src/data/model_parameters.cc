@@ -121,7 +121,7 @@ void Model::set_value() {
   /*********************************************************
    *  Initialize linear and bias term                      *
    *********************************************************/
-  for (index_t i = 0; i < param_num_w_; i += 2) {
+  for (index_t i = 0; i < param_num_w_; i += auxiliary_size_) {
     param_w_[i] = 0;      /* model */
     for (index_t j = 1; j < auxiliary_size_; ++j) {
       param_w_[i+j] = 1.0;  /* gradient cache */
