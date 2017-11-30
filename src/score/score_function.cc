@@ -21,11 +21,8 @@ This file is the implementation of the base Score class.
 
 #include "src/score/score_function.h"
 #include "src/score/linear_score.h"
-#include "src/score/linear_score_ftrl.h"
 #include "src/score/fm_score.h"
-#include "src/score/fm_score_ftrl.h"
 #include "src/score/ffm_score.h"
-#include "src/score/ffm_score_ftrl.h"
 
 namespace xLearn {
 
@@ -34,10 +31,7 @@ namespace xLearn {
 //------------------------------------------------------------------------------
 CLASS_REGISTER_IMPLEMENT_REGISTRY(xLearn_score_registry, Score);
 REGISTER_SCORE("linear", LinearScore);
-//REGISTER_SCORE("linear", LinearScoreFtrl);
 REGISTER_SCORE("fm", FMScore);
-REGISTER_SCORE("fm", FMScoreFtrl);
 REGISTER_SCORE("ffm", FFMScore);
-REGISTER_SCORE("ffm", FFMScoreFtrl);
 
 }  // namespace xLearn
