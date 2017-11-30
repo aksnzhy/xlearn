@@ -35,7 +35,8 @@ real_t FFMScore::CalcScore(const SparseRow* row,
    *  linear term and bias term                            *
    *********************************************************/
   real_t sum_w = 0;
-  real_t sqrt_norm = sqrt(norm);
+  //real_t sqrt_norm = sqrt(norm);
+  real_t sqrt_norm = 1.0; 
   real_t *w = model.GetParameter_w();
   index_t auxiliary_size = model.GetAuxiliarySize();
   for (SparseRow::const_iterator iter = row->begin();
@@ -200,18 +201,18 @@ void FFMScore::calc_grad_ftrl(const SparseRow* row,
     index_t idx_z = iter->feat_id * 3+2;
     real_t old_n = w[idx_n];
     w[idx_n] += gradient * gradient;
-    real_t sigma = 1.0f * (std::sqrt(w[idx_n]) - std::sqrt(old_n)) / alpha;
+    real_t sigma = (std::sqrt(w[idx_n]) - std::sqrt(old_n)) / alpha;
     w[idx_z] += gradient - sigma * w[idx_w];
     if (std::abs(w[idx_z]) <= lambda1) {
       w[idx_w] = 0.0;
     } else {
-      real_t smooth_lr = 1.0f / (lambda2 + (beta + std::sqrt(w[idx_n])) / alpha);
+      real_t smooth_lr = -1.0f / (lambda2 + (beta + std::sqrt(w[idx_n])) / alpha);
       if (w[idx_z] < 0.0) {
         w[idx_z] += lambda1;
       } else if (w[idx_z] > 0.0) {
         w[idx_z] -= lambda1;
       }
-      w[idx_w] = -1.0f * smooth_lr * w[idx_z];
+      w[idx_w] = smooth_lr * w[idx_z];
     }
   }
   // bias
@@ -219,19 +220,19 @@ void FFMScore::calc_grad_ftrl(const SparseRow* row,
   real_t &wb = w[0];
   real_t &wbn = w[1];
   real_t &wbz = w[2];
-  real_t g = -1.0 * pg;
+  real_t g = 1.0 * pg;
   wbn += g*g;
   if (std::abs(wbz) <= lambda1) {
     wb = 0.0f;
   } else {
-    real_t smooth_lr = 1.0f
+    real_t smooth_lr = -1.0f
       / (lambda2 + (beta + std::sqrt(wbn)) / alpha);
     if (wbz < 0.0) {
       wbz += lambda1;
     } else if (wbz > 0.0) {
       wbz -= lambda1;
     }
-    wb = -1.0f * smooth_lr * wbz;
+    wb = smooth_lr * wbz;
   }
 
   /*********************************************************
