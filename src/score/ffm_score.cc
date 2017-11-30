@@ -37,9 +37,10 @@ real_t FFMScore::CalcScore(const SparseRow* row,
   real_t sum_w = 0;
   real_t sqrt_norm = sqrt(norm);
   real_t *w = model.GetParameter_w();
+  index_t auxiliary_size = model.GetAuxiliarySize();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
-    sum_w += (iter->feat_val * w[iter->feat_id*2] * sqrt_norm);
+    sum_w += (iter->feat_val * w[iter->feat_id*auxiliary_size] * sqrt_norm);
   }
   // bias
   w = model.GetParameter_b();
@@ -47,9 +48,9 @@ real_t FFMScore::CalcScore(const SparseRow* row,
   /*********************************************************
    *  latent factor                                        *
    *********************************************************/
-  index_t align0 = 2 * model.get_aligned_k();
+  index_t align0 = auxiliary_size * model.get_aligned_k();
   index_t align1 = model.GetNumField() * align0;
-  int align = kAlign * 2;
+  int align = kAlign * auxiliary_size;
   w = model.GetParameter_v();
   __m128 XMMt = _mm_setzero_ps();
   for (SparseRow::const_iterator iter_i = row->begin();
