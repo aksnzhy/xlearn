@@ -174,9 +174,6 @@ class Model {
   /* algorithm method
   For now it can be 'adagrad' and 'ftrl' */
   std::string algo_method_;
-  /* auxiliary memory size for different algorithm method
-  For 'adagrad' it equals 2 and 'ftrl' it equals 3 */
-  index_t auxiliary_size_;
   /* Size of the linear term
   Note that we store both of the model parameter
   and the gradient cache in param_w_, so
