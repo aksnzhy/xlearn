@@ -32,7 +32,7 @@ real_t LinearScore::CalcScore(const SparseRow* row,
   real_t score = 0.0;
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
-    index_t idx = iter->feat_id * 2;
+    index_t idx = iter->feat_id * model.GetAuxiliarySize();
     score += w[idx] * iter->feat_val;
   }
   // bias

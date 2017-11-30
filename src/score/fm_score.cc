@@ -37,9 +37,10 @@ real_t FMScore::CalcScore(const SparseRow* row,
   real_t sqrt_norm = sqrt(norm);
   real_t *w = model.GetParameter_w();
   real_t t = 0;
+  index_t aux_size = model.GetAuxiliarySize();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
-    t += (iter->feat_val * w[iter->feat_id*2] * sqrt_norm);
+    t += (iter->feat_val * w[iter->feat_id*aux_size] * sqrt_norm);
   }
   // bias
   w = model.GetParameter_b();
@@ -48,7 +49,7 @@ real_t FMScore::CalcScore(const SparseRow* row,
    *  latent factor                                        *
    *********************************************************/
   index_t aligned_k = model.get_aligned_k();
-  index_t align0 = model.get_aligned_k() * 2;
+  index_t align0 = model.get_aligned_k() * model.GetAuxiliarySize();
   std::vector<real_t> sv(aligned_k, 0);
   real_t* s = sv.data();
   for (SparseRow::const_iterator iter = row->begin();
