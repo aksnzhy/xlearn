@@ -34,8 +34,8 @@ real_t FMScore::CalcScore(const SparseRow* row,
   /*********************************************************
    *  linear term and bias term                            *
    *********************************************************/
-  //real_t sqrt_norm = sqrt(norm);
-  real_t sqrt_norm = 1.0; 
+  real_t sqrt_norm = sqrt(norm);
+  //real_t sqrt_norm = 1.0; 
   real_t *w = model.GetParameter_w();
   real_t t = 0;
   index_t aux_size = model.GetAuxiliarySize();

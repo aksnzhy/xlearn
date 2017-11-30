@@ -119,7 +119,7 @@ void LinearScore::calc_grad_ftrl(const SparseRow* row,
   real_t &wb = w[0];
   real_t &wbn = w[1];
   real_t &wbz = w[2];
-  real_t g = 1.0 * pg;
+  real_t g = pg;
   wbn += g*g;
   wbz += g;
   if (std::abs(wbz) <= lambda1) {
