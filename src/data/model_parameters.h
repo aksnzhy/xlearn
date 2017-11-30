@@ -114,6 +114,9 @@ class Model {
   // Shrink back for getting the best model.
   void Shrink();
 
+  // Get the size of auxiliary cache size
+  inline real_t GetAuxiliarySize() { return auxiliary_size_; }
+
   // Get the pointer of linear term.
   inline real_t* GetParameter_w() { return param_w_; }
 
@@ -168,6 +171,9 @@ class Model {
   /* Loss function
   For now it can be 'squared' and 'cross-entropy' */
   std::string  loss_func_;
+  /* algorithm method
+  For now it can be 'adagrad' and 'ftrl' */
+  std::string algo_method_;
   /* Size of the linear term
   Note that we store both of the model parameter
   and the gradient cache in param_w_, so
@@ -212,6 +218,9 @@ class Model {
 
   // Reset the value of current model parameters.
   void set_value();
+
+  // Reset the value of current model parameter for ftrl algorithm 
+  void set_ftrl_value();
 
   // Serialize w, v, b to disk file.
   void serialize_w_v_b(FILE* file);

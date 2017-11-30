@@ -85,7 +85,56 @@ void LinearScore::calc_grad_ftrl(const SparseRow* row,
                                  Model& model,
                                  real_t pg,
                                  real_t norm) {
-  // TODO(xswang)
+  real_t alpha = 1e-2;
+  real_t beta = 1.0;
+  real_t lambda1 = 1e-1;
+  real_t lambda2 = 0.0;
+  real_t* w = model.GetParameter_w();
+  for (SparseRow::const_iterator iter = row->begin();
+      iter != row->end(); ++iter) {
+    real_t gradient = pg * iter->feat_val;
+    index_t idx_w = iter->feat_id * 3;
+    index_t idx_n = idx_w + 1;
+    index_t idx_z = idx_w + 2;
+    real_t old_n = w[idx_n];
+    w[idx_n] += (gradient * gradient);
+    real_t sigma = 1.0f
+                   * (std::sqrt(w[idx_n]) - sqrt(old_n))
+                   / alpha;
+    w[idx_z] += gradient - sigma * w[idx_w];
+    if (std::abs(w[idx_z]) <= lambda1) {
+      w[idx_w] = 0.0;
+    } else {
+      real_t smooth_lr = 1.0f
+                         / (lambda2 + (beta + std::sqrt(w[idx_n])) / alpha);
+      if (w[idx_z] < 0.0) {
+        w[idx_z] += lambda1;
+      } else if (w[idx_z] > 0.0) {
+        w[idx_z] -= lambda1;
+      }
+      w[idx_w] = -1.0f * smooth_lr * w[idx_z];
+    }
+  }
+
+  w = model.GetParameter_b();
+  real_t &wb = w[0];
+  real_t &wbn = w[1];
+  real_t &wbz = w[2];
+  real_t g = -1.0 * pg;
+  wbn += g*g;
+  wbz += g;
+  if (std::abs(wbz) <= lambda1) {
+    wb = 0.0f;
+  } else {
+    real_t smooth_lr = 1.0f
+      / (lambda2 + (beta + std::sqrt(wbn)) / alpha);
+    if (wbz < 0.0) {
+      wbz += lambda1;
+    } else if(wbz > 0.0) {
+      wbz -= lambda1;
+    }
+    wb = -1.0f * smooth_lr * wbz;
+  }
 }
 
 } // namespace xLearn
