@@ -30,7 +30,6 @@ This file tests the Loss class.
 #include "src/data/model_parameters.h"
 #include "src/data/hyper_parameters.h"
 #include "src/score/linear_score.h"
-#include "src/score/linear_score_ftrl.h"
 #include "src/score/fm_score.h"
 #include "src/score/ffm_score.h"
 
