@@ -35,7 +35,6 @@ real_t FMScore::CalcScore(const SparseRow* row,
    *  linear term and bias term                            *
    *********************************************************/
   real_t sqrt_norm = sqrt(norm);
-  //real_t sqrt_norm = 1.0; 
   real_t *w = model.GetParameter_w();
   real_t t = 0;
   index_t auxiliary_size = model.GetAuxiliarySize();
@@ -195,12 +194,13 @@ void FMScore::calc_grad_ftrl(const SparseRow* row,
     index_t idx_z = idx_w + 2;
     real_t old_n =  w[idx_n];
     w[idx_n] += gradient * gradient;
-    real_t sigma =  (std::sqrt(w[idx_n]) - std::sqrt(old_n)) / alpha_;
+    real_t sqrt_n = std::sqrt(w[idx_n]);
+    real_t sigma = (sqrt_n - std::sqrt(old_n)) / alpha_;
     w[idx_z] += gradient - sigma * w[idx_w];
     if (std::abs(w[idx_z]) <= lambda_1_) {
       w[idx_w] = 0;
     } else {
-      real_t smooth_lr = -1.0f / (lambda_2_ + (beta_ + std::sqrt(w[idx_n])) / alpha_);
+      real_t smooth_lr = -1.0f / (lambda_2_ + (beta_ + sqrt_n) / alpha_);
       if (w[idx_z] > 0.0) {
         w[idx_z] -= lambda_1_;
       }
@@ -215,9 +215,12 @@ void FMScore::calc_grad_ftrl(const SparseRow* row,
   real_t &wb = w[0];
   real_t &wbn = w[1];
   real_t &wbz = w[2];
-  real_t g = 1.0 * pg;
+  real_t g = pg;
+  real_t old_wbn = wbn;
   wbn += g*g;
-  wbz += g;
+  real_t sqrt_wbn = std::sqrt(wbn);
+  real_t sigma_wb = (sqrt_wbn - std::sqrt(old_wbn)) / alpha_;
+  wbz += g - sigma_wb * wb;
   if (std::abs(wbz) <= lambda_1_) {
     wb = 0.0f;
   } else {
@@ -260,6 +263,24 @@ void FMScore::calc_grad_ftrl(const SparseRow* row,
   __m128 XMMlambda1 = _mm_set1_ps(lambda_1_);
   __m128 XMMlambda2 = _mm_set1_ps(lambda_2_);
   __m128 XMMzero = _mm_set1_ps(0.0);
+  if (comp_res == nullptr) {
+    int ret = posix_memalign(
+        (void**)&comp_res,
+        kAlignByte,
+        1 * sizeof(real_t));
+  }
+  if (comp_z_lt_zero == nullptr) {
+    int ret = posix_memalign(
+        (void**)&comp_z_lt_zero,
+        kAlignByte,
+        1 * sizeof(real_t));
+  }
+  if (comp_z_gt_zero == nullptr) {
+    int ret = posix_memalign(
+        (void**)&comp_z_gt_zero,
+        kAlignByte,
+        1 * sizeof(real_t));
+  }
   for (SparseRow::const_iterator iter = row->begin();
     iter != row->end(); ++iter) {
     index_t j1 = iter->feat_id;

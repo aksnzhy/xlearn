@@ -35,8 +35,7 @@ real_t FFMScore::CalcScore(const SparseRow* row,
    *  linear term and bias term                            *
    *********************************************************/
   real_t sum_w = 0;
-  //real_t sqrt_norm = sqrt(norm);
-  real_t sqrt_norm = 1.0; 
+  real_t sqrt_norm = sqrt(norm);
   real_t *w = model.GetParameter_w();
   index_t auxiliary_size = model.GetAuxiliarySize();
   for (SparseRow::const_iterator iter = row->begin();
@@ -201,7 +200,8 @@ void FFMScore::calc_grad_ftrl(const SparseRow* row,
     if (std::abs(w[idx_z]) <= lambda_1_) {
       w[idx_w] = 0.0;
     } else {
-      real_t smooth_lr = -1.0f / (lambda_2_ + (beta_ + std::sqrt(w[idx_n])) / alpha_);
+      real_t smooth_lr = -1.0f
+                         / (lambda_2_ + (beta_ + std::sqrt(w[idx_n])) / alpha_);
       if (w[idx_z] < 0.0) {
         w[idx_z] += lambda_1_;
       } else if (w[idx_z] > 0.0) {
@@ -215,13 +215,17 @@ void FFMScore::calc_grad_ftrl(const SparseRow* row,
   real_t &wb = w[0];
   real_t &wbn = w[1];
   real_t &wbz = w[2];
-  real_t g = 1.0 * pg;
+  real_t g = pg;
+  real_t old_wbn = wbn;
   wbn += g*g;
+  real_t sqrt_wbn = std::sqrt(wbn);
+  real_t sigma_wbn = (sqrt_wbn - std::sqrt(old_wbn)) / alpha_;
+  wbz += g - sigma_wbn * wb;
   if (std::abs(wbz) <= lambda_1_) {
     wb = 0.0f;
   } else {
     real_t smooth_lr = -1.0f
-      / (lambda_2_ + (beta_ + std::sqrt(wbn)) / alpha_);
+                       / (lambda_2_ + (beta_ + sqrt_wbn) / alpha_);
     if (wbz < 0.0) {
       wbz += lambda_1_;
     } else if (wbz > 0.0) {
@@ -244,6 +248,30 @@ void FFMScore::calc_grad_ftrl(const SparseRow* row,
   __m128 XMMlambda1 = _mm_set1_ps(lambda_1_);
   __m128 XMMlambda2 = _mm_set1_ps(lambda_2_);
   __m128 XMMzero = _mm_set1_ps(0.0);
+  if (comp_res1 == nullptr) {
+    int ret = posix_memalign(
+        (void**)&comp_res1,
+        kAlignByte,
+        1 * sizeof(real_t));
+  }
+  if (comp_res2 == nullptr) {
+    int ret = posix_memalign(
+        (void**)&comp_res2,
+        kAlignByte,
+        1 * sizeof(real_t));
+  }
+  if (comp_z_lt_zero == nullptr) {
+    int ret = posix_memalign(
+        (void**)&comp_z_lt_zero,
+        kAlignByte,
+        1 * sizeof(real_t));
+  }
+  if (comp_z_gt_zero == nullptr) {
+    int ret = posix_memalign(
+        (void**)&comp_z_gt_zero,
+        kAlignByte,
+        1 * sizeof(real_t));
+  }
 
   for (SparseRow::const_iterator iter_i = row->begin();
     iter_i != row->end(); ++iter_i) {
