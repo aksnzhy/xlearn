@@ -105,6 +105,13 @@ void LinearScore::calc_grad_ftrl(const SparseRow* row,
                          / (lambda_2_ + (beta_ + std::sqrt(w[idx_n])) / alpha_);
       const index_t sgn_z = (w[idx_z] > 0.0) ? 1.0 : -1.0;
       w[idx_w] = smooth_lr * (w[idx_z] - sgn_z * lambda_1_);
+      if (w[idx_z] > 0.0) {
+        w[idx_z] -= lambda_1_;
+      }
+      if (w[idx_z] < 0.0) {
+        w[idx_z] += lambda_1_;
+      }
+      w[idx_w] = smooth_lr * w[idx_z];
     }
   }
 
@@ -120,8 +127,13 @@ void LinearScore::calc_grad_ftrl(const SparseRow* row,
   } else {
     real_t smooth_lr = -1.0f
                        / (lambda_2_ + (beta_ + std::sqrt(wbn)) / alpha_);
-    const index_t sgn_z = (wbz > 0.0) ? 1.0 : -1.0;
-    wb = smooth_lr * (wbz - sgn_z * lambda_1_);
+    if (wbz > 0.0) {
+      wbz -= lambda_1_;
+    }
+    if (wbz < 0.0) {
+      wbz += lambda_1_;
+    }
+    wb = smooth_lr * wbz;
   }
 }
 
