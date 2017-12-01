@@ -36,26 +36,7 @@ namespace xLearn {
 class FFMScore : public Score {
 public:
  // Constructor and Desstructor
- FFMScore() { 
-   int ret = posix_memalign(
-       (void**)&comp_res1,
-       kAlignByte,
-       1 * sizeof(real_t));
-   ret = posix_memalign(
-       (void**)&comp_res2,
-       kAlignByte,
-       1 * sizeof(real_t));
-
-   ret = posix_memalign(
-       (void**)&comp_z_lt_zero,
-       kAlignByte,
-       1 * sizeof(real_t));
-   ret = posix_memalign(
-       (void**)&comp_z_gt_zero,
-       kAlignByte,
-       1 * sizeof(real_t));
-
- }
+ FFMScore() { }
  ~FFMScore() { }
 
  // Given one exmaple and current model, this method
