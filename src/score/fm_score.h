@@ -23,6 +23,7 @@ This file defines the FMrScore (factorization machine) class.
 #define XLEARN_LOSS_FM_SCORE_H_
 
 #include "src/base/common.h"
+#include "src/data/model_parameters.h"
 #include "src/score/score_function.h"
 
 namespace xLearn {
@@ -63,6 +64,11 @@ class FMScore : public Score {
                       Model& model,
                       real_t pg,
                       real_t norm = 1.0);
+ private:
+  real_t* comp_res = nullptr;
+  real_t* comp_z_lt_zero = nullptr;
+  real_t* comp_z_gt_zero = nullptr;
+
 
  private:
   DISALLOW_COPY_AND_ASSIGN(FMScore);

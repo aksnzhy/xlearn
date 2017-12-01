@@ -66,6 +66,13 @@ public:
   	                  real_t norm = 1.0);
 
  private:
+  real_t* comp_res1 = nullptr;
+  real_t* comp_res2 = nullptr;
+  real_t* comp_z_lt_zero = nullptr;
+  real_t* comp_z_gt_zero = nullptr;
+
+
+ private:
   DISALLOW_COPY_AND_ASSIGN(FFMScore);
 };
 

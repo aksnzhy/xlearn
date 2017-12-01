@@ -80,6 +80,7 @@ class Score {
                         Model& model,
                         real_t pg,
                         real_t norm = 1.0) = 0;
+
  protected:
   real_t learning_rate_;
   real_t regu_lambda_;

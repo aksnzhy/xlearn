@@ -187,7 +187,7 @@ TEST(MODEL_TEST, Save_and_Load) {
   EXPECT_EQ(hyper_param.num_K, new_model.GetNumK());
   EXPECT_EQ(hyper_param.num_feature, new_model.GetNumFeature());
   EXPECT_EQ(hyper_param.num_field, new_model.GetNumField());
-  EXPECT_EQ(hyper_param.auxiliary_size, new_model.GetAuxilarySize());
+  EXPECT_EQ(hyper_param.auxiliary_size, new_model.GetAuxiliarySize());
   EXPECT_FLOAT_EQ(b[0], 0);
   EXPECT_FLOAT_EQ(b[1], 1.0);
   for (int i = 0; i < w_len; ++i) {

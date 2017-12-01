@@ -30,9 +30,10 @@ real_t LinearScore::CalcScore(const SparseRow* row,
                               real_t norm) {
   real_t* w = model.GetParameter_w();
   real_t score = 0.0;
+  index_t auxiliary_size = model.GetAuxiliarySize();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
-    index_t idx = iter->feat_id * 2;
+    index_t idx = iter->feat_id * auxiliary_size;
     score += w[idx] * iter->feat_val;
   }
   // bias
@@ -85,7 +86,57 @@ void LinearScore::calc_grad_ftrl(const SparseRow* row,
                                  Model& model,
                                  real_t pg,
                                  real_t norm) {
-  // TODO(xswang)
+  real_t* w = model.GetParameter_w();
+  for (SparseRow::const_iterator iter = row->begin();
+      iter != row->end(); ++iter) {
+    real_t gradient = pg * iter->feat_val;
+    index_t idx_w = iter->feat_id * 3;
+    index_t idx_n = idx_w + 1;
+    index_t idx_z = idx_w + 2;
+    real_t old_n = w[idx_n];
+    w[idx_n] += (gradient * gradient);
+    real_t sqrt_n = std::sqrt(w[idx_n]);
+    real_t sigma = (sqrt_n- std::sqrt(old_n))
+                   / alpha_;
+    w[idx_z] += gradient - sigma * w[idx_w];
+    if (std::abs(w[idx_z]) <= lambda_1_) {
+      w[idx_w] = 0.0;
+    } else {
+      real_t smooth_lr = -1.0f
+                         / (lambda_2_ + (beta_ + sqrt_n) / alpha_);
+      if (w[idx_z] > 0.0) {
+        w[idx_z] -= lambda_1_;
+      }
+      if (w[idx_z] < 0.0) {
+        w[idx_z] += lambda_1_;
+      }
+      w[idx_w] = smooth_lr * w[idx_z];
+    }
+  }
+
+  w = model.GetParameter_b();
+  real_t &wb = w[0];
+  real_t &wbn = w[1];
+  real_t &wbz = w[2];
+  real_t g = pg;
+  real_t old_n = wbn;
+  wbn += g*g;
+  real_t sqrt_wbn = std::sqrt(wbn);
+  real_t sigma_wbn = (sqrt_wbn - std::sqrt(old_n)) / alpha_;
+  wbz += g - sigma_wbn * wb;
+  if (std::abs(wbz) <= lambda_1_) {
+    wb = 0.0f;
+  } else {
+    real_t smooth_lr = -1.0f
+                       / (lambda_2_ + (beta_ + sqrt_wbn) / alpha_);
+    if (wbz > 0.0) {
+      wbz -= lambda_1_;
+    }
+    if (wbz < 0.0) {
+      wbz += lambda_1_;
+    }
+    wb = smooth_lr * wbz;
+  }
 }
 
 } // namespace xLearn
