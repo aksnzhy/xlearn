@@ -40,6 +40,10 @@ TEST(C_API_TEST, Initialize) {
   EXPECT_EQ(XLearnSetFloat(&xlearn, "lr", 0.1), 0);
   EXPECT_EQ(XLearnSetFloat(&xlearn, "lambda", 0.05), 0);
   EXPECT_EQ(XLearnSetFloat(&xlearn, "init", 0.22), 0);
+  EXPECT_EQ(XLearnSetFloat(&xlearn, "alpha", 1.0), 0);
+  EXPECT_EQ(XLearnSetFloat(&xlearn, "beta", 1.0), 0);
+  EXPECT_EQ(XLearnSetFloat(&xlearn, "lambda_1", 1.0), 0);
+  EXPECT_EQ(XLearnSetFloat(&xlearn, "lambda_2", 1.0), 0);
   EXPECT_EQ(XLearnSetInt(&xlearn, "epoch", 5), 0);
   EXPECT_EQ(XLearnSetBool(&xlearn, "norm", false), 0);
   EXPECT_EQ(XLearnSetBool(&xlearn, "lock_free", true), 0);
@@ -64,6 +68,10 @@ TEST(C_API_TEST, Initialize) {
   EXPECT_FLOAT_EQ(xl->GetHyperParam().learning_rate, 0.1);
   EXPECT_FLOAT_EQ(xl->GetHyperParam().regu_lambda, 0.05);
   EXPECT_FLOAT_EQ(xl->GetHyperParam().model_scale, 0.22);
+  EXPECT_FLOAT_EQ(xl->GetHyperParam().alpha, 1);
+  EXPECT_FLOAT_EQ(xl->GetHyperParam().beta, 1);
+  EXPECT_FLOAT_EQ(xl->GetHyperParam().lambda_1, 1);
+  EXPECT_FLOAT_EQ(xl->GetHyperParam().lambda_2, 1);
   EXPECT_EQ(xl->GetHyperParam().num_epoch, 5);
   EXPECT_EQ(xl->GetHyperParam().norm, false);
   EXPECT_EQ(xl->GetHyperParam().lock_free, true);
