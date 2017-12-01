@@ -268,18 +268,21 @@ void FMScore::calc_grad_ftrl(const SparseRow* row,
         (void**)&comp_res,
         kAlignByte,
         1 * sizeof(real_t));
+    CHECK_EQ(ret, 0);
   }
   if (comp_z_lt_zero == nullptr) {
     int ret = posix_memalign(
         (void**)&comp_z_lt_zero,
         kAlignByte,
         1 * sizeof(real_t));
+    CHECK_EQ(ret, 0);
   }
   if (comp_z_gt_zero == nullptr) {
     int ret = posix_memalign(
         (void**)&comp_z_gt_zero,
         kAlignByte,
         1 * sizeof(real_t));
+    CHECK_EQ(ret, 0);
   }
   for (SparseRow::const_iterator iter = row->begin();
     iter != row->end(); ++iter) {
@@ -308,7 +311,7 @@ void FMScore::calc_grad_ftrl(const SparseRow* row,
       static const union {
         int i[4];
         __m128 m;
-      } __mm_abs_mask_cheat_ps = {0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff};
+      } __mm_abs_mask_cheat_ps = {{ 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff }};
       __m128 XMMcomp_res = _mm_cmplt_ps(XMMlambda1,
                            _mm_and_ps(XMMz,
                            __mm_abs_mask_cheat_ps.m));
