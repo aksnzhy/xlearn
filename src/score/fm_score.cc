@@ -38,10 +38,10 @@ real_t FMScore::CalcScore(const SparseRow* row,
   //real_t sqrt_norm = 1.0; 
   real_t *w = model.GetParameter_w();
   real_t t = 0;
-  index_t aux_size = model.GetAuxiliarySize();
+  index_t auxiliary_size = model.GetAuxiliarySize();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
-    t += (iter->feat_val * w[iter->feat_id*aux_size] * sqrt_norm);
+    t += (iter->feat_val * w[iter->feat_id*auxiliary_size] * sqrt_norm);
   }
   // bias
   w = model.GetParameter_b();
@@ -206,12 +206,16 @@ void FMScore::calc_grad_ftrl(const SparseRow* row,
       w[idx_w] = 0;
     } else {
       real_t smooth_lr = -1.0f / (lambda2 + (beta + std::sqrt(w[idx_n])) / alpha);
+      //const index_t sgn_z = (w[idx_z] > 0.0) ? 1.0 : -1.0;
+      ///*
       if (w[idx_z] < 0.0) {
         w[idx_z] += lambda1;
       } else if (w[idx_z] > 0.0) {
         w[idx_z] -= lambda1;
       }
       w[idx_w] = smooth_lr * w[idx_z];
+      //*/
+      //w[idx_w] = smooth_lr * (w[idx_z] - sgn_z * lambda1);
     }
   }
   // bias
@@ -226,13 +230,9 @@ void FMScore::calc_grad_ftrl(const SparseRow* row,
     wb = 0.0f;
   } else {
     real_t smooth_lr = -1.0f
-      / (lambda2 + (beta + std::sqrt(wbn)) / alpha);
-    if (wbz < 0.0) {
-      wbz += lambda1;
-    } else if (wbz > 0.0) {
-      wbz -= lambda1;
-    }
-    wb = smooth_lr * wbz;
+                       / (lambda2 + (beta + std::sqrt(wbn)) / alpha);
+    const index_t sgn_z = (wbz > 0.0) ? 1.0 : -1.0;
+    wb = smooth_lr * (wbz - sgn_z * lambda1);
   }
 
   /*********************************************************

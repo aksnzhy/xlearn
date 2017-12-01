@@ -30,9 +30,10 @@ real_t LinearScore::CalcScore(const SparseRow* row,
                               real_t norm) {
   real_t* w = model.GetParameter_w();
   real_t score = 0.0;
+  index_t auxiliary_size = model.GetAuxiliarySize();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
-    index_t idx = iter->feat_id * model.GetAuxiliarySize();
+    index_t idx = iter->feat_id * auxiliary_size;
     score += w[idx] * iter->feat_val;
   }
   // bias
@@ -106,12 +107,8 @@ void LinearScore::calc_grad_ftrl(const SparseRow* row,
     } else {
       real_t smooth_lr = -1.0f
                          / (lambda2 + (beta + std::sqrt(w[idx_n])) / alpha);
-      if (w[idx_z] < 0.0) {
-        w[idx_z] += lambda1;
-      } else if (w[idx_z] > 0.0) {
-        w[idx_z] -= lambda1;
-      }
-      w[idx_w] = smooth_lr * w[idx_z];
+      const index_t sgn_z = (w[idx_z] > 0.0) ? 1.0 : -1.0;
+      w[idx_w] = smooth_lr * (w[idx_z] - sgn_z * lambda1);
     }
   }
 
@@ -126,13 +123,9 @@ void LinearScore::calc_grad_ftrl(const SparseRow* row,
     wb = 0.0f;
   } else {
     real_t smooth_lr = -1.0f
-      / (lambda2 + (beta + std::sqrt(wbn)) / alpha);
-    if (wbz < 0.0) {
-      wbz += lambda1;
-    } else if(wbz > 0.0) {
-      wbz -= lambda1;
-    }
-    wb = smooth_lr * wbz;
+                       / (lambda2 + (beta + std::sqrt(wbn)) / alpha);
+    const index_t sgn_z = (wbz > 0.0) ? 1.0 : -1.0;
+    wb = smooth_lr * (wbz - sgn_z * lambda1);
   }
 }
 
