@@ -221,9 +221,9 @@ struct DMatrix {
     this->row.resize(row_length, nullptr);
     // Copy row
     for (index_t i = 0; i < row_length; ++i) {
-      SparseRow* row = matrix->row[i];
-      for (SparseRow::iterator iter = row->begin();
-           iter != row->end(); ++iter) {
+      SparseRow* rowc = matrix->row[i];
+      for (SparseRow::iterator iter = rowc->begin();
+           iter != rowc->end(); ++iter) {
         this->AddNode(i, 
                 iter->feat_id, 
                 iter->feat_val, 

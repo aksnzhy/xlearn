@@ -85,6 +85,9 @@ void FileSpliter::split(const std::string& filename, int num_blocks) {
         average_block_size + (next_block_size - real_file_size);
     offset += real_file_size;
   }
+  delete *file_ptr_write;
+  delete file_ptr_write;
+  delete file_desc_write;
   munmap(map_ptr_read, file_size);
 }
 
