@@ -30,7 +30,7 @@ cmake_minimum_required(VERSION 3.0)
 # Using c++11;
 # Optimization on architecture
 #-------------------------------------------------------------------------------
-add_definitions("-Wall -g -Wno-sign-compare -O3 -std=c++11 
+add_definitions("-Wall -Wno-sign-compare -O3 -std=c++11 
 -march=native -Wno-strict-aliasing -Wno-comment")
 
 #-------------------------------------------------------------------------------
