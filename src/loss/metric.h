@@ -554,7 +554,7 @@ class AUCMetric : public Metric {
       positive_sum += all_positive_number_[i];
       negative_sum += all_negative_number_[i];
       auc += (pre_positive_sum + positive_sum) * 
-             all_negative_number_[i] * 1.0 / 2;
+             (double)(all_negative_number_[i]) * 1.0 / 2;
     }
     positivesum_dot_negativesum = positive_sum * negative_sum;
     auc_res = auc / (positivesum_dot_negativesum);

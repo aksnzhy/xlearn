@@ -54,9 +54,17 @@ class Score {
   // Invoke this function before we use this class.
   virtual void Initialize(real_t learning_rate,
                           real_t regu_lambda,
+                          real_t alpha,
+                          real_t beta,
+                          real_t lambda_1,
+                          real_t lambda_2,
                           std::string& opt_type) {
     learning_rate_ = learning_rate;
     regu_lambda_ = regu_lambda;
+    alpha_ = alpha;
+    beta_ = beta;
+    lambda_1_ = lambda_1;
+    lambda_2_ = lambda_2;
     opt_type_ = opt_type;
   }
 
@@ -76,6 +84,10 @@ class Score {
  protected:
   real_t learning_rate_;
   real_t regu_lambda_;
+  real_t alpha_;
+  real_t beta_;
+  real_t lambda_1_;
+  real_t lambda_2_;
   std::string opt_type_;
 
  private:

@@ -187,12 +187,7 @@ void FFMScore::calc_grad_ftrl(const SparseRow* row,
   /*********************************************************
   *    *  linear term and bias term                            *
   **********************************************************/
-  real_t alpha = 5e-2;
-  real_t beta = 1.0;
-  real_t lambda1 = 5e-5;
-  real_t lambda2 = 15.0;
   real_t *w = model.GetParameter_w();
-
   for (SparseRow::const_iterator iter = row->begin();
     iter != row->end(); ++iter) {
     real_t gradient = pg * iter->feat_val;
@@ -201,16 +196,16 @@ void FFMScore::calc_grad_ftrl(const SparseRow* row,
     index_t idx_z = iter->feat_id * 3+2;
     real_t old_n = w[idx_n];
     w[idx_n] += gradient * gradient;
-    real_t sigma = (std::sqrt(w[idx_n]) - std::sqrt(old_n)) / alpha;
+    real_t sigma = (std::sqrt(w[idx_n]) - std::sqrt(old_n)) / alpha_;
     w[idx_z] += gradient - sigma * w[idx_w];
-    if (std::abs(w[idx_z]) <= lambda1) {
+    if (std::abs(w[idx_z]) <= lambda_1_) {
       w[idx_w] = 0.0;
     } else {
-      real_t smooth_lr = -1.0f / (lambda2 + (beta + std::sqrt(w[idx_n])) / alpha);
+      real_t smooth_lr = -1.0f / (lambda_2_ + (beta_ + std::sqrt(w[idx_n])) / alpha_);
       if (w[idx_z] < 0.0) {
-        w[idx_z] += lambda1;
+        w[idx_z] += lambda_1_;
       } else if (w[idx_z] > 0.0) {
-        w[idx_z] -= lambda1;
+        w[idx_z] -= lambda_1_;
       }
       w[idx_w] = smooth_lr * w[idx_z];
     }
@@ -222,15 +217,15 @@ void FFMScore::calc_grad_ftrl(const SparseRow* row,
   real_t &wbz = w[2];
   real_t g = 1.0 * pg;
   wbn += g*g;
-  if (std::abs(wbz) <= lambda1) {
+  if (std::abs(wbz) <= lambda_1_) {
     wb = 0.0f;
   } else {
     real_t smooth_lr = -1.0f
-      / (lambda2 + (beta + std::sqrt(wbn)) / alpha);
+      / (lambda_2_ + (beta_ + std::sqrt(wbn)) / alpha_);
     if (wbz < 0.0) {
-      wbz += lambda1;
+      wbz += lambda_1_;
     } else if (wbz > 0.0) {
-      wbz -= lambda1;
+      wbz -= lambda_1_;
     }
     wb = smooth_lr * wbz;
   }
@@ -244,10 +239,10 @@ void FFMScore::calc_grad_ftrl(const SparseRow* row,
   w = model.GetParameter_v();
   __m128 XMMpg = _mm_set1_ps(pg);
   __m128 XMMcoef = _mm_set1_ps(-1.0);
-  __m128 XMMalpha = _mm_set1_ps(alpha);
-  __m128 XMMbeta = _mm_set1_ps(beta);
-  __m128 XMMlambda1 = _mm_set1_ps(lambda1);
-  __m128 XMMlambda2 = _mm_set1_ps(lambda2);
+  __m128 XMMalpha = _mm_set1_ps(alpha_);
+  __m128 XMMbeta = _mm_set1_ps(beta_);
+  __m128 XMMlambda1 = _mm_set1_ps(lambda_1_);
+  __m128 XMMlambda2 = _mm_set1_ps(lambda_2_);
   __m128 XMMzero = _mm_set1_ps(0.0);
 
   for (SparseRow::const_iterator iter_i = row->begin();

@@ -86,10 +86,6 @@ void LinearScore::calc_grad_ftrl(const SparseRow* row,
                                  Model& model,
                                  real_t pg,
                                  real_t norm) {
-  real_t alpha = 5e-2;
-  real_t beta = 1.0;
-  real_t lambda1 = 5e-5;
-  real_t lambda2 = 15.0;
   real_t* w = model.GetParameter_w();
   for (SparseRow::const_iterator iter = row->begin();
       iter != row->end(); ++iter) {
@@ -100,15 +96,15 @@ void LinearScore::calc_grad_ftrl(const SparseRow* row,
     real_t old_n = w[idx_n];
     w[idx_n] += (gradient * gradient);
     real_t sigma = (std::sqrt(w[idx_n]) - sqrt(old_n))
-                   / alpha;
+                   / alpha_;
     w[idx_z] += gradient - sigma * w[idx_w];
-    if (std::abs(w[idx_z]) <= lambda1) {
+    if (std::abs(w[idx_z]) <= lambda_1_) {
       w[idx_w] = 0.0;
     } else {
       real_t smooth_lr = -1.0f
-                         / (lambda2 + (beta + std::sqrt(w[idx_n])) / alpha);
+                         / (lambda_2_ + (beta_ + std::sqrt(w[idx_n])) / alpha_);
       const index_t sgn_z = (w[idx_z] > 0.0) ? 1.0 : -1.0;
-      w[idx_w] = smooth_lr * (w[idx_z] - sgn_z * lambda1);
+      w[idx_w] = smooth_lr * (w[idx_z] - sgn_z * lambda_1_);
     }
   }
 
@@ -119,13 +115,13 @@ void LinearScore::calc_grad_ftrl(const SparseRow* row,
   real_t g = pg;
   wbn += g*g;
   wbz += g;
-  if (std::abs(wbz) <= lambda1) {
+  if (std::abs(wbz) <= lambda_1_) {
     wb = 0.0f;
   } else {
     real_t smooth_lr = -1.0f
-                       / (lambda2 + (beta + std::sqrt(wbn)) / alpha);
+                       / (lambda_2_ + (beta_ + std::sqrt(wbn)) / alpha_);
     const index_t sgn_z = (wbz > 0.0) ? 1.0 : -1.0;
-    wb = smooth_lr * (wbz - sgn_z * lambda1);
+    wb = smooth_lr * (wbz - sgn_z * lambda_1_);
   }
 }
 

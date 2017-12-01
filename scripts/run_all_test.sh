@@ -4,7 +4,6 @@
 ./base/levenshtein_distance_test
 ./base/thread_pool_test
 ./c_api/c_api_test
-python ./c_api/c_api_test.py
 ./data/data_structure_test
 ./data/model_parameters_test
 ./loss/cross_entropy_loss_test
