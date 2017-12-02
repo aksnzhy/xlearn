@@ -17,8 +17,7 @@
 /*
 Author: Chao Ma (mctt90@gmail.com)
 
-This file defines the Solver class, which is the entry
-of the xLearn.
+This file defines the Solver class, which is the entry of the xLearn.
 */
 
 #ifndef XLEARN_SOLVER_SOLVER_H_
@@ -26,37 +25,37 @@ of the xLearn.
 
 #include "src/base/common.h"
 #include "src/base/thread_pool.h"
-#include "src/data/hyper_parameters.h"
 #include "src/data/data_structure.h"
+#include "src/data/hyper_parameters.h"
 #include "src/data/model_parameters.h"
-#include "src/reader/reader.h"
-#include "src/reader/parser.h"
-#include "src/reader/file_splitor.h"
-#include "src/score/score_function.h"
 #include "src/loss/loss.h"
 #include "src/loss/metric.h"
+#include "src/reader/file_splitor.h"
+#include "src/reader/parser.h"
+#include "src/reader/reader.h"
+#include "src/score/score_function.h"
 #include "src/solver/checker.h"
-#include "src/solver/trainer.h"
 #include "src/solver/inference.h"
+#include "src/solver/trainer.h"
 
 namespace xLearn {
 //------------------------------------------------------------------------------
-// Solver is entry class of xLearn, which can perform training 
-// or prediction tasks. There are three important functions in this 
-// class, including the Initialize(), StartWork(), and Finalize() funtions.
-// 
+// Solver is entry class of xLearn, which can perform training
+// or prediction tasks. There are three important functions in this
+// class, including the Initialize(), StartWork(), and Clear() functions.
+//
 // We can use Solver class like this:
 //
 //  xLearn::Solver solver;
 //  solver.SetTrain();   // or solver.SetPredict()
 //  solver.Initialize(argc, argv);
 //  solver.StartWork();
-//  solver.Finalize();
+//  solver.Clear();
 //------------------------------------------------------------------------------
 class Solver {
  public:
-  // Constructor and Desstructor
-  Solver() 
+  // Constructor and Destructor
+  Solver()
     : score_(nullptr),
       loss_(nullptr),
       metric_(nullptr) { }
@@ -67,15 +66,15 @@ class Solver {
   void SetPredict() { hyper_param_.is_train = false; }
 
   // Initialize the xLearn environment, including checking
-  // and parsing the commad line arguments, reading problem
-  // (training data or testing data), initialize model, loss, 
+  // and parsing the command line arguments, reading problem
+  // (training data or testing data), initialize model, loss,
   // metric, and score functions, etc.
   void Initialize(int argc, char* argv[]);
 
   // Initialize the xLearn environment through the
-  // given hyper-parameters. This function will be 
+  // given hyper-parameters. This function will be
   // used for python API.
-  void Initialize(HyperParam& hyper_param);
+  void Initialize(const HyperParam& hyper_param);
 
   // Start a training task or start an inference task.
   void StartWork();
@@ -84,25 +83,6 @@ class Solver {
   void Clear();
 
  protected:
-  /* Global hyper-parameters */
-  xLearn::HyperParam hyper_param_;
-  /* Check the user input */
-  xLearn::Checker checker_;
-  /* Global model parameters */
-  xLearn::Model *model_;
-  /* One Reader corresponds one data file */
-  std::vector<xLearn::Reader*> reader_;
-  /* Split file in cross-validation */
-  xLearn::FileSpliter splitor_;
-  /* linear, fm or ffm ? */
-  xLearn::Score* score_;
-  /* cross-entropy or squared ? */
-  xLearn::Loss* loss_;
-  /* acc, prec, recall, mae, etc */
-  xLearn::Metric* metric_;
-  /* ThreadPool for multi-thread training */
-  ThreadPool* pool_;
-
   // Create object by name
   xLearn::Reader* create_reader();
   xLearn::Score* create_score();
@@ -122,6 +102,26 @@ class Solver {
   // Start function
   void start_train_work();
   void start_prediction_work();
+
+
+  /* Global hyper-parameters */
+  xLearn::HyperParam hyper_param_;
+  /* Check the user input */
+  xLearn::Checker checker_;
+  /* Global model parameters */
+  xLearn::Model* model_;
+  /* One Reader corresponds one data file */
+  std::vector<xLearn::Reader*> reader_;
+  /* Split file in cross-validation */
+  xLearn::FileSpliter splitor_;
+  /* linear, fm or ffm ? */
+  xLearn::Score* score_;
+  /* cross-entropy or squared ? */
+  xLearn::Loss* loss_;
+  /* acc, prec, recall, mae, etc */
+  xLearn::Metric* metric_;
+  /* ThreadPool for multi-thread training */
+  ThreadPool* pool_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Solver);

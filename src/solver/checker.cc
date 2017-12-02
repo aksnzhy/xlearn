@@ -19,16 +19,16 @@ Author: Chao Ma (mctt90@gmail.com)
 This file is the implementation of the Checker class.
 */
 
-#include <string>
 #include <cstdlib>
-#include <algorithm>
 #include <cstdio>
+#include <algorithm>
+#include <string>
 
 #include "src/base/common.h"
 #include "src/base/format_print.h"
-#include "src/solver/checker.h"
-#include "src/base/levenshtein_distance.h"
 #include "src/base/file_util.h"
+#include "src/base/levenshtein_distance.h"
+#include "src/solver/checker.h"
 
 namespace xLearn {
 
@@ -56,6 +56,8 @@ std::string Checker::option_help() const {
 "  -x <metric>          :  The metric can be 'acc', 'prec', 'recall', 'f1' (classification), and 'mae',\n"
 "                          'mape', 'rmsd (rmse)' (regression). xLearn uses the Accuracy (acc) by default.\n"
 "                          If we set this option to 'none', xLearn will not print any metric information.\n"
+"  -o <opt_method>      :  Choose the optimization method, including 'adagrad' and 'ftrl'. \n"
+"                          we use the adagrad optimization. \n"
 "                                                                                                 \n"
 "  -v <validate_file>   :  Path of the validation data file. This option will be empty by default, \n"
 "                          and in this way, the xLearn will not perform validation. \n"
@@ -103,6 +105,10 @@ std::string Checker::option_help() const {
 "                                                                  \n"
 "  --quiet              :  Don't print any evaluation information during the training and \n"
 "                          just train the model quietly. \n"
+"  -alpha               :  Used by ftrl. \n"
+"  -beta                :  Used by ftrl. \n"
+"  -lambda_1            :  Used by ftrl. \n"
+"  -lambda_2            :  Used by ftrl. \n"
 "----------------------------------------------------------------------------------------------\n"
     );
   } else {
@@ -143,6 +149,10 @@ void Checker::Initialize(bool is_train, int argc, char* argv[]) {
     menu_.push_back(std::string("--dis-es"));
     menu_.push_back(std::string("--no-norm"));
     menu_.push_back(std::string("--quiet"));
+    menu_.push_back(std::string("-alpha"));
+    menu_.push_back(std::string("-beta"));
+    menu_.push_back(std::string("-lambda_1"));
+    menu_.push_back(std::string("-lambda_2"));
   } else {  // for Prediction
     menu_.push_back(std::string("-o"));
     menu_.push_back(std::string("-l"));
@@ -189,7 +199,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     hyper_param.train_set_file = std::string(args_[1]);
   } else {
     print_error(
-      StringPrintf("Training data file: %s does not exist.", 
+      StringPrintf("Training data file: %s does not exist.",
                     args_[1].c_str())
     );
     return false;
@@ -259,7 +269,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
           StringPrintf("Unknow metric: %s \n"
                " -x can only be: \n"
                "   acc \n"
-               "   prec \n" 
+               "   prec \n"
                "   recall \n"
                "   f1 \n"
                "   auc\n"
@@ -273,6 +283,19 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
         bo = false;
       } else {
         hyper_param.metric = list[i+1];
+      }
+      i += 2;
+    } else if (list[i].compare("-o") == 0) {  // optimization method
+      if (list[i+1].compare("adagrad") != 0 &&
+          list[i+1].compare("ftrl") != 0) {
+        print_error(
+          StringPrintf("Unknow optimization method: %s \n"
+               " -o can only be: adagrad and ftrl. \n",
+               list[i+1].c_str())
+        );
+        bo = false;
+      } else {
+        hyper_param.opt_type = list[i+1];
       }
       i += 2;
     } else if (list[i].compare("-v") == 0) {  // validation file
@@ -383,6 +406,58 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("--quiet") == 0) {  // quiet
       hyper_param.quiet = true;
       i += 1;
+    } else if (list[i].compare("-alpha") == 0) {  // alpha
+      real_t value = atof(list[i+1].c_str());
+      if (value <= 0) {
+        print_error(
+          StringPrintf("Illegal -alpha : '%f'. "
+                       "-alpha must be greater than zero.",
+               value)
+        );
+        bo = false;
+      } else {
+        hyper_param.alpha = value;
+      }
+      i += 2;
+    } else if (list[i].compare("-beta") == 0) {  // beta
+      real_t value = atof(list[i+1].c_str());
+      if (value < 0) {
+        print_error(
+          StringPrintf("Illegal -beta : '%f'. "
+                       "-beta cannot be less than zero.",
+               value)
+        );
+        bo = false;
+      } else {
+        hyper_param.beta = value;
+      }
+      i += 2;
+    } else if (list[i].compare("-lambda_1") == 0) {  // lambda_1
+      real_t value = atof(list[i+1].c_str());
+      if (value < 0) {
+        print_error(
+          StringPrintf("Illegal -lambda_1 : '%f'. "
+                       "-lambda_1 cannot be less than zero.",
+               value)
+        );
+        bo = false;
+      } else {
+        hyper_param.lambda_1 = value;
+      }
+      i += 2;
+    } else if (list[i].compare("-lambda_2") == 0) { // lambda_2
+      real_t value = atof(list[i+1].c_str());
+      if (value < 0) {
+        print_error(
+          StringPrintf("Illegal -lambda_2 : '%f'. "
+                       "-lambda_2 cannot be less than zero.",
+               value)
+        );
+        bo = false;
+      } else {
+        hyper_param.lambda_2 = value;
+      }
+      i += 2;
     } else {  // no match
       std::string similar_str;
       ss.FindSimilar(list[i], menu_, similar_str);
@@ -421,7 +496,7 @@ bool Checker::check_train_param(HyperParam& hyper_param) {
    *********************************************************/
   if (!FileExist(hyper_param.train_set_file.c_str())) {
     print_error(
-      StringPrintf("Training data file: %s does not exist.", 
+      StringPrintf("Training data file: %s does not exist.",
                     hyper_param.train_set_file.c_str())
     );
     bo = false;
@@ -484,7 +559,7 @@ void Checker::check_conflict_train(HyperParam& hyper_param) {
       !hyper_param.cross_validation) {
     print_warning(
       StringPrintf("Validation file not found, xLearn has already "
-                   "disable (-x %s) option.", 
+                   "disable (-x %s) option.",
                    hyper_param.metric.c_str())
     );
     hyper_param.metric = "none";

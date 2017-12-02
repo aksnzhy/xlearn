@@ -21,17 +21,17 @@ This file is the implementation of the Solver class.
 
 #include "src/solver/solver.h"
 
-#include <vector>
-#include <string>
+#include <cstdio>
 #include <algorithm>
 #include <stdexcept>
-#include <cstdio>
+#include <string>
 #include <thread>
+#include <vector>
 
-#include "src/base/stringprintf.h"
 #include "src/base/split_string.h"
-#include "src/base/timer.h"
+#include "src/base/stringprintf.h"
 #include "src/base/system.h"
+#include "src/base/timer.h"
 
 namespace xLearn {
 
@@ -46,7 +46,7 @@ namespace xLearn {
 //      xLearn   -- 0.10 Version --
 //------------------------------------------------------------------------------
 void Solver::print_logo() const {
-  std::string logo = 
+  std::string logo =
 "----------------------------------------------------------------------------------------------\n"
                     "           _\n"
                     "          | |\n"
@@ -106,7 +106,7 @@ Metric* Solver::create_metric() {
   Metric* metric;
   metric = CREATE_METRIC(hyper_param_.metric.c_str());
   // Note that here we do not cheack metric == nullptr
-  // this is because we can set metric to "none", which 
+  // this is because we can set metric to "none", which
   // means that we don't print any metric info.
   return metric;
 }
@@ -133,7 +133,7 @@ void Solver::Initialize(int argc, char* argv[]) {
 }
 
 // Initialize the xLearn environment through the
-// given hyper-parameters. This function will be 
+// given hyper-parameters. This function will be
 // used for python API.
 void Solver::Initialize(HyperParam& hyper_param) {
   // Print logo
@@ -266,14 +266,14 @@ void Solver::init_train() {
   hyper_param_.num_feature = max_feat + 1;
   LOG(INFO) << "Number of feature: " << hyper_param_.num_feature;
   print_info(
-    StringPrintf("Number of Feature: %d", 
+    StringPrintf("Number of Feature: %d",
                  hyper_param_.num_feature)
   );
   if (hyper_param_.score_func.compare("ffm") == 0) {
     hyper_param_.num_field = max_field + 1;
     LOG(INFO) << "Number of field: " << hyper_param_.num_field;
     print_info(
-      StringPrintf("Number of Field: %d", 
+      StringPrintf("Number of Field: %d",
         hyper_param_.num_field)
     );
   }
@@ -289,17 +289,23 @@ void Solver::init_train() {
   print_action("Initialize model ...");
   // Initialize parameters
   model_ = new Model();
+  if (hyper_param_.opt_type.compare("adagrad") == 0) {
+    hyper_param_.auxiliary_size = 2;
+  } else if (hyper_param_.opt_type.compare("ftrl") == 0) {
+    hyper_param_.auxiliary_size = 3;
+  }
   model_->Initialize(hyper_param_.score_func,
                    hyper_param_.loss_func,
                    hyper_param_.num_feature,
                    hyper_param_.num_field,
                    hyper_param_.num_K,
+                   hyper_param_.auxiliary_size,
                    hyper_param_.model_scale);
   index_t num_param = model_->GetNumParameter();
   hyper_param_.num_param = num_param;
   LOG(INFO) << "Number parameters: " << num_param;
   print_info(
-    StringPrintf("Model size: %s", 
+    StringPrintf("Model size: %s",
          PrintSize(num_param*sizeof(real_t)).c_str())
   );
   print_info(
@@ -311,14 +317,19 @@ void Solver::init_train() {
    *********************************************************/
   score_ = create_score();
   score_->Initialize(hyper_param_.learning_rate,
-                     hyper_param_.regu_lambda);
+                     hyper_param_.regu_lambda,
+                     hyper_param_.alpha,
+                     hyper_param_.beta,
+                     hyper_param_.lambda_1,
+                     hyper_param_.lambda_2,
+                     hyper_param_.opt_type);
   LOG(INFO) << "Initialize score function.";
   /*********************************************************
    *  Initialize loss function                             *
    *********************************************************/
   loss_ = create_loss();
-  loss_->Initialize(score_, pool_, 
-         hyper_param_.norm, 
+  loss_->Initialize(score_, pool_,
+         hyper_param_.norm,
          hyper_param_.lock_free);
   LOG(INFO) << "Initialize loss function.";
   /*********************************************************
@@ -361,26 +372,26 @@ void Solver::init_predict() {
     hyper_param_.num_field = model_->GetNumField();
   }
   print_info(
-    StringPrintf("Loss function: %s", 
+    StringPrintf("Loss function: %s",
       hyper_param_.loss_func.c_str())
   );
   print_info(
-    StringPrintf("Score function: %s", 
+    StringPrintf("Score function: %s",
       hyper_param_.score_func.c_str())
   );
   print_info(
-    StringPrintf("Number of Feature: %d", 
+    StringPrintf("Number of Feature: %d",
                  hyper_param_.num_feature)
   );
   if (hyper_param_.score_func.compare("fm") == 0 ||
       hyper_param_.score_func.compare("ffm") == 0) {
     print_info(
-      StringPrintf("Number of K: %d", 
+      StringPrintf("Number of K: %d",
                    hyper_param_.num_K)
     );
     if (hyper_param_.score_func.compare("ffm") == 0) {
       print_info(
-        StringPrintf("Number of field: %d", 
+        StringPrintf("Number of field: %d",
                     hyper_param_.num_field)
       );
     }
@@ -468,7 +479,7 @@ void Solver::start_train_work() {
   if (hyper_param_.cross_validation) {
     trainer.CVTrain();
     print_action("Finish Cross-Validation");
-  } 
+  }
 /******************************************************************************
  * Original training without cross-validation                                 *
  ******************************************************************************/
@@ -480,7 +491,7 @@ void Solver::start_train_work() {
       print_action("Finish training and start to save model ...");
       trainer.SaveModel(hyper_param_.model_file);
       print_info(
-        StringPrintf("Model file: %s", 
+        StringPrintf("Model file: %s",
           hyper_param_.model_file.c_str())
       );
       print_info(

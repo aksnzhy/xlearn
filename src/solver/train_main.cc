@@ -21,8 +21,8 @@ This file is the entry for training of the xLearn.
 */
 
 #include "src/base/common.h"
-#include "src/base/timer.h"
 #include "src/base/stringprintf.h"
+#include "src/base/timer.h"
 #include "src/solver/solver.h"
 
 //------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
   solver.Clear();
 
   print_info(
-    StringPrintf("Total time cost: %.2f (sec)", 
+    StringPrintf("Total time cost: %.2f (sec)",
     timer.toc()), true);
 
   return 0;

@@ -24,8 +24,8 @@ the command line arguments.
 #ifndef XLEARN_SOLVER_CHECKER_H_
 #define XLEARN_SOLVER_CHECKER_H_
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "src/base/common.h"
 #include "src/data/hyper_parameters.h"
@@ -70,7 +70,7 @@ class Checker {
   bool check_prediction_param(HyperParam& hyper_param);
   void check_conflict_train(HyperParam& hyper_param);
   void check_conflict_predict(HyperParam& hyper_param);
-  
+
  private:
   DISALLOW_COPY_AND_ASSIGN(Checker);
 };
