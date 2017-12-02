@@ -69,7 +69,6 @@ class FMScore : public Score {
   real_t* comp_z_lt_zero = nullptr;
   real_t* comp_z_gt_zero = nullptr;
 
-
  private:
   DISALLOW_COPY_AND_ASSIGN(FMScore);
 };
