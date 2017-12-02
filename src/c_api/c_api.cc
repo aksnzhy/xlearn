@@ -181,6 +181,8 @@ XL_DLL int XLearnSetStr(XLearnHandle *out,
   	xl->GetHyperParam().log_file = std::string(value);
   } else if (strcmp(key, "loss") == 0) {
   	xl->GetHyperParam().loss_func = std::string(value);
+  } else if (strcmp(key, "opt") == 0) {
+    xl->GetHyperParam().opt_type = std::string(value);
   }
   API_END();
 }
@@ -215,6 +217,14 @@ XL_DLL int XLearnSetFloat(XLearnHandle *out,
   	xl->GetHyperParam().regu_lambda = value;
   } else if (strcmp(key, "init") == 0) {
   	xl->GetHyperParam().model_scale = value;
+  } else if (strcmp(key, "alpha") == 0) {
+    xl->GetHyperParam().alpha = value;
+  } else if (strcmp(key, "beta") == 0) {
+    xl->GetHyperParam().beta = value;
+  } else if (strcmp(key, "lambda_1") == 0) {
+    xl->GetHyperParam().lambda_1 = value;
+  } else if (strcmp(key, "lambda_2") == 0) {
+    xl->GetHyperParam().lambda_2 = value;
   }
   API_END();
 }

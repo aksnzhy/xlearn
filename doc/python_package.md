@@ -20,7 +20,7 @@ For now, xLearn can support three data format, including `libsvm`, `libffm`, and
        feat_1 feat_2 feat_3 ... feat_n y1
        feat_1 feat_2 feat_3 ... feat_n y2
 
-Note that the CSV format can only be used in linear amd fm model. For ffm, users need to convert their data to libffm format.
+Note that the CSV format can only be used in linear and fm model. For ffm, users need to convert their data to libffm format.
 **Also, when using csv, users need to add a dummy `y` at the end of the test data in every line.**
 
 #### Quick start
@@ -93,8 +93,6 @@ We can also use some other set funtions:
     disableNorm()
     disableLockFree()
     disableEarlyStop()
-    disableSign()
-    disableSigmoid()
 
 #### Train model
 
@@ -113,6 +111,12 @@ We can also perform cross-validation by using `cv()` function:
 We can perform prediction by using `predict()` function:
 
     predict("model_file", "output_file")
+
+#### Set Output format
+
+On default, xlearn will only output the score for prediction. If you want to get a result between 0~1. You can use `setSigmoid()` function.
+
+If you want to convert the output to a binary result, i.e., 0 (false) or 1 (true), You can use `setSign` function.
 
   [1]: install.md
   [2]: https://www.kaggle.com/c/criteo-display-ad-challenge

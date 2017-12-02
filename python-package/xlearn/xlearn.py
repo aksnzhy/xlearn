@@ -57,6 +57,21 @@ class XLearn(object):
 			elif key == 'fold':
 				_check_call(_LIB.XLearnSetInt(ctypes.byref(self.handle), 
 					c_str(key), ctypes.c_uint(value)))
+			elif key == 'opt':
+				_check_call(_LIB.XLearnSetStr(ctypes.byref(self.handle), 
+					c_str(key), c_str(value)))
+			elif key == 'alpha':
+				_check_call(_LIB.XLearnSetFloat(ctypes.byref(self.handle), 
+					c_str(key), ctypes.c_float(value)))
+			elif key == 'beta':
+				_check_call(_LIB.XLearnSetFloat(ctypes.byref(self.handle), 
+					c_str(key), ctypes.c_float(value)))
+			elif key == 'lambda_1':
+				_check_call(_LIB.XLearnSetFloat(ctypes.byref(self.handle), 
+					c_str(key), ctypes.c_float(value)))
+			elif key == 'lambda_2':
+				_check_call(_LIB.XLearnSetFloat(ctypes.byref(self.handle), 
+					c_str(key), ctypes.c_float(value)))
 			else:
 				raise Exception("Invalid key!", key)
 

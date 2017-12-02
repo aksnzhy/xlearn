@@ -62,7 +62,22 @@ For the useage of xlearn command line, please see this page: [command_line.md][1
 
 ### Python Package Installation
 
-Install xLearn is very simple. We can only set the environment variable `PYTHONPATH` to tell python where to find the library. For example assume we cloned `xLearn` on the home directory `~`, then we can added the following line in ~/.bashrc. It is ***recommended for developers*** who may change the code. The changes will be immediately reflected once you pulled the code and rebuild the project.
+Two ways can be used to install xlearn python package.
+
+#### Using `install-python.sh`
+
+Users can use the install-python.sh script to install python package.
+
+    cd python-package
+    ./install-python.sh
+
+The users can make a test: 
+
+    python test_python.py
+
+#### Or set python path manually
+
+In addtion, we can only set the environment variable `PYTHONPATH` to tell python where to find the library. For example assume we cloned `xLearn` on the home directory `~`, then we can added the following line in ~/.bashrc. It is ***recommended for developers*** who may change the code. The changes will be immediately reflected once you pulled the code and rebuild the project.
 
     export PYTHONPATH=~/xlearn/build/python-package/xlearn
     

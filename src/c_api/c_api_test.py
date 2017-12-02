@@ -1,7 +1,7 @@
 # coding: utf-8
 import unittest
 import ctypes
-from ctypes import cdll, c_bool, c_int
+from ctypes import cdll, c_bool, c_int, c_float
 
 XLearnHandle = ctypes.c_void_p
 
@@ -23,6 +23,11 @@ class TestCAPI(unittest.TestCase):
 		self.assertEqual(myLib.XLearnSetBool(xl_handle, c_str("quiet"), c_bool(True)), 0)
 		self.assertEqual(myLib.XLearnSetStr(xl_handle, c_str("loss"), c_str("squared")), 0)
 		self.assertEqual(myLib.XLearnSetInt(xl_handle, c_str("fold"), c_int(10)), 0)
+		self.assertEqual(myLib.XLearnSetStr(xl_handle, c_str("opt"), c_str("ftrl")), 0)
+		self.assertEqual(myLib.XLearnSetStr(xl_handle, c_str("alpha"), c_float(1)), 0)
+		self.assertEqual(myLib.XLearnSetStr(xl_handle, c_str("beta"), c_float(1)), 0)
+		self.assertEqual(myLib.XLearnSetStr(xl_handle, c_str("lambda_1"), c_float(1)), 0)
+		self.assertEqual(myLib.XLearnSetStr(xl_handle, c_str("lambda_2"), c_float(1)), 0)
 
 if __name__ == '__main__':
 	unittest.main()

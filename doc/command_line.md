@@ -143,6 +143,16 @@ Now you can perform prediction on the trainned model. For example:
 
     ./xlearn_predict ./small_test.txt ./small_train.txt.model
 
+#### Set Output format
+
+On default, xlearn will only output the score for prediction. If you want to get a result between 0~1. You can use `--sigmoid` option:
+
+    ./xlearn_predict ./small_test.txt ./small_train.txt.model --sigmoid
+
+If you want to convert the output to a binary result, i.e., 0 (false) or 1 (true), You can use `--sign` option:
+
+    ./xlearn_predict ./small_test.txt ./small_train.txt.model --sign
+
 #### Set log
 
 You can specify the path of your log path by using `-l` option. On default, xlearn will save the log information in `/tmp/`

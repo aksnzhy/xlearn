@@ -114,6 +114,9 @@ class Model {
   // Shrink back for getting the best model.
   void Shrink();
 
+  // Get the size of auxiliary cache size
+  inline real_t GetAuxiliarySize() { return auxiliary_size_; }
+
   // Get the pointer of linear term.
   inline real_t* GetParameter_w() { return param_w_; }
 
@@ -147,9 +150,6 @@ class Model {
 
   // Get the number of k.
   inline index_t GetNumK() { return num_K_; }
-
-  // Get the auxiliary cache size.
-  inline index_t GetAuxilarySize() { return auxiliary_size_; }
 
   // Get the aligned size of K.
   inline index_t get_aligned_k() {
