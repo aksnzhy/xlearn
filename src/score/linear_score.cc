@@ -50,7 +50,7 @@ void LinearScore::CalcGrad(const SparseRow* row,
   if (opt_type_.compare("adagrad") == 0) {
     this->calc_grad_adagrad(row, model, pg, norm);
   }
-  // Using ftrl 
+  // Using ftrl
   else if (opt_type_.compare("ftrl") == 0) {
     this->calc_grad_ftrl(row, model, pg, norm);
   }
@@ -95,8 +95,8 @@ void LinearScore::calc_grad_ftrl(const SparseRow* row,
     index_t idx_z = idx_w + 2;
     real_t old_n = w[idx_n];
     w[idx_n] += (gradient * gradient);
-    real_t sqrt_n = std::sqrt(w[idx_n]);
-    real_t sigma = (sqrt_n- std::sqrt(old_n))
+    real_t sqrt_n = sqrt(w[idx_n]);
+    real_t sigma = (sqrt_n - sqrt(old_n))
                    / alpha_;
     w[idx_z] += gradient - sigma * w[idx_w];
     if (std::abs(w[idx_z]) <= lambda_1_) {
@@ -121,8 +121,9 @@ void LinearScore::calc_grad_ftrl(const SparseRow* row,
   real_t g = pg;
   real_t old_n = wbn;
   wbn += g*g;
-  real_t sqrt_wbn = std::sqrt(wbn);
-  real_t sigma_wbn = (sqrt_wbn - std::sqrt(old_n)) / alpha_;
+  real_t sqrt_wbn = sqrt(wbn);
+  real_t sigma_wbn = (sqrt_wbn - sqrt(old_n))
+                     / alpha_;
   wbz += g - sigma_wbn * wb;
   if (std::abs(wbz) <= lambda_1_) {
     wb = 0.0f;
