@@ -75,7 +75,7 @@ The users can make a test:
 
     python test_python.py
 
-#### Set python path manually
+#### Or set python path manually
 
 In addtion, we can only set the environment variable `PYTHONPATH` to tell python where to find the library. For example assume we cloned `xLearn` on the home directory `~`, then we can added the following line in ~/.bashrc. It is ***recommended for developers*** who may change the code. The changes will be immediately reflected once you pulled the code and rebuild the project.
 
