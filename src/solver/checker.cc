@@ -106,8 +106,11 @@ std::string Checker::option_help() const {
 "  --quiet              :  Don't print any evaluation information during the training and \n"
 "                          just train the model quietly. \n"
 "  -alpha               :  Used by ftrl. \n"
+"
 "  -beta                :  Used by ftrl. \n"
+"
 "  -lambda_1            :  Used by ftrl. \n"
+"
 "  -lambda_2            :  Used by ftrl. \n"
 "----------------------------------------------------------------------------------------------\n"
     );
@@ -136,6 +139,7 @@ void Checker::Initialize(bool is_train, int argc, char* argv[]) {
     menu_.push_back(std::string("-s"));
     menu_.push_back(std::string("-x"));
     menu_.push_back(std::string("-v"));
+    menu_.push_back(std::string("-o"));
     menu_.push_back(std::string("-m"));
     menu_.push_back(std::string("-l"));
     menu_.push_back(std::string("-k"));
@@ -290,7 +294,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
           list[i+1].compare("ftrl") != 0) {
         print_error(
           StringPrintf("Unknow optimization method: %s \n"
-               " -0 can only be: adagrad and ftrl. \n",
+               " -o can only be: adagrad and ftrl. \n",
                list[i+1].c_str())
         );
         bo = false;
