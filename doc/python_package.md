@@ -93,8 +93,6 @@ We can also use some other set funtions:
     disableNorm()
     disableLockFree()
     disableEarlyStop()
-    disableSign()
-    disableSigmoid()
 
 #### Train model
 
