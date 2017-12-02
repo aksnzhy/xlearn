@@ -114,5 +114,11 @@ We can perform prediction by using `predict()` function:
 
     predict("model_file", "output_file")
 
+#### Set Output format
+
+On default, xlearn will only output the score for prediction. If you want to get a result between 0~1. You can use `setSigmoid()` function.
+
+If you want to convert the output to a binary result, i.e., 0 (false) or 1 (true), You can use `setSign` function.
+
   [1]: install.md
   [2]: https://www.kaggle.com/c/criteo-display-ad-challenge
