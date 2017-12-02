@@ -9,9 +9,19 @@ add_library(xlearn STATIC c_api.cc c_api_error.cc)
 target_link_libraries(xlearn ${STA_DEPS})
 
 # Build shared library
-set(SHA_DEPS solver reader loss score data base)
-add_library(xlearn_shared SHARED c_api.cc c_api_error.cc)
-target_link_libraries(xlearn_shared ${SHA_DEPS})
+#set(SHA_DEPS solver reader loss score data base)
+add_library(xlearn_shared SHARED c_api.cc c_api_error.cc 
+../base/logging.cc ../base/stringprintf.cc ../base/split_string.cc 
+../base/levenshtein_distance.cc ../base/timer.cc 
+../data/model_parameters.cc 
+../loss/loss.cc ../loss/squared_loss.cc ../loss/cross_entropy_loss.cc 
+../loss/metric.cc 
+../reader/parser.cc ../reader/file_splitor.cc ../reader/reader.cc 
+../score/score_function.cc ../score/linear_score.cc ../score/fm_score.cc 
+../score/ffm_score.cc 
+../solver/checker.cc ../solver/trainer.cc 
+../solver/inference.cc ../solver/solver.cc)
+#target_link_libraries(xlearn_shared ${SHA_DEPS})
 
 # Set properties
 set_target_properties(xlearn_shared PROPERTIES OUTPUT_NAME "xlearn")
