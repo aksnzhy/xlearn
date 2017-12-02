@@ -183,8 +183,8 @@ void FMScore::calc_grad_ftrl(const SparseRow* row,
                              real_t pg,
                              real_t norm) {
   /*********************************************************
-  *    *  linear term and bias term                            *
-  **********************************************************/
+   *  linear term and bias term                            *
+   *********************************************************/
   real_t *w = model.GetParameter_w();
   for (SparseRow::const_iterator iter = row->begin();
     iter != row->end(); ++iter) {
@@ -234,10 +234,9 @@ void FMScore::calc_grad_ftrl(const SparseRow* row,
     }
     wb = smooth_lr * wbz;
   }
-
   /*********************************************************
-  **  latent factor                                        *
-  **********************************************************/
+   *  latent factor                                        *
+   *********************************************************/
   index_t aligned_k = model.get_aligned_k();
   index_t align0 = model.get_aligned_k() * 3;
   __m128 XMMpg = _mm_set1_ps(pg);
@@ -256,7 +255,6 @@ void FMScore::calc_grad_ftrl(const SparseRow* row,
       _mm_store_ps(s+d, XMMs);
     }
   }
-
   __m128 XMMcoef = _mm_set1_ps(-1.0);
   __m128 XMMalpha = _mm_set1_ps(alpha_);
   __m128 XMMbeta = _mm_set1_ps(beta_);
@@ -311,7 +309,8 @@ void FMScore::calc_grad_ftrl(const SparseRow* row,
       static const union {
         int i[4];
         __m128 m;
-      } __mm_abs_mask_cheat_ps = {{ 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff }};
+      } __mm_abs_mask_cheat_ps = {{ 0x7fffffff, 0x7fffffff, 
+                                    0x7fffffff, 0x7fffffff }};
       __m128 XMMcomp_res = _mm_cmplt_ps(XMMlambda1,
                            _mm_and_ps(XMMz,
                            __mm_abs_mask_cheat_ps.m));

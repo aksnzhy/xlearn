@@ -113,7 +113,6 @@ void LinearScore::calc_grad_ftrl(const SparseRow* row,
       w[idx_w] = smooth_lr * w[idx_z];
     }
   }
-
   w = model.GetParameter_b();
   real_t &wb = w[0];
   real_t &wbn = w[1];
@@ -122,8 +121,7 @@ void LinearScore::calc_grad_ftrl(const SparseRow* row,
   real_t old_n = wbn;
   wbn += g*g;
   real_t sqrt_wbn = sqrt(wbn);
-  real_t sigma_wbn = (sqrt_wbn - sqrt(old_n))
-                     / alpha_;
+  real_t sigma_wbn = (sqrt_wbn - sqrt(old_n)) / alpha_;
   wbz += g - sigma_wbn * wb;
   if (std::abs(wbz) <= lambda_1_) {
     wb = 0.0f;

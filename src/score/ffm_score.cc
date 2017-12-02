@@ -184,8 +184,8 @@ void FFMScore::calc_grad_ftrl(const SparseRow* row,
                               real_t pg,
                               real_t norm) {
   /*********************************************************
-  *    *  linear term and bias term                            *
-  **********************************************************/
+   *  linear term and bias term                            *
+   *********************************************************/
   real_t *w = model.GetParameter_w();
   for (SparseRow::const_iterator iter = row->begin();
     iter != row->end(); ++iter) {
@@ -233,10 +233,9 @@ void FFMScore::calc_grad_ftrl(const SparseRow* row,
     }
     wb = smooth_lr * wbz;
   }
-
   /*********************************************************
-  *    *  latent factor                                        *
-  **********************************************************/
+   *  latent factor                                        *
+   *********************************************************/
   index_t align0 = 3 * model.get_aligned_k();
   index_t align1 = model.GetNumField() * align0;
   index_t align = kAlign * 3;
@@ -276,7 +275,6 @@ void FFMScore::calc_grad_ftrl(const SparseRow* row,
         1 * sizeof(real_t));
     CHECK_EQ(ret, 0);
   }
-
   for (SparseRow::const_iterator iter_i = row->begin();
     iter_i != row->end(); ++iter_i) {
     index_t j1 = iter_i->feat_id;
@@ -324,17 +322,15 @@ void FFMScore::calc_grad_ftrl(const SparseRow* row,
                 _mm_add_ps(XMMz1,XMMg1),  XMMsigma1);
         XMMz2 = _mm_sub_ps(
                 _mm_add_ps(XMMz2,XMMg2),  XMMsigma2);
-
         static const union {
           int i[4];
           __m128 m;
-        } __mm_abs_mask_cheat_ps = {{ 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff }};
+        } __mm_abs_mask_cheat_ps = {{ 0x7fffffff, 0x7fffffff, 
+                                      0x7fffffff, 0x7fffffff }};
         __m128 XMMcomp_res1 = _mm_cmplt_ps(XMMlambda1,
                               _mm_and_ps(XMMz1, __mm_abs_mask_cheat_ps.m));
         __m128 XMMcomp_res2 = _mm_cmplt_ps(XMMlambda2,
                               _mm_and_ps(XMMz2, __mm_abs_mask_cheat_ps.m));
-
-
         _mm_store_ps(comp_res1, XMMcomp_res1);
         _mm_store_ps(comp_res2, XMMcomp_res2);
         if (*comp_res1) {
@@ -355,7 +351,6 @@ void FFMScore::calc_grad_ftrl(const SparseRow* row,
         } else {
           XMMw1 = _mm_set1_ps(0.0);
         }
-
         if (*comp_res2) {
           __m128 XMMsmooth_lr = _mm_rcp_ps(
                                 _mm_add_ps(XMMlambda2,
