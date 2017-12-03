@@ -47,9 +47,7 @@ def compile_cpp():
         shutil.rmtree(build_path)
     os.makedirs(build_path)
     old_working_dir = os.getcwd()
-    print(old_working_dir)
     os.chdir(build_path)
-    print(os.listdir(old_working_dir))
 
     src_path = '../compile'
     cmake_cmd = ['cmake', src_path]
