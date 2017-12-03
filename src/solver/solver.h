@@ -43,7 +43,7 @@ namespace xLearn {
 //------------------------------------------------------------------------------
 // Solver is entry class of xLearn, which can perform training 
 // or prediction tasks. There are three important functions in this 
-// class, including the Initialize(), StartWork(), and Finalize() funtions.
+// class, including the Initialize(), StartWork(), and Clear() funtions.
 // 
 // We can use Solver class like this:
 //
@@ -51,11 +51,11 @@ namespace xLearn {
 //  solver.SetTrain();   // or solver.SetPredict()
 //  solver.Initialize(argc, argv);
 //  solver.StartWork();
-//  solver.Finalize();
+//  solver.Clear();
 //------------------------------------------------------------------------------
 class Solver {
  public:
-  // Constructor and Desstructor
+  // Constructor and Destructor
   Solver() 
     : score_(nullptr),
       loss_(nullptr),
@@ -89,7 +89,7 @@ class Solver {
   /* Check the user input */
   xLearn::Checker checker_;
   /* Global model parameters */
-  xLearn::Model *model_;
+  xLearn::Model* model_;
   /* One Reader corresponds one data file */
   std::vector<xLearn::Reader*> reader_;
   /* Split file in cross-validation */
