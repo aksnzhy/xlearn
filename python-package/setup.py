@@ -50,7 +50,10 @@ def compile_cpp():
         silent_call(cmake_cmd, raise_error=True, error_msg='Please install CMake first')
         silent_call(["make", "-j4"], raise_error=True, 
                 error_msg='An error has occurred while building xlearn library file')
-        shutil.copy('lib/libxlearn.so', '../xlearn/')
+        suffix_list = ['dylib', 'so']
+        for suffix in suffix_list:
+            if os.path.isfile('lib/libxlearn.{}'.format(suffix)):
+                shutil.copy('lib/libxlearn.{}'.format(suffix), '../xlearn/')
 
     os.chdir(old_working_dir)
     
@@ -65,6 +68,8 @@ class CustomInstall(install):
 class CustomSdist(sdist):
     
     def run(self):
+        if os.path.isdir('compile'):
+            shutil.rmtree('compile')
         src_list = ['demo', 'gtest', 'scripts', 'src']
         for src in src_list:
             dst = 'compile/{}'.format(src)
@@ -86,7 +91,7 @@ if __name__ == "__main__":
     # LIB_PATH = [os.path.relpath(libfile, CURRENT_DIR) for libfile in libpath['find_lib_path']()]
     # print("Install libxlearn from: %s" % LIB_PATH)
     
-    setup(name='xlearnk',
+    setup(name='xlearn',
           version=open(os.path.join(CURRENT_DIR, 'xlearn/VERSION')).read().strip(),
           description="xLearn Python Package",
           maintainer='Chao Ma',
