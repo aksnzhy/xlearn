@@ -26,6 +26,20 @@ def silent_call(cmd, raise_error=False, error_msg=''):
             raise Exception(error_msg);
         return 1
 
+def copy_files():
+    if os.path.isdir('compile'):
+        shutil.rmtree('compile')
+    src_list = ['demo', 'gtest', 'scripts', 'src']
+    for src in src_list:
+        dst = 'compile/{}'.format(src)
+        if os.path.isdir(dst):
+            shutil.rmtree(dst)
+        shutil.copytree('../{}'.format(src), dst)
+    shutil.copy('../CMakeLists.txt', 'compile')
+    # create empty python-package for cmake
+    os.makedirs('compile/python-package')
+    open('compile/python-package/CMakeLists.txt', 'w')
+
 def compile_cpp():
     
     build_path = os.path.join(CURRENT_DIR, 'build_cpp')
@@ -61,25 +75,14 @@ def compile_cpp():
 class CustomInstall(install):
     
     def run(self):
-
+        copy_files()
         compile_cpp();
         install.run(self)
 
 class CustomSdist(sdist):
     
     def run(self):
-        if os.path.isdir('compile'):
-            shutil.rmtree('compile')
-        src_list = ['demo', 'gtest', 'scripts', 'src']
-        for src in src_list:
-            dst = 'compile/{}'.format(src)
-            if os.path.isdir(dst):
-                shutil.rmtree(dst)
-            shutil.copytree('../{}'.format(src), dst)
-        shutil.copy('../CMakeLists.txt', 'compile')
-        # create empty python-package for cmake
-        os.makedirs('compile/python-package')
-        open('compile/python-package/CMakeLists.txt', 'w')
+        copy_files()
         sdist.run(self)
 
 
