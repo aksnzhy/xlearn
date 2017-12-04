@@ -54,7 +54,7 @@ def compile_cpp():
         raise Exception('{} not exists'.format(src_path))
     if os.name == "nt":
         # Windows
-        pass
+        print('Windows users please use github installation.')
     else:
         # Linux, Darwin (OS X), etc.
         silent_call(cmake_cmd, raise_error=True, error_msg='Please install CMake first')
