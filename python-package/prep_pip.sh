@@ -1,4 +1,4 @@
-#!/usr/bin/sh
+#!/bin/bash
 
 cp setup_pip.py setup.py
 python setup.py sdist

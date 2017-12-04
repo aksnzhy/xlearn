@@ -41,14 +41,12 @@ def copy_files():
     open('compile/python-package/CMakeLists.txt', 'w')
 
 def compile_cpp():
-    
     build_path = os.path.join(CURRENT_DIR, 'build_cpp')
     if os.path.isdir(build_path):
         shutil.rmtree(build_path)
     os.makedirs(build_path)
     old_working_dir = os.getcwd()
     os.chdir(build_path)
-
     src_path = '../compile'
     cmake_cmd = ['cmake', src_path]
     if not os.path.isdir(src_path):
@@ -84,13 +82,6 @@ class CustomSdist(sdist):
 
 
 if __name__ == "__main__":
-    libpath_py = os.path.join(CURRENT_DIR, 'xlearn/libpath.py')
-    libpath = {'__file__': libpath_py}
-    exec(compile(open(libpath_py, "rb").read(), libpath_py, 'exec'), libpath, libpath)
-    
-    # LIB_PATH = [os.path.relpath(libfile, CURRENT_DIR) for libfile in libpath['find_lib_path']()]
-    # print("Install libxlearn from: %s" % LIB_PATH)
-    
     setup(name='xlearn',
           version=open(os.path.join(CURRENT_DIR, 'xlearn/VERSION')).read().strip(),
           description="xLearn Python Package",
@@ -106,7 +97,6 @@ if __name__ == "__main__":
           # this is the golden line
           include_package_data=True,
           # move data to MANIFEST.in
-          # data_files=[('xlearn', LIB_PATH)],
           license='Apache-2.0',
           classifiers=['License :: OSI Approved :: Apache Software License'],
           url='https://github.com/aksnzhy/xlearn')
