@@ -1,3 +1,3 @@
 # coding: utf-8
 
-from xlearn import *
+from .xlearn import *

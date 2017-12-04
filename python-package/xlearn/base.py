@@ -2,7 +2,7 @@
 import sys
 import os
 import ctypes
-from libpath import find_lib_path
+from .libpath import find_lib_path
 
 class XLearnError(Exception):
 	"""Error thrown by xlearn trainer"""
