@@ -53,8 +53,7 @@ XL_DLL int XLearnHello() {
 }
 
 // Create xlearn handle
-XL_DLL int XLearnCreate(const char *model_type,
-	                    XLearnHandle *out) {
+XL_DLL int XLearnCreate(const char *model_type, XL *out) {
   API_BEGIN();
   XLearn* xl = new XLearn;
   xl->GetHyperParam().score_func = std::string(model_type);
@@ -63,14 +62,14 @@ XL_DLL int XLearnCreate(const char *model_type,
 }
 
 // Free the xLearn handle
-XL_DLL int XLearnHandleFree(XLearnHandle *out) {
+XL_DLL int XLearnHandleFree(XL *out) {
   API_BEGIN();
   // For now, we do nothing here
   API_END();
 }
 
 // Show the mode information
-XL_DLL int XLearnShow(XLearnHandle *out) {
+XL_DLL int XLearnShow(XL *out) {
   API_BEGIN()
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   printf("Info: \n Model: %s\n Loss: %s\n", 
@@ -80,8 +79,7 @@ XL_DLL int XLearnShow(XLearnHandle *out) {
 }
 
 // Set file path of the training data
-XL_DLL int XLearnSetTrain(XLearnHandle *out,
-	                      const char *train_path) {
+XL_DLL int XLearnSetTrain(XL *out, const char *train_path) {
   API_BEGIN();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   xl->GetHyperParam().train_set_file = std::string(train_path);
@@ -89,8 +87,7 @@ XL_DLL int XLearnSetTrain(XLearnHandle *out,
 }
 
 // Set file path of the test data
-XL_DLL int XLearnSetTest(XLearnHandle *out,
-	                     const char *test_path) {
+XL_DLL int XLearnSetTest(XL *out, const char *test_path) {
   API_BEGIN();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   xl->GetHyperParam().test_set_file = std::string(test_path);
@@ -98,8 +95,7 @@ XL_DLL int XLearnSetTest(XLearnHandle *out,
 }
 
 // Set file path of the validation data
-XL_DLL int XLearnSetValidate(XLearnHandle *out,
-	                         const char *val_path) {
+XL_DLL int XLearnSetValidate(XL *out, const char *val_path) {
   API_BEGIN();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   xl->GetHyperParam().validate_set_file = std::string(val_path);
@@ -107,8 +103,7 @@ XL_DLL int XLearnSetValidate(XLearnHandle *out,
 }
 
 // Start to train
-XL_DLL int XLearnFit(XLearnHandle *out,
-	                 const char *model_path) {
+XL_DLL int XLearnFit(XL *out, const char *model_path) {
   API_BEGIN();
   Timer timer;
   timer.tic();
@@ -125,7 +120,7 @@ XL_DLL int XLearnFit(XLearnHandle *out,
 }
 
 // Cross-validation
-XL_DLL int XLearnCV(XLearnHandle *out) {
+XL_DLL int XLearnCV(XL *out) {
   API_BEGIN();
   Timer timer;
   timer.tic();
@@ -143,9 +138,7 @@ XL_DLL int XLearnCV(XLearnHandle *out) {
 }
 
 // Start to predict
-XL_DLL int XLearnPredict(XLearnHandle *out,
-	                     const char *model_path,
-	                     const char *out_path) {
+XL_DLL int XLearnPredict(XL *out, const char *model_path, const char *out_path) {
   API_BEGIN();
   Timer timer;
   timer.tic();
@@ -164,9 +157,7 @@ XL_DLL int XLearnPredict(XLearnHandle *out,
 }
 
 // Set string param
-XL_DLL int XLearnSetStr(XLearnHandle *out,
-	                    const char *key,
-	                    const char *value) {
+XL_DLL int XLearnSetStr(XL *out, const char *key, const char *value) {
   API_BEGIN();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   if (strcmp(key, "task") == 0) {
@@ -188,9 +179,7 @@ XL_DLL int XLearnSetStr(XLearnHandle *out,
 }
 
 // Set int param
-XL_DLL int XLearnSetInt(XLearnHandle *out,
-	                      const char *key,
-	                      const int value) {
+XL_DLL int XLearnSetInt(XL *out, const char *key, const int value) {
   API_BEGIN();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   if (strcmp(key, "k") == 0) {
@@ -206,9 +195,7 @@ XL_DLL int XLearnSetInt(XLearnHandle *out,
 }
 
 // Set float param
-XL_DLL int XLearnSetFloat(XLearnHandle *out,
-	                      const char *key,
-	                      const float value) {
+XL_DLL int XLearnSetFloat(XL *out, const char *key, const float value) {
   API_BEGIN();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   if (strcmp(key, "lr") == 0) {
@@ -230,9 +217,7 @@ XL_DLL int XLearnSetFloat(XLearnHandle *out,
 }
 
 // Set bool param
-XL_DLL int XLearnSetBool(XLearnHandle *out,
-	                     const char *key,
-	                     const bool value) {
+XL_DLL int XLearnSetBool(XL *out, const char *key, const bool value) {
   API_BEGIN();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   if (strcmp(key, "on_disk") == 0) {
