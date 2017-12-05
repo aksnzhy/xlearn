@@ -44,64 +44,49 @@ to other languages.
 #endif
 
 /* Handle to xlearn */
-typedef void* XLearnHandle;
+typedef void* XL;
 
 // Say hello to user
 XL_DLL int XLearnHello();
 
 // Create xlearn handle
-XL_DLL int XLearnCreate(const char *model_type,
-	                    XLearnHandle *out);
+XL_DLL int XLearnCreate(const char *model_type, XL *out);
 
 // Free the xLearn handle
-XL_DLL int XLearnHandleFree(XLearnHandle *out);
+XL_DLL int XLearnHandleFree(XL *out);
 
 // Show the model information
-XL_DLL int XLearnShow(XLearnHandle *out);
+XL_DLL int XLearnShow(XL *out);
 
 // Set file path of the training data
-XL_DLL int XLearnSetTrain(XLearnHandle *out,
-	                      const char *train_path);
+XL_DLL int XLearnSetTrain(XL *out, const char *train_path);
 
 // Set file path of the test data
-XL_DLL int XLearnSetTest(XLearnHandle *out,
-	                     const char *test_path);
+XL_DLL int XLearnSetTest(XL *out, const char *test_path);
 
 // Set file path of the validation data
-XL_DLL int XLearnSetValidate(XLearnHandle *out,
-	                         const char *val_path);
+XL_DLL int XLearnSetValidate(XL *out, const char *val_path);
 
 // Start to train
-XL_DLL int XLearnFit(XLearnHandle *out,
-	                 const char *model_path);
+XL_DLL int XLearnFit(XL *out, const char *model_path);
 
 // Cross-validation
-XL_DLL int XLearnCV(XLearnHandle *out);
+XL_DLL int XLearnCV(XL *out);
 
 // Start to predict
-XL_DLL int XLearnPredict(XLearnHandle *out,
-	                     const char *model_path,
-	                     const char *out_path);
+XL_DLL int XLearnPredict(XL *out, const char *model_path, const char *out_path);
 
 // Set string param
-XL_DLL int XLearnSetStr(XLearnHandle *out,
-	                    const char *key,
-	                    const char *value);
+XL_DLL int XLearnSetStr(XL *out, const char *key, const char *value);
 
 // Set int param
-XL_DLL int XLearnSetInt(XLearnHandle *out,
-	                    const char *key,
-	                    const int value);
+XL_DLL int XLearnSetInt(XL *out, const char *key, const int value);
 
 // Set float param
-XL_DLL int XLearnSetFloat(XLearnHandle *out,
-	                      const char *key,
-	                      const float value);
+XL_DLL int XLearnSetFloat(XL *out, const char *key, const float value);
 
 // Set bool param
-XL_DLL int XLearnSetBool(XLearnHandle *out,
-	                     const char *key,
-	                     const bool value);
+XL_DLL int XLearnSetBool(XL *out, const char *key, const bool value);
 
 // This is the entry class used by c_api.
 class XLearn {

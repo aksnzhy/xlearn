@@ -123,7 +123,8 @@ inline void print_info(const std::string& out, bool imp = false) {
     std::cout << green << "[------------] " << reset
             << out << std::endl;
   } else {
-  	std::cout << green << bold << "[------------] " << out << std::endl;
+  	std::cout << green << bold << "[------------] " << out << reset
+              << std::endl;
   }
 }
 
