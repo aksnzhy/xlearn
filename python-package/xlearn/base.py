@@ -2,7 +2,7 @@
 import sys
 import os
 import ctypes
-from libpath import find_lib_path
+from .libpath import find_lib_path
 
 class XLearnError(Exception):
 	"""Error thrown by xlearn trainer"""
@@ -33,7 +33,7 @@ def _check_call(ret):
 	if ret != 0:
 		raise XLearnError(_LIB.XLearGetLastError())
 
-#type definitions
+# type definitions
 XLearnHandle = ctypes.c_void_p
 
 if sys.version_info[0] < 3:

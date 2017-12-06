@@ -460,9 +460,14 @@ void Solver::start_train_work() {
   bool quiet = hyper_param_.quiet &&
               !hyper_param_.cross_validation;
   bool save_model = true;
+  bool save_txt_model = true;
   if (hyper_param_.model_file.compare("none") == 0 ||
       hyper_param_.cross_validation) {
     save_model = false;
+  }
+  if (hyper_param_.txt_model_file.compare("none") == 0 ||
+      hyper_param_.cross_validation) {
+    save_txt_model = false;
   }
   Trainer trainer;
   trainer.Initialize(reader_,  /* Reader list */
@@ -488,7 +493,7 @@ void Solver::start_train_work() {
     if (save_model) {
       Timer timer;
       timer.tic();
-      print_action("Finish training and start to save model ...");
+      print_action("Start to save model ...");
       trainer.SaveModel(hyper_param_.model_file);
       print_info(
         StringPrintf("Model file: %s", 
@@ -498,9 +503,22 @@ void Solver::start_train_work() {
         StringPrintf("Time cost for saving model: %.2f (sec)",
              timer.toc())
       );
-    } else {
-      print_action("Finish training");
+    } 
+    if (save_txt_model) {
+      Timer timer;
+      timer.tic();
+      print_action("Start to save txt model ...");
+      trainer.SaveTxtModel(hyper_param_.txt_model_file);
+      print_info(
+        StringPrintf("TXT Model file: %s", 
+          hyper_param_.txt_model_file.c_str())
+      );
+      print_info(
+        StringPrintf("Time cost for saving txt model: %.2f (sec)",
+             timer.toc())
+      );
     }
+    print_action("Finish training");
   }
 }
 

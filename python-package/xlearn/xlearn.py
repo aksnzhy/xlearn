@@ -2,8 +2,8 @@
 import sys
 import os
 import ctypes
-from base import _LIB, XLearnHandle
-from base import _check_call, c_str
+from .base import _LIB, XLearnHandle
+from .base import _check_call, c_str
 
 class XLearn(object):
 	"""XLearn is the core interface used by python API."""

@@ -65,6 +65,9 @@ std::string Checker::option_help() const {
 "  -m <model_file>      :  Path of the model checkpoint file. On default, the model file name will be. \n"
 "                          set to 'train_file' + '.model'. If we set this value to 'none', the xLearn will \n"
 "                          not dump the model checkpoint after training. \n"
+"  -t <txt_model_file>  :  Path of the txt model checkpoint file. On default, this option is empty \n"
+"                          and xLearn will not dump the txt model. For now, only the bias and linear term \n"
+"                          will dump to the txt model checkpoint file. \n"
 "                                                                             \n"
 "  -l <log_file>        :  Path of the log file. Using '/tmp/xlearn_log/' by default. \n"
 "                                                                                       \n"
@@ -141,6 +144,7 @@ void Checker::Initialize(bool is_train, int argc, char* argv[]) {
     menu_.push_back(std::string("-v"));
     menu_.push_back(std::string("-o"));
     menu_.push_back(std::string("-m"));
+    menu_.push_back(std::string("-t"));
     menu_.push_back(std::string("-l"));
     menu_.push_back(std::string("-k"));
     menu_.push_back(std::string("-r"));
@@ -315,6 +319,9 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       i += 2;
     } else if (list[i].compare("-m") == 0) {  // model file
       hyper_param.model_file = list[i+1];
+      i += 2;
+    } else if (list[i].compare("-t") == 0) { // txt model file
+      hyper_param.txt_model_file = list[i+1];
       i += 2;
     } else if (list[i].compare("-l") == 0) {  // log file
       hyper_param.log_file = list[i+1];
