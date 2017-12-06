@@ -107,8 +107,11 @@ struct HyperParam {
   This value can be empty. */
   std::string validate_set_file;
   /* Filename of model checkpoint
-  model_file = train_set_file + ".model" */
+  On default, model_file = train_set_file + ".model" */
   std::string model_file;
+  /* Filename of the txt model checkpoint 
+  On default, txt_model_file = none */
+  std::string txt_model_file = "none";
   /* Filename of output result for prediction
   output_file = test_set_file + ".out" */
   std::string output_file;
