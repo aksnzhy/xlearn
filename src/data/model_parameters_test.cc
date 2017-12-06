@@ -199,6 +199,28 @@ TEST(MODEL_TEST, Save_and_Load) {
   RemoveFile(hyper_param.model_file.c_str());
 }
 
+TEST(MODEL_TEST, SerializeToTxt) {
+  HyperParam hyper_param = Init();
+  hyper_param.score_func = "linear";
+  Model model_lr;
+  model_lr.Initialize(hyper_param.score_func,
+                    hyper_param.loss_func,
+                    hyper_param.num_feature,
+                    hyper_param.num_field,
+                    hyper_param.num_K,
+                    hyper_param.auxiliary_size, 
+                    0.5);
+  // Serialize model to txt file
+  model_lr.SerializeToTxt(hyper_param.model_file);
+  std::ifstream i_file(hyper_param.model_file);
+  for (index_t i = 0; i < hyper_param.num_feature+1; ++i) {
+    real_t tmp = -1.0;
+    i_file >> tmp;
+    EXPECT_FLOAT_EQ(tmp, 0.0);
+  }
+  RemoveFile(hyper_param.model_file.c_str());
+}
+
 TEST(MODEL_TEST, BestModel) {
   // Init model
   HyperParam hyper_param = Init();

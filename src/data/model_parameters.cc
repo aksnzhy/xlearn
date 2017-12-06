@@ -219,6 +219,19 @@ void Model::Serialize(const std::string& filename) {
   Close(file);
 }
 
+// Serialize current model to a txt file.
+void Model::SerializeToTxt(const std::string& filename) {
+  CHECK_NE(filename.empty(), true);
+  std::ofstream o_file(filename);
+  // For now, only LR model can dump to txt file.
+  /* bias */
+  o_file << (*param_b_) << "\n";
+  /* linear term */ 
+  for (index_t n = 0; n < param_num_w_; n+=auxiliary_size_) {
+    o_file << *(param_w_+n) << "\n";
+  }
+}
+
 // Deserialize model from a checkpoint file
 bool Model::Deserialize(const std::string& filename) {
   CHECK_NE(filename.empty(), true);
