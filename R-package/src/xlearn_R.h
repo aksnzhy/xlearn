@@ -49,3 +49,4 @@ XL_DLL SEXP XLearnSetFloat_R(SEXP out, SEXP key, SEXP value);
 XL_DLL SEXP XLearnSetBool_R(SEXP out, SEXP key, SEXP value);
 
 #endif
+

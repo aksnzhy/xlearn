@@ -34,3 +34,4 @@ predict.xl.model = function(object, newdata, out.path = "./pred.out") {
 #' @import methods
 #' @useDynLib xlearn, .registration = TRUE
 NULL
+
