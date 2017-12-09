@@ -24,6 +24,30 @@ if ((x) != 0) {                                 \
     Rf_error(XLearnGetLastError());                \
 }
 
+/*!
+ * \brief macro to annotate begin of api
+ */
+#define R_API_BEGIN()                           \
+GetRNGstate();                                  \
+try {
+/*!
+    * \brief macro to annotate end of api
+    */
+#define R_API_END()                             \
+} catch(...) {                                  \
+    PutRNGstate();                              \              
+    error("Error");                             \
+}                                               \
+PutRNGstate();
+
+/*!
+* \brief macro to check the call.
+*/
+#define CHECK_CALL(x)                           \
+if ((x) != 0) {                                 \
+    error(XLearnGetLastError());                \
+}
+
 // Say hello to user
 SEXP XLearnHello_R() {
     R_API_BEGIN();
@@ -154,4 +178,5 @@ SEXP XLearnSetBool_R(SEXP out, SEXP key, SEXP value) {
                              Rf_asLogical(value)));
     R_API_END();
 }
+
 
