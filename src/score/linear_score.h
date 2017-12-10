@@ -52,6 +52,12 @@ class LinearScore : public Score {
                 real_t norm = 1.0);
 
  protected:
+  // Calculate gradient and update model using sgd
+  void calc_grad_sgd(const SparseRow* row,
+                     Model& model,
+                     real_t pg,
+                     real_t norm = 1.0);
+
   // Calculate gradient and update model using adagrad
   void calc_grad_adagrad(const SparseRow* row,
                          Model& model,

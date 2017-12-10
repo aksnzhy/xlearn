@@ -46,8 +46,12 @@ void LinearScore::CalcGrad(const SparseRow* row,
                            Model& model,
                            real_t pg,
                            real_t norm) {
+  // Using sgd
+  if (opt_type_.compare("sgd") == 0) {
+    this->calc_grad_sgd(row, model, pg, norm);
+  }
   // Using adagrad
-  if (opt_type_.compare("adagrad") == 0) {
+  else if (opt_type_.compare("adagrad") == 0) {
     this->calc_grad_adagrad(row, model, pg, norm);
   }
   // Using ftrl
@@ -56,11 +60,33 @@ void LinearScore::CalcGrad(const SparseRow* row,
   }
 }
 
+// Calculate gradient and update current model using sgd
+void LinearScore::calc_grad_sgd(const SparseRow* row,
+                                Model& model,
+                                real_t pg,
+                                real_t norm) {
+  // linear term
+  real_t* w = model.GetParameter_w();
+  for (SparseRow::const_iterator iter = row->begin();
+       iter != row->end(); ++iter) {
+    real_t gradient = pg * iter->feat_val;
+    index_t idx_g = iter->feat_id;
+    gradient += regu_lambda_ * w[idx_g];
+    w[idx_g] -= (learning_rate_ * gradient);
+  }
+  // bias
+  w = model.GetParameter_b();
+  real_t &wb = w[0];
+  real_t g = pg;
+  wb -= learning_rate_ * g;
+}
+
 // Calculate gradient and update current model using adagrad
 void LinearScore::calc_grad_adagrad(const SparseRow* row,
                                     Model& model,
                                     real_t pg,
                                     real_t norm) {
+  // linear term
   real_t* w = model.GetParameter_w();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {

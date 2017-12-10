@@ -89,14 +89,84 @@ void FFMScore::CalcGrad(const SparseRow* row,
                         Model& model,
                         real_t pg,
                         real_t norm) {
+  // Using sgd
+  if (opt_type_.compare("sgd") == 0) {
+    this->calc_grad_sgd(row, model, pg, norm);
+  }
   // Using adagrad
-  if (opt_type_.compare("adagrad") == 0) {
+  else if (opt_type_.compare("adagrad") == 0) {
     this->calc_grad_adagrad(row, model, pg, norm);
   }
   // Using ftrl 
   else if (opt_type_.compare("ftrl") == 0) {
     this->calc_grad_ftrl(row, model, pg, norm);
   }
+}
+
+// Calculate gradient and update current model using sgd
+void FFMScore::calc_grad_sgd(const SparseRow* row,
+                             Model& model,
+                             real_t pg,
+                             real_t norm) {
+  /*********************************************************
+   *  linear term and bias term                            *
+   *********************************************************/
+  real_t sqrt_norm = sqrt(norm);
+  real_t *w = model.GetParameter_w();
+  for (SparseRow::const_iterator iter = row->begin();
+       iter != row->end(); ++iter) {
+    real_t &wl = w[iter->feat_id];
+    real_t g = regu_lambda_*wl+pg*iter->feat_val*sqrt_norm;
+    wl -= (learning_rate_ * g);
+  }
+  // bias
+  w = model.GetParameter_b();
+  real_t &wb = w[0];
+  real_t g = pg;
+  wb -= (learning_rate_ * g);
+  /*********************************************************
+   *  latent factor                                        *
+   *********************************************************/
+  index_t align0 = model.GetAuxiliarySize() * model.get_aligned_k();
+  index_t align1 = model.GetNumField() * align0;
+  index_t align = kAlign * model.GetAuxiliarySize();
+  w = model.GetParameter_v();
+  __m128 XMMpg = _mm_set1_ps(pg);
+  __m128 XMMlr = _mm_set1_ps(learning_rate_);
+  __m128 XMMlamb = _mm_set1_ps(regu_lambda_);
+  for (SparseRow::const_iterator iter_i = row->begin();
+       iter_i != row->end(); ++iter_i) {
+    index_t j1 = iter_i->feat_id;
+    index_t f1 = iter_i->field_id;
+    real_t v1 = iter_i->feat_val;
+    for (SparseRow::const_iterator iter_j = iter_i+1;
+         iter_j != row->end(); ++iter_j) {
+      index_t j2 = iter_j->feat_id;
+      index_t f2 = iter_j->field_id;
+      real_t v2 = iter_j->feat_val;
+      real_t* w1_base = w + j1*align1 + f2*align0;
+      real_t* w2_base = w + j2*align1 + f1*align0;
+      __m128 XMMv = _mm_set1_ps(v1*v2*norm);
+      __m128 XMMpgv = _mm_mul_ps(XMMv, XMMpg);
+      for (index_t d = 0; d < align0; d += align) {
+        real_t *w1 = w1_base + d;
+        real_t *w2 = w2_base + d;
+        __m128 XMMw1 = _mm_load_ps(w1);
+        __m128 XMMw2 = _mm_load_ps(w2);
+        __m128 XMMg1 = _mm_add_ps(
+                       _mm_mul_ps(XMMlamb, XMMw1),
+                       _mm_mul_ps(XMMpgv, XMMw2));
+        __m128 XMMg2 = _mm_add_ps(
+                       _mm_mul_ps(XMMlamb, XMMw2),
+                       _mm_mul_ps(XMMpgv, XMMw1));
+        XMMw1 = _mm_sub_ps(XMMw1, _mm_mul_ps(XMMlr, XMMg1));
+        XMMw2 = _mm_sub_ps(XMMw2, _mm_mul_ps(XMMlr, XMMg2));
+        _mm_store_ps(w1, XMMw1);
+        _mm_store_ps(w2, XMMw2);
+      }
+    }
+  }
+
 }
 
 // Calculate gradient and update current model using adagrad

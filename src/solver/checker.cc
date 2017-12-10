@@ -55,9 +55,9 @@ std::string Checker::option_help() const {
 "                                                                            \n"
 "  -x <metric>          :  The metric can be 'acc', 'prec', 'recall', 'f1', 'auc' (classification), and \n"
 "                          'mae', 'mape', 'rmsd (rmse)' (regression). On defaurt, xLearn will not print \n"
-"                          any evaluation metric information.                                          \n"
+"                          any evaluation metric information.                                            \n"
 "                                                                                                      \n"
-"  -o <opt_method>      :  Choose the optimization method, including 'adagrad' and 'ftrl'. On default \n"
+"  -p <opt_method>      :  Choose the optimization method, including 'sgd', adagrad' and 'ftrl'. On default, \n"
 "                          we use the adagrad optimization. \n"
 "                                                                                                 \n"
 "  -v <validate_file>   :  Path of the validation data file. This option will be empty by default, \n"
@@ -143,7 +143,7 @@ void Checker::Initialize(bool is_train, int argc, char* argv[]) {
     menu_.push_back(std::string("-s"));
     menu_.push_back(std::string("-x"));
     menu_.push_back(std::string("-v"));
-    menu_.push_back(std::string("-o"));
+    menu_.push_back(std::string("-p"));
     menu_.push_back(std::string("-m"));
     menu_.push_back(std::string("-t"));
     menu_.push_back(std::string("-l"));
@@ -294,9 +294,10 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
         hyper_param.metric = list[i+1];
       }
       i += 2;
-    } else if (list[i].compare("-o") == 0) {  // optimization method
+    } else if (list[i].compare("-p") == 0) {  // optimization method
       if (list[i+1].compare("adagrad") != 0 &&
-          list[i+1].compare("ftrl") != 0) {
+          list[i+1].compare("ftrl") != 0 &&
+          list[i+1].compare("sgd") != 0) {
         print_error(
           StringPrintf("Unknow optimization method: %s \n"
                " -o can only be: adagrad and ftrl. \n",

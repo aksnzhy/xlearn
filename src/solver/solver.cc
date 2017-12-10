@@ -289,7 +289,9 @@ void Solver::init_train() {
   print_action("Initialize model ...");
   // Initialize parameters
   model_ = new Model();
-  if (hyper_param_.opt_type.compare("adagrad") == 0) {
+  if (hyper_param_.opt_type.compare("sgd") == 0) {
+    hyper_param_.auxiliary_size = 1;
+  } else if (hyper_param_.opt_type.compare("adagrad") == 0) {
     hyper_param_.auxiliary_size = 2;
   } else if (hyper_param_.opt_type.compare("ftrl") == 0) {
     hyper_param_.auxiliary_size = 3;
