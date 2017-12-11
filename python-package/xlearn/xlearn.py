@@ -113,7 +113,7 @@ class XLearn(object):
 	def setQuiet(self):
 		"""Set xlearn to quiet model"""
 		key = 'quiet'
-		_check_call(_LIB.XLearnSetBool(self.handle, 
+		_check_call(_LIB.XLearnSetBool(ctypes.byref(self.handle), 
 			c_str(key), ctypes.c_bool(True)))
 
 	def setOnDisk(self):
