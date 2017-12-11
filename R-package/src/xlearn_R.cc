@@ -25,8 +25,8 @@ if ((x) != 0) {                                 \
 }
 
 /*!
- * \brief macro to annotate begin of api
- */
+* \brief macro to annotate begin of api
+*/
 #define R_API_BEGIN()                           \
 GetRNGstate();                                  \
 try {
@@ -35,7 +35,7 @@ try {
     */
 #define R_API_END()                             \
 } catch(...) {                                  \
-    PutRNGstate();                              \              
+    PutRNGstate();                              \
     error("Error");                             \
 }                                               \
 PutRNGstate();

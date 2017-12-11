@@ -1,0 +1,3 @@
+PKG_CPPFLAGS=-I./
+
+CXX_STD = CXX11

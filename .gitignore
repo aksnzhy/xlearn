@@ -39,3 +39,7 @@
 .bin
 .out
 .model
+
+# R-package
+.Rhistory
+*.tar.gz
