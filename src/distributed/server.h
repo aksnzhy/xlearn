@@ -132,7 +132,15 @@ class XLearnServer{
  public:
   XLearnServer(){
     auto server_ = new ps::KVServer<float>(0);
-    server_->set_request_handle(KVServerFTRLHandle());
+    if (opt_type_.compare("sgd") == 0) {
+      server_->set_request_handle(KVServerSGDHandle());
+    }
+    if (opt_type_.compare("adagrad") == 0) {
+      server_->set_request_handle(KVServerAdaGradHandle());
+    }
+    if (opt_type_.compare("ftrl") == 0) {
+      server_->set_request_handle(KVServerFTRLHandle());
+    }
     std::cout << "init server success " << std::endl;
   }
   ~S(){}
