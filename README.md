@@ -4,8 +4,8 @@
 ![Project Status](https://img.shields.io/badge/version-0.1.0-green.svg)
 [![Travis](https://img.shields.io/travis/rust-lang/rust.svg)]()
 
-[Installation](doc/install.md) |
-[Tutorial](doc/tutorial.md) |
+[Installation](http://xlearn-doc.readthedocs.io/en/latest/install.html) |
+[Documents](http://xlearn-doc.readthedocs.io/en/latest/start.html) |
 [RoadMap](doc/roadmap.md) |
 [News](doc/news.md) 
 
