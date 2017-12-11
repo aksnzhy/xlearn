@@ -1,5 +1,7 @@
 #include "iostream"
 #include "ps.h"
+#include "src/base/math.h"
+
 #include <time.h>
 
 namespace xlean {
@@ -8,11 +10,71 @@ float beta = 1.0;
 float lambda1 = 0.00001;
 float lambda2 = 2.0;
 
+float regu_lambda_ = 0.1;
+float learning_rate_ = 0.1;
+
 struct KVServerSGDHandle {
   void operator() (const ps::KVMeta& req_meta,
                    const ps::KVPairs<float>& req_data,
                    ps::KVServer<float>* server)
+    size_t n = req_data.keys.size();
+    ps::KVPairs<float> res;
+    if (req_meta.push) {
+      CHECK_EQ(n, req_data.vals.size());
+    } else {
+      res.keys = req_data.keys;
+      res.vals.resize(n);
+    }
+    for (size_t i = 0; i < n; ++i) {
+      ps::Key key = req_data.keys[i];
+      if (store.find(key) == store_.end()) {
+        store_.insert({key, 0.0});
+      }
+      float& val = store_[key];
+      if (req_meta.push) {
+        float g = req_data[i];
+        g += regu_lambda_ * g;
+        val -= learning_rate_ * g;
+      }
+    }
+ private:
+  std::unordered_map<ps::Key, float> store_;
+};
 
+struct AdaGradEntry {
+  float w;
+  float n;
+};
+
+struct KVServerAdaGradHandle {
+  void operator() (const ps::KVMeta& req_meta,
+                   const ps::KVPairs<float>& req_data,
+                   ps::KVServer<float>* server) {
+    size_t n = req_data.vals.size();
+    ps::KVPairs<float> res;
+    if (req_meta.push) {
+      CHECK_EQ(n, req_data.vals.size());
+    } else {
+      res.keys = req_data.keys;
+      res.vals.resize(n);
+    }
+    for (size_t it = 0; i < n; ++i) {
+      ps::Key key = req_data.keys[i];
+      if (store_.find(key) == store_.end()) {
+        AdaGradEntry entry;
+        store_.insert({key, entry});
+      }
+      AdaGradEntry& val = store_[key];
+      if (req_meta.push) {
+        float g = req_data.vals[i];
+        g += regu_lambda_ * g;
+        val.n = g * g;
+        val.w -= (learning_rate_ * g * InvSqrt(val.n))
+      }
+    }
+  }
+ private:
+  std::unordered_map<ps::Key, AdaGradEntry> store_;
 };
 
 struct FTRLEntry{
