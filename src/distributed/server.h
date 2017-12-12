@@ -40,10 +40,11 @@ struct KVServerSGDHandle {
       ps::Key key = req_data.keys[i];
       SGDEntry& val = store_[key];
       if (req_meta.push) {
-        for (int j = 0; j < val.w.size(); ++j)
-        float gradient = req_data.vals[i * k + j];
-        gradient += regu_lambda_ * gradient;
-        val.w[j] -= learning_rate_ * gradient;
+        for (int j = 0; j < val.w.size(); ++j) {
+          float gradient = req_data.vals[i * k + j];
+          gradient += regu_lambda_ * gradient;
+          val.w[j] -= learning_rate_ * gradient;
+        }
       }
     }
  private:
@@ -56,17 +57,21 @@ struct AdaGradEntry {
     n.resize(k, 0.0);
   }
   std::vector<float> w;
-  float n;
+  std::vector<float> n;
 };
 
 struct KVServerAdaGradHandle {
   void operator() (const ps::KVMeta& req_meta,
                    const ps::KVPairs<float>& req_data,
                    ps::KVServer<float>* server) {
-    size_t n = req_data.vals.size();
+    size_t k = 0;
+    if (req_data.lens.size() == 0) {
+      k = req_data.vals.size() / req_data.keys.size();
+    }
+    size_t keys_size = req_data.keys.size();
     ps::KVPairs<float> res;
     if (req_meta.push) {
-      CHECK_EQ(n, req_data.vals.size());
+      CHECK_EQ(keys_size * k, req_data.vals.size());
     } else {
       res.keys = req_data.keys;
       res.vals.resize(n);
@@ -75,10 +80,16 @@ struct KVServerAdaGradHandle {
       ps::Key key = req_data.keys[i];
       AdaGradEntry& val = store_[key];
       if (req_meta.push) {
-        float g = req_data.vals[i];
-        g += regu_lambda_ * g;
-        val.n = g * g;
-        val.w -= (learning_rate_ * g * InvSqrt(val.n))
+        for (int j = 0; j < val.w.size(); ++j) {
+          float g = req_data.vals[i * k + j];
+          g += regu_lambda_ * g;
+          val.n = g * g;
+          val.w[j] -= (learning_rate_ * g * InvSqrt(val.n))
+        }
+      } else {
+        for (int j = 0; j < val.w.size(); ++j) {
+          res[i * k + j] = val.w[j];
+        }
       }
     }
   }
