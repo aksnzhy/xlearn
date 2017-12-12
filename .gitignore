@@ -6,6 +6,7 @@
 *.lo
 *.o
 *.obj
+build/*
 
 # Precompiled Headers
 *.gch
@@ -43,3 +44,4 @@
 # R-package
 .Rhistory
 *.tar.gz
+xlearn/*

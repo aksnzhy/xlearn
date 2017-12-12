@@ -45,7 +45,7 @@ PutRNGstate();
 */
 #define CHECK_CALL(x)                           \
 if ((x) != 0) {                                 \
-    error(XLearnGetLastError());                \
+    Rf_error(XLearnGetLastError());                \
 }
 
 // Say hello to user
