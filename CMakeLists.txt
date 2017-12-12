@@ -63,6 +63,7 @@ link_directories(
   "${PROJECT_BINARY_DIR}/src/loss"
   "${PROJECT_BINARY_DIR}/src/solver"
   "${PROJECT_BINARY_DIR}/src/c_api"
+  "/Library/Frameworks/R.framework/Resources/lib"
 )
 
 #-------------------------------------------------------------------------------
