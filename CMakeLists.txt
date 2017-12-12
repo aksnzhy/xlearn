@@ -52,7 +52,6 @@ include_directories(
   "${PROJECT_SOURCE_DIR}"
   "${PROJECT_BINARY_DIR}"
   "${PROJECT_SOURCE_DIR}/gtest/include"
-  #"/Library/Frameworks/R.framework/Resources/include"
 )
 
 link_directories(
@@ -63,7 +62,6 @@ link_directories(
   "${PROJECT_BINARY_DIR}/src/loss"
   "${PROJECT_BINARY_DIR}/src/solver"
   "${PROJECT_BINARY_DIR}/src/c_api"
-  #"/Library/Frameworks/R.framework/Resources/lib"
 )
 
 #-------------------------------------------------------------------------------

@@ -1,0 +1,15 @@
+Package: xlearn
+Title: Large-Scale Machine Learning
+Version: 0.1
+Date: 2017-12-04
+Author: Chao Ma <mctt90@gmail.com>, Tong He <hetong007@gmail.com>
+Maintainer: Tong He <hetong007@gmail.com>
+Description: High Performance, Easy-to-use, and Scalable Machine Learning Package
+Depends: 
+    R (>= 3.0.2)
+Imports:
+    Matrix
+License: GPL-2
+Suggests: testthat, knitr, rmarkdown
+VignetteBuilder: knitr
+RoxygenNote: 6.0.1
