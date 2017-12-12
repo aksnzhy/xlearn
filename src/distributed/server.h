@@ -26,7 +26,7 @@ struct KVServerSGDHandle {
                    ps::KVServer<float>* server)
     int k = 0;
     if (req_data.lens() == 0) {
-      k = req_data.keys.size() / req_data.vals.size();
+      k = req_data.vals.size() / req_data.keys.size();
     }
     size_t keys_size = req_data.keys.size();
     ps::KVPairs<float> res;
@@ -41,7 +41,7 @@ struct KVServerSGDHandle {
       SGDEntry& val = store_[key];
       if (req_meta.push) {
         for (int j = 0; j < val.w.size(); ++j)
-        float gradient = req_data[i * k + j];
+        float gradient = req_data.vals[i * k + j];
         gradient += regu_lambda_ * gradient;
         val.w[j] -= learning_rate_ * gradient;
       }
@@ -55,7 +55,7 @@ struct AdaGradEntry {
     w.resize(k, 0.0);
     n.resize(k, 0.0);
   }
-  float w;
+  std::vector<float> w;
   float n;
 };
 
