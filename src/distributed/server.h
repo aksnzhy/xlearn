@@ -52,6 +52,10 @@ struct KVServerSGDHandle {
 };
 
 struct AdaGradEntry {
+  AdaGradEntry(size_t k) {
+    w.resize(k, 0.0);
+    n.resize(n, 0.0);
+  }
   float w;
   float n;
 };
