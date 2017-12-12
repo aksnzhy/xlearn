@@ -13,28 +13,38 @@ float lambda2 = 2.0;
 float regu_lambda_ = 0.1;
 float learning_rate_ = 0.1;
 
+struct SGDEntry{
+  SGDEntry(size_t k) {
+    w.resize(w, 0.0);
+  }
+  std::vector<float> w;
+}
+
 struct KVServerSGDHandle {
   void operator() (const ps::KVMeta& req_meta,
                    const ps::KVPairs<float>& req_data,
                    ps::KVServer<float>* server)
-    size_t n = req_data.keys.size();
+    int k = 0;
+    if (req_data.lens() == 0) {
+      k = req_data.keys.size() / req_data.vals.size();
+    }
+    size_t keys_size = req_data.keys.size();
     ps::KVPairs<float> res;
     if (req_meta.push) {
-      CHECK_EQ(n, req_data.vals.size());
+      CHECK_EQ(keys_size * k, req_data.vals.size());
     } else {
       res.keys = req_data.keys;
-      res.vals.resize(n);
+      SGDEntry entry(k);
+      res.vals.resize(keys_size, entry);
     }
-    for (size_t i = 0; i < n; ++i) {
+    for (size_t i = 0; i < keys_size; ++i) {
       ps::Key key = req_data.keys[i];
-      if (store.find(key) == store_.end()) {
-        store_.insert({key, 0.0});
-      }
-      float& val = store_[key];
+      SGDEntry& val = store_[key];
       if (req_meta.push) {
-        float g = req_data[i];
-        g += regu_lambda_ * g;
-        val -= learning_rate_ * g;
+        for (int j = 0; j < val.w.size(); ++j)
+        float gradient = req_data[i * k + j];
+        gradient += regu_lambda_ * gradient;
+        val.w[j] -= learning_rate_ * gradient;
       }
     }
  private:
