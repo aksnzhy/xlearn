@@ -15,7 +15,7 @@ float learning_rate_ = 0.1;
 
 struct SGDEntry{
   SGDEntry(size_t k) {
-    w.resize(w, 0.0);
+    w.resize(k, 0.0);
   }
   std::vector<float> w;
 }
@@ -34,8 +34,7 @@ struct KVServerSGDHandle {
       CHECK_EQ(keys_size * k, req_data.vals.size());
     } else {
       res.keys = req_data.keys;
-      SGDEntry entry(k);
-      res.vals.resize(keys_size, entry);
+      res.vals.resize(keys_size);
     }
     for (size_t i = 0; i < keys_size; ++i) {
       ps::Key key = req_data.keys[i];
@@ -48,13 +47,13 @@ struct KVServerSGDHandle {
       }
     }
  private:
-  std::unordered_map<ps::Key, float> store_;
+  std::unordered_map<ps::Key, SGDEntry> store_;
 };
 
 struct AdaGradEntry {
   AdaGradEntry(size_t k) {
     w.resize(k, 0.0);
-    n.resize(n, 0.0);
+    n.resize(k, 0.0);
   }
   float w;
   float n;
@@ -74,10 +73,6 @@ struct KVServerAdaGradHandle {
     }
     for (size_t it = 0; i < n; ++i) {
       ps::Key key = req_data.keys[i];
-      if (store_.find(key) == store_.end()) {
-        AdaGradEntry entry;
-        store_.insert({key, entry});
-      }
       AdaGradEntry& val = store_[key];
       if (req_meta.push) {
         float g = req_data.vals[i];
