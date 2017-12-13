@@ -13,12 +13,12 @@ float lambda2 = 2.0;
 float regu_lambda_ = 0.1;
 float learning_rate_ = 0.1;
 
-struct SGDEntry{
-  SGDEntry(size_t k) {
+typedef struct SGDEntry{
+  SGDEntry(size_t k = 4) {
     w.resize(k, 0.0);
   }
   std::vector<float> w;
-}
+} sgdentry;
 
 struct KVServerSGDHandle {
   void operator() (const ps::KVMeta& req_meta,
@@ -52,17 +52,17 @@ struct KVServerSGDHandle {
       }
     }
  private:
-  std::unordered_map<ps::Key, SGDEntry> store_;
+  std::unordered_map<ps::Key, sgdentry> store_;
 };
 
-struct AdaGradEntry {
-  AdaGradEntry(size_t k) {
+typedef struct AdaGradEntry {
+  AdaGradEntry(size_t k = 4) {
     w.resize(k, 0.0);
     n.resize(k, 0.0);
   }
   std::vector<float> w;
   std::vector<float> n;
-};
+} adagradentry;
 
 struct KVServerAdaGradHandle {
   void operator() (const ps::KVMeta& req_meta,
@@ -98,11 +98,11 @@ struct KVServerAdaGradHandle {
     }
   }
  private:
-  std::unordered_map<ps::Key, AdaGradEntry> store_;
+  std::unordered_map<ps::Key, adagradentry> store_;
 };
 
-struct FTRLEntry{
-  FTRLEntry(int k) {
+typedef struct FTRLEntry{
+  FTRLEntry(size_t k = 4) {
     w.resize(k, 0.0);
     n.resize(k, 0.0);
     z.resize(k, 0.0);
@@ -110,7 +110,7 @@ struct FTRLEntry{
   std::vector<float> w;
   std::vector<float> z;
   std::vector<float> n;
-};
+} ftrlentry;
 
 struct KVServerFTRLHandle {
   void operator() (const ps::KVMeta& req_meta,
@@ -155,7 +155,7 @@ struct KVServerFTRLHandle {
     server->Response(req_meta, res);
   }
  private:
-  std::unordered_map<ps::Key, FTRLEntry> store_;
+  std::unordered_map<ps::Key, ftrlentry> store_;
 };
 
 class XLearnServer{
