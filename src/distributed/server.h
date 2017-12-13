@@ -24,14 +24,10 @@ struct KVServerSGDHandle {
   void operator() (const ps::KVMeta& req_meta,
                    const ps::KVPairs<float>& req_data,
                    ps::KVServer<float>* server)
-    int k = 0;
-    if (req_data.lens() == 0) {
-      k = req_data.vals.size() / req_data.keys.size();
-    }
     size_t keys_size = req_data.keys.size();
     ps::KVPairs<float> res;
     if (req_meta.push) {
-      CHECK_EQ(keys_size * k, req_data.vals.size());
+      CHECK_EQ(keys_size * v_dim, req_data.vals.size());
     } else {
       res.keys = req_data.keys;
       res.vals.resize(keys_size);
@@ -41,13 +37,13 @@ struct KVServerSGDHandle {
       SGDEntry& val = store_[key];
       if (req_meta.push) {
         for (int j = 0; j < val.w.size(); ++j) {
-          float gradient = req_data.vals[i * k + j];
+          float gradient = req_data.vals[i * v_dim + j];
           gradient += regu_lambda_ * gradient;
           val.w[j] -= learning_rate_ * gradient;
         }
       } else {
         for (int j = 0; j < val.w.size(); ++j) {
-          res.vals[i * k + j] = val.w[j];
+          res.vals[i * v_dim + j] = val.w[j];
         }
       }
     }
@@ -68,14 +64,10 @@ struct KVServerAdaGradHandle {
   void operator() (const ps::KVMeta& req_meta,
                    const ps::KVPairs<float>& req_data,
                    ps::KVServer<float>* server) {
-    size_t k = 0;
-    if (req_data.lens.size() == 0) {
-      k = req_data.vals.size() / req_data.keys.size();
-    }
     size_t keys_size = req_data.keys.size();
     ps::KVPairs<float> res;
     if (req_meta.push) {
-      CHECK_EQ(keys_size * k, req_data.vals.size());
+      CHECK_EQ(keys_size * v_dim, req_data.vals.size());
     } else {
       res.keys = req_data.keys;
       res.vals.resize(n);
@@ -85,14 +77,14 @@ struct KVServerAdaGradHandle {
       AdaGradEntry& val = store_[key];
       if (req_meta.push) {
         for (int j = 0; j < val.w.size(); ++j) {
-          float gradient = req_data.vals[i * k + j];
+          float gradient = req_data.vals[i * v_dim + j];
           gradient += regu_lambda_ * gradient;
           val.n[j] = gradient * gradient;
           val.w[j] -= (learning_rate_ * gradient * InvSqrt(val.n[j]))
         }
       } else {
         for (int j = 0; j < val.w.size(); ++j) {
-          res[i * k + j] = val.w[j];
+          res[i * v_dim + j] = val.w[j];
         }
       }
     }
@@ -116,10 +108,6 @@ struct KVServerFTRLHandle {
   void operator() (const ps::KVMeta& req_meta,
                    const ps::KVPairs<float>& req_data,
                    ps::KVServer<float>* server) {
-    int k = 0;
-    if (req_data.lens.size() == 0) {
-      k = req_data.vals.size() / req_data.keys.size();
-    }
     size_t keys_size = req_data.keys.size();
     ps::KVPairs<float> res;
     if (req_meta.push) {
@@ -133,7 +121,7 @@ struct KVServerFTRLHandle {
       FTRLEntry& val = store_[key];
       for (int j = 0; j < val.w.size(); ++j) {
         if (req_meta.push) {
-          float gradient = req_data.vals[i * k + j];
+          float gradient = req_data.vals[i * v_dim + j];
           float old_n = val.n[j];
           float n = old_n + gradient * gradient;
           val.z[j] += gradient - (std::sqrt(n) - std::sqrt(old_n)) / alpha * val.w[j];
@@ -148,7 +136,7 @@ struct KVServerFTRLHandle {
             val.w[j] = tmpr / tmpl;
           }
         } else {
-          res.vals[i * k + j] = val.w[j];
+          res.vals[i * v_dim + j] = val.w[j];
         }
       }
     }
@@ -173,7 +161,7 @@ class XLearnServer{
     }
     std::cout << "init server success " << std::endl;
   }
-  ~S(){}
+  ~XLearnServer(){}
   ps::KVServer<float>* server_;
 };//end class Server
 }
