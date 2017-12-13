@@ -80,15 +80,15 @@ struct KVServerAdaGradHandle {
       res.keys = req_data.keys;
       res.vals.resize(n);
     }
-    for (size_t it = 0; i < n; ++i) {
+    for (size_t it = 0; i < keys_size; ++i) {
       ps::Key key = req_data.keys[i];
       AdaGradEntry& val = store_[key];
       if (req_meta.push) {
         for (int j = 0; j < val.w.size(); ++j) {
-          float g = req_data.vals[i * k + j];
-          g += regu_lambda_ * g;
-          val.n[j] = g * g;
-          val.w[j] -= (learning_rate_ * g * InvSqrt(val.n[j]))
+          float gradient = req_data.vals[i * k + j];
+          gradient += regu_lambda_ * gradient;
+          val.n[j] = gradient * gradient;
+          val.w[j] -= (learning_rate_ * gradient * InvSqrt(val.n[j]))
         }
       } else {
         for (int j = 0; j < val.w.size(); ++j) {
@@ -116,11 +116,11 @@ struct KVServerFTRLHandle {
   void operator() (const ps::KVMeta& req_meta,
                    const ps::KVPairs<float>& req_data,
                    ps::KVServer<float>* server) {
-    int k = 0; 
+    int k = 0;
     if (req_data.lens.size() == 0) {
       k = req_data.vals.size() / req_data.keys.size();
     }
-    size_t n = req_data.keys.size();
+    size_t keys_size = req_data.keys.size();
     ps::KVPairs<float> res;
     if (req_meta.push) {
       CHECK_EQ(n, req_data.vals.size());
@@ -128,15 +128,15 @@ struct KVServerFTRLHandle {
       res.keys = req_data.keys;
       res.vals.resize(n);
     }
-    for (size_t i = 0; i < n; ++i) {
+    for (size_t i = 0; i < keys_size; ++i) {
       ps::Key key = req_data.keys[i];
-      FTRLEntry& val = store[key];
+      FTRLEntry& val = store_[key];
       for (int j = 0; j < val.w.size(); ++j) {
         if (req_meta.push) {
-          float g = req_data.vals[i * k + j];
+          float gradient = req_data.vals[i * k + j];
           float old_n = val.n[j];
-          float n = old_n + g * g;
-          val.z[j] += g - (std::sqrt(n) - std::sqrt(old_n)) / alpha * val.w[j];
+          float n = old_n + gradient * gradient;
+          val.z[j] += gradient - (std::sqrt(n) - std::sqrt(old_n)) / alpha * val.w[j];
           val.n[j] = n;
           if (std::abs(val.z[j]) <= lambda1) {
             val.w[j] = 0.0;
@@ -155,7 +155,7 @@ struct KVServerFTRLHandle {
     server->Response(req_meta, res);
   }
  private:
-  std::unordered_map<ps::Key, FTRLEntry> store;
+  std::unordered_map<ps::Key, FTRLEntry> store_;
 };
 
 class XLearnServer{
