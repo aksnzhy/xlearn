@@ -87,8 +87,8 @@ struct KVServerAdaGradHandle {
         for (int j = 0; j < val.w.size(); ++j) {
           float g = req_data.vals[i * k + j];
           g += regu_lambda_ * g;
-          val.n = g * g;
-          val.w[j] -= (learning_rate_ * g * InvSqrt(val.n))
+          val.n[j] = g * g;
+          val.w[j] -= (learning_rate_ * g * InvSqrt(val.n[j]))
         }
       } else {
         for (int j = 0; j < val.w.size(); ++j) {
@@ -102,16 +102,24 @@ struct KVServerAdaGradHandle {
 };
 
 struct FTRLEntry{
-  FTRLEntry() : w(0.0), z(0.0), n(0.0) { }
-  float w;
-  float z;
-  float n;
+  FTRLEntry(int k) {
+    w.resize(k, 0.0);
+    n.resize(k, 0.0);
+    z.resize(k, 0.0);
+  }
+  std::vector<float> w;
+  std::vector<float> z;
+  std::vector<float> n;
 };
 
 struct KVServerFTRLHandle {
   void operator() (const ps::KVMeta& req_meta,
                    const ps::KVPairs<float>& req_data,
                    ps::KVServer<float>* server) {
+    int k = 0; 
+    if (req_data.lens.size() == 0) {
+      k = req_data.vals.size() / req_data.keys.size();
+    }
     size_t n = req_data.keys.size();
     ps::KVPairs<float> res;
     if (req_meta.push) {
@@ -122,28 +130,26 @@ struct KVServerFTRLHandle {
     }
     for (size_t i = 0; i < n; ++i) {
       ps::Key key = req_data.keys[i];
-      if (store.find(key) == store.end()) {
-        FTRLEntry entry;
-        store.insert({key, entry});
-      }
       FTRLEntry& val = store[key];
-      if (req_meta.push) {
-        float g = req_data.vals[i];
-        float old_n = val.n;
-        float n = old_n + g * g;
-        val.z += g - (std::sqrt(n) - std::sqrt(old_n)) / alpha * val.w;
-        val.n = n;
-        if (std::abs(val.z) <= lambda1) {
-          val.w = 0.0;
+      for (int j = 0; j < val.w.size(); ++j) {
+        if (req_meta.push) {
+          float g = req_data.vals[i * k + j];
+          float old_n = val.n[j];
+          float n = old_n + g * g;
+          val.z[j] += g - (std::sqrt(n) - std::sqrt(old_n)) / alpha * val.w[j];
+          val.n[j] = n;
+          if (std::abs(val.z[j]) <= lambda1) {
+            val.w[j] = 0.0;
+          } else {
+            float tmpr= 0.0;
+            if (val.z[j] > 0.0) tmpr = val.z[j] - lambda1;
+            if (val.z[j] < 0.0) tmpr = val.z[j] + lambda1;
+            float tmpl = -1 * ( (beta + std::sqrt(val.n[j]))/alpha  + lambda2 );
+            val.w[j] = tmpr / tmpl;
+          }
         } else {
-          float tmpr= 0.0;
-          if (val.z > 0.0) tmpr = val.z - lambda1;
-          if (val.z < 0.0) tmpr = val.z + lambda1;
-          float tmpl = -1 * ( (beta + std::sqrt(val.n))/alpha  + lambda2 );
-          val.w = tmpr / tmpl;
+          res.vals[i * k + j] = val.w[j];
         }
-      } else {
-        res.vals[i] = val.w;
       }
     }
     server->Response(req_meta, res);
