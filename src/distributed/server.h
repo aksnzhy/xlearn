@@ -45,6 +45,10 @@ struct KVServerSGDHandle {
           gradient += regu_lambda_ * gradient;
           val.w[j] -= learning_rate_ * gradient;
         }
+      } else {
+        for (int j = 0; j < val.w.size(); ++j) {
+          res.vals[i * k + j] = val.w[j];
+        }
       }
     }
  private:
