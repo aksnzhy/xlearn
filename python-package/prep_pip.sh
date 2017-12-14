@@ -7,6 +7,4 @@ python setup.py sdist
 #twine upload --repository-url https://test.pypi.org/legacy/ dist/*
 
 # make sure you know what you gonna do, and uncomment the following line
-#sudo pip install twine
-#twine upload dist/*.tar.gz
-
+# twine upload dist/*.tar.gz

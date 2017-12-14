@@ -219,6 +219,19 @@ void Model::Serialize(const std::string& filename) {
   Close(file);
 }
 
+// Serialize current model to a txt file.
+void Model::SerializeToTxt(const std::string& filename) {
+  CHECK_NE(filename.empty(), true);
+  std::ofstream o_file(filename);
+  // For now, only LR model can dump to txt file.
+  /* bias */
+  o_file << (*param_b_) << "\n";
+  /* linear term */ 
+  for (index_t n = 0; n < param_num_w_; n+=auxiliary_size_) {
+    o_file << *(param_w_+n) << "\n";
+  }
+}
+
 // Deserialize model from a checkpoint file
 bool Model::Deserialize(const std::string& filename) {
   CHECK_NE(filename.empty(), true);
@@ -265,7 +278,7 @@ void Model::SetBestModel() {
     }
     if (param_best_b_ == nullptr) {
         param_best_b_ = (real_t*)malloc(
-        2 * sizeof(real_t));
+        auxiliary_size_ * sizeof(real_t));
     }
   } catch (std::bad_alloc&) {
     LOG(FATAL) << "Cannot allocate enough memory for current  \
@@ -275,7 +288,7 @@ void Model::SetBestModel() {
   // Copy current model parameters
   memcpy(param_best_w_, param_w_, param_num_w_*sizeof(real_t));
   memcpy(param_best_v_, param_v_, param_num_v_*sizeof(real_t));
-  memcpy(param_best_b_, param_b_, 2*sizeof(real_t));
+  memcpy(param_best_b_, param_b_, auxiliary_size_*sizeof(real_t));
 }
 
 // Shrink back for getting the best model
@@ -288,7 +301,7 @@ void Model::Shrink() {
     memcpy(param_v_, param_best_v_, param_num_v_*sizeof(real_t));
   }
   if (param_best_b_ != nullptr) {
-    memcpy(param_b_, param_best_b_, 2*sizeof(real_t));
+    memcpy(param_b_, param_best_b_, auxiliary_size_*sizeof(real_t));
   }
 }
 
@@ -303,7 +316,7 @@ void Model::serialize_w_v_b(FILE* file) {
   // Write w
   WriteDataToDisk(file, (char*)param_w_, sizeof(real_t)*param_num_w_);
   // Write b
-  WriteDataToDisk(file, (char*)param_b_, sizeof(real_t)*2);
+  WriteDataToDisk(file, (char*)param_b_, sizeof(real_t)*auxiliary_size_);
   // Write v
   if (score_func_.compare("linear") != 0) {
     WriteDataToDisk(file, (char*)param_v_, sizeof(real_t)*param_num_v_);
@@ -323,7 +336,7 @@ void Model::deserialize_w_v_b(FILE* file) {
   // Read w
   ReadDataFromDisk(file, (char*)param_w_, sizeof(real_t)*param_num_w_);
   // Read b
-  ReadDataFromDisk(file, (char*)param_b_, sizeof(real_t)*2);
+  ReadDataFromDisk(file, (char*)param_b_, sizeof(real_t)*auxiliary_size_);
   // Read v
   if (score_func_.compare("linear") != 0) {
     ReadDataFromDisk(file, (char*)param_v_, sizeof(real_t)*param_num_v_);

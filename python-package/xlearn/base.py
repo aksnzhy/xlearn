@@ -33,7 +33,7 @@ def _check_call(ret):
 	if ret != 0:
 		raise XLearnError(_LIB.XLearGetLastError())
 
-#type definitions
+# type definitions
 XLearnHandle = ctypes.c_void_p
 
 if sys.version_info[0] < 3:
