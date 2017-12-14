@@ -75,8 +75,16 @@ class Trainer {
 
   // Save model to disk file
   void SaveModel(const std::string& filename) {
+    CHECK_NE(filename.empty(), true);
     CHECK_NE(filename.compare("none"), 0);
     model_->Serialize(filename);
+  }
+
+  // Save txt model to disk file
+  void SaveTxtModel(const std::string& filename) {
+    CHECK_NE(filename.empty(), true);
+    CHECK_NE(filename.compare("none"), 0);
+    model_->SerializeToTxt(filename);
   }
 
  protected:

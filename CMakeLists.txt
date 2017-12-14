@@ -30,8 +30,8 @@ cmake_minimum_required(VERSION 3.0)
 # Using c++11;
 # Optimization on architecture
 #-------------------------------------------------------------------------------
-add_definitions("-Wall -Wno-sign-compare -O3 -std=c++11 
--march=native -Wno-strict-aliasing -Wno-comment")
+add_definitions("-Wall -Wno-sign-compare -O3 -std=c++11 -march=native 
+-Wno-strict-aliasing -Wno-comment")
 
 #-------------------------------------------------------------------------------
 # Declare where our project will be installed.
@@ -41,9 +41,9 @@ set(CMAKE_INSTALL_PREFIX "xLearn")
 #-------------------------------------------------------------------------------
 # Ensure executables are statically linked with libraries.
 #-------------------------------------------------------------------------------
-#if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-#  set(CMAKE_EXE_LINKER_FLAGS "-static -static-libgcc")
-#endif()
+if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  set(CMAKE_EXE_LINKER_FLAGS "-static -static-libgcc")
+endif()
 
 #-------------------------------------------------------------------------------
 # Set include paths and library paths.
@@ -61,6 +61,7 @@ link_directories(
   "${PROJECT_BINARY_DIR}/src/score"
   "${PROJECT_BINARY_DIR}/src/loss"
   "${PROJECT_BINARY_DIR}/src/solver"
+  "${PROJECT_BINARY_DIR}/src/c_api"
 )
 
 #-------------------------------------------------------------------------------
