@@ -30,6 +30,7 @@ This file is the implementation of the Model class.
 #include "src/base/math.h"
 #include "src/base/logging.h"
 #include "src/base/stringprintf.h"
+#include "src/base/memalign.h"
 
 namespace xLearn {
 
@@ -71,7 +72,7 @@ void Model::Initialize(const std::string& score_func,
                    get_aligned_k() *
                    num_field * auxiliary_size_;
   } else {
-    LOG(FATAL) << "Unknow score function: " << score_func;
+    LOG(LogSeverity::FATAL) << "Unknow score function: " << score_func;
   }
   this->initial(true);
 }
@@ -87,22 +88,16 @@ void Model::initial(bool set_val) {
     if (score_func_.compare("fm") == 0 ||
         score_func_.compare("ffm") == 0) {
       // Aligned malloc for latent factor
-#ifdef _WIN32
-      param_v_ = _aligned_malloc(
-                 param_num_v_ * sizeof(real_t),
-                 kAlignByte);
-#else
       int ret = posix_memalign(
                 (void**)&param_v_,
                 kAlignByte,
                 param_num_v_ * sizeof(real_t));
       CHECK_EQ(ret, 0);
-#endif
     } else {
       param_v_ = nullptr;
     }
   } catch (std::bad_alloc&) {
-    LOG(FATAL) << "Cannot allocate enough memory for current  \
+    LOG(LogSeverity::FATAL) << "Cannot allocate enough memory for current  \
                    model parameters. Parameter size: "
                << GetNumParameter();
   }
@@ -264,24 +259,18 @@ void Model::SetBestModel() {
     }
     if (param_best_v_ == nullptr &&
         score_func_.compare("linear") != 0) {
-  #ifdef _WIN32
-        param_best_v_ = _aligned_malloc(
-        param_num_v_ * sizeof(real_t),
-        kAlignByte);
-  #else
       int ret = posix_memalign(
                 (void**)&param_best_v_,
                 kAlignByte,
                 param_num_v_ * sizeof(real_t));
       CHECK_EQ(ret, 0);
-  #endif
     }
     if (param_best_b_ == nullptr) {
         param_best_b_ = (real_t*)malloc(
         auxiliary_size_ * sizeof(real_t));
     }
   } catch (std::bad_alloc&) {
-    LOG(FATAL) << "Cannot allocate enough memory for current  \
+    LOG(LogSeverity::FATAL) << "Cannot allocate enough memory for current  \
                    model parameters. Parameter size: "
                << GetNumParameter();
   }

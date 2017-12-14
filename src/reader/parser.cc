@@ -60,7 +60,7 @@ uint64 Parser::get_line_from_buffer(char* line,
   while (end_pos < size && buf[end_pos] != '\n') { end_pos++; }
   uint64 read_size = end_pos - pos + 1;
   if (read_size > kMaxLineSize) {
-    LOG(FATAL) << "Encountered a too-long line.    \
+    LOG(LogSeverity::FATAL) << "Encountered a too-long line.    \
                    Please check the data.";
   }
   memcpy(line, buf+pos, read_size);

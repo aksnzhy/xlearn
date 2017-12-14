@@ -29,7 +29,7 @@ programming convenient.
 #ifndef _MSC_VER
 #include <stdint.h>  // Linux, MacOSX and Cygwin has this standard header.
 #else
-#include "base/stdint_msvc.h"  // Visual C++ use this header.
+//#include "base/stdint_msvc.h"  // Visual C++ use this header.
 #endif
 
 #include <limits>
@@ -53,28 +53,28 @@ programming convenient.
 //------------------------------------------------------------------------------
 
 #define CHECK(a) if (!(a)) {                            \
-    LOG(ERROR) << "CHECK failed "                       \
+    LOG(LogSeverity::ERR) << "CHECK failed "                       \
                << __FILE__ << ":" << __LINE__ << "\n"   \
                << #a << " = " << (a) << "\n";           \
     abort();                                            \
   }                                                     \
 
 #define CHECK_NOTNULL(a) if ((a) == NULL) {             \
-    LOG(ERROR) << "CHECK failed "                       \
+    LOG(LogSeverity::ERR) << "CHECK failed "                       \
                << __FILE__ << ":" << __LINE__ << "\n"   \
                << #a << " == NULL \n";                  \
     abort();                                            \
   }                                                     \
 
 #define CHECK_NULL(a) if ((a) != NULL) {                \
-    LOG(ERROR) << "CHECK failed "                       \
+    LOG(LogSeverity::ERR) << "CHECK failed "                       \
                << __FILE__ << ":" << __LINE__ << "\n"   \
                << #a << " = " << (a) << "\n";           \
     abort();                                            \
   }                                                     \
 
 #define CHECK_EQ(a, b) if (!((a) == (b))) {             \
-    LOG(ERROR) << "CHECK_EQ failed "                    \
+    LOG(LogSeverity::ERR) << "CHECK_EQ failed "                    \
                << __FILE__ << ":" << __LINE__ << "\n"   \
                << #a << " = " << (a) << "\n"            \
                << #b << " = " << (b) << "\n";           \
@@ -82,7 +82,7 @@ programming convenient.
   }                                                     \
 
 #define CHECK_NE(a, b) if (!((a) != (b))) {             \
-    LOG(ERROR) << "CHECK_NE failed "                    \
+    LOG(LogSeverity::ERR) << "CHECK_NE failed "                    \
                << __FILE__ << ":" << __LINE__ << "\n"   \
                << #a << " = " << (a) << "\n"            \
                << #b << " = " << (b) << "\n";           \
@@ -90,7 +90,7 @@ programming convenient.
   }                                                     \
 
 #define CHECK_GT(a, b) if (!((a) > (b))) {              \
-    LOG(ERROR) << "CHECK_GT failed "                    \
+    LOG(LogSeverity::ERR) << "CHECK_GT failed "                    \
                << __FILE__ << ":" << __LINE__ << "\n"   \
                << #a << " = " << (a) << "\n"            \
                << #b << " = " << (b) << "\n";           \
@@ -98,7 +98,7 @@ programming convenient.
   }                                                     \
 
 #define CHECK_LT(a, b) if (!((a) < (b))) {              \
-    LOG(ERROR) << "CHECK_LT failed "                    \
+    LOG(LogSeverity::ERR) << "CHECK_LT failed "                    \
                << __FILE__ << ":" << __LINE__ << "\n"   \
                << #a << " = " << (a) << "\n"            \
                << #b << " = " << (b) << "\n";           \
@@ -106,7 +106,7 @@ programming convenient.
   }                                                     \
 
 #define CHECK_GE(a, b) if (!((a) >= (b))) {             \
-    LOG(ERROR) << "CHECK_GE failed "                    \
+    LOG(LogSeverity::ERR) << "CHECK_GE failed "                    \
                << __FILE__ << ":" << __LINE__ << "\n"   \
                << #a << " = " << (a) << "\n"            \
                << #b << " = " << (b) << "\n";           \
@@ -114,7 +114,7 @@ programming convenient.
   }                                                     \
 
 #define CHECK_LE(a, b) if (!((a) <= (b))) {             \
-    LOG(ERROR) << "CHECK_LE failed "                    \
+    LOG(LogSeverity::ERR) << "CHECK_LE failed "                    \
                << __FILE__ << ":" << __LINE__ << "\n"   \
                << #a << " = " << (a) << "\n"            \
                << #b << " = " << (b) << "\n";           \

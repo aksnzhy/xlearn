@@ -25,8 +25,14 @@ This file defines the FMrScore (factorization machine) class.
 #include "src/base/common.h"
 #include "src/data/model_parameters.h"
 #include "src/score/score_function.h"
+#include "src/base/memalign.h"
 
 namespace xLearn {
+
+#ifdef _WIN32
+//Define a replacement for posix_mamalign for windows
+#define posix_memalign(p, a, s) (((*(p)) = _aligned_malloc((s), (a))), *(p) ?0 :errno)
+#endif //WIN32
 
 //------------------------------------------------------------------------------
 // FMScore is used to implemente factorization machines, in which

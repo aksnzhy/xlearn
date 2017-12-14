@@ -56,6 +56,7 @@ const int kAlignByte = 16;
 struct MetricInfo {
   real_t loss_val;    /* Loss info */
   real_t metric_val;  /* Metric info */
+  MetricInfo() { loss_val = metric_val = 0.0; }
 };
 
 //------------------------------------------------------------------------------

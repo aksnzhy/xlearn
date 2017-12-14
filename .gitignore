@@ -39,3 +39,6 @@
 .bin
 .out
 .model
+
+# Visual Studio
+.vs/

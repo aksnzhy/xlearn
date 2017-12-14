@@ -20,10 +20,10 @@ Author: Chao Ma (mctt90@gmail.com) and Yuze Liao
 This file is the implementation of the fileSpliter class.
 */
 
-#include <sys/mman.h>
-#include <unistd.h>
 #include <vector>
 
+#include "src/base/unistd.h"
+#include "src/base/mman.h"
 #include "src/base/common.h"
 #include "src/base/file_util.h"
 #include "src/base/stringprintf.h"

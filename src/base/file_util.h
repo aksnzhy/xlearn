@@ -23,10 +23,10 @@ This file contains facilitlies to control the file.
 #ifndef XLEARN_BASE_FILE_UTIL_H_
 #define XLEARN_BASE_FILE_UTIL_H_
 
-#include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
 
+#include "src/base/unistd.h"
 #include "src/base/common.h"
 #include "src/base/stringprintf.h"
 
@@ -130,7 +130,7 @@ inline bool FileExist(const char* filename) {
 inline FILE* OpenFileOrDie(const char* filename, const char* mode) {
   FILE* input_stream = fopen(filename, mode);
   if (input_stream == nullptr) {
-    LOG(FATAL) << "Cannot open file: " << filename
+    LOG(LogSeverity::FATAL) << "Cannot open file: " << filename
                << " with mode: " << mode;
   }
   return input_stream;
@@ -139,18 +139,18 @@ inline FILE* OpenFileOrDie(const char* filename, const char* mode) {
 // Close file using fclose().
 inline void Close(FILE *file) {
   if (fclose(file) == -1) {
-    LOG(FATAL) << "Error invoke fclose().";
+    LOG(LogSeverity::FATAL) << "Error invoke fclose().";
   }
 }
 
 // Return the size (byte) of a target file.
 inline uint64 GetFileSize(FILE* file) {
   if (fseek(file, 0L, SEEK_END) != 0) {
-    LOG(FATAL) << "Error: invoke fseek().";
+    LOG(LogSeverity::FATAL) << "Error: invoke fseek().";
   }
   uint64 total_size = ftell(file);
   if (total_size == -1) {
-    LOG(FATAL) << "Error: invoke ftell().";
+    LOG(LogSeverity::FATAL) << "Error: invoke ftell().";
   }
   rewind(file);  /* Return to the head */
   return total_size;
@@ -164,7 +164,7 @@ inline void GetLine(FILE* file, std::string& str_line) {
  CHECK_NOTNULL(ret);
   int read_len = strlen(line);
   if (line[read_len - 1] != '\n') {
-    LOG(FATAL) << "Encountered a too-long line.     \
+    LOG(LogSeverity::FATAL) << "Encountered a too-long line.     \
                    Please check the data.";
   } else {
     line[read_len - 1] = '\0';
@@ -184,7 +184,7 @@ inline size_t WriteDataToDisk(FILE* file, const char* buf, size_t len) {
   CHECK_GE(len, 0);
   size_t write_len = fwrite(buf, 1, len, file);
   if (write_len != len) {
-    LOG(FATAL) << "Error: invoke fwrite().";
+    LOG(LogSeverity::FATAL) << "Error: invoke fwrite().";
   }
   return write_len;
 }
@@ -202,7 +202,7 @@ inline size_t ReadDataFromDisk(FILE* file, char* buf, size_t len) {
   }
   size_t ret = fread(buf, 1, len, file);
   if (ret > len) {
-    LOG(FATAL) << "Error: invoke fread().";
+    LOG(LogSeverity::FATAL) << "Error: invoke fread().";
   }
   return ret;
 }
@@ -211,7 +211,7 @@ inline size_t ReadDataFromDisk(FILE* file, char* buf, size_t len) {
 inline void RemoveFile(const char* filename) {
   CHECK_NOTNULL(filename);
   if (remove(filename) == -1) {
-    LOG(FATAL) << "Error: invoke remove().";
+    LOG(LogSeverity::FATAL) << "Error: invoke remove().";
   }
 }
 
@@ -296,7 +296,7 @@ inline uint64_t HashFile(const std::string& filename, bool one_block=false) {
 
   uint64_t magic = 90359;
   for(long pos = 0; pos < end; ) {
-    long next_pos = std::min(pos + kChunkSize, end);
+    long next_pos = std::min(static_cast<long>(pos + kChunkSize), end);
     long size = next_pos - pos;
     std::vector<char> buffer(kChunkSize);
     f.read(buffer.data(), size);
@@ -328,7 +328,7 @@ inline uint64 ReadFileToMemory(const std::string& filename, char **buf) {
   try {
     *buf = new char[len];
   } catch (std::bad_alloc&) {
-    LOG(FATAL) << "Cannot allocate enough memory for Reader.";
+    LOG(LogSeverity::FATAL) << "Cannot allocate enough memory for Reader.";
   }
   uint64 read_size = fread(*buf, 1, len, file);
   CHECK_EQ(read_size, len);

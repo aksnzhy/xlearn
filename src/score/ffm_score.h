@@ -24,6 +24,7 @@ This file defines the FFMScore (field-aware factorization machine) class.
 
 #include "src/base/common.h"
 #include "src/score/score_function.h"
+#include "src/base/memalign.h"
 
 namespace xLearn {
 

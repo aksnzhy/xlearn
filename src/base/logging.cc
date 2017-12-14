@@ -24,6 +24,7 @@ This file is the implementation of the logging facilities.
 
 #include <stdlib.h>
 #include <time.h>
+#include <assert.h>
 
 //------------------------------------------------------------------------------
 // Logger
@@ -32,6 +33,20 @@ This file is the implementation of the logging facilities.
 std::ofstream Logger::info_log_file_;
 std::ofstream Logger::warn_log_file_;
 std::ofstream Logger::erro_log_file_;
+
+const char *cross_plat_ctime_r(time_t *cur_time, char *buffer)
+{
+#ifdef _WIN32
+	size_t bufsize = sizeof(buffer);
+	errno_t e = ctime_s(buffer, bufsize, cur_time);
+	//assert(e == 0 && "Huh? ctime_s returned an error");
+	return buffer;
+#else 
+	const char *res = ctime_r(cur_time, buffer);
+	//assert(res != NULL && "ctime_r failed...");
+	return res;
+#endif
+}
 
 void InitializeLogger(const std::string& info_log_filename,
                       const std::string& warn_log_filename,
@@ -43,11 +58,11 @@ void InitializeLogger(const std::string& info_log_filename,
 
 /*static*/
 std::ostream& Logger::GetStream(LogSeverity severity) {
-  if (severity == INFO) {
+  if (severity == LogSeverity::INFO) {
     return info_log_file_.is_open() ? info_log_file_ : std::cout;
-  } else if (severity == WARNING) {
+  } else if (severity == LogSeverity::WARNING) {
     return warn_log_file_.is_open() ? warn_log_file_ : std::cerr;
-  } else if (severity == ERROR || severity == FATAL) {
+  } else if (severity == LogSeverity::ERR || severity == LogSeverity::FATAL) {
     return erro_log_file_.is_open() ? erro_log_file_ : std::cerr;
   }
   return std::cout; // Print message
@@ -61,7 +76,7 @@ std::ostream& Logger::Start(LogSeverity severity,
   time_t tm;
   time(&tm);
   char time_string[128];
-  ctime_r(&tm, time_string);
+  cross_plat_ctime_r(&tm, time_string);
   return GetStream(severity) << time_string
                              << " " << file << ":" << line
                              << " (" << function << ") " << std::flush;
@@ -69,7 +84,7 @@ std::ostream& Logger::Start(LogSeverity severity,
 
 Logger::~Logger() {
   GetStream(severity_) << "\n" << std::flush;
-  if (severity_ == FATAL) {
+  if (severity_ == LogSeverity::FATAL) {
     info_log_file_.close();
     warn_log_file_.close();
     erro_log_file_.close();

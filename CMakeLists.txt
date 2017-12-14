@@ -19,7 +19,6 @@
 #
 # $> make install
 #
-project ("xLearn")
 
 cmake_minimum_required(VERSION 3.0)
 
@@ -30,8 +29,11 @@ cmake_minimum_required(VERSION 3.0)
 # Using c++11;
 # Optimization on architecture
 #-------------------------------------------------------------------------------
-add_definitions("-Wall -Wno-sign-compare -O3 -std=c++11 
--march=native -Wno-strict-aliasing -Wno-comment")
+add_definitions("-Wall -O3 -std=c++11 -march=native")
+
+#-Wno-sign-compare
+#-Wno-strict-aliasing
+#-Wno-comment
 
 #-------------------------------------------------------------------------------
 # Declare where our project will be installed.

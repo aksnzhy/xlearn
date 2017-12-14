@@ -74,7 +74,7 @@ Reader* Solver::create_reader() {
   std::string str = hyper_param_.on_disk ? "disk" : "memory";
   reader = CREATE_READER(str.c_str());
   if (reader == nullptr) {
-    LOG(ERROR) << "Cannot create reader: " << str;
+    LOG(LogSeverity::ERR) << "Cannot create reader: " << str;
   }
   return reader;
 }
@@ -84,7 +84,7 @@ Score* Solver::create_score() {
   Score* score;
   score = CREATE_SCORE(hyper_param_.score_func.c_str());
   if (score == nullptr) {
-    LOG(ERROR) << "Cannot create score: "
+    LOG(LogSeverity::ERR) << "Cannot create score: "
                << hyper_param_.score_func;
   }
   return score;
@@ -95,7 +95,7 @@ Loss* Solver::create_loss() {
   Loss* loss;
   loss = CREATE_LOSS(hyper_param_.loss_func.c_str());
   if (loss == nullptr) {
-    LOG(ERROR) << "Cannot create loss: "
+    LOG(LogSeverity::ERR) << "Cannot create loss: "
                << hyper_param_.loss_func;
   }
   return loss;
@@ -183,7 +183,7 @@ void Solver::init_log() {
   }
   InitializeLogger(StringPrintf("%s.INFO", prefix.c_str()),
               StringPrintf("%s.WARN", prefix.c_str()),
-              StringPrintf("%s.ERROR", prefix.c_str()));
+              StringPrintf("%s.LogSeverity::ERR", prefix.c_str()));
 }
 
 // Initialize training task
@@ -199,13 +199,13 @@ void Solver::init_train() {
   Timer timer;
   timer.tic();
   print_action("Read Problem ...");
-  LOG(INFO) << "Start to init Reader";
+  LOG(LogSeverity::INFO) << "Start to init Reader";
   // Split file
   if (hyper_param_.cross_validation) {
     CHECK_GT(hyper_param_.num_folds, 0);
     splitor_.split(hyper_param_.train_set_file,
                    hyper_param_.num_folds);
-    LOG(INFO) << "Split file into "
+    LOG(LogSeverity::INFO) << "Split file into "
               << hyper_param_.num_folds
               << " parts.";
   }
@@ -228,7 +228,7 @@ void Solver::init_train() {
       file_list.push_back(hyper_param_.validate_set_file);
     }
   }
-  LOG(INFO) << "Number of Reader: " << num_reader;
+  LOG(LogSeverity::INFO) << "Number of Reader: " << num_reader;
   reader_.resize(num_reader, nullptr);
   // Create Reader
   for (int i = 0; i < num_reader; ++i) {
@@ -244,7 +244,7 @@ void Solver::init_train() {
       );
       exit(0);
     }
-    LOG(INFO) << "Init Reader: " << file_list[i];
+    LOG(LogSeverity::INFO) << "Init Reader: " << file_list[i];
   }
   /*********************************************************
    *  Read problem                                         *
@@ -264,14 +264,14 @@ void Solver::init_train() {
     reader_[i]->Reset();
   }
   hyper_param_.num_feature = max_feat + 1;
-  LOG(INFO) << "Number of feature: " << hyper_param_.num_feature;
+  LOG(LogSeverity::INFO) << "Number of feature: " << hyper_param_.num_feature;
   print_info(
     StringPrintf("Number of Feature: %d", 
                  hyper_param_.num_feature)
   );
   if (hyper_param_.score_func.compare("ffm") == 0) {
     hyper_param_.num_field = max_field + 1;
-    LOG(INFO) << "Number of field: " << hyper_param_.num_field;
+    LOG(LogSeverity::INFO) << "Number of field: " << hyper_param_.num_field;
     print_info(
       StringPrintf("Number of Field: %d", 
         hyper_param_.num_field)
@@ -303,7 +303,7 @@ void Solver::init_train() {
                    hyper_param_.model_scale);
   index_t num_param = model_->GetNumParameter();
   hyper_param_.num_param = num_param;
-  LOG(INFO) << "Number parameters: " << num_param;
+  LOG(LogSeverity::INFO) << "Number parameters: " << num_param;
   print_info(
     StringPrintf("Model size: %s", 
          PrintSize(num_param*sizeof(real_t)).c_str())
@@ -323,7 +323,7 @@ void Solver::init_train() {
                      hyper_param_.lambda_1,
                      hyper_param_.lambda_2,
                      hyper_param_.opt_type);
-  LOG(INFO) << "Initialize score function.";
+  LOG(LogSeverity::INFO) << "Initialize score function.";
   /*********************************************************
    *  Initialize loss function                             *
    *********************************************************/
@@ -331,7 +331,7 @@ void Solver::init_train() {
   loss_->Initialize(score_, pool_, 
          hyper_param_.norm, 
          hyper_param_.lock_free);
-  LOG(INFO) << "Initialize loss function.";
+  LOG(LogSeverity::INFO) << "Initialize loss function.";
   /*********************************************************
    *  Init metric                                          *
    *********************************************************/
@@ -339,7 +339,7 @@ void Solver::init_train() {
   if (metric_ != nullptr) {
     metric_->Initialize(pool_);
   }
-  LOG(INFO) << "Initialize evaluation metric.";
+  LOG(LogSeverity::INFO) << "Initialize evaluation metric.";
 }
 
 // Initialize predict task
@@ -400,7 +400,7 @@ void Solver::init_predict() {
     StringPrintf("Time cost for loading model: %.2f (sec)",
         timer.toc())
   );
-  LOG(INFO) << "Initialize model.";
+  LOG(LogSeverity::INFO) << "Initialize model.";
   /*********************************************************
    *  Initialize Reader and read problem                   *
    *********************************************************/
@@ -423,18 +423,18 @@ void Solver::init_predict() {
     StringPrintf("Time cost for reading problem: %.2f (sec)",
                   timer.toc())
   );
-  LOG(INFO) << "Initialize Reader: " << hyper_param_.test_set_file;
+  LOG(LogSeverity::INFO) << "Initialize Reader: " << hyper_param_.test_set_file;
   /*********************************************************
    *  Init score function                                  *
    *********************************************************/
   score_ = create_score();
-  LOG(INFO) << "Initialize score function.";
+  LOG(LogSeverity::INFO) << "Initialize score function.";
   /*********************************************************
    *  Init loss function                                   *
    *********************************************************/
   loss_ = create_loss();
   loss_->Initialize(score_, pool_, hyper_param_.norm);
-  LOG(INFO) << "Initialize score function.";
+  LOG(LogSeverity::INFO) << "Initialize score function.";
 }
 
 /******************************************************************************
@@ -444,10 +444,10 @@ void Solver::init_predict() {
 // Start training or inference
 void Solver::StartWork() {
   if (hyper_param_.is_train) {
-    LOG(INFO) << "Start training work.";
+    LOG(LogSeverity::INFO) << "Start training work.";
     start_train_work();
   } else {
-    LOG(INFO) << "Start inference work.";
+    LOG(LogSeverity::INFO) << "Start inference work.";
     start_prediction_work();
   }
 }
@@ -542,7 +542,7 @@ void Solver::start_prediction_work() {
 
 // Finalize xLearn
 void Solver::Clear() {
-  LOG(INFO) << "Clear the xLearn environment ...";
+  LOG(LogSeverity::INFO) << "Clear the xLearn environment ...";
   print_action("Clear the xLearn environment ...");
   // Clear model
   delete this->model_;

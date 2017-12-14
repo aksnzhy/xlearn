@@ -39,7 +39,7 @@ TEST(ThreadPoolTest, Print_test) {
     printf("Hello master\n");
   }
   printf("final\n");
-  usleep(100);
+  //usleep(100);
 }
 
 int a1 = 0;

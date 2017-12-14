@@ -23,13 +23,27 @@ This file defines several system functions.
 #ifndef XLEARN_BASE_SYSTEM_H_
 #define XLEARN_BASE_SYSTEM_H_
 
+#ifdef _WIN32
+#include "src/base/uname.h"
+#else
 #include <sys/utsname.h>
-#include <unistd.h>
+#endif
 
 #include <string>
 
+#include "src/base/unistd.h"
 #include "src/base/common.h"
 #include "src/base/stringprintf.h"
+
+struct tm *localtime_safe(const time_t *timep, struct tm *result)
+{
+#ifdef _WIN32
+	localtime_s(result, timep);
+	return result;
+#else
+	return localtime_r(timep, result)
+#endif
+}
 
 // Get host name
 std::string get_host_name() {
@@ -50,7 +64,7 @@ std::string get_user_name() {
 std::string print_current_time() {
   time_t current_time = time(NULL);
   struct tm broken_down_time;
-  CHECK(localtime_r(&current_time, &broken_down_time) == &broken_down_time);
+  CHECK(localtime_safe(&current_time, &broken_down_time) == &broken_down_time);
   return StringPrintf("%04d%02d%02d-%02d%02d%02d",
                       1900 + broken_down_time.tm_year,
                       1 + broken_down_time.tm_mon,
@@ -74,5 +88,6 @@ std::string get_log_file(const std::string& file_base) {
                 getpid());
   return filename_prefix;
 }
+
 
 #endif  // XLEARN_BASE_SYSTEM_H_
