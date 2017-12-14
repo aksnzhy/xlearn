@@ -83,7 +83,8 @@ class CustomSdist(sdist):
 
 if __name__ == "__main__":
     setup(name='xlearn',
-          version=open(os.path.join(CURRENT_DIR, 'xlearn/VERSION')).read().strip(),
+          #version=open(os.path.join(CURRENT_DIR, 'xlearn/VERSION')).read().strip(),
+          version="0.1.0.post1",
           description="xLearn Python Package",
           maintainer='Chao Ma',
           maintainer_email='mctt90@gmail.com',
