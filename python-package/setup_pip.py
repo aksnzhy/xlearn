@@ -62,12 +62,11 @@ def compile_cpp():
                 error_msg='An error has occurred while building xlearn library file')
         suffix_list = ['dylib', 'so']
         for suffix in suffix_list:
-            if os.path.isfile('lib/libxlearn.{}'.format(suffix)):
-                shutil.copy('lib/libxlearn.{}'.format(suffix), '../xlearn/')
+            if os.path.isfile('lib/libxlearn_api.{}'.format(suffix)):
+                shutil.copy('lib/libxlearn_api.{}'.format(suffix), '../xlearn/')
 
     os.chdir(old_working_dir)
     
-
 class CustomInstall(install):
     
     def run(self):
@@ -79,7 +78,6 @@ class CustomSdist(sdist):
     def run(self):
         copy_files()
         sdist.run(self)
-
 
 if __name__ == "__main__":
     setup(name='xlearn',

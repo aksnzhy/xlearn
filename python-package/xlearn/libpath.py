@@ -31,11 +31,11 @@ def find_lib_path():
             dll_path.append(os.path.join(curr_path, '../../windows/Release/'))
             # hack for pip installation when copy all parent source directory here
             dll_path.append(os.path.join(curr_path, './windows/Release/'))
-        dll_path = [os.path.join(p, 'xlearn.dll') for p in dll_path]
+        dll_path = [os.path.join(p, 'xlearn_api.dll') for p in dll_path]
     elif sys.platform.startswith('linux'):
-        dll_path = [os.path.join(p, 'libxlearn.so') for p in dll_path]
+        dll_path = [os.path.join(p, 'libxlearn_api.so') for p in dll_path]
     elif sys.platform == 'darwin':
-        dll_path = [os.path.join(p, 'libxlearn.dylib') for p in dll_path]
+        dll_path = [os.path.join(p, 'libxlearn_api.dylib') for p in dll_path]
 
     lib_path = [p for p in dll_path if os.path.exists(p) and os.path.isfile(p)]
 
