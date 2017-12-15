@@ -227,7 +227,7 @@ class OndiskReader : public Reader {
   // We cannot set shuffle for OndiskReader
   void inline SetShuffle(bool shuffle) {
     if (shuffle == true) {
-      LOG(ERROR) << "Cannot set shuffle for OndiskReader.";
+      LOG(ERR) << "Cannot set shuffle for OndiskReader.";
     }
     this->shuffle_ = false;
   }
