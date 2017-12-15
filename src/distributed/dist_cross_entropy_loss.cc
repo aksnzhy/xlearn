@@ -88,18 +88,7 @@ static void ce_gradient_thread(const DMatrix* matrix,
                                size_t start_idx,
                                size_t end_idx) {
   CHECK_GE(end_idx, start_idx);
-  *sum = 0;
-  for (size_t i = start_idx; i < end_idx; ++i) {
-    SparseRow* row = matrix->row[i];
-    real_t norm = is_norm ? matrix->norm[i] : 1.0;
-    real_t pred = score_func->CalcScore(row, *model, norm);
-    // partial gradient
-    real_t y = matrix->Y[i] > 0 ? 1.0 : -1.0;
-    *sum += log1p(exp(-y*pred));
-    real_t pg = -y/(1.0+(1.0/exp(-y*pred)));
-    // real gradient and update
-    score_func->CalcGrad(row, *model, pg, norm);
-  }
+  score_func_->DistCalcScore(matrix, model, start_idx, end_idx);
 }
 
 //------------------------------------------------------------------------------
@@ -121,6 +110,22 @@ void DistCrossEntropyLoss::CalcGrad(const DMatrix* matrix,
   CHECK_GT(matrix->row_length, 0);
   size_t row_len = matrix->row_length;
   total_example_ += row_len;
+  std::vector<real_t> gradient_pull;
+  index_t min_fea_id = MAX_INT;
+  for (int i = 0; i < row_len; ++i) {
+    SparseRow* row = matrix->row[i];
+    for (SparseRow::const_iterator iter = row->begin();
+         iter != row->end(); ++iter) {
+      index_t idx = iter->feat_id;
+      gradient_pull.push_back(idx);
+      if (idx < min_fea_id) min_fea_id = idx;
+    }
+  }
+  std::sort(gradient_pull.begin(), gradient_pull.end());
+  gradient_pull.erase(unique(gradient_pull.begin(), gradient_pull.end()),
+                      gradient_pull.end());
+
+  std::vector<real_t> gradient_push(gradient_pull.size(), 0.0);
   // multi-thread training
   int count = lock_free_ ? threadNumber_ : 1;
   std::vector<real_t> sum(count, 0);

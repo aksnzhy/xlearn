@@ -73,6 +73,9 @@ class Score {
   virtual real_t CalcScore(const SparseRow* row,
                            Model& model,
                            real_t norm = 1.0) = 0;
+  virtual real_t DistCalcGrad(const Matrix* matrix,
+                               Model& model,
+                               real_t norm = 1.0) = 0;
 
   // Calculate gradient and update current
   // model parameters
