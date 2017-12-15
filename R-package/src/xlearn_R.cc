@@ -154,3 +154,5 @@ SEXP XLearnSetBool_R(SEXP out, SEXP key, SEXP value) {
                              Rf_asLogical(value)));
     R_API_END();
 }
+
+
