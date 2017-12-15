@@ -74,7 +74,7 @@ Reader* Solver::create_reader() {
   std::string str = hyper_param_.on_disk ? "disk" : "memory";
   reader = CREATE_READER(str.c_str());
   if (reader == nullptr) {
-    LOG(ERROR) << "Cannot create reader: " << str;
+    LOG(FATAL) << "Cannot create reader: " << str;
   }
   return reader;
 }
@@ -84,7 +84,7 @@ Score* Solver::create_score() {
   Score* score;
   score = CREATE_SCORE(hyper_param_.score_func.c_str());
   if (score == nullptr) {
-    LOG(ERROR) << "Cannot create score: "
+    LOG(FATAL) << "Cannot create score: "
                << hyper_param_.score_func;
   }
   return score;
@@ -95,7 +95,7 @@ Loss* Solver::create_loss() {
   Loss* loss;
   loss = CREATE_LOSS(hyper_param_.loss_func.c_str());
   if (loss == nullptr) {
-    LOG(ERROR) << "Cannot create loss: "
+    LOG(FATAL) << "Cannot create loss: "
                << hyper_param_.loss_func;
   }
   return loss;
