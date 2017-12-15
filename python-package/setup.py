@@ -13,7 +13,7 @@ libpath = {'__file__': libpath_py}
 exec(compile(open(libpath_py, "rb").read(), libpath_py, 'exec'), libpath, libpath)
 
 LIB_PATH = [os.path.relpath(libfile, CURRENT_DIR) for libfile in libpath['find_lib_path']()]
-print("Install libxlearn from: %s" % LIB_PATH)
+print("Install libxlearn_api from: %s" % LIB_PATH)
 
 setup(name='xlearn',
       version=open(os.path.join(CURRENT_DIR, 'xlearn/VERSION')).read().strip(),
