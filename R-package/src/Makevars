@@ -2,4 +2,4 @@ PKG_CPPFLAGS = -I./ -Wno-sign-compare -march=native -Wno-strict-aliasing -Wno-co
 
 CXX_STD = CXX11
 
-OBJECTS = ./xlearn_R.o ./init.o\
+OBJECTS = ./xlearn_R.o ./init.o

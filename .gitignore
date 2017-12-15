@@ -35,6 +35,7 @@ build/*
 # vim temp file
 *.un~
 *.DS_Store
+*.swp
 
 # xlearn output
 .bin
