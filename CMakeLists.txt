@@ -1,25 +1,9 @@
 # Copyright (c) 2016 by contributors.
 # Authour: Chao Ma (mctt90@gmail.com)
 #
-# This is the root CMakeLists.txt file of the xLearn project, which
-# build all subdirectories (packages) in the order of
-# inter-package dependence.
+# This is the root CMakeLists.txt file of the xLearn R package.
 #
-# you can build the xLearn using the following commands:
-#
-# $> cd xLearn
-# $> mkdir build
-# $> cd build
-# $> cmake ..
-# $> make
-#
-# Thus you check out the xLearn project and build it in a
-# subdirectory ``build". If you want further to install the
-# built project, you can type the command:
-#
-# $> make install
-#
-project ("xLearn")
+project ("xLearn-R")
 
 cmake_minimum_required(VERSION 3.0)
 
@@ -36,14 +20,7 @@ add_definitions("-Wall -Wno-sign-compare -O3 -std=c++11 -march=native
 #-------------------------------------------------------------------------------
 # Declare where our project will be installed.
 #-------------------------------------------------------------------------------
-set(CMAKE_INSTALL_PREFIX "xLearn")
-
-#-------------------------------------------------------------------------------
-# Ensure executables are statically linked with libraries.
-#-------------------------------------------------------------------------------
-if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  set(CMAKE_EXE_LINKER_FLAGS "-static -static-libgcc")
-endif()
+set(CMAKE_INSTALL_PREFIX "xLearn-R")
 
 #-------------------------------------------------------------------------------
 # Set include paths and library paths.
@@ -52,6 +29,7 @@ include_directories(
   "${PROJECT_SOURCE_DIR}"
   "${PROJECT_BINARY_DIR}"
   "${PROJECT_SOURCE_DIR}/gtest/include"
+  "/Library/Frameworks/R.framework/Resources/include"
 )
 
 link_directories(
@@ -65,16 +43,31 @@ link_directories(
 )
 
 #-------------------------------------------------------------------------------
-# Declare packages in xLearn project.
+# Build
 #-------------------------------------------------------------------------------
-add_subdirectory(gtest)
-add_subdirectory(demo)
-add_subdirectory(src/base)
-add_subdirectory(src/data)
-add_subdirectory(src/reader)
-add_subdirectory(src/score)
-add_subdirectory(src/loss)
-add_subdirectory(src/solver)
-add_subdirectory(src/c_api)
-add_subdirectory(python-package)
-add_subdirectory(scripts)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+
+# Build static library
+set(STA_DEPS c_api solver reader loss score data base)
+add_library(xlearn_R STATIC ./src/xlearn_R.cc)
+target_link_libraries(xlearn_R ${STA_DEPS})
+
+# Build shared library
+add_library(xlearn_R_shared SHARED ./src/xlearn_R.cc ../c_api/c_api.cc 
+../c_api/c_api_error.cc 
+../base/logging.cc ../base/stringprintf.cc ../base/split_string.cc 
+../base/levenshtein_distance.cc ../base/timer.cc 
+../data/model_parameters.cc 
+../loss/loss.cc ../loss/squared_loss.cc ../loss/cross_entropy_loss.cc 
+../loss/metric.cc 
+../reader/parser.cc ../reader/file_splitor.cc ../reader/reader.cc 
+../score/score_function.cc ../score/linear_score.cc ../score/fm_score.cc 
+../score/ffm_score.cc 
+../solver/checker.cc ../solver/trainer.cc 
+../solver/inference.cc ../solver/solver.cc)
+
+# Set properties
+set_target_properties(xlearn_R_shared PROPERTIES OUTPUT_NAME "xlearn_R")
+set_target_properties(xlearn_R_shared PROPERTIES CLEAN_DIRECT_OUTPUT 1)
+set_target_properties(xlearn_R PROPERTIES CLEAN_DIRECT_OUTPUT 1)
