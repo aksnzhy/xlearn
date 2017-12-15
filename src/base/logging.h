@@ -50,7 +50,7 @@ void InitializeLogger(const std::string& info_log_filename,
                       const std::string& warn_log_filename,
                       const std::string& erro_log_filename);
 
-enum LogSeverity { INFO, WARNING, ERROR, FATAL };
+enum LogSeverity { INFO, WARNING, ERR, FATAL };
 
 class Logger {
   friend void InitializeLogger(const std::string& info_log_filename,

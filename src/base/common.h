@@ -53,28 +53,28 @@ programming convenient.
 //------------------------------------------------------------------------------
 
 #define CHECK(a) if (!(a)) {                            \
-    LOG(ERROR) << "CHECK failed "                       \
+    LOG(ERR) << "CHECK failed "                         \
                << __FILE__ << ":" << __LINE__ << "\n"   \
                << #a << " = " << (a) << "\n";           \
     abort();                                            \
   }                                                     \
 
 #define CHECK_NOTNULL(a) if ((a) == NULL) {             \
-    LOG(ERROR) << "CHECK failed "                       \
+    LOG(ERR) << "CHECK failed "                         \
                << __FILE__ << ":" << __LINE__ << "\n"   \
                << #a << " == NULL \n";                  \
     abort();                                            \
   }                                                     \
 
 #define CHECK_NULL(a) if ((a) != NULL) {                \
-    LOG(ERROR) << "CHECK failed "                       \
+    LOG(ERR) << "CHECK failed "                         \
                << __FILE__ << ":" << __LINE__ << "\n"   \
                << #a << " = " << (a) << "\n";           \
     abort();                                            \
   }                                                     \
 
 #define CHECK_EQ(a, b) if (!((a) == (b))) {             \
-    LOG(ERROR) << "CHECK_EQ failed "                    \
+    LOG(ERR) << "CHECK_EQ failed "                      \
                << __FILE__ << ":" << __LINE__ << "\n"   \
                << #a << " = " << (a) << "\n"            \
                << #b << " = " << (b) << "\n";           \
@@ -82,7 +82,7 @@ programming convenient.
   }                                                     \
 
 #define CHECK_NE(a, b) if (!((a) != (b))) {             \
-    LOG(ERROR) << "CHECK_NE failed "                    \
+    LOG(ERR) << "CHECK_NE failed "                      \
                << __FILE__ << ":" << __LINE__ << "\n"   \
                << #a << " = " << (a) << "\n"            \
                << #b << " = " << (b) << "\n";           \
@@ -90,7 +90,7 @@ programming convenient.
   }                                                     \
 
 #define CHECK_GT(a, b) if (!((a) > (b))) {              \
-    LOG(ERROR) << "CHECK_GT failed "                    \
+    LOG(ERR) << "CHECK_GT failed "                      \
                << __FILE__ << ":" << __LINE__ << "\n"   \
                << #a << " = " << (a) << "\n"            \
                << #b << " = " << (b) << "\n";           \
@@ -98,7 +98,7 @@ programming convenient.
   }                                                     \
 
 #define CHECK_LT(a, b) if (!((a) < (b))) {              \
-    LOG(ERROR) << "CHECK_LT failed "                    \
+    LOG(ERR) << "CHECK_LT failed "                      \
                << __FILE__ << ":" << __LINE__ << "\n"   \
                << #a << " = " << (a) << "\n"            \
                << #b << " = " << (b) << "\n";           \
@@ -106,7 +106,7 @@ programming convenient.
   }                                                     \
 
 #define CHECK_GE(a, b) if (!((a) >= (b))) {             \
-    LOG(ERROR) << "CHECK_GE failed "                    \
+    LOG(ERR) << "CHECK_GE failed "                      \
                << __FILE__ << ":" << __LINE__ << "\n"   \
                << #a << " = " << (a) << "\n"            \
                << #b << " = " << (b) << "\n";           \
@@ -114,7 +114,7 @@ programming convenient.
   }                                                     \
 
 #define CHECK_LE(a, b) if (!((a) <= (b))) {             \
-    LOG(ERROR) << "CHECK_LE failed "                    \
+    LOG(ERR) << "CHECK_LE failed "                      \
                << __FILE__ << ":" << __LINE__ << "\n"   \
                << #a << " = " << (a) << "\n"            \
                << #b << " = " << (b) << "\n";           \

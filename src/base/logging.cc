@@ -47,7 +47,7 @@ std::ostream& Logger::GetStream(LogSeverity severity) {
     return info_log_file_.is_open() ? info_log_file_ : std::cout;
   } else if (severity == WARNING) {
     return warn_log_file_.is_open() ? warn_log_file_ : std::cerr;
-  } else if (severity == ERROR || severity == FATAL) {
+  } else if (severity == ERR || severity == FATAL) {
     return erro_log_file_.is_open() ? erro_log_file_ : std::cerr;
   }
   return std::cout; // Print message

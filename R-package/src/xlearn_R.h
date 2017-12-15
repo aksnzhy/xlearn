@@ -3,8 +3,8 @@
 #define R_NO_REMAP
 
 #include <Rinternals.h>
-#include <R_ext/Random.h>
-#include <Rmath.h>
+#include <stdlib.h> // for NULL
+#include <R_ext/Rdynload.h>
 
 #include <src/c_api/c_api.h>
 #include <src/c_api/c_api_error.h>
