@@ -61,6 +61,7 @@ link_directories(
   "${PROJECT_BINARY_DIR}/src/score"
   "${PROJECT_BINARY_DIR}/src/loss"
   "${PROJECT_BINARY_DIR}/src/solver"
+  "${PROJECT_BINARY_DIR}/src/distributed"
   "${PROJECT_BINARY_DIR}/src/c_api"
 )
 
@@ -75,7 +76,7 @@ add_subdirectory(src/reader)
 add_subdirectory(src/score)
 add_subdirectory(src/loss)
 add_subdirectory(src/solver)
+add_subdirectory(src/distributed)
 add_subdirectory(src/c_api)
 add_subdirectory(python-package)
-#add_subdirectory(R-package)
 add_subdirectory(scripts)
