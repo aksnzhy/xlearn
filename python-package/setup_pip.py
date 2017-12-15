@@ -79,7 +79,6 @@ class CustomSdist(sdist):
         copy_files()
         sdist.run(self)
 
-
 if __name__ == "__main__":
     setup(name='xlearn',
           version="0.20.a1",
