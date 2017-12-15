@@ -25,3 +25,4 @@ add_library(xlearn_R_shared SHARED ./src/init.cc ./src/xlearn_R.cc
 set_target_properties(xlearn_R_shared PROPERTIES OUTPUT_NAME "xlearn_R")
 set_target_properties(xlearn_R_shared PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 set_target_properties(xlearn_R PROPERTIES CLEAN_DIRECT_OUTPUT 1)
+set_target_properties(xlearn_R PROPERTIES PREFIX "")
