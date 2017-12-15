@@ -5,6 +5,7 @@
 #include <Rinternals.h>
 #include <stdlib.h> // for NULL
 #include <R_ext/Rdynload.h>
+#include <R_ext/Random.h>
 
 #include <src/c_api/c_api.h>
 #include <src/c_api/c_api_error.h>
