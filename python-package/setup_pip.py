@@ -82,7 +82,7 @@ class CustomSdist(sdist):
 
 if __name__ == "__main__":
     setup(name='xlearn',
-          version="0.1.0.post1",
+          version="0.20.a1",
           description="xLearn Python Package",
           maintainer='Chao Ma',
           maintainer_email='mctt90@gmail.com',
