@@ -24,7 +24,7 @@ This file defines the LinearScore class.
 
 #include "src/base/common.h"
 #include "src/data/model_parameters.h"
-#include "src/score/dist_score_function.h"
+#include "src/distributed/dist_score_function.h"
 
 namespace xLearn {
 
@@ -44,23 +44,16 @@ class DistLinearScore : public DistScore {
                    std::unordered_map<index_t, real_t>* w,
                    real_t norm = 1.0);
 
-  void DistCalcScore(const Matrix* matrix,
+  void DistCalcGrad(const DMatrix* matrix,
                      std::unordered_map<index_t, real_t>* w,
                      real_t* sum,
                      std::unordered_map<index_t, real_t>* g,
                      index_t start_idx,
                      index_t end_idx);
 
-  // Calculate gradient and update current
-  // model parameters.
-  void CalcGrad(const SparseRow* row,
-                Model& model,
-                real_t pg,
-                real_t norm = 1.0);
-
  protected:
   // Calculate gradient and update model using sgd
-  void calc_grad_sgd(const Matrix* matrix,
+  void calc_grad_sgd(const DMatrix* matrix,
                      std::unordered_map<index_t, real_t>* w,
                      real_t* sum,
                      std::unordered_map<index_t, real_t>* g,
@@ -69,7 +62,7 @@ class DistLinearScore : public DistScore {
                     );
 
   // Calculate gradient and update model using adagrad
-  void calc_grad_adagrad(const Matrix* matrix,
+  void calc_grad_adagrad(const DMatrix* matrix,
                          std::unordered_map<index_t, real_t>* w,
                          real_t* sum,
                          std::unordered_map<index_t, real_t>* g,
@@ -78,7 +71,7 @@ class DistLinearScore : public DistScore {
                         );
 
   // Calculate gradient and update model using ftrl
-  void calc_grad_ftrl(const Matrix* matrix,
+  void calc_grad_ftrl(const DMatrix* matrix,
                       std::unordered_map<index_t, real_t>* w,
                       real_t* sum,
                       std::unordered_map<index_t, real_t>* g,
@@ -87,7 +80,7 @@ class DistLinearScore : public DistScore {
                      );
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(LinearScore);
+  DISALLOW_COPY_AND_ASSIGN(DistLinearScore);
 };
 
 }  // namespace xLearn

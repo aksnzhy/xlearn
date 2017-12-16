@@ -19,7 +19,7 @@ Author: Chao Ma (mctt90@gmail.com)
 This file is the implementation of LinearScore class.
 */
 
-#include "src/score/dist_linear_score.h"
+#include "src/distributed/dist_linear_score.h"
 #include "src/base/math.h"
 
 namespace xLearn {
@@ -32,18 +32,18 @@ real_t DistLinearScore::CalcScore(const SparseRow* row,
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
     index_t idx = iter->feat_id;
-    score += w[idx] * iter->feat_val;
+    score += (*w)[idx] * iter->feat_val;
   }
   return score;
 }
 
 // Calculate gradient and update current model
-void DistLinearScore::CalcDistGrad(const Matrix* matrix,
+void DistLinearScore::DistCalcGrad(const DMatrix* matrix,
                            std::unordered_map<index_t, real_t>* w,
-                           real_t* sum;
+                           real_t* sum,
                            std::unordered_map<index_t, real_t>* g,
-                           real_t start_idx,
-                           real_t end_idx) {
+                           index_t start_idx,
+                           index_t end_idx) {
   // Using sgd
   if (opt_type_.compare("sgd") == 0) {
     this->calc_grad_sgd(matrix, w, sum, g, start_idx, end_idx);
@@ -59,7 +59,7 @@ void DistLinearScore::CalcDistGrad(const Matrix* matrix,
 }
 
 // Calculate gradient and update current model using sgd
-void DistLinearScore::calc_grad_sgd(const Matrix* matrix,
+void DistLinearScore::calc_grad_sgd(const DMatrix* matrix,
                                 std::unordered_map<index_t, real_t>* w,
                                 real_t* sum,
                                 std::unordered_map<index_t, real_t>* g,
@@ -68,22 +68,22 @@ void DistLinearScore::calc_grad_sgd(const Matrix* matrix,
   // linear term
   for (index_t i = start_idx; i < end_idx; ++i) {
     SparseRow* row = matrix->row[i];
-    real_t pred = CalcScore(row, w, norm);
+    real_t pred = CalcScore(row, w);
     real_t y = matrix->Y[i] > 0 ? 1.0 : -1.0;
-    sum += log1p(exp(-y*pred));
+    (*sum) += log1p(exp(-y*pred));
     real_t pg = -y / (1.0 + (1.0 / exp(-y * pred)));
     for (SparseRow::const_iterator iter = row->begin();
         iter != row->end(); ++iter) {
       index_t idx_g = iter->feat_id;
       real_t gradient = pg * iter->feat_val;
-      gradient += regu_lambda_ * w[idx_g]; // get gradient
-      g[idx_g] += gradient;
+      gradient += regu_lambda_ * (*w)[idx_g]; // get gradient
+      (*g)[idx_g] += gradient;
     }
   }
 }
 
 // Calculate gradient and update current model using adagrad
-void DistLinearScore::calc_grad_adagrad(const Matrix* matrix,
+void DistLinearScore::calc_grad_adagrad(const DMatrix* matrix,
                                     std::unordered_map<index_t, real_t>* w,
                                     real_t* sum,
                                     std::unordered_map<index_t, real_t>* g,
@@ -92,22 +92,22 @@ void DistLinearScore::calc_grad_adagrad(const Matrix* matrix,
   // linear term
   for (index_t i = start_idx; i < end_idx; ++i) {
     SparseRow* row = matrix->row[i];
-    real_t pred = CalcScore(row, w, norm);
+    real_t pred = CalcScore(row, w);
     real_t y = matrix->Y[i] > 0 ? 1.0 : -1.0;
-    sum += log1p(exp(-y*pred));
+    (*sum) += log1p(exp(-y*pred));
     real_t pg = -y / (1.0 + (1.0 / exp(-y * pred)));
     for (SparseRow::const_iterator iter = row->begin();
         iter != row->end(); ++iter) {
       index_t idx_g = iter->feat_id;
       real_t gradient = pg * iter->feat_val;
-      gradient += regu_lambda_ * w[idx_g]; // get gradient
-      g[idx_g] += gradient;
+      gradient += regu_lambda_ * (*w)[idx_g]; // get gradient
+      (*g)[idx_g] += gradient;
     }
   }
 }
 
 // Calculate gradient and update current model using ftrl
-void DistLinearScore::calc_grad_ftrl(const Matrix* matrix,
+void DistLinearScore::calc_grad_ftrl(const DMatrix* matrix,
                                  std::unordered_map<index_t, real_t>* w,
                                  real_t* sum,
                                  std::unordered_map<index_t, real_t>* g,
@@ -115,15 +115,15 @@ void DistLinearScore::calc_grad_ftrl(const Matrix* matrix,
                                  real_t end_idx) {
   for (int i = 0; i < start_idx; ++i) {
     SparseRow* row = matrix->row[i];
-    real_t pred = CalcScore(row, w, norm);
+    real_t pred = CalcScore(row, w);
     real_t y = matrix->Y[i] > 0 ? 1.0 : -1.0;
-    sum += log1p(exp(-y * pred));
+    (*sum) += log1p(exp(-y * pred));
     real_t pg = -y / (1.0 + (1.0 / exp(-y * pred)));
     for (SparseRow::const_iterator iter = row->begin();
         iter != row->end(); ++iter) {
       index_t idx_g = iter->feat_id;
       real_t gradient = pg * iter->feat_val; // get gradient
-      g[idx_g] += gradient;
+      (*g)[idx_g] += gradient;
     }
   }
 }
