@@ -19,7 +19,7 @@ Author: Chao Ma (mctt90@gmail.com)
 This file is the implementation of CrossEntropyLoss class.
 */
 
-#include "src/loss/dist_cross_entropy_loss.h"
+#include "src/distributed/dist_cross_entropy_loss.h"
 
 #include<thread>
 #include<atomic>
@@ -83,14 +83,14 @@ void DistCrossEntropyLoss::Evalute(const std::vector<real_t>& pred,
 // Calculate gradient in one thread.
 static void ce_gradient_thread(const DMatrix* matrix,
                                std::unordered_map<index_t, real_t>* w,
-                               Score* score_func,
+                               DistScore* score_func,
                                bool is_norm,
                                real_t* sum,
                                std::unordered_map<index_t, real_t>* g,
                                size_t start_idx,
                                size_t end_idx) {
   CHECK_GE(end_idx, start_idx);
-  score_func->DistCalcScore(matrix, w, sum, g, start_idx, end_idx);
+  score_func->DistCalcGrad(matrix, w, sum, g, start_idx, end_idx);
 }
 
 //------------------------------------------------------------------------------
@@ -130,9 +130,9 @@ void DistCrossEntropyLoss::CalcGrad(const DMatrix* matrix,
   feature_ids.erase(unique(feature_ids.begin(), feature_ids.end()),
                       feature_ids.end());
 
-  gradient_pull.resize(feature_ids.size);
-  if (model->score_func_.compare("linear_dist") == 0) {
-    kv_w_.Pull(feature_ids, gradient_pull);
+  gradient_pull.resize(feature_ids.size());
+  if (model->score_func_.compare("dist_linear") == 0) {
+    kv_w_->Pull(feature_ids, gradient_pull);
   }
   for (int i = 0; i < gradient_pull.size(); ++i) {
     index_t idx = feature_ids[i];
@@ -164,7 +164,7 @@ void DistCrossEntropyLoss::CalcGrad(const DMatrix* matrix,
     gradient_pull.push_back(g);
   }
   if (model->score_func_.compare("dist_linear") == 0) {
-    kv_w_.Push(feat_ids, gradient_push);
+    kv_w_->Push(feature_ids, gradient_push);
   }
   // Accumulate loss
   for (int i = 0; i < sum.size(); ++i) {
