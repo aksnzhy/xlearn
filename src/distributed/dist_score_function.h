@@ -16,7 +16,7 @@
 
 /*
 Author: Chao Ma (mctt90@gmail.com)
-This file defines the Score class, including linear score,
+This file defines the DistScore class, including linear score,
 FM score, FFM score, and etc.
 */
 
@@ -35,7 +35,7 @@ FM score, FFM score, and etc.
 namespace xLearn {
 
 //------------------------------------------------------------------------------
-// Score is an abstract class, which can be implemented by different
+// DistScore is an abstract class, which can be implemented by different
 // score functions such as LinearScore (liner_score.h), FMScore (fm_score.h)
 // FFMScore (ffm_score.h) etc. On common, we initial a Score function and
 // pass its pointer to a Loss class like this:
@@ -75,19 +75,12 @@ class DistScore {
                            std::unordered_map<index_t, real_t>* w,
                            real_t norm = 1.0) = 0;
 
-  virtual real_t DistCalcScore(const Matrix* matrix,
+  virtual void DistCalcGrad(const DMatrix* matrix,
                                std::unordered_map<index_t, real_t>* w,
                                real_t* sum,
                                std::unordered_map<index_t, real_t>* g,
-                               size_t start_idx,
-                               size_t end_idx) = 0;
-
-  // Calculate gradient and update current
-  // model parameters
-  virtual void DistCalcGrad(const SparseRow* row,
-                        Model& model,
-                        real_t pg,
-                        real_t norm = 1.0) = 0;
+                               index_t start_idx,
+                               index_t end_idx) = 0;
 
  protected:
   real_t learning_rate_;
@@ -99,18 +92,18 @@ class DistScore {
   std::string opt_type_;
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(Score);
+  DISALLOW_COPY_AND_ASSIGN(DistScore);
 };
 
 //------------------------------------------------------------------------------
 // Class register
 //------------------------------------------------------------------------------
-CLASS_REGISTER_DEFINE_REGISTRY(xLearn_score_registry, Score);
+CLASS_REGISTER_DEFINE_REGISTRY(xLearn_dist_score_registry, DistScore);
 
 #define REGISTER_SCORE(format_name, score_name)             \
   CLASS_REGISTER_OBJECT_CREATOR(                            \
-      xLearn_score_registry,                                \
-      Score,                                                \
+      xLearn_dist_score_registry,                                \
+      DistScore,                                                \
       format_name,                                          \
       score_name)
 
@@ -121,4 +114,4 @@ CLASS_REGISTER_DEFINE_REGISTRY(xLearn_score_registry, Score);
 
 }  // namespace xLearn
 
-#endif  // XLEARN_LOSS_SCORE_FUNCTION_H_
+#endif  // XLEARN_LOSS_DIST_SCORE_FUNCTION_H_
