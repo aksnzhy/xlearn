@@ -32,6 +32,7 @@ function or objective function.
 #include "src/base/thread_pool.h"
 #include "src/data/model_parameters.h"
 #include "src/score/score_function.h"
+#include "src/distributed/dist_score_function.h"
 
 #include "ps/ps.h"
 
