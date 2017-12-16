@@ -31,6 +31,7 @@ cmake_minimum_required(VERSION 3.0)
 # Optimization on architecture
 #-------------------------------------------------------------------------------
 add_definitions("-Wall -Wno-sign-compare -O3 -std=c++11 -march=native 
+-Wno-dev 
 -Wno-strict-aliasing -Wno-comment")
 
 #-------------------------------------------------------------------------------
@@ -44,6 +45,9 @@ set(CMAKE_INSTALL_PREFIX "xLearn")
 if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set(CMAKE_EXE_LINKER_FLAGS "-static -static-libgcc")
 endif()
+
+#set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+#include(ps-lite)
 
 #-------------------------------------------------------------------------------
 # Set include paths and library paths.
@@ -72,6 +76,7 @@ link_directories(
 #-------------------------------------------------------------------------------
 # Declare packages in xLearn project.
 #-------------------------------------------------------------------------------
+add_subdirectory(ps-lite)
 add_subdirectory(gtest)
 add_subdirectory(demo)
 add_subdirectory(src/base)
