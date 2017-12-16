@@ -88,7 +88,7 @@ static void ce_gradient_thread(const DMatrix* matrix,
                                size_t start_idx,
                                size_t end_idx) {
   CHECK_GE(end_idx, start_idx);
-  score_func_->DistCalcScore(matrix, model, start_idx, end_idx);
+  score_func->DistCalcScore(matrix, weight_map, sum, start_idx, end_idx);
 }
 
 //------------------------------------------------------------------------------
@@ -110,22 +110,31 @@ void DistCrossEntropyLoss::CalcGrad(const DMatrix* matrix,
   CHECK_GT(matrix->row_length, 0);
   size_t row_len = matrix->row_length;
   total_example_ += row_len;
+  std::vector<index_t> feature_ids;
   std::vector<real_t> gradient_pull;
-  index_t min_fea_id = MAX_INT;
+  std::unordered_map<index_t, real_t> weight_map;
   for (int i = 0; i < row_len; ++i) {
     SparseRow* row = matrix->row[i];
     for (SparseRow::const_iterator iter = row->begin();
          iter != row->end(); ++iter) {
       index_t idx = iter->feat_id;
-      gradient_pull.push_back(idx);
-      if (idx < min_fea_id) min_fea_id = idx;
+      feature_ids.push_back(idx);
+      weight_map[idx] = 0.0;
     }
   }
-  std::sort(gradient_pull.begin(), gradient_pull.end());
-  gradient_pull.erase(unique(gradient_pull.begin(), gradient_pull.end()),
-                      gradient_pull.end());
+  std::sort(feature_ids.begin(), feature_ids.end());
+  feature_ids.erase(unique(feature_ids.begin(), feature_ids.end()),
+                      feature_ids.end());
 
-  std::vector<real_t> gradient_push(gradient_pull.size(), 0.0);
+  gradient_pull.resize(feature_ids.size);
+  if (model->score_func_.compare("linear_dist") == 0) {
+    kv_w_.Pull(feature_ids, gradient_pull);
+  }
+  for (int i = 0; i < gradient_pull.size(); ++i) {
+    index_t idx = feature_ids[i];
+    real_t weight = gradient_pull[i];
+    weight_map[idx] = weight;
+  }
   // multi-thread training
   int count = lock_free_ ? threadNumber_ : 1;
   std::vector<real_t> sum(count, 0);
@@ -135,6 +144,7 @@ void DistCrossEntropyLoss::CalcGrad(const DMatrix* matrix,
     pool_->enqueue(std::bind(ce_gradient_thread,
                              matrix,
                              &model,
+                             weight_map,
                              score_func_,
                              norm_,
                              &(sum[i]),
