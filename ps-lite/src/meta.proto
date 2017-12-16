@@ -1,0 +1,49 @@
+/**
+ *  Copyright (c) 2015 by Contributors
+ */
+package ps;
+option optimize_for = LITE_RUNTIME;
+
+message PBNode {
+  // the node role
+  required int32 role = 1;
+  // node id
+  optional int32 id = 2;
+  // hostname or ip
+  optional string hostname = 3;
+  // the port this node is binding
+  optional int32 port = 4;
+  // whether this node is created by failover
+  optional bool is_recovery = 5;
+}
+
+// system control info
+message PBControl {
+  required int32 cmd = 1;
+  repeated PBNode node = 2;
+  optional int32 barrier_group = 3;
+  optional uint64 msg_sig = 4;
+}
+
+// mete information about a message
+message PBMeta {
+  // message.head
+  optional int32 head = 1;
+  // message.body
+  optional bytes body = 2;
+  // if set, then it is system control task. otherwise, it is for app
+  optional PBControl control = 3;
+  // true: a request task
+  // false: the response task to the request task with the same *time*
+  optional bool request = 4 [default = false];
+  // the unique id of an customer
+  optional int32 customer_id = 7;
+  // the timestamp of this message
+  optional int32 timestamp = 8;
+  // data type of message.data[i]
+  repeated int32 data_type = 9 [packed=true];
+  // whether or not a push message
+  optional bool push = 5;
+  // whether or not it's for SimpleApp
+  optional bool simple_app = 6 [default = false];
+}

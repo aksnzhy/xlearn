@@ -1,0 +1,10 @@
+prefix=/Users/xiaoshuwang/documents/oneflow/opensource/logistic_regression_ps/ps-lite/deps
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libzmq
+Description: 0MQ c++ library
+Version: 4.1.4
+Libs: -L${libdir} -lzmq
+Cflags: -I${includedir}

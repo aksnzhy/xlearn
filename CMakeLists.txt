@@ -52,6 +52,7 @@ include_directories(
   "${PROJECT_SOURCE_DIR}"
   "${PROJECT_BINARY_DIR}"
   "${PROJECT_SOURCE_DIR}/gtest/include"
+  "${PROJECT_SOURCE_DIR}/ps-lite"
 )
 
 link_directories(
@@ -63,12 +64,15 @@ link_directories(
   "${PROJECT_BINARY_DIR}/src/solver"
   "${PROJECT_BINARY_DIR}/src/distributed"
   "${PROJECT_BINARY_DIR}/src/c_api"
+  "${PROJECT_BINARY_DIR}/ps-lite/deps/lib"
+  "${PROJECT_BINARY_DIR}/ps-lite/build"
 )
 
 #-------------------------------------------------------------------------------
 # Declare packages in xLearn project.
 #-------------------------------------------------------------------------------
 add_subdirectory(gtest)
+add_subdirectory(ps-lite)
 add_subdirectory(demo)
 add_subdirectory(src/base)
 add_subdirectory(src/data)
