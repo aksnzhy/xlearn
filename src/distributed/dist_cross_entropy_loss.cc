@@ -23,6 +23,7 @@ This file is the implementation of CrossEntropyLoss class.
 
 #include<thread>
 #include<atomic>
+#include<unordered_map>
 
 namespace xLearn {
 
@@ -81,14 +82,15 @@ void DistCrossEntropyLoss::Evalute(const std::vector<real_t>& pred,
 
 // Calculate gradient in one thread.
 static void ce_gradient_thread(const DMatrix* matrix,
-                               Model* model,
+                               std::unordered_map<index_t, real_t>* w,
                                Score* score_func,
                                bool is_norm,
                                real_t* sum,
+                               std::unordered_map<index_t, real_t>* g,
                                size_t start_idx,
                                size_t end_idx) {
   CHECK_GE(end_idx, start_idx);
-  score_func->DistCalcScore(matrix, weight_map, sum, start_idx, end_idx);
+  score_func->DistCalcScore(matrix, w, sum, g, start_idx, end_idx);
 }
 
 //------------------------------------------------------------------------------
@@ -113,6 +115,8 @@ void DistCrossEntropyLoss::CalcGrad(const DMatrix* matrix,
   std::vector<index_t> feature_ids;
   std::vector<real_t> gradient_pull;
   std::unordered_map<index_t, real_t> weight_map;
+  std::unordered_map<index_t, real_t> gradient_push_map;
+  std::vector<real_t> gradient_push;
   for (int i = 0; i < row_len; ++i) {
     SparseRow* row = matrix->row[i];
     for (SparseRow::const_iterator iter = row->begin();
@@ -135,6 +139,7 @@ void DistCrossEntropyLoss::CalcGrad(const DMatrix* matrix,
     real_t weight = gradient_pull[i];
     weight_map[idx] = weight;
   }
+  gradient_push_map.resize(feature_ids.size(), 0.0);
   // multi-thread training
   int count = lock_free_ ? threadNumber_ : 1;
   std::vector<real_t> sum(count, 0);
@@ -143,16 +148,24 @@ void DistCrossEntropyLoss::CalcGrad(const DMatrix* matrix,
     index_t end_idx = getEnd(row_len, count, i);
     pool_->enqueue(std::bind(ce_gradient_thread,
                              matrix,
-                             &model,
                              weight_map,
                              score_func_,
                              norm_,
                              &(sum[i]),
+                             gradient_push_map,
                              start_idx,
                              end_idx));
   }
   // Wait all of the threads finish their job
   pool_->Sync(count);
+  for (int i = 0; i < feat_ids.size(); ++i) {
+    index_t idx = feature_ids[i];
+    real_t g = gradient_push_map[idx];
+    gradient_pull.push_back(g);
+  }
+  if (model->score_func_.compare("dist_linear") == 0) {
+    kv_w_.Push(feat_ids, gradient_push);
+  }
   // Accumulate loss
   for (int i = 0; i < sum.size(); ++i) {
     loss_sum_ += sum[i];

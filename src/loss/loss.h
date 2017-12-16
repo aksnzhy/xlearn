@@ -33,6 +33,8 @@ function or objective function.
 #include "src/data/model_parameters.h"
 #include "src/score/score_function.h"
 
+#include "ps/ps.h"
+
 namespace xLearn {
 
 //------------------------------------------------------------------------------
@@ -71,7 +73,10 @@ namespace xLearn {
 class Loss {
  public:
   // Constructor and Desstructor
-  Loss() : loss_sum_(0), total_example_ (0) { };
+  Loss() : loss_sum_(0), total_example_ (0) { 
+    kv_w_ = new ps::KVWorker<float>(0);
+    kv_v_ = new ps::KVWorker<float>(1);
+  };
   virtual ~Loss() { }
 
   // This function needs to be invoked before using this class
@@ -133,6 +138,11 @@ class Loss {
   real_t loss_sum_;
   /* Used to store the number of example */
   index_t total_example_;
+  /* kv store for w */
+  ps::KVWorker<float>* kv_w_;
+  /* kv store for v */
+  ps::KVWorker<float>* kv_v_;
+
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Loss);
