@@ -94,6 +94,19 @@ class Loss {
     lock_free_ = lock_free;
   }
 
+  void DistInitialize(DistScore* score,
+                  ThreadPool* pool,
+                  bool norm = true,
+                  bool lock_free = false) {
+    CHECK_NOTNULL(score);
+    CHECK_NOTNULL(pool);
+    dist_score_func_ = score;
+    pool_ = pool;
+    norm_ = norm;
+    threadNumber_ = pool_->ThreadNumber();
+    lock_free_ = lock_free;
+  }
+
   // Given predictions and labels, accumulate loss value.
   virtual void Evalute(const std::vector<real_t>& pred,
                        const std::vector<real_t>& label) = 0;
@@ -127,6 +140,7 @@ class Loss {
   /* The score function, including LinearScore,
   FMScore, FFMScore, etc */
   Score* score_func_;
+  DistScore* dist_score_func_;
   /* Use instance-wise normalization */
   bool norm_;
   /* Open lock-free training ? */
