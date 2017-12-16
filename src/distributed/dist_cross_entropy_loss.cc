@@ -82,15 +82,15 @@ void DistCrossEntropyLoss::Evalute(const std::vector<real_t>& pred,
 
 // Calculate gradient in one thread.
 static void ce_gradient_thread(const DMatrix* matrix,
-                               std::unordered_map<index_t, real_t>* w,
-                               DistScore* score_func,
+                               std::unordered_map<index_t, real_t>& w,
+                               DistScore* dist_score_func,
                                bool is_norm,
                                real_t* sum,
-                               std::unordered_map<index_t, real_t>* g,
+                               std::unordered_map<index_t, real_t>& g,
                                size_t start_idx,
                                size_t end_idx) {
   CHECK_GE(end_idx, start_idx);
-  score_func->DistCalcGrad(matrix, w, sum, g, start_idx, end_idx);
+  dist_score_func->DistCalcGrad(matrix, w, sum, g, start_idx, end_idx);
 }
 
 //------------------------------------------------------------------------------
@@ -147,11 +147,11 @@ void DistCrossEntropyLoss::CalcGrad(const DMatrix* matrix,
     index_t end_idx = getEnd(row_len, count, i);
     pool_->enqueue(std::bind(ce_gradient_thread,
                              matrix,
-                             weight_map,
-                             score_func_,
+                             std::ref(weight_map),
+                             dist_score_func_,
                              norm_,
                              &(sum[i]),
-                             gradient_push_map,
+                             std::ref(gradient_push_map),
                              start_idx,
                              end_idx));
   }

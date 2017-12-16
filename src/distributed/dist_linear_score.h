@@ -45,36 +45,36 @@ class DistLinearScore : public DistScore {
                    real_t norm = 1.0);
 
   void DistCalcGrad(const DMatrix* matrix,
-                     std::unordered_map<index_t, real_t>* w,
+                     std::unordered_map<index_t, real_t>& w,
                      real_t* sum,
-                     std::unordered_map<index_t, real_t>* g,
+                     std::unordered_map<index_t, real_t>& g,
                      index_t start_idx,
                      index_t end_idx);
 
  protected:
   // Calculate gradient and update model using sgd
   void calc_grad_sgd(const DMatrix* matrix,
-                     std::unordered_map<index_t, real_t>* w,
+                     std::unordered_map<index_t, real_t>& w,
                      real_t* sum,
-                     std::unordered_map<index_t, real_t>* g,
+                     std::unordered_map<index_t, real_t>& g,
                      real_t start_idx,
                      real_t end_idx
                     );
 
   // Calculate gradient and update model using adagrad
   void calc_grad_adagrad(const DMatrix* matrix,
-                         std::unordered_map<index_t, real_t>* w,
+                         std::unordered_map<index_t, real_t>& w,
                          real_t* sum,
-                         std::unordered_map<index_t, real_t>* g,
+                         std::unordered_map<index_t, real_t>& g,
                          real_t start_idx,
                          real_t end_idx
                         );
 
   // Calculate gradient and update model using ftrl
   void calc_grad_ftrl(const DMatrix* matrix,
-                      std::unordered_map<index_t, real_t>* w,
+                      std::unordered_map<index_t, real_t>& w,
                       real_t* sum,
-                      std::unordered_map<index_t, real_t>* g,
+                      std::unordered_map<index_t, real_t>& g,
                       real_t start_idx,
                       real_t end_idx
                      );
