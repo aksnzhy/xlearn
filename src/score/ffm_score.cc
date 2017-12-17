@@ -367,7 +367,7 @@ void FFMScore::calc_grad_ftrl(const SparseRow* row,
                  _mm_mul_ps(XMMg2, XMMg2));
         _mm_store_ps(wg1, XMMwg1);
         _mm_store_ps(wg2, XMMwg2);
-        // Update w SSE may not faster
+        // Update w. SSE may not faster
         for (size_t i = 0; i < kAlign; ++i) {
           // w1
           real_t z1_value = *(z1+i);
