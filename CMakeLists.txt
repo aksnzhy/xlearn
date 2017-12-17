@@ -69,8 +69,7 @@ link_directories(
   "${PROJECT_BINARY_DIR}/src/solver"
   "${PROJECT_BINARY_DIR}/src/distributed"
   "${PROJECT_BINARY_DIR}/src/c_api"
-  "${PROJECT_SOURCE_DIR}/ps-lite/deps/lib"
-  "${PROJECT_SOURCE_DIR}/ps-lite/build"
+  "${PROJECT_BINARY_DIR}/ps-lite"
 )
 
 #-------------------------------------------------------------------------------
