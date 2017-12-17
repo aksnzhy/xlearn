@@ -4,7 +4,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
 # Build static library
-set(STA_DEPS solver reader loss score data base ps protobuf zmq distributed)
+set(STA_DEPS solver reader loss score data base pslite protobuf zmq distributed)
 add_library(xlearn_api STATIC c_api.cc c_api_error.cc)
 target_link_libraries(xlearn_api ${STA_DEPS})
 
@@ -23,7 +23,7 @@ add_library(xlearn_api_shared SHARED c_api.cc c_api_error.cc
 ../solver/checker.cc ../solver/trainer.cc 
 ../solver/inference.cc ../solver/solver.cc)
 
-target_link_libraries(xlearn_api_shared ps zmq protobuf)
+target_link_libraries(xlearn_api_shared pslite zmq protobuf)
 
 # Set properties
 set_target_properties(xlearn_api_shared PROPERTIES OUTPUT_NAME "xlearn_api")
@@ -31,7 +31,7 @@ set_target_properties(xlearn_api_shared PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 set_target_properties(xlearn_api PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 
 # Build unittests.
-set(LIBS xlearn_api solver reader loss score data base pthread gtest ps protobuf zmq distributed_shared)
+set(LIBS xlearn_api solver reader loss score data base pthread gtest pslite protobuf zmq distributed_shared)
 
 add_executable(c_api_test c_api_test.cc)
 target_link_libraries(c_api_test gtest_main ${LIBS})
