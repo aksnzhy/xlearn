@@ -37,10 +37,12 @@ real_t FFMScore::CalcScore(const SparseRow* row,
   real_t sum_w = 0;
   real_t sqrt_norm = sqrt(norm);
   real_t *w = model.GetParameter_w();
-  index_t auxiliary_size = model.GetAuxiliarySize();
+  index_t aux_size = model.GetAuxiliarySize();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
-    sum_w += (iter->feat_val * w[iter->feat_id*auxiliary_size] * sqrt_norm);
+    sum_w += (iter->feat_val * 
+              w[iter->feat_id*aux_size] * 
+              sqrt_norm);
   }
   // bias
   w = model.GetParameter_b();
@@ -48,9 +50,9 @@ real_t FFMScore::CalcScore(const SparseRow* row,
   /*********************************************************
    *  latent factor                                        *
    *********************************************************/
-  index_t align0 = auxiliary_size * model.get_aligned_k();
+  index_t align0 = aux_size * model.get_aligned_k();
   index_t align1 = model.GetNumField() * align0;
-  int align = kAlign * auxiliary_size;
+  int align = kAlign * aux_size;
   w = model.GetParameter_v();
   __m128 XMMt = _mm_setzero_ps();
   for (SparseRow::const_iterator iter_i = row->begin();
@@ -248,6 +250,7 @@ void FFMScore::calc_grad_adagrad(const SparseRow* row,
   }
 }
 
+
 // Calculate gradient and update current model using ftrl
 void FFMScore::calc_grad_ftrl(const SparseRow* row,
                               Model& model,
@@ -255,53 +258,45 @@ void FFMScore::calc_grad_ftrl(const SparseRow* row,
                               real_t norm) {
   /*********************************************************
    *  linear term and bias term                            *
-   *********************************************************/
+   *********************************************************/  
+  real_t sqrt_norm = sqrt(norm);
   real_t *w = model.GetParameter_w();
   for (SparseRow::const_iterator iter = row->begin();
-    iter != row->end(); ++iter) {
-    real_t gradient = pg * iter->feat_val;
-    index_t idx_w = iter->feat_id * 3;
-    index_t idx_n = iter->feat_id * 3+1;
-    index_t idx_z = iter->feat_id * 3+2;
-    real_t old_n = w[idx_n];
-    w[idx_n] += gradient * gradient;
-    real_t sigma = (sqrt(w[idx_n]) - sqrt(old_n)) / alpha_;
-    w[idx_z] += gradient - sigma * w[idx_w];
-    if (std::abs(w[idx_z]) <= lambda_1_) {
-      w[idx_w] = 0.0;
+       iter != row->end(); ++iter) {
+    real_t &wl = w[iter->feat_id*3];
+    real_t &wlg = w[iter->feat_id*3+1];
+    real_t &wlz = w[iter->feat_id*3+2];
+    real_t g = lambda_2_*wl+pg*iter->feat_val*sqrt_norm; 
+    real_t old_wlg = wlg;
+    wlg += g*g;
+    real_t sigma = (sqrt(wlg)-sqrt(old_wlg)) / alpha_;
+    wlz += (g-sigma*wl);
+    int sign = wlz > 0 ? 1:-1;
+    if (sign*wlz <= lambda_1_) {
+      wl = 0;
     } else {
-      real_t smooth_lr = -1.0f
-                         / (lambda_2_ + (beta_ + sqrt(w[idx_n])) / alpha_);
-      if (w[idx_z] < 0.0) {
-        w[idx_z] += lambda_1_;
-      } else if (w[idx_z] > 0.0) {
-        w[idx_z] -= lambda_1_;
-      }
-      w[idx_w] = smooth_lr * w[idx_z];
+      wl = (sign*lambda_1_-wlz) / 
+           ((beta_ + sqrt(wlg)) / 
+            alpha_ + lambda_2_);
     }
   }
   // bias
   w = model.GetParameter_b();
   real_t &wb = w[0];
-  real_t &wbn = w[1];
+  real_t &wbg = w[1];
   real_t &wbz = w[2];
   real_t g = pg;
-  real_t old_wbn = wbn;
-  wbn += g*g;
-  real_t sqrt_wbn = sqrt(wbn);
-  real_t sigma_wbn = (sqrt_wbn - sqrt(old_wbn)) / alpha_;
-  wbz += g - sigma_wbn * wb;
-  if (std::abs(wbz) <= lambda_1_) {
-    wb = 0.0f;
+  real_t old_wbg = wbg;
+  wbg += g*g;
+  real_t sigma = (sqrt(wbg)-sqrt(old_wbg)) / alpha_;
+  wbz += (g-sigma*wb);
+  int sign = wbz > 0 ? 1:-1;
+  if (sign*wbz <= lambda_1_) {
+    wb = 0;
   } else {
-    real_t smooth_lr = -1.0f
-                       / (lambda_2_ + (beta_ + sqrt_wbn) / alpha_);
-    if (wbz < 0.0) {
-      wbz += lambda_1_;
-    } else if (wbz > 0.0) {
-      wbz -= lambda_1_;
-    }
-    wb = smooth_lr * wbz;
+    wb = (sign*lambda_1_-wbz) / 
+         ((beta_ + sqrt(wbg)) / 
+          alpha_ + lambda_2_);
   }
   /*********************************************************
    *  latent factor                                        *
@@ -311,142 +306,91 @@ void FFMScore::calc_grad_ftrl(const SparseRow* row,
   index_t align = kAlign * 3;
   w = model.GetParameter_v();
   __m128 XMMpg = _mm_set1_ps(pg);
-  __m128 XMMcoef = _mm_set1_ps(-1.0);
   __m128 XMMalpha = _mm_set1_ps(alpha_);
-  __m128 XMMbeta = _mm_set1_ps(beta_);
-  __m128 XMMlambda1 = _mm_set1_ps(lambda_1_);
-  __m128 XMMlambda2 = _mm_set1_ps(lambda_2_);
-  __m128 XMMzero = _mm_set1_ps(0.0);
-  if (comp_res1 == nullptr) {
-    int ret = posix_memalign(
-        (void**)&comp_res1,
-        kAlignByte,
-        1 * sizeof(real_t));
-    CHECK_EQ(ret, 0);
-  }
-  if (comp_res2 == nullptr) {
-    int ret = posix_memalign(
-        (void**)&comp_res2,
-        kAlignByte,
-        1 * sizeof(real_t));
-    CHECK_EQ(ret, 0);
-  }
-  if (comp_z_lt_zero == nullptr) {
-    int ret = posix_memalign(
-        (void**)&comp_z_lt_zero,
-        kAlignByte,
-        1 * sizeof(real_t));
-    CHECK_EQ(ret, 0);
-  }
-  if (comp_z_gt_zero == nullptr) {
-    int ret = posix_memalign(
-        (void**)&comp_z_gt_zero,
-        kAlignByte,
-        1 * sizeof(real_t));
-    CHECK_EQ(ret, 0);
-  }
+  __m128 XMML2 = _mm_set1_ps(lambda_2_);
   for (SparseRow::const_iterator iter_i = row->begin();
-    iter_i != row->end(); ++iter_i) {
+       iter_i != row->end(); ++iter_i) {
     index_t j1 = iter_i->feat_id;
     index_t f1 = iter_i->field_id;
     real_t v1 = iter_i->feat_val;
     for (SparseRow::const_iterator iter_j = iter_i+1;
-        iter_j != row->end(); ++iter_j) {
+         iter_j != row->end(); ++iter_j) {
       index_t j2 = iter_j->feat_id;
       index_t f2 = iter_j->field_id;
       real_t v2 = iter_j->feat_val;
       real_t* w1_base = w + j1*align1 + f2*align0;
       real_t* w2_base = w + j2*align1 + f1*align0;
-      __m128 XMMv = _mm_set1_ps(v1*v2);
+      __m128 XMMv = _mm_set1_ps(v1*v2*norm);
       __m128 XMMpgv = _mm_mul_ps(XMMv, XMMpg);
       for (index_t d = 0; d < align0; d += align) {
         real_t *w1 = w1_base + d;
         real_t *w2 = w2_base + d;
-        real_t *n1 = w1 + kAlign;
-        real_t *n2 = w2 + kAlign;
+        real_t *wg1 = w1 + kAlign;
+        real_t *wg2 = w2 + kAlign;
         real_t *z1 = w1 + kAlign * 2;
         real_t *z2 = w2 + kAlign * 2;
         __m128 XMMw1 = _mm_load_ps(w1);
         __m128 XMMw2 = _mm_load_ps(w2);
-        __m128 XMMn1 = _mm_load_ps(n1);
-        __m128 XMMn2 = _mm_load_ps(n2);
+        __m128 XMMwg1 = _mm_load_ps(wg1);
+        __m128 XMMwg2 = _mm_load_ps(wg2);
         __m128 XMMz1 = _mm_load_ps(z1);
         __m128 XMMz2 = _mm_load_ps(z2);
-        __m128 XMMg1 = _mm_mul_ps(XMMpgv, XMMw2);
-        __m128 XMMg2 = _mm_mul_ps(XMMpgv, XMMw1);
-        __m128 XMMold_n1 = XMMn1;
-        __m128 XMMold_n2 = XMMn2;
-        XMMn1 = _mm_add_ps(XMMn1, _mm_mul_ps(XMMg1, XMMg1));
-        XMMn2 = _mm_add_ps(XMMn2, _mm_mul_ps(XMMg2, XMMg2));
-        __m128 XMMsigma1 = _mm_mul_ps(XMMw1,
-                           _mm_div_ps(
+        __m128 XMMg1 = _mm_add_ps(
+                       _mm_mul_ps(XMML2, XMMw1),
+                       _mm_mul_ps(XMMpgv, XMMw2));
+        __m128 XMMg2 = _mm_add_ps(
+                       _mm_mul_ps(XMML2, XMMw2),
+                       _mm_mul_ps(XMMpgv, XMMw1));
+        __m128 XMMsigma1 = _mm_div_ps(
                            _mm_sub_ps(
-                           _mm_sqrt_ps(XMMn1),
-                           _mm_sqrt_ps(XMMold_n1)), XMMalpha));
-        __m128 XMMsigma2 = _mm_mul_ps(XMMw2,
-                           _mm_div_ps(
+                           _mm_sqrt_ps(
+                           _mm_add_ps(XMMwg1,
+                           _mm_mul_ps(XMMg1, XMMg1))),
+                           _mm_sqrt_ps(XMMwg1)), XMMalpha);
+        __m128 XMMsigma2 = _mm_div_ps(
                            _mm_sub_ps(
-                           _mm_sqrt_ps(XMMn2),
-                           _mm_sqrt_ps(XMMold_n2)), XMMalpha));
-        XMMz1 = _mm_sub_ps(
-                _mm_add_ps(XMMz1,XMMg1),  XMMsigma1);
-        XMMz2 = _mm_sub_ps(
-                _mm_add_ps(XMMz2,XMMg2),  XMMsigma2);
-        static const union {
-          int i[4];
-          __m128 m;
-        } __mm_abs_mask_cheat_ps = {{ 0x7fffffff, 0x7fffffff, 
-                                      0x7fffffff, 0x7fffffff }};
-        __m128 XMMcomp_res1 = _mm_cmplt_ps(XMMlambda1,
-                              _mm_and_ps(XMMz1, __mm_abs_mask_cheat_ps.m));
-        __m128 XMMcomp_res2 = _mm_cmplt_ps(XMMlambda2,
-                              _mm_and_ps(XMMz2, __mm_abs_mask_cheat_ps.m));
-        _mm_store_ps(comp_res1, XMMcomp_res1);
-        _mm_store_ps(comp_res2, XMMcomp_res2);
-        if (*comp_res1) {
-          __m128 XMMsmooth_lr = _mm_rcp_ps(
-                                _mm_add_ps(XMMlambda2,
-                                _mm_div_ps(
-                                _mm_add_ps(XMMbeta,
-                                _mm_sqrt_ps(XMMn1)), XMMalpha)));
-          _mm_store_ps(comp_z_lt_zero, _mm_cmplt_ps(XMMz1, XMMzero));
-          _mm_store_ps(comp_z_gt_zero, _mm_cmpgt_ps(XMMz1, XMMzero));
-          if (*comp_z_lt_zero) {
-            XMMz1 = _mm_add_ps(XMMz1, XMMlambda1);
-          } else if(*comp_z_gt_zero) {
-            XMMz1 = _mm_sub_ps(XMMz1, XMMlambda1);
-          }
-          XMMw1 = _mm_mul_ps(XMMcoef,
-                  _mm_mul_ps(XMMsmooth_lr, XMMz1));
-        } else {
-          XMMw1 = _mm_set1_ps(0.0);
-        }
-        if (*comp_res2) {
-          __m128 XMMsmooth_lr = _mm_rcp_ps(
-                                _mm_add_ps(XMMlambda2,
-                                _mm_div_ps(
-                                _mm_add_ps(XMMbeta,
-                                _mm_sqrt_ps(XMMn2)), XMMalpha)));
-          _mm_store_ps(comp_z_lt_zero, _mm_cmplt_ps(XMMz2, XMMzero));
-          _mm_store_ps(comp_z_gt_zero, _mm_cmpgt_ps(XMMz2, XMMzero));
-          if (*comp_z_lt_zero) {
-            XMMz2 = _mm_add_ps(XMMz2, XMMlambda1);
-          } else if (*comp_z_gt_zero) {
-            XMMz2 = _mm_sub_ps(XMMz2, XMMlambda1);
-          }
-          XMMw2 = _mm_mul_ps(XMMcoef,
-                  _mm_mul_ps(XMMsmooth_lr, XMMz2));
-        } else {
-          XMMw2 = _mm_set1_ps(0.0);
-        }
-        _mm_store_ps(w1, XMMw1);
-        _mm_store_ps(w2, XMMw2);
-        _mm_store_ps(n1, XMMn1);
-        _mm_store_ps(n2, XMMn2);
+                           _mm_sqrt_ps(
+                           _mm_add_ps(XMMwg2,
+                           _mm_mul_ps(XMMg2, XMMg2))),
+                           _mm_sqrt_ps(XMMwg2)), XMMalpha);
+        XMMz1 = _mm_add_ps(XMMz1,
+                _mm_sub_ps(XMMg1,
+                _mm_mul_ps(XMMsigma1, XMMw1)));
+        XMMz2 = _mm_add_ps(XMMz2,
+                _mm_sub_ps(XMMg2,
+                _mm_mul_ps(XMMsigma2, XMMw2)));
         _mm_store_ps(z1, XMMz1);
         _mm_store_ps(z2, XMMz2);
+        XMMwg1 = _mm_add_ps(XMMwg1,
+                 _mm_mul_ps(XMMg1, XMMg1));
+        XMMwg2 = _mm_add_ps(XMMwg2,
+                 _mm_mul_ps(XMMg2, XMMg2));
+        _mm_store_ps(wg1, XMMwg1);
+        _mm_store_ps(wg2, XMMwg2);
+        // Update w SSE may not faster
+        for (size_t i = 0; i < kAlign; ++i) {
+          // w1
+          real_t z1_value = *(z1+i);
+          int sign = z1_value > 0 ? 1 : -1;
+          if (sign * z1_value <= lambda_1_) {
+            *(w1+i) = 0;
+          } else {
+            *(w1+i) = (sign*lambda_1_-z1_value) / 
+              ((beta_ + sqrt(*(wg1+i))) / alpha_ + lambda_2_);
+          }
+          // w2
+          real_t z2_value = *(z2+i);
+          sign = z2_value > 0 ? 1 : -1;
+          if (sign * z2_value <= lambda_1_) {
+            *(w2+i) = 0;
+          } else {
+            *(w2+i) = (sign*lambda_1_-z2_value) / 
+              ((beta_ + sqrt(*(wg2+i))) / alpha_ + lambda_2_);
+          }
+        }
       }
     }
   }
 }
+
 } // namespace xLearn
