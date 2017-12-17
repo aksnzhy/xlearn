@@ -2,13 +2,13 @@
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/test/loss)
 
 # Build static library
-set(STA_DEPS score data base ps protobuf zmq distributed)
+set(STA_DEPS score data base pslite protobuf zmq distributed)
 add_library(loss STATIC loss.cc squared_loss.cc 
 cross_entropy_loss.cc metric.cc)
 target_link_libraries(loss ${STA_DEPS})
 
 # Build shared library
-set(SHA_DEPS score_shared data_shared base_shared ps protobuf zmq distributed)
+set(SHA_DEPS score_shared data_shared base_shared pslite protobuf zmq distributed)
 add_library(loss_shared SHARED loss.cc squared_loss.cc
 cross_entropy_loss.cc metric.cc)
 target_link_libraries(loss_shared ${SHA_DEPS})
