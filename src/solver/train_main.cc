@@ -24,6 +24,8 @@ This file is the entry for training of the xLearn.
 #include "src/base/timer.h"
 #include "src/base/stringprintf.h"
 #include "src/solver/solver.h"
+#include "src/distributed/server.h"
+#include "src/distributed/worker.h"
 
 //------------------------------------------------------------------------------
 // The pre-defined main function
@@ -33,11 +35,18 @@ int main(int argc, char* argv[]) {
   Timer timer;
   timer.tic();
 
-  xLearn::Solver solver;
-  solver.SetTrain();
-  solver.Initialize(argc, argv);
-  solver.StartWork();
-  solver.Clear();
+  if (ps::IsServer()) {
+    xlearn::XLearnServer* server = new xlearn::XLearnServer();
+  }
+  ps::Start();
+  if (ps::IsWorker()) {
+    xLearn::Solver solver;
+    solver.SetTrain();
+    solver.Initialize(argc, argv);
+    solver.StartWork();
+    solver.Clear();
+  }
+  ps::Finalize();
 
   print_info(
     StringPrintf("Total time cost: %.2f (sec)", 
