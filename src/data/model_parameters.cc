@@ -50,6 +50,8 @@ void Model::Initialize(const std::string& score_func,
   CHECK_GT(num_feature, 0);
   CHECK_GE(num_field, 0);
   CHECK_GE(num_K, 0);
+  // The aux_size is used for different 
+  // optimization method
   CHECK_GE(aux_size, 0);
   CHECK_GT(scale, 0);
   score_func_ = score_func;
@@ -57,19 +59,18 @@ void Model::Initialize(const std::string& score_func,
   num_feat_ = num_feature;
   num_field_ = num_field;
   num_K_ = num_K;
-  auxiliary_size_ = aux_size;
+  aux_size_ = aux_size;
   scale_ = scale;
   // Calculate the number of model parameters
-  param_num_w_ = num_feature * auxiliary_size_;
+  param_num_w_ = num_feature * aux_size_;
   if (score_func == "linear") {
     param_num_v_ = 0;
   } else if (score_func == "fm") {
-    param_num_v_ = num_feature *
-                   get_aligned_k() * auxiliary_size_;
+    // fm: feature * K
+    param_num_v_ = num_feature * get_aligned_k() * aux_size_;
   } else if (score_func == "ffm") {
-    param_num_v_ = num_feature *
-                   get_aligned_k() *
-                   num_field * auxiliary_size_;
+    // ffm: feature * K * field
+    param_num_v_ = num_feature * get_aligned_k() * num_field * aux_size_;
   } else {
     LOG(FATAL) << "Unknow score function: " << score_func;
   }
@@ -83,7 +84,7 @@ void Model::initial(bool set_val) {
   try {
     // Conventional malloc for linear term and bias
     param_w_ = (real_t*)malloc(param_num_w_ * sizeof(real_t));
-    param_b_ = (real_t*)malloc(auxiliary_size_ * sizeof(real_t));
+    param_b_ = (real_t*)malloc(aux_size_ * sizeof(real_t));
     if (score_func_.compare("fm") == 0 ||
         score_func_.compare("ffm") == 0) {
       // Aligned malloc for latent factor
@@ -106,7 +107,7 @@ void Model::initial(bool set_val) {
                    model parameters. Parameter size: "
                << GetNumParameter();
   }
-  // set value for model
+  // Set value for model
   if (set_val) {
     set_value();
   }
@@ -121,14 +122,14 @@ void Model::set_value() {
   /*********************************************************
    *  Initialize linear and bias term                      *
    *********************************************************/
-  for (index_t i = 0; i < param_num_w_; i += auxiliary_size_) {
-    param_w_[i] = 0;      /* model */
-    for (index_t j = 1; j < auxiliary_size_; ++j) {
+  for (index_t i = 0; i < param_num_w_; i += aux_size_) {
+    param_w_[i] = 0;        /* model */
+    for (index_t j = 1; j < aux_size_; ++j) {
       param_w_[i+j] = 1.0;  /* gradient cache */
     }
   }
-  param_b_[0] = 0;    /* model */
-  for (index_t j = 1; j < auxiliary_size_; ++j) {
+  param_b_[0] = 0;      /* model */
+  for (index_t j = 1; j < aux_size_; ++j) {
     param_b_[j] = 1.0;  /* gradient cache */
   }
   /*********************************************************
@@ -143,7 +144,7 @@ void Model::set_value() {
         *w = coef * dis(generator);
       for(index_t d = num_K_; d < k_aligned; d++, w++)
         *w = 0;
-      for(index_t d = k_aligned; d < auxiliary_size_*k_aligned; d++, w++)
+      for(index_t d = k_aligned; d < aux_size_*k_aligned; d++, w++)
         *w = 1.0;
     }
   }
@@ -159,11 +160,11 @@ void Model::set_value() {
         for (index_t d = 0; d < k_aligned; ) {
           for (index_t s = 0; s < kAlign; s++, w++, d++) {
             w[0] = (d < num_K_) ? coef * dis(generator) : 0.0;
-            for (index_t j = 1; j < auxiliary_size_; ++j) {
+            for (index_t j = 1; j < aux_size_; ++j) {
               w[kAlign * j] = 1.0;
             }
           }
-          w += (auxiliary_size_-1) * kAlign;
+          w += (aux_size_-1) * kAlign;
         }
       }
     }
@@ -213,7 +214,7 @@ void Model::Serialize(const std::string& filename) {
   // Write K
   WriteDataToDisk(file, (char*)&num_K_, sizeof(num_K_));
   // Write aux_size
-  WriteDataToDisk(file, (char*)&auxiliary_size_, sizeof(auxiliary_size_));
+  WriteDataToDisk(file, (char*)&aux_size_, sizeof(aux_size_));
   // Write w
   this->serialize_w_v_b(file);
   Close(file);
@@ -227,7 +228,7 @@ void Model::SerializeToTxt(const std::string& filename) {
   /* bias */
   o_file << (*param_b_) << "\n";
   /* linear term */ 
-  for (index_t n = 0; n < param_num_w_; n+=auxiliary_size_) {
+  for (index_t n = 0; n < param_num_w_; n+=aux_size_) {
     o_file << *(param_w_+n) << "\n";
   }
 }
@@ -248,7 +249,7 @@ bool Model::Deserialize(const std::string& filename) {
   // Read K
   ReadDataFromDisk(file, (char*)&num_K_, sizeof(num_K_));
   // Read aux_size
-  ReadDataFromDisk(file, (char*)&auxiliary_size_, sizeof(auxiliary_size_));
+  ReadDataFromDisk(file, (char*)&aux_size_, sizeof(aux_size_));
   // Read w
   this->deserialize_w_v_b(file);
   Close(file);
@@ -278,7 +279,8 @@ void Model::SetBestModel() {
     }
     if (param_best_b_ == nullptr) {
         param_best_b_ = (real_t*)malloc(
-        auxiliary_size_ * sizeof(real_t));
+         aux_size_ * sizeof(real_t)
+        );
     }
   } catch (std::bad_alloc&) {
     LOG(FATAL) << "Cannot allocate enough memory for current  \
@@ -288,7 +290,7 @@ void Model::SetBestModel() {
   // Copy current model parameters
   memcpy(param_best_w_, param_w_, param_num_w_*sizeof(real_t));
   memcpy(param_best_v_, param_v_, param_num_v_*sizeof(real_t));
-  memcpy(param_best_b_, param_b_, auxiliary_size_*sizeof(real_t));
+  memcpy(param_best_b_, param_b_, aux_size_*sizeof(real_t));
 }
 
 // Shrink back for getting the best model
@@ -301,7 +303,7 @@ void Model::Shrink() {
     memcpy(param_v_, param_best_v_, param_num_v_*sizeof(real_t));
   }
   if (param_best_b_ != nullptr) {
-    memcpy(param_b_, param_best_b_, auxiliary_size_*sizeof(real_t));
+    memcpy(param_b_, param_best_b_, aux_size_*sizeof(real_t));
   }
 }
 
@@ -316,7 +318,7 @@ void Model::serialize_w_v_b(FILE* file) {
   // Write w
   WriteDataToDisk(file, (char*)param_w_, sizeof(real_t)*param_num_w_);
   // Write b
-  WriteDataToDisk(file, (char*)param_b_, sizeof(real_t)*auxiliary_size_);
+  WriteDataToDisk(file, (char*)param_b_, sizeof(real_t)*aux_size_);
   // Write v
   if (score_func_.compare("linear") != 0) {
     WriteDataToDisk(file, (char*)param_v_, sizeof(real_t)*param_num_v_);
@@ -336,7 +338,7 @@ void Model::deserialize_w_v_b(FILE* file) {
   // Read w
   ReadDataFromDisk(file, (char*)param_w_, sizeof(real_t)*param_num_w_);
   // Read b
-  ReadDataFromDisk(file, (char*)param_b_, sizeof(real_t)*auxiliary_size_);
+  ReadDataFromDisk(file, (char*)param_b_, sizeof(real_t)*aux_size_);
   // Read v
   if (score_func_.compare("linear") != 0) {
     ReadDataFromDisk(file, (char*)param_v_, sizeof(real_t)*param_num_v_);

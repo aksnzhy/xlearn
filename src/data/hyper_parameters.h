@@ -74,10 +74,10 @@ struct HyperParam {
   /* Hyper param for init model parameters */
   real_t model_scale = 0.66;
   /* Used for ftrl */
-  real_t alpha = 5e-2;
+  real_t alpha = 0.3;
   real_t beta = 1.0;
-  real_t lambda_1 = 5e-5;
-  real_t lambda_2 = 15.0;
+  real_t lambda_1 = 0.00001;
+  real_t lambda_2 = 0.00002;
   /* Number of epoch. 
   This value could be changed in early-stop */
   int num_epoch = 10;
