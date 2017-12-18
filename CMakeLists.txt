@@ -45,9 +45,6 @@ if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set(CMAKE_EXE_LINKER_FLAGS "-static -static-libgcc")
 endif()
 
-#set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-#include(ps-lite)
-
 #-------------------------------------------------------------------------------
 # Set include paths and library paths.
 #-------------------------------------------------------------------------------
@@ -56,7 +53,6 @@ include_directories(
   "${PROJECT_BINARY_DIR}"
   "${PROJECT_SOURCE_DIR}/gtest/include"
   "${PROJECT_SOURCE_DIR}/ps-lite/include"
-  "${PROJECT_SOURCE_DIR}/ps-lite/deps/include"
 )
 
 link_directories(
