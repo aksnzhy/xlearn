@@ -8,6 +8,10 @@
 #ifndef WORKER_H
 #define WORKER_H
 
+#include "ps/ps.h"
+
+namespace xlearn{
+
 class XLearnWorker {
  public:
   XLearnWorker() {
@@ -20,5 +24,7 @@ class XLearnWorker {
   ps::KVWorker<float>* kv_w_;
   ps::KVWorker<float>* kv_v_;
 };
+
+}
 
 #endif /* !WORKER_H */
