@@ -545,7 +545,7 @@ class AUCMetric : public Metric {
     CHECK_EQ(positive_vec.size(), negative_vec.size());
     index_t positive_sum = 0;
     index_t negative_sum= 0;
-    index_t pre_positive_sum = 0.0;
+    index_t pre_positive_sum = 0;
     index_t positivesum_dot_negativesum = 0;
     double auc = 0.0;
     double auc_res = 0.0;
