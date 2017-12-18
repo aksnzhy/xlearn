@@ -1,10 +1,11 @@
 #include "iostream"
-#include "ps.h"
 #include "src/base/math.h"
+#include "src/distributed/dist_score_function.h"
+#include "ps/ps.h"
 
 #include <time.h>
 
-namespace xlean {
+namespace xlearn {
 float alpha = 0.001;
 float beta = 1.0;
 float lambda1 = 0.00001;
@@ -12,6 +13,8 @@ float lambda2 = 2.0;
 
 float regu_lambda_ = 0.1;
 float learning_rate_ = 0.1;
+
+int v_dim = 4;
 
 typedef struct SGDEntry{
   SGDEntry(size_t k = 4) {
@@ -23,7 +26,7 @@ typedef struct SGDEntry{
 struct KVServerSGDHandle {
   void operator() (const ps::KVMeta& req_meta,
                    const ps::KVPairs<float>& req_data,
-                   ps::KVServer<float>* server)
+                   ps::KVServer<float>* server) {
     size_t keys_size = req_data.keys.size();
     ps::KVPairs<float> res;
     if (req_meta.push) {
@@ -47,6 +50,7 @@ struct KVServerSGDHandle {
         }
       }
     }
+  }
  private:
   std::unordered_map<ps::Key, sgdentry> store_;
 };
@@ -70,9 +74,9 @@ struct KVServerAdaGradHandle {
       CHECK_EQ(keys_size * v_dim, req_data.vals.size());
     } else {
       res.keys = req_data.keys;
-      res.vals.resize(n);
+      res.vals.resize(keys_size);
     }
-    for (size_t it = 0; i < keys_size; ++i) {
+    for (size_t i = 0; i < keys_size; ++i) {
       ps::Key key = req_data.keys[i];
       AdaGradEntry& val = store_[key];
       if (req_meta.push) {
@@ -80,11 +84,11 @@ struct KVServerAdaGradHandle {
           float gradient = req_data.vals[i * v_dim + j];
           gradient += regu_lambda_ * gradient;
           val.n[j] = gradient * gradient;
-          val.w[j] -= (learning_rate_ * gradient * InvSqrt(val.n[j]))
+          val.w[j] -= (learning_rate_ * gradient * InvSqrt(val.n[j]));
         }
       } else {
         for (int j = 0; j < val.w.size(); ++j) {
-          res[i * v_dim + j] = val.w[j];
+          res.vals[i * v_dim + j] = val.w[j];
         }
       }
     }
@@ -111,10 +115,10 @@ struct KVServerFTRLHandle {
     size_t keys_size = req_data.keys.size();
     ps::KVPairs<float> res;
     if (req_meta.push) {
-      CHECK_EQ(n, req_data.vals.size());
+      CHECK_EQ(keys_size * v_dim, req_data.vals.size());
     } else {
       res.keys = req_data.keys;
-      res.vals.resize(n);
+      res.vals.resize(keys_size);
     }
     for (size_t i = 0; i < keys_size; ++i) {
       ps::Key key = req_data.keys[i];
@@ -150,15 +154,17 @@ class XLearnServer{
  public:
   XLearnServer(){
     auto server_ = new ps::KVServer<float>(0);
+    /*
     if (opt_type_.compare("sgd") == 0) {
       server_->set_request_handle(KVServerSGDHandle());
     }
     if (opt_type_.compare("adagrad") == 0) {
       server_->set_request_handle(KVServerAdaGradHandle());
     }
-    if (opt_type_.compare("ftrl") == 0) {
+    */
+    //if (opt_type_.compare("ftrl") == 0) {
       server_->set_request_handle(KVServerFTRLHandle());
-    }
+    //}
     std::cout << "init server success " << std::endl;
   }
   ~XLearnServer(){}
