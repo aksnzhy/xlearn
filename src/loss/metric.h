@@ -556,11 +556,8 @@ class AUCMetric : public Metric {
       auc += (pre_positive_sum + positive_sum) *
              (double)(all_negative_number_[i]) * 1.0 / 2;
     }
-    std::cout <<positive_sum << "------" << negative_sum << std::endl;
-    std::cout << auc << std::endl;
     positivesum_dot_negativesum = positive_sum * negative_sum;
     auc_res = auc / (positivesum_dot_negativesum);
-    std::cout << auc_res << std::endl;
     return 1.0 - auc_res;
   }
 
