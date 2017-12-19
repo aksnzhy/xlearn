@@ -1,3 +1,6 @@
+Criteo CTR Prediction
+---------------------------
+
 Predict click-through rates on display ads (`Link`__)
 
 Display advertising is a billion dollar effort and one of the central uses of machine learning on the Internet. 

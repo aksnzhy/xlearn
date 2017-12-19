@@ -1,3 +1,6 @@
+Mushroom Classification
+---------------------------
+
 This dataset comes from UCI Machine Learning Repositpry (`Link`__)
 
 This data set includes descriptions of hypothetical samples corresponding to 23 species of gilled mushrooms in 
