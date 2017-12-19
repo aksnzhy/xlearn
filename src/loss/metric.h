@@ -543,10 +543,10 @@ class AUCMetric : public Metric {
   real_t CalcAUC(std::vector<index_t> positive_vec,
                  std::vector<index_t> negative_vec) {
     CHECK_EQ(positive_vec.size(), negative_vec.size());
-    index_t positive_sum = 0;
-    index_t negative_sum= 0;
-    index_t pre_positive_sum = 0.0;
-    index_t positivesum_dot_negativesum = 0;
+    long long positive_sum = 0;
+    long long negative_sum= 0;
+    long long pre_positive_sum = 0.0;
+    long long positivesum_dot_negativesum = 0;
     double auc = 0.0;
     double auc_res = 0.0;
     for (index_t i = 0; i < kMaxBucketSize; ++i) {
