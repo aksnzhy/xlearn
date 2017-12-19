@@ -118,7 +118,7 @@ class Model {
   void Shrink();
 
   // Get the size of auxiliary cache size
-  inline real_t GetAuxiliarySize() { return auxiliary_size_; }
+  inline real_t GetAuxiliarySize() { return aux_size_; }
 
   // Get the pointer of linear term.
   inline real_t* GetParameter_w() { return param_w_; }
@@ -195,7 +195,7 @@ class Model {
   index_t  num_K_;
   /* Auxiliary memory size for different optimization method
   For 'adagrad' it equals 2 and 'ftrl' it equals 3 */
-  index_t auxiliary_size_;
+  index_t aux_size_;
   /* Storing the parameter of linear term */
   real_t*  param_w_ = nullptr;
   /* Storing the parameter of latent factor */

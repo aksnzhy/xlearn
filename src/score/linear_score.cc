@@ -112,55 +112,45 @@ void LinearScore::calc_grad_ftrl(const SparseRow* row,
                                  Model& model,
                                  real_t pg,
                                  real_t norm) {
-  real_t* w = model.GetParameter_w();
+  // linear term
+  real_t sqrt_norm = sqrt(norm);
+  real_t *w = model.GetParameter_w();
   for (SparseRow::const_iterator iter = row->begin();
-      iter != row->end(); ++iter) {
-    real_t gradient = pg * iter->feat_val;
-    index_t idx_w = iter->feat_id * 3;
-    index_t idx_n = idx_w + 1;
-    index_t idx_z = idx_w + 2;
-    real_t old_n = w[idx_n];
-    w[idx_n] += (gradient * gradient);
-    real_t sqrt_n = sqrt(w[idx_n]);
-    real_t sigma = (sqrt_n - sqrt(old_n))
-                   / alpha_;
-    w[idx_z] += gradient - sigma * w[idx_w];
-    if (std::abs(w[idx_z]) <= lambda_1_) {
-      w[idx_w] = 0.0;
+       iter != row->end(); ++iter) {
+    real_t &wl = w[iter->feat_id*3];
+    real_t &wlg = w[iter->feat_id*3+1];
+    real_t &wlz = w[iter->feat_id*3+2];
+    real_t g = lambda_2_*wl+pg*iter->feat_val*sqrt_norm; 
+    real_t old_wlg = wlg;
+    wlg += g*g;
+    real_t sigma = (sqrt(wlg)-sqrt(old_wlg)) / alpha_;
+    wlz += (g-sigma*wl);
+    int sign = wlz > 0 ? 1:-1;
+    if (sign*wlz <= lambda_1_) {
+      wl = 0;
     } else {
-      real_t smooth_lr = -1.0f
-                         / (lambda_2_ + (beta_ + sqrt_n) / alpha_);
-      if (w[idx_z] > 0.0) {
-        w[idx_z] -= lambda_1_;
-      }
-      if (w[idx_z] < 0.0) {
-        w[idx_z] += lambda_1_;
-      }
-      w[idx_w] = smooth_lr * w[idx_z];
+      wl = (sign*lambda_1_-wlz) / 
+           ((beta_ + sqrt(wlg)) / 
+            alpha_ + lambda_2_);
     }
   }
+  // bias
   w = model.GetParameter_b();
   real_t &wb = w[0];
-  real_t &wbn = w[1];
+  real_t &wbg = w[1];
   real_t &wbz = w[2];
   real_t g = pg;
-  real_t old_n = wbn;
-  wbn += g*g;
-  real_t sqrt_wbn = sqrt(wbn);
-  real_t sigma_wbn = (sqrt_wbn - sqrt(old_n)) / alpha_;
-  wbz += g - sigma_wbn * wb;
-  if (std::abs(wbz) <= lambda_1_) {
-    wb = 0.0f;
+  real_t old_wbg = wbg;
+  wbg += g*g;
+  real_t sigma = (sqrt(wbg)-sqrt(old_wbg)) / alpha_;
+  wbz += (g-sigma*wb);
+  int sign = wbz > 0 ? 1:-1;
+  if (sign*wbz <= lambda_1_) {
+    wb = 0;
   } else {
-    real_t smooth_lr = -1.0f
-                       / (lambda_2_ + (beta_ + sqrt_wbn) / alpha_);
-    if (wbz > 0.0) {
-      wbz -= lambda_1_;
-    }
-    if (wbz < 0.0) {
-      wbz += lambda_1_;
-    }
-    wb = smooth_lr * wbz;
+    wb = (sign*lambda_1_-wbz) / 
+         ((beta_ + sqrt(wbg)) / 
+          alpha_ + lambda_2_);
   }
 }
 
