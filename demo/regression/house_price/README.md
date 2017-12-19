@@ -1,1 +1,0 @@
-This demo shows how to solve a regression problem using cross-validation.

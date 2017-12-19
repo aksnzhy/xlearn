@@ -37,10 +37,12 @@ real_t FMScore::CalcScore(const SparseRow* row,
   real_t sqrt_norm = sqrt(norm);
   real_t *w = model.GetParameter_w();
   real_t t = 0;
-  index_t auxiliary_size = model.GetAuxiliarySize();
+  index_t aux_size = model.GetAuxiliarySize();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
-    t += (iter->feat_val * w[iter->feat_id*auxiliary_size] * sqrt_norm);
+    t += (iter->feat_val *
+          w[iter->feat_id*aux_size] *
+          sqrt_norm);
   }
   // bias
   w = model.GetParameter_b();
@@ -49,7 +51,7 @@ real_t FMScore::CalcScore(const SparseRow* row,
    *  latent factor                                        *
    *********************************************************/
   index_t aligned_k = model.get_aligned_k();
-  index_t align0 = model.get_aligned_k() * model.GetAuxiliarySize();
+  index_t align0 = model.get_aligned_k() * aux_size;
   std::vector<real_t> sv(aligned_k, 0);
   real_t* s = sv.data();
   for (SparseRow::const_iterator iter = row->begin();
@@ -134,7 +136,8 @@ void FMScore::calc_grad_sgd(const SparseRow* row,
    *  latent factor                                        *
    *********************************************************/
   index_t aligned_k = model.get_aligned_k();
-  index_t align0 = model.get_aligned_k() * model.GetAuxiliarySize();
+  index_t align0 = model.get_aligned_k() * 
+                   model.GetAuxiliarySize();
   __m128 XMMpg = _mm_set1_ps(pg);
   __m128 XMMlr = _mm_set1_ps(learning_rate_);
   __m128 XMMlamb = _mm_set1_ps(regu_lambda_);
@@ -201,7 +204,8 @@ void FMScore::calc_grad_adagrad(const SparseRow* row,
    *  latent factor                                        *
    *********************************************************/
   index_t aligned_k = model.get_aligned_k();
-  index_t align0 = model.get_aligned_k() * model.GetAuxiliarySize();
+  index_t align0 = model.get_aligned_k() * 
+                   model.GetAuxiliarySize();
   __m128 XMMpg = _mm_set1_ps(pg);
   __m128 XMMlr = _mm_set1_ps(learning_rate_);
   __m128 XMMlamb = _mm_set1_ps(regu_lambda_);
@@ -252,69 +256,62 @@ void FMScore::calc_grad_ftrl(const SparseRow* row,
   /*********************************************************
    *  linear term and bias term                            *
    *********************************************************/
+  real_t sqrt_norm = sqrt(norm);
   real_t *w = model.GetParameter_w();
   for (SparseRow::const_iterator iter = row->begin();
-    iter != row->end(); ++iter) {
-    real_t gradient = pg * iter->feat_val;
-    index_t idx_w = iter->feat_id * 3;
-    index_t idx_n = idx_w + 1;
-    index_t idx_z = idx_w + 2;
-    real_t old_n =  w[idx_n];
-    w[idx_n] += gradient * gradient;
-    real_t sqrt_n = sqrt(w[idx_n]);
-    real_t sigma = (sqrt_n - sqrt(old_n)) / alpha_;
-    w[idx_z] += gradient - sigma * w[idx_w];
-    if (std::abs(w[idx_z]) <= lambda_1_) {
-      w[idx_w] = 0;
+       iter != row->end(); ++iter) {
+    real_t &wl = w[iter->feat_id*3];
+    real_t &wlg = w[iter->feat_id*3+1];
+    real_t &wlz = w[iter->feat_id*3+2];
+    real_t g = lambda_2_*wl+pg*iter->feat_val*sqrt_norm; 
+    real_t old_wlg = wlg;
+    wlg += g*g;
+    real_t sigma = (sqrt(wlg)-sqrt(old_wlg)) / alpha_;
+    wlz += (g-sigma*wl);
+    int sign = wlz > 0 ? 1:-1;
+    if (sign*wlz <= lambda_1_) {
+      wl = 0;
     } else {
-      real_t smooth_lr = -1.0f / (lambda_2_ + (beta_ + sqrt_n) / alpha_);
-      if (w[idx_z] > 0.0) {
-        w[idx_z] -= lambda_1_;
-      }
-      if (w[idx_z] < 0.0) {
-        w[idx_z] += lambda_1_;
-      }
-      w[idx_w] = smooth_lr * w[idx_z];
+      wl = (sign*lambda_1_-wlz) / 
+           ((beta_ + sqrt(wlg)) / 
+            alpha_ + lambda_2_);
     }
   }
   // bias
   w = model.GetParameter_b();
   real_t &wb = w[0];
-  real_t &wbn = w[1];
+  real_t &wbg = w[1];
   real_t &wbz = w[2];
   real_t g = pg;
-  real_t old_wbn = wbn;
-  wbn += g*g;
-  real_t sqrt_wbn = sqrt(wbn);
-  real_t sigma_wb = (sqrt_wbn - sqrt(old_wbn)) / alpha_;
-  wbz += g - sigma_wb * wb;
-  if (std::abs(wbz) <= lambda_1_) {
-    wb = 0.0f;
+  real_t old_wbg = wbg;
+  wbg += g*g;
+  real_t sigma = (sqrt(wbg)-sqrt(old_wbg)) / alpha_;
+  wbz += (g-sigma*wb);
+  int sign = wbz > 0 ? 1:-1;
+  if (sign*wbz <= lambda_1_) {
+    wb = 0;
   } else {
-    real_t smooth_lr = -1.0f
-                       / (lambda_2_ + (beta_ + sqrt(wbn)) / alpha_);
-    if (wbz > 0.0) {
-      wbz -= lambda_1_;
-    }
-    if (wbz < 0.0) {
-      wbz += lambda_1_;
-    }
-    wb = smooth_lr * wbz;
-  }
+    wb = (sign*lambda_1_-wbz) / 
+         ((beta_ + sqrt(wbg)) / 
+          alpha_ + lambda_2_);
+  }  
   /*********************************************************
    *  latent factor                                        *
    *********************************************************/
   index_t aligned_k = model.get_aligned_k();
-  index_t align0 = model.get_aligned_k() * model.GetAuxiliarySize();
+  index_t align0 = model.get_aligned_k() * 
+                   model.GetAuxiliarySize();
   __m128 XMMpg = _mm_set1_ps(pg);
+  __m128 XMMalpha = _mm_set1_ps(alpha_);
+  __m128 XMML2 = _mm_set1_ps(lambda_2_);
   std::vector<real_t> sv(aligned_k, 0);
   real_t* s = sv.data();
-  for (SparseRow::const_iterator iter = row->begin();
-      iter != row->end(); ++iter) {
+ for (SparseRow::const_iterator iter = row->begin();
+       iter != row->end(); ++iter) {
     index_t j1 = iter->feat_id;
     real_t v1 = iter->feat_val;
     real_t *w = model.GetParameter_v() + j1 * align0;
-    __m128 XMMv = _mm_set1_ps(v1);
+    __m128 XMMv = _mm_set1_ps(v1*norm);
     for (index_t d = 0; d < aligned_k; d += kAlign) {
       __m128 XMMs = _mm_load_ps(s+d);
       __m128 const XMMw = _mm_load_ps(w+d);
@@ -322,87 +319,50 @@ void FMScore::calc_grad_ftrl(const SparseRow* row,
       _mm_store_ps(s+d, XMMs);
     }
   }
-  __m128 XMMcoef = _mm_set1_ps(-1.0);
-  __m128 XMMalpha = _mm_set1_ps(alpha_);
-  __m128 XMMbeta = _mm_set1_ps(beta_);
-  __m128 XMMlambda1 = _mm_set1_ps(lambda_1_);
-  __m128 XMMlambda2 = _mm_set1_ps(lambda_2_);
-  __m128 XMMzero = _mm_set1_ps(0.0);
-  if (comp_res == nullptr) {
-    int ret = posix_memalign(
-        (void**)&comp_res,
-        kAlignByte,
-        1 * sizeof(real_t));
-    CHECK_EQ(ret, 0);
-  }
-  if (comp_z_lt_zero == nullptr) {
-    int ret = posix_memalign(
-        (void**)&comp_z_lt_zero,
-        kAlignByte,
-        1 * sizeof(real_t));
-    CHECK_EQ(ret, 0);
-  }
-  if (comp_z_gt_zero == nullptr) {
-    int ret = posix_memalign(
-        (void**)&comp_z_gt_zero,
-        kAlignByte,
-        1 * sizeof(real_t));
-    CHECK_EQ(ret, 0);
-  }
   for (SparseRow::const_iterator iter = row->begin();
-    iter != row->end(); ++iter) {
+       iter != row->end(); ++iter) {
     index_t j1 = iter->feat_id;
     real_t v1 = iter->feat_val;
-    real_t *w = model.GetParameter_v() + j1 * align0;
-    __m128 XMMv = _mm_set1_ps(v1);
+    real_t *w_base = model.GetParameter_v() + j1 * align0;
+    __m128 XMMv = _mm_set1_ps(v1*norm);
     __m128 XMMpgv = _mm_mul_ps(XMMpg, XMMv);
-    for(index_t d = 0; d < aligned_k; d += kAlign) {
+    for (index_t d = 0; d < aligned_k; d += kAlign) {
+      real_t* w = w_base + d;
+      real_t* wg = w_base + aligned_k + d;
+      real_t* z = w_base + aligned_k*2 + d;
       __m128 XMMs = _mm_load_ps(s+d);
-      __m128 XMMw = _mm_load_ps(w+d);
-      __m128 XMMn = _mm_load_ps(w+aligned_k+d);
-      __m128 XMMz = _mm_load_ps(w+aligned_k*2+d);
-      __m128 XMMg = _mm_mul_ps(XMMpgv,
+      __m128 XMMw = _mm_load_ps(w);
+      __m128 XMMwg = _mm_load_ps(wg);
+      __m128 XMMz = _mm_load_ps(z);
+      __m128 XMMg = _mm_add_ps(
+                    _mm_mul_ps(XMML2, XMMw),
+                    _mm_mul_ps(XMMpgv,
                     _mm_sub_ps(XMMs,
-                    _mm_mul_ps(XMMw, XMMv)));
-      __m128 XMMold_n = XMMn;
-      XMMn = _mm_add_ps(XMMn,
-             _mm_mul_ps(XMMg, XMMg));
-      __m128 XMMsigma = _mm_mul_ps(
-                        _mm_div_ps(
-                        _mm_sub_ps(_mm_sqrt_ps(XMMn),
-                        _mm_sqrt_ps(XMMold_n)), XMMalpha), XMMw);
-      XMMz = _mm_sub_ps(
-             _mm_add_ps(XMMz, XMMg), XMMsigma);
-      static const union {
-        int i[4];
-        __m128 m;
-      } __mm_abs_mask_cheat_ps = {{ 0x7fffffff, 0x7fffffff, 
-                                    0x7fffffff, 0x7fffffff }};
-      __m128 XMMcomp_res = _mm_cmplt_ps(XMMlambda1,
-                           _mm_and_ps(XMMz,
-                           __mm_abs_mask_cheat_ps.m));
-      _mm_store_ps(comp_res, XMMcomp_res);
-      if (comp_res) {
-        __m128 XMMsmooth_lr = _mm_rcp_ps(
-                              _mm_add_ps(XMMlambda2,
-                              _mm_div_ps(
-                              _mm_add_ps(XMMbeta,
-                              _mm_sqrt_ps(XMMn)), XMMalpha)));
-        _mm_store_ps(comp_z_lt_zero, _mm_cmplt_ps(XMMz, XMMzero));
-        _mm_store_ps(comp_z_gt_zero, _mm_cmpgt_ps(XMMz, XMMzero));
-        if (comp_z_lt_zero) {
-          XMMz = _mm_add_ps(XMMz, XMMlambda1);
-        } else if(comp_z_gt_zero) {
-          XMMz = _mm_sub_ps(XMMz, XMMlambda1);
+                      _mm_mul_ps(XMMw, XMMv))));
+      __m128 XMMsigma = _mm_div_ps(
+                        _mm_sub_ps(
+                        _mm_sqrt_ps(
+                        _mm_add_ps(XMMwg,
+                        _mm_mul_ps(XMMg, XMMg))),
+                        _mm_sqrt_ps(XMMwg)), XMMalpha);
+      XMMz = _mm_add_ps(XMMz,
+             _mm_sub_ps(XMMg,
+             _mm_mul_ps(XMMsigma, XMMw)));
+      _mm_store_ps(z, XMMz);
+      XMMwg = _mm_add_ps(XMMwg,
+              _mm_mul_ps(XMMg, XMMg));
+      _mm_store_ps(wg, XMMwg);
+      // Update w. SSE mat not faster.
+      for (size_t i = 0; i < kAlign; ++i) {
+        real_t z_value = *(z+i);
+        int sign = z_value > 0 ? 1:-1;
+        if (sign * z_value <= lambda_1_) {
+          *(w+i) = 0;
+        } else {
+          *(w+i) = (sign*lambda_1_-z_value) / 
+              ((beta_ + sqrt(*(wg+i))) / alpha_ + lambda_2_);
         }
-        XMMw = _mm_mul_ps(XMMcoef,
-               _mm_mul_ps(XMMsmooth_lr, XMMz));
-      } else {
-        XMMw = _mm_set1_ps(0.0);
       }
-      _mm_store_ps(w+d, XMMw);
-      _mm_store_ps(w+aligned_k+d, XMMn);
-      _mm_store_ps(w+aligned_k*2+d, XMMz);
     }
   }
 }
