@@ -28,6 +28,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.*/
 #include <Windows.h>
 #include <stdio.h>
 
+#pragma comment(lib, "Ws2_32.lib")
+
 struct utsname {
 	char sysname[UTSNAME_LENGTH];
 	char nodename[UTSNAME_LENGTH];
@@ -36,51 +38,5 @@ struct utsname {
 	char machine[UTSNAME_LENGTH];
 };
 
-int uname(struct utsname *name) {
-	struct utsname *ret;
-	OSVERSIONINFO versionInfo;
-	SYSTEM_INFO sysInfo;
-
-	// Get Windows version info
-	ZeroMemory(&versionInfo, sizeof(OSVERSIONINFO));
-	versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO); // wtf
-	GetVersionEx(&versionInfo);
-
-	// Get hardware info
-	ZeroMemory(&sysInfo, sizeof(SYSTEM_INFO));
-	GetSystemInfo(&sysInfo);
-
-	strcpy(name->sysname, "Windows");
-	itoa(versionInfo.dwBuildNumber, name->release, 10);
-	sprintf(name->version, "%i.%i", versionInfo.dwMajorVersion, versionInfo.dwMinorVersion);
-
-	if (gethostname(name->nodename, UTSNAME_LENGTH) != 0) {
-		if (WSAGetLastError() == WSANOTINITIALISED) { // WinSock not initialized
-			WSADATA WSAData;
-			WSAStartup(MAKEWORD(1, 0), &WSAData);
-			gethostname(name->nodename, UTSNAME_LENGTH);
-			WSACleanup();
-		}
-		else
-			return WSAGetLastError();
-	}
-
-	switch (sysInfo.wProcessorArchitecture) {
-	case PROCESSOR_ARCHITECTURE_AMD64:
-		strcpy(name->machine, "x86_64");
-		break;
-	case PROCESSOR_ARCHITECTURE_IA64:
-		strcpy(name->machine, "ia64");
-		break;
-	case PROCESSOR_ARCHITECTURE_INTEL:
-		strcpy(name->machine, "x86");
-		break;
-	case PROCESSOR_ARCHITECTURE_UNKNOWN:
-	default:
-		strcpy(name->machine, "unknown");
-	}
-
-	return 0;
-}
-
+int uname(struct utsname *name);
 #endif//UTSNAME_H
