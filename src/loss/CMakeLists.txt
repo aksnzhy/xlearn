@@ -21,14 +21,14 @@ set_target_properties(loss PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 # Build uinttests
 set(LIBS loss score data base gtest)
 
-add_executable(loss_test loss_test.cc)
-target_link_libraries(loss_test gtest_main ${LIBS})
+#add_executable(loss_test loss_test.cc)
+#target_link_libraries(loss_test gtest_main ${LIBS})
 
-add_executable(squared_loss_test squared_loss_test.cc)
-target_link_libraries(squared_loss_test gtest_main ${LIBS})
+#add_executable(squared_loss_test squared_loss_test.cc)
+#target_link_libraries(squared_loss_test gtest_main ${LIBS})
 
-add_executable(cross_entropy_loss_test cross_entropy_loss_test.cc)
-target_link_libraries(cross_entropy_loss_test gtest_main ${LIBS})
+#add_executable(cross_entropy_loss_test cross_entropy_loss_test.cc)
+#target_link_libraries(cross_entropy_loss_test gtest_main ${LIBS})
 
 add_executable(metric_test metric_test.cc)
 target_link_libraries(metric_test gtest_main ${LIBS})

@@ -107,9 +107,9 @@ CLASS_REGISTER_DEFINE_REGISTRY(xLearn_dist_score_registry, DistScore);
       format_name,                                          \
       score_name)
 
-#define CREATE_SCORE(format_name)                           \
+#define CREATE_DIST_SCORE(format_name)                           \
   CLASS_REGISTER_CREATE_OBJECT(                             \
-      xLearn_score_registry,                                \
+      xLearn_dist_score_registry,                                \
       format_name)
 
 }  // namespace xLearn
