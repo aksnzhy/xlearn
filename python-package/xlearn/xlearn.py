@@ -179,12 +179,10 @@ class XLearn(object):
 	def predict(self, model_path, out_path):
 		"""Predict output
 
-        Parameters
-        ----------
-        model_path : str
-          path of model checkpoint.
-        out_path : str
-          path of output result.
+		Parameters
+		----------
+		model_path : str. path of model checkpoint.
+		out_path : str. path of output result.
 		"""
 		_check_call(_LIB.XLearnPredict(ctypes.byref(self.handle), 
 			c_str(model_path), c_str(out_path)))
