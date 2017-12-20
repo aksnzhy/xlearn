@@ -130,7 +130,7 @@ std::string Checker::option_help() const {
 "                                                                           \n"
 "OPTIONS: \n"
 "  -o <output_file>     :  Path of the output file. On default, this value will be set \n"
-"                          to 'test_file' + '.out'     \n"
+"                          to 'test_file' + '.out'                    \n"
 "                                                                         \n"
 "  -nthread <thread number> :  Number of thread for multi-thread learning. \n"
 "                                                                             \n"
