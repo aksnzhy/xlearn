@@ -120,7 +120,7 @@ class XLearn(object):
 		"""Set xlearn to use on-disk training"""
 		key = 'on_disk'
 		_check_call(_LIB.XLearnSetBool(ctypes.byref(self.handle), 
-    	    c_str(key), ctypes.c_bool(True)))
+			c_str(key), ctypes.c_bool(True)))
 
 	def disableNorm(self):
 		"""Disable instance-wise normalization"""
