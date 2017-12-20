@@ -408,7 +408,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-nthread") == 0) {  // number of thread
       int value = atoi(list[i+1].c_str());
       if (value <= 0) {
-         print_error(
+        print_error(
           StringPrintf("Illegal -nthread : '%i'. -nthread must be greater than zero.",
                value)
         );
@@ -527,6 +527,15 @@ bool Checker::check_train_param(HyperParam& hyper_param) {
     print_error(
       StringPrintf("Training data file: %s does not exist.", 
                     hyper_param.train_set_file.c_str())
+    );
+    bo = false;
+  }
+  /*********************************************************
+   *  Check invalid value                                  *
+   *********************************************************/
+  if (hyper_param.thread_number <= 0) {
+    print_error(
+      StringPrintf("The thread number must be greater than zero.")
     );
     bo = false;
   }
