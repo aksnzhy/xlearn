@@ -177,35 +177,39 @@ void Trainer::train(std::vector<Reader*>& train_reader,
     Timer timer;
     timer.tic();
     // Calc grad and update model
+    std::cout << "n = " << epoch_ << std::endl;
     real_t tr_loss = calc_gradient(train_reader);
+    std::cout << "trainer.cc : 181 ========" << std::endl;
     // we don't do any evaluation in a quiet model
-    if (!quiet_) {
-      if (!test_reader.empty()) { 
-        te_info = calc_metric(test_reader); 
-      }
-      // show evaludation metric info
-      show_train_info(tr_loss, 
-                      te_info.loss_val,
-                      te_info.metric_val,
-                      timer.toc(), 
-                      !test_reader.empty(), 
-                      n);
-      // Early-stopping
-      if (early_stop_) {
-        if (te_info.loss_val < best_loss) {
-          best_loss = te_info.loss_val;
-          best_epoch = n;
-          model_->SetBestModel();
+    if (ps::MyRank() == 100) {
+      if (!quiet_) {
+        if (!test_reader.empty()) { 
+          te_info = calc_metric(test_reader); 
         }
-        if (te_info.loss_val >= prev_loss) {
-          stop_window++;
-          // If the validation loss goes up conntinuously
-          // in 3 epoch, we stop training
-          if (stop_window == kStopWindow) { break; }
-        } else {
-          stop_window = 0;
+        // show evaludation metric info
+        show_train_info(tr_loss, 
+            te_info.loss_val,
+            te_info.metric_val,
+            timer.toc(), 
+            !test_reader.empty(), 
+            n);
+        // Early-stopping
+        if (early_stop_) {
+          if (te_info.loss_val < best_loss) {
+            best_loss = te_info.loss_val;
+            best_epoch = n;
+            model_->SetBestModel();
+          }
+          if (te_info.loss_val >= prev_loss) {
+            stop_window++;
+            // If the validation loss goes up conntinuously
+            // in 3 epoch, we stop training
+            if (stop_window == kStopWindow) { break; }
+          } else {
+            stop_window = 0;
+          }
+          prev_loss = te_info.loss_val;
         }
-        prev_loss = te_info.loss_val;
       }
     }
   }
@@ -231,7 +235,9 @@ real_t Trainer::calc_gradient(std::vector<Reader*>& reader) {
     for (;;) {
       index_t tmp = reader[i]->Samples(matrix);
       if (tmp == 0) { break; }
+      std::cout << "trainer.cc 237 ===============" << std::endl;
       loss_->CalcGrad(matrix, *model_);
+      std::cout << "trainer.cc 239 ===============" << std::endl;
     }
   }
   return loss_->GetLoss();

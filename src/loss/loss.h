@@ -82,13 +82,13 @@ class Loss {
 
   // This function needs to be invoked before using this class
   //void Initialize(Score* score, 
-  void Initialize(DistScore* score, 
+  void Initialize(Score* score, 
                   ThreadPool* pool, 
                   bool norm = true,
                   bool lock_free = false) {
     CHECK_NOTNULL(score);
     CHECK_NOTNULL(pool);
-    dist_score_func_ = score;
+    score_func_ = score;
     pool_ = pool;
     norm_ = norm;
     threadNumber_ = pool_->ThreadNumber();

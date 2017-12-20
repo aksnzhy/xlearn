@@ -32,25 +32,24 @@ This file is the entry for training of the xLearn.
 //------------------------------------------------------------------------------
 
 int main(int argc, char* argv[]) {
-  Timer timer;
-  timer.tic();
-
   if (ps::IsServer()) {
     xlearn::XLearnServer* server = new xlearn::XLearnServer();
   }
+
   ps::Start();
   if (ps::IsWorker()) {
+    Timer timer;
+    timer.tic();
     xLearn::Solver solver;
     solver.SetTrain();
     solver.Initialize(argc, argv);
     solver.StartWork();
     solver.Clear();
+    print_info(
+      StringPrintf("Total time cost: %.2f (sec)", 
+      timer.toc()), false);
   }
   ps::Finalize();
-
-  print_info(
-    StringPrintf("Total time cost: %.2f (sec)", 
-    timer.toc()), false);
 
   return 0;
 }

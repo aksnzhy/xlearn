@@ -14,7 +14,7 @@ float lambda2 = 2.0;
 float regu_lambda_ = 0.1;
 float learning_rate_ = 0.1;
 
-int v_dim = 4;
+int v_dim = 1;
 
 typedef struct SGDEntry{
   SGDEntry(size_t k = 4) {
@@ -115,6 +115,7 @@ struct KVServerFTRLHandle {
     size_t keys_size = req_data.keys.size();
     ps::KVPairs<float> res;
     if (req_meta.push) {
+      std::cout << keys_size * v_dim << "==" << req_data.vals.size() << std::endl;
       CHECK_EQ(keys_size * v_dim, req_data.vals.size());
     } else {
       res.keys = req_data.keys;

@@ -59,6 +59,7 @@ class Solver {
   // Constructor and Destructor
   Solver() 
     : score_(nullptr),
+      dist_score_(nullptr),
       loss_(nullptr),
       metric_(nullptr) { }
   ~Solver() { }
@@ -96,8 +97,8 @@ class Solver {
   /* Split file in cross-validation */
   xLearn::FileSpliter splitor_;
   /* linear, fm or ffm ? */
-  //xLearn::Score* score_;
-  xLearn::DistScore* score_;
+  xLearn::Score* score_;
+  xLearn::DistScore* dist_score_;
   /* cross-entropy or squared ? */
   xLearn::Loss* loss_;
   /* acc, prec, recall, mae, etc */

@@ -319,8 +319,8 @@ void Solver::init_train() {
   /*********************************************************
    *  Initialize score function                            *
    *********************************************************/
-  score_ = create_score();
-  score_->Initialize(hyper_param_.learning_rate,
+  dist_score_ = create_score();
+  dist_score_->Initialize(hyper_param_.learning_rate,
                      hyper_param_.regu_lambda,
                      hyper_param_.alpha,
                      hyper_param_.beta,
@@ -332,7 +332,7 @@ void Solver::init_train() {
    *  Initialize loss function                             *
    *********************************************************/
   loss_ = create_loss();
-  loss_->Initialize(score_, pool_, 
+  loss_->DistInitialize(dist_score_, pool_, 
          hyper_param_.norm, 
          hyper_param_.lock_free);
   LOG(INFO) << "Initialize loss function.";
@@ -431,13 +431,13 @@ void Solver::init_predict() {
   /*********************************************************
    *  Init score function                                  *
    *********************************************************/
-  score_ = create_score();
+  dist_score_ = create_score();
   LOG(INFO) << "Initialize score function.";
   /*********************************************************
    *  Init loss function                                   *
    *********************************************************/
   loss_ = create_loss();
-  loss_->Initialize(score_, pool_, hyper_param_.norm);
+  loss_->DistInitialize(dist_score_, pool_, hyper_param_.norm);
   LOG(INFO) << "Initialize score function.";
 }
 

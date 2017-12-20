@@ -236,15 +236,15 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       } else {
         switch (value) {
           case 0:
-            hyper_param.loss_func = "cross-entropy";
+            hyper_param.loss_func = "dist-cross-entropy";
             hyper_param.score_func = "linear";
             break;
           case 1:
-            hyper_param.loss_func = "cross-entropy";
+            hyper_param.loss_func = "dist-cross-entropy";
             hyper_param.score_func = "fm";
             break;
           case 2:
-            hyper_param.loss_func = "cross-entropy";
+            hyper_param.loss_func = "dist-cross-entropy";
             hyper_param.score_func = "ffm";
             break;
           case 3:
@@ -590,7 +590,7 @@ void Checker::check_conflict_train(HyperParam& hyper_param) {
       );
       hyper_param.metric = "none";
     }
-  } else if (hyper_param.loss_func.compare("cross-entropy") == 0) {
+  } else if (hyper_param.loss_func.compare("dist-cross-entropy") == 0) {
     if (hyper_param.metric.compare("mae") == 0 ||
         hyper_param.metric.compare("mape") == 0 ||
         hyper_param.metric.compare("rmsd") == 0 ||
