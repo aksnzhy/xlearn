@@ -21,7 +21,7 @@
 #
 project ("xLearn")
 
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 2.8)
 
 #-------------------------------------------------------------------------------
 # Take almost all warnings;
@@ -39,6 +39,11 @@ add_definitions("-Wall -Wno-sign-compare -O3 -std=c++11
 set(CMAKE_INSTALL_PREFIX "xLearn")
 
 #-------------------------------------------------------------------------------
+# For Mac OSX
+#-------------------------------------------------------------------------------
+set(CMAKE_MACOSX_RPATH TRUE)
+
+#-------------------------------------------------------------------------------
 # Ensure executables are statically linked with libraries.
 #-------------------------------------------------------------------------------
 if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -52,7 +57,6 @@ include_directories(
   "${PROJECT_SOURCE_DIR}"
   "${PROJECT_BINARY_DIR}"
   "${PROJECT_SOURCE_DIR}/gtest/include"
-#  "/usr/share/R/include"
 )
 
 link_directories(
@@ -63,7 +67,6 @@ link_directories(
   "${PROJECT_BINARY_DIR}/src/loss"
   "${PROJECT_BINARY_DIR}/src/solver"
   "${PROJECT_BINARY_DIR}/src/c_api"
-#  "/usr/lib/R/lib"
 )
 
 #-------------------------------------------------------------------------------
