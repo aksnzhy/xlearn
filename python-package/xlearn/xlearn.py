@@ -120,7 +120,7 @@ class XLearn(object):
 		"""Set xlearn to use on-disk training"""
 		key = 'on_disk'
 		_check_call(_LIB.XLearnSetBool(ctypes.byref(self.handle), 
-    		c_str(key), ctypes.c_bool(True)))
+    	    c_str(key), ctypes.c_bool(True)))
 
 	def disableNorm(self):
 		"""Disable instance-wise normalization"""
@@ -195,8 +195,7 @@ def create_linear():
 	"""
 	model_type = 'linear'
 	handle = XLearnHandle()
-	_check_call(_LIB.XLearnCreate(c_str(model_type),
-		                          ctypes.byref(handle)))
+	_check_call(_LIB.XLearnCreate(c_str(model_type), ctypes.byref(handle)))
 	return XLearn(handle)
 
 def create_fm():
@@ -205,8 +204,7 @@ def create_fm():
 	"""
 	model_type = 'fm'
 	handle = XLearnHandle()
-	_check_call(_LIB.XLearnCreate(c_str(model_type),
-		                          ctypes.byref(handle)))
+	_check_call(_LIB.XLearnCreate(c_str(model_type), ctypes.byref(handle)))
 	return XLearn(handle)
 
 def create_ffm():
@@ -215,8 +213,7 @@ def create_ffm():
 	"""
 	model_type = 'ffm'
 	handle = XLearnHandle()
-	_check_call(_LIB.XLearnCreate(c_str(model_type),
-		                          ctypes.byref(handle)))
+	_check_call(_LIB.XLearnCreate(c_str(model_type), ctypes.byref(handle)))
 	return XLearn(handle)
 
 def hello():
