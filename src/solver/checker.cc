@@ -131,7 +131,9 @@ std::string Checker::option_help() const {
 "OPTIONS: \n"
 "  -o <output_file>     :  Path of the output file. On default, this value will be set \n"
 "                          to 'test_file' + '.out'     \n"
-"                                                             \n"
+"                                                                         \n"
+"  -nthread <thread number> :  Number of thread for multi-thread learning. \n"
+"                                                                             \n"
 "  -l <log_file_path>   :  Path of the log file. Using '/tmp/xlearn_log' by default. \n"
 "----------------------------------------------------------------------------------------------\n"
     );
