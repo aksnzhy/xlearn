@@ -60,6 +60,8 @@ struct HyperParam {
   /* Block size for on-disk training.
   On default this value will be set to 500 MB */
   uint64 block_size = 500;
+  /* Number of thread existing in the thread pool */
+  int thread_number = 0;
 //------------------------------------------------------------------------------
 // Parameters for optimization method
 //------------------------------------------------------------------------------
