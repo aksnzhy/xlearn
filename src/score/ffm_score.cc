@@ -250,7 +250,6 @@ void FFMScore::calc_grad_adagrad(const SparseRow* row,
   }
 }
 
-
 // Calculate gradient and update current model using ftrl
 void FFMScore::calc_grad_ftrl(const SparseRow* row,
                               Model& model,
