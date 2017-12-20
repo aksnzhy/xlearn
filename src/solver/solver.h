@@ -33,6 +33,7 @@ of the xLearn.
 #include "src/reader/parser.h"
 #include "src/reader/file_splitor.h"
 #include "src/score/score_function.h"
+#include "src/distributed/dist_score_function.h"
 #include "src/loss/loss.h"
 #include "src/loss/metric.h"
 #include "src/solver/checker.h"
@@ -95,7 +96,8 @@ class Solver {
   /* Split file in cross-validation */
   xLearn::FileSpliter splitor_;
   /* linear, fm or ffm ? */
-  xLearn::Score* score_;
+  //xLearn::Score* score_;
+  xLearn::DistScore* score_;
   /* cross-entropy or squared ? */
   xLearn::Loss* loss_;
   /* acc, prec, recall, mae, etc */
@@ -105,7 +107,8 @@ class Solver {
 
   // Create object by name
   xLearn::Reader* create_reader();
-  xLearn::Score* create_score();
+  //xLearn::Score* create_score();
+  xLearn::DistScore* create_score();
   xLearn::Loss* create_loss();
   xLearn::Metric* create_metric();
 

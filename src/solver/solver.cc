@@ -80,9 +80,11 @@ Reader* Solver::create_reader() {
 }
 
 // Create Score by a given string
-Score* Solver::create_score() {
-  Score* score;
-  score = CREATE_SCORE(hyper_param_.score_func.c_str());
+DistScore* Solver::create_score() {
+  //Score* score;
+  DistScore* score;
+  //score = CREATE_SCORE(hyper_param_.score_func.c_str());
+  score = CREATE_DIST_SCORE("dist_linear");
   if (score == nullptr) {
     LOG(FATAL) << "Cannot create score: "
                << hyper_param_.score_func;
