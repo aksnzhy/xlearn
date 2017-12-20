@@ -668,6 +668,18 @@ bool Checker::check_prediction_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-l") == 0) {  // path of the log file
       hyper_param.log_file = list[i+1];
       i += 2;
+    } else if (list[i].compare("-nthread") == 0) {  // number of thread
+      int value = atoi(list[i+1].c_str());
+      if (value <= 0) {
+         print_error(
+          StringPrintf("Illegal -nthread : '%i'. -nthread must be greater than zero.",
+               value)
+        );
+        bo = false;
+      } else {
+        hyper_param.thread_number = value;
+      }
+      i += 2;
     } else if (list[i].compare("--sign") == 0) {  // convert output to 0 and 1
       hyper_param.sign = true;
       i += 1;
