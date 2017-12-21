@@ -16,7 +16,7 @@ ffm_model.setValidate("./small_test.txt")
 param = { 'task':'binary',
           'lr' : 0.2,
           'lambda' : 0.002,
-          'metric' : 'auc' }
+          'metric' : 'acc' }
 
 # Tarin model
 ffm_model.fit(param, "model.out")

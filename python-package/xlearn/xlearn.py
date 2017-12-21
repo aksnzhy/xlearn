@@ -72,6 +72,9 @@ class XLearn(object):
 			elif key == 'lambda_2':
 				_check_call(_LIB.XLearnSetFloat(ctypes.byref(self.handle), 
 					c_str(key), ctypes.c_float(value)))
+			elif key == 'nthread':
+				_check_call(_LIB.XLearnSetInt(ctypes.byref(self.handle),
+					c_str(key), ctypes.c_uint(value)))
 			else:
 				raise Exception("Invalid key!", key)
 

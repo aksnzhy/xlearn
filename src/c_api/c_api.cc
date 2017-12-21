@@ -190,6 +190,8 @@ XL_DLL int XLearnSetInt(XL *out, const char *key, const int value) {
   	xl->GetHyperParam().num_folds = value;
   } else if (strcmp(key, "block_size") == 0) {
   	xl->GetHyperParam().block_size = value;
+  } else if (strcmp(key, "nthread") == 0) {
+    xl->GetHyperParam().thread_number = value;
   }
   API_END();
 }
