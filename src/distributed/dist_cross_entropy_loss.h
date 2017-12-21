@@ -46,7 +46,7 @@ class DistCrossEntropyLoss : public Loss {
   // and update current model parameters.
   // This function will also accumulate the loss value.
   void CalcGrad(const DMatrix* data_matrix, Model& model);
-  void CalcGrad(const DMatrix& data_matrix, Model& model);
+  //void DistCalcGrad(const DMatrix& data_matrix, Model& model);
 
   // Return current loss type.
   std::string loss_type() { return "dist_log_loss"; }

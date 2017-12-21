@@ -75,7 +75,7 @@ class DistScore {
                            std::unordered_map<index_t, real_t>* w,
                            real_t norm = 1.0) = 0;
 
-  virtual void DistCalcGrad(const DMatrix& matrix,
+  virtual void DistCalcGrad(const DMatrix* matrix,
                                std::unordered_map<index_t, real_t>& w,
                                real_t* sum,
                                std::unordered_map<index_t, real_t>& g,

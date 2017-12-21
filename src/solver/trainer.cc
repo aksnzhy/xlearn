@@ -177,9 +177,7 @@ void Trainer::train(std::vector<Reader*>& train_reader,
     Timer timer;
     timer.tic();
     // Calc grad and update model
-    std::cout << "n = " << epoch_ << std::endl;
     real_t tr_loss = calc_gradient(train_reader);
-    std::cout << "trainer.cc : 181 ========" << std::endl;
     // we don't do any evaluation in a quiet model
     if (ps::MyRank() == 100) {
       if (!quiet_) {
@@ -211,15 +209,15 @@ void Trainer::train(std::vector<Reader*>& train_reader,
           prev_loss = te_info.loss_val;
         }
       }
+      if (early_stop_ && best_epoch != epoch_) {  // not for cv
+        print_action(
+            StringPrintf("Early-stopping at epoch %d", best_epoch)
+            );
+        model_->Shrink();
+      } else {  // for cv
+        metric_info_.push_back(te_info);
+      }
     }
-  }
-  if (early_stop_ && best_epoch != epoch_) {  // not for cv
-    print_action(
-      StringPrintf("Early-stopping at epoch %d", best_epoch)
-    );
-    model_->Shrink();
-  } else {  // for cv
-    metric_info_.push_back(te_info);
   }
 }
 
@@ -235,9 +233,7 @@ real_t Trainer::calc_gradient(std::vector<Reader*>& reader) {
     for (;;) {
       index_t tmp = reader[i]->Samples(matrix);
       if (tmp == 0) { break; }
-      std::cout << "trainer.cc 237 ===============" << std::endl;
       loss_->CalcGrad(matrix, *model_);
-      std::cout << "trainer.cc 239 ===============" << std::endl;
     }
   }
   return loss_->GetLoss();

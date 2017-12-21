@@ -81,7 +81,7 @@ void DistCrossEntropyLoss::Evalute(const std::vector<real_t>& pred,
 
 
 // Calculate gradient in one thread.
-static void ce_gradient_thread(const DMatrix& matrix,
+static void ce_gradient_thread(const DMatrix* matrix,
                                std::unordered_map<index_t, real_t>& w,
                                DistScore* dist_score_func,
                                bool is_norm,
@@ -91,7 +91,6 @@ static void ce_gradient_thread(const DMatrix& matrix,
                                size_t end_idx) {
   CHECK_GE(end_idx, start_idx);
   dist_score_func->DistCalcGrad(matrix, w, sum, g, start_idx, end_idx);
-//  std::cout << "test    944444 " << std::endl;
 }
 
 //------------------------------------------------------------------------------
@@ -108,21 +107,18 @@ static void ce_gradient_thread(const DMatrix& matrix,
 //                         master_thread
 //------------------------------------------------------------------------------
 void DistCrossEntropyLoss::CalcGrad(const DMatrix* matrix,
-                                    Model& model) {}
-void DistCrossEntropyLoss::CalcGrad(const DMatrix& matrix,
-                                Model& model) {
-  //CHECK_NOTNULL(matrix);
-  CHECK_GT(matrix.row_length, 0);
-  size_t row_len = matrix.row_length;
+                                    Model& model) {
+  CHECK_NOTNULL(matrix);
+  CHECK_GT(matrix->row_length, 0);
+  size_t row_len = matrix->row_length;
   total_example_ += row_len;
   auto feature_ids = std::vector<ps::Key>();
   auto gradient_pull = std::make_shared<std::vector<float>>();
   std::unordered_map<index_t, real_t> weight_map;
   std::unordered_map<index_t, real_t> gradient_push_map;
-  //std::vector<real_t> gradient_push;
   auto gradient_push = std::make_shared<std::vector<float>>();
   for (index_t i = 0; i < row_len; ++i) {
-    SparseRow* row = matrix.row[i];
+    SparseRow* row = matrix->row[i];
     for (SparseRow::const_iterator iter = row->begin();
          iter != row->end(); ++iter) {
       index_t idx = iter->feat_id;
@@ -152,7 +148,7 @@ void DistCrossEntropyLoss::CalcGrad(const DMatrix& matrix,
     index_t start_idx = getStart(row_len, count, i);
     index_t end_idx = getEnd(row_len, count, i);
     pool_->enqueue(std::bind(ce_gradient_thread,
-                             std::ref(matrix),
+                             matrix,
                              std::ref(weight_map),
                              dist_score_func_,
                              norm_,
