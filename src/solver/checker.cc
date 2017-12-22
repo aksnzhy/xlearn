@@ -532,6 +532,9 @@ bool Checker::check_train_param(HyperParam& hyper_param) {
     );
     bo = false;
   }
+  //if (!FileExist(hyper_param.validate_set_file.c_str())) {
+
+  //}
   /*********************************************************
    *  Check invalid value                                  *
    *********************************************************/
