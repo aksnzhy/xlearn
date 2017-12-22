@@ -532,15 +532,26 @@ bool Checker::check_train_param(HyperParam& hyper_param) {
     );
     bo = false;
   }
-  //if (!FileExist(hyper_param.validate_set_file.c_str())) {
-
-  //}
+  if (!hyper_param.validate_set_file.empty() &&
+      !FileExist(hyper_param.validate_set_file.c_str())) {
+    print_error(
+      StringPrintf("Validation data file: %s does not exist.", 
+                    hyper_param.validate_set_file.c_str())
+    );
+    bo = false;
+  }
   /*********************************************************
    *  Check invalid value                                  *
    *********************************************************/
-  if (hyper_param.thread_number <= 0) {
+  if (hyper_param.thread_number < 0) {
     print_error(
       StringPrintf("The thread number must be greater than zero.")
+    );
+    bo = false;
+  }
+  if (hyper_param.loss_func.compare("unknow") == 0) {
+    print_error(
+      StringPrintf("The task can only be 'binary' or 'reg'.")
     );
     bo = false;
   }

@@ -165,7 +165,9 @@ XL_DLL int XLearnSetStr(XL *out, const char *key, const char *value) {
   	  xl->GetHyperParam().loss_func = std::string("cross-entropy");
   	} else if (strcmp(value, "reg") == 0) {
   	  xl->GetHyperParam().loss_func = std::string("squared");
-  	}
+  	} else {
+      xl->GetHyperParam().loss_func = std::string("unknow");
+    }
   } else if (strcmp(key, "metric") == 0) {
   	xl->GetHyperParam().metric = std::string(value);
   } else if (strcmp(key, "log") == 0) {
