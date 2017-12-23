@@ -46,3 +46,7 @@ build/*
 .Rhistory
 *.tar.gz
 xlearn/*
+
+# Python-package
+*.egg-info
+*.pyc
