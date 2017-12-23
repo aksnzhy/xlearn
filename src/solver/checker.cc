@@ -572,6 +572,15 @@ bool Checker::check_train_param(HyperParam& hyper_param) {
     );
     bo = false;
   }
+  if (hyper_param.opt_type.compare("sgd") != 0 &&
+      hyper_param.opt_type.compare("ftrl") != 0 &&
+      hyper_param.opt_type.compare("adagrad") != 0) {
+    print_error(
+      StringPrintf("Unknow optimization method: %s.",
+        hyper_param.opt_type.c_str())
+    );
+    bo = false;
+  }
   if (!bo) return false;
   /*********************************************************
    *  Check warning and fix conflict                       *
