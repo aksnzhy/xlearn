@@ -32,9 +32,6 @@ function or objective function.
 #include "src/base/thread_pool.h"
 #include "src/data/model_parameters.h"
 #include "src/score/score_function.h"
-#include "src/distributed/dist_score_function.h"
-
-#include "ps/ps.h"
 
 namespace xLearn {
 
@@ -74,11 +71,7 @@ namespace xLearn {
 class Loss {
  public:
   // Constructor and Desstructor
-  Loss() : loss_sum_(0), total_example_(0), 
-           score_func_(nullptr), dist_score_func_(nullptr) { 
-    kv_w_ = new ps::KVWorker<float>(0);
-    kv_v_ = new ps::KVWorker<float>(1);
-  };
+  Loss() : loss_sum_(0), total_example_(0) { };
   virtual ~Loss() { }
 
   // This function needs to be invoked before using this class
@@ -90,19 +83,6 @@ class Loss {
     CHECK_NOTNULL(score);
     CHECK_NOTNULL(pool);
     score_func_ = score;
-    pool_ = pool;
-    norm_ = norm;
-    threadNumber_ = pool_->ThreadNumber();
-    lock_free_ = lock_free;
-  }
-
-  void DistInitialize(DistScore* score,
-                  ThreadPool* pool,
-                  bool norm = true,
-                  bool lock_free = false) {
-    CHECK_NOTNULL(score);
-    CHECK_NOTNULL(pool);
-    dist_score_func_ = score;
     pool_ = pool;
     norm_ = norm;
     threadNumber_ = pool_->ThreadNumber();
@@ -142,7 +122,6 @@ class Loss {
   /* The score function, including LinearScore,
   FMScore, FFMScore, etc */
   Score* score_func_;
-  DistScore* dist_score_func_;
   /* Use instance-wise normalization */
   bool norm_;
   /* Open lock-free training ? */
@@ -155,11 +134,6 @@ class Loss {
   real_t loss_sum_;
   /* Used to store the number of example */
   index_t total_example_;
-  /* kv store for w */
-  ps::KVWorker<float>* kv_w_;
-  /* kv store for v */
-  ps::KVWorker<float>* kv_v_;
-
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Loss);

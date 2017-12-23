@@ -80,11 +80,9 @@ Reader* Solver::create_reader() {
 }
 
 // Create Score by a given string
-DistScore* Solver::create_score() {
-  //Score* score;
-  DistScore* score;
-  //score = CREATE_SCORE(hyper_param_.score_func.c_str());
-  score = CREATE_DIST_SCORE("dist_linear");
+Score* Solver::create_score() {
+  Score* score;
+  score = CREATE_SCORE(hyper_param_.score_func.c_str());
   if (score == nullptr) {
     LOG(FATAL) << "Cannot create score: "
                << hyper_param_.score_func;
@@ -322,8 +320,8 @@ void Solver::init_train() {
   /*********************************************************
    *  Initialize score function                            *
    *********************************************************/
-  dist_score_ = create_score();
-  dist_score_->Initialize(hyper_param_.learning_rate,
+  score_ = create_score();
+  score_->Initialize(hyper_param_.learning_rate,
                      hyper_param_.regu_lambda,
                      hyper_param_.alpha,
                      hyper_param_.beta,
@@ -335,7 +333,7 @@ void Solver::init_train() {
    *  Initialize loss function                             *
    *********************************************************/
   loss_ = create_loss();
-  loss_->DistInitialize(dist_score_, pool_, 
+  loss_->Initialize(score_, pool_,
          hyper_param_.norm, 
          hyper_param_.lock_free);
   LOG(INFO) << "Initialize loss function.";
@@ -434,13 +432,13 @@ void Solver::init_predict() {
   /*********************************************************
    *  Init score function                                  *
    *********************************************************/
-  dist_score_ = create_score();
+  score_ = create_score();
   LOG(INFO) << "Initialize score function.";
   /*********************************************************
    *  Init loss function                                   *
    *********************************************************/
   loss_ = create_loss();
-  loss_->DistInitialize(dist_score_, pool_, hyper_param_.norm);
+  loss_->Initialize(score_, pool_, hyper_param_.norm);
   LOG(INFO) << "Initialize score function.";
 }
 

@@ -242,15 +242,15 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       } else {
         switch (value) {
           case 0:
-            hyper_param.loss_func = "dist-cross-entropy";
+            hyper_param.loss_func = "cross-entropy";
             hyper_param.score_func = "linear";
             break;
           case 1:
-            hyper_param.loss_func = "dist-cross-entropy";
+            hyper_param.loss_func = "cross-entropy";
             hyper_param.score_func = "fm";
             break;
           case 2:
-            hyper_param.loss_func = "dist-cross-entropy";
+            hyper_param.loss_func = "cross-entropy";
             hyper_param.score_func = "ffm";
             break;
           case 3:

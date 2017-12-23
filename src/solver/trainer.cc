@@ -179,45 +179,43 @@ void Trainer::train(std::vector<Reader*>& train_reader,
     // Calc grad and update model
     real_t tr_loss = calc_gradient(train_reader);
     // we don't do any evaluation in a quiet model
-    if (ps::MyRank() == 0) {
-      if (!quiet_) {
-        if (!test_reader.empty()) { 
-          te_info = calc_metric(test_reader); 
-        }
-        // show evaludation metric info
-        show_train_info(tr_loss, 
-            te_info.loss_val,
-            te_info.metric_val,
-            timer.toc(), 
-            !test_reader.empty(), 
-            n);
-        // Early-stopping
-        if (early_stop_) {
-          if (te_info.loss_val < best_loss) {
-            best_loss = te_info.loss_val;
-            best_epoch = n;
-            model_->SetBestModel();
-          }
-          if (te_info.loss_val >= prev_loss) {
-            stop_window++;
-            // If the validation loss goes up conntinuously
-            // in 3 epoch, we stop training
-            if (stop_window == kStopWindow) { break; }
-          } else {
-            stop_window = 0;
-          }
-          prev_loss = te_info.loss_val;
-        }
+    if (!quiet_) {
+      if (!test_reader.empty()) { 
+        te_info = calc_metric(test_reader); 
       }
-      if (early_stop_ && best_epoch != epoch_) {  // not for cv
-        print_action(
-            StringPrintf("Early-stopping at epoch %d", best_epoch)
-            );
-        model_->Shrink();
-      } else {  // for cv
-        metric_info_.push_back(te_info);
+      // show evaludation metric info
+      show_train_info(tr_loss, 
+          te_info.loss_val,
+          te_info.metric_val,
+          timer.toc(), 
+          !test_reader.empty(), 
+          n);
+      // Early-stopping
+      if (early_stop_) {
+        if (te_info.loss_val < best_loss) {
+          best_loss = te_info.loss_val;
+          best_epoch = n;
+          model_->SetBestModel();
+        }
+        if (te_info.loss_val >= prev_loss) {
+          stop_window++;
+          // If the validation loss goes up conntinuously
+          // in 3 epoch, we stop training
+          if (stop_window == kStopWindow) { break; }
+        } else {
+          stop_window = 0;
+        }
+        prev_loss = te_info.loss_val;
       }
-    }  // for ps::MyRank
+    }
+    if (early_stop_ && best_epoch != epoch_) {  // not for cv
+      print_action(
+          StringPrintf("Early-stopping at epoch %d", best_epoch)
+          );
+      model_->Shrink();
+    } else {  // for cv
+      metric_info_.push_back(te_info);
+    }
   }
 }
 

@@ -31,7 +31,6 @@ This file defines the Trainer class.
 #include "src/data/model_parameters.h"
 #include "src/loss/loss.h"
 #include "src/loss/metric.h"
-#include "ps/ps.h"
 
 namespace xLearn {
 
