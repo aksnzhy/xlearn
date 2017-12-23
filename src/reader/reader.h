@@ -152,6 +152,9 @@ class InmemReader : public Reader {
   // Pre-load all the data into memory buffer.
   virtual void Initialize(const std::string& filename);
 
+  // Initialized from DMatrix
+  virtual void Initialize(const DMatrix* const matrix);
+
   // Sample data from the memory buffer.
   virtual index_t Samples(DMatrix* &matrix);
 

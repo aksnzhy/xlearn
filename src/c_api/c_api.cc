@@ -20,15 +20,17 @@ Author: Chao Ma (mctt90@gmail.com)
 This file is the implementation of C API for xLearn.
 */
 
-#include <string>
+#include <cmath>
 #include <iostream>
+#include <string>
 
 #include <string.h>
 
-#include "src/c_api/c_api.h"
-#include "src/c_api/c_api_error.h"
 #include "src/base/format_print.h"
 #include "src/base/timer.h"
+#include "src/c_api/c_api.h"
+#include "src/c_api/c_api_error.h"
+#include "src/data/data_structure.h"
 
 // Say hello to user
 XL_DLL int XLearnHello() {
@@ -237,3 +239,42 @@ XL_DLL int XLearnSetBool(XL *out, const char *key, const bool value) {
   }
   API_END();
 }
+
+XL_DLL int XLDMatrixCreateFromFile(const char *fname,
+                                   int silent,
+                                   XL* out) {
+  API_BEGIN();
+  API_END();
+}
+
+XL_DLL int XLDMatrixCreateFromCSREx(const size_t* indptr,
+                                    const unsigned* indices,
+                                    const real_t* data,
+                                    size_t nindptr,
+                                    size_t nelem,
+                                    size_t num_col,
+                                    XL* out) {
+  API_BEGIN();
+  xLearn::DMatrix* mat = new xLearn::DMatrix();
+  mat->row_length = nindptr;
+  mat->row.reserve(nindptr - 1);
+  for (size_t i = 1; i < nindptr; ++ i) {
+    xLearn::SparseRow* row = new xLearn::SparseRow();
+    row->reserve(indptr[i] - indptr[i - 1]);
+    for (size_t j = indptr[i - 1]; j < indptr[i]; ++ j) {
+      if (!std::isnan(data[j])) {
+          row->emplace_back(xLearn::Node(0, indices[j], data[j]));
+      }
+    }
+    mat->row.push_back(row);
+  }
+  *out = mat;
+  API_END();
+}
+
+XL_DLL int XLDMatrixCreateFromCSR(const size_t* indptr,
+                                  const unsigned* indices,
+                                  const real_t* data,
+                                  size_t nindptr,
+                                  size_t nelem,
+                                  XL* out);

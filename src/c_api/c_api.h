@@ -111,4 +111,23 @@ class XLearn {
   DISALLOW_COPY_AND_ASSIGN(XLearn);
 };
 
+XL_DLL int XLDMatrixCreateFromFile(const char *fname,
+                                   int silent,
+                                   XL* out);
+
+XL_DLL int XLDMatrixCreateFromCSREx(const size_t* indptr,
+                                    const unsigned* indices,
+                                    const real_t* data,
+                                    size_t nindptr,
+                                    size_t nelem,
+                                    size_t num_col,
+                                    XL* out);
+
+XL_DLL int XLDMatrixCreateFromCSR(const size_t* indptr,
+                                  const unsigned* indices,
+                                  const real_t* data,
+                                  size_t nindptr,
+                                  size_t nelem,
+                                  XL* out);
+
 #endif  // XLEARN_C_API_C_API_H_
