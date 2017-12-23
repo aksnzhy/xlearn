@@ -545,13 +545,30 @@ bool Checker::check_train_param(HyperParam& hyper_param) {
    *********************************************************/
   if (hyper_param.thread_number < 0) {
     print_error(
-      StringPrintf("The thread number must be greater than zero.")
+      StringPrintf("The thread number must be greater than zero: %d.",
+        hyper_param.thread_number)
     );
     bo = false;
   }
   if (hyper_param.loss_func.compare("unknow") == 0) {
     print_error(
       StringPrintf("The task can only be 'binary' or 'reg'.")
+    );
+    bo = false;
+  }
+  if (hyper_param.metric.compare("acc") != 0 &&
+      hyper_param.metric.compare("prec") != 0 &&
+      hyper_param.metric.compare("recall") != 0 &&
+      hyper_param.metric.compare("f1") != 0 &&
+      hyper_param.metric.compare("auc") != 0 &&
+      hyper_param.metric.compare("mae") != 0 &&
+      hyper_param.metric.compare("mape") != 0 &&
+      hyper_param.metric.compare("rmsd") != 0 &&
+      hyper_param.metric.compare("rmse") != 0 &&
+      hyper_param.metric.compare("none") != 0) {
+    print_error(
+      StringPrintf("Unknow evaluation metric: %s.",
+        hyper_param.metric.c_str())
     );
     bo = false;
   }
