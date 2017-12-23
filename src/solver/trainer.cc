@@ -179,7 +179,7 @@ void Trainer::train(std::vector<Reader*>& train_reader,
     // Calc grad and update model
     real_t tr_loss = calc_gradient(train_reader);
     // we don't do any evaluation in a quiet model
-    if (ps::MyRank() == 100) {
+    if (ps::MyRank() == 0) {
       if (!quiet_) {
         if (!test_reader.empty()) { 
           te_info = calc_metric(test_reader); 
@@ -217,7 +217,7 @@ void Trainer::train(std::vector<Reader*>& train_reader,
       } else {  // for cv
         metric_info_.push_back(te_info);
       }
-    }
+    }  // for ps::MyRank
   }
 }
 

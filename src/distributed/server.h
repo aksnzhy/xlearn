@@ -115,7 +115,6 @@ struct KVServerFTRLHandle {
     size_t keys_size = req_data.keys.size();
     ps::KVPairs<float> res;
     if (req_meta.push) {
-      std::cout << keys_size * v_dim << "==" << req_data.vals.size() << std::endl;
       CHECK_EQ(keys_size * v_dim, req_data.vals.size());
     } else {
       res.keys = req_data.keys;

@@ -25,6 +25,7 @@ FM score, FFM score, and etc.
 
 #include <vector>
 #include <unordered_map>
+#include <map>
 
 #include "src/base/common.h"
 #include "src/base/class_register.h"
@@ -72,13 +73,13 @@ class DistScore {
   // Given one exmaple and current model, this method
   // returns the score
   virtual real_t CalcScore(const SparseRow* row,
-                           std::unordered_map<index_t, real_t>* w,
+                           std::map<index_t, real_t>* w,
                            real_t norm = 1.0) = 0;
 
   virtual void DistCalcGrad(const DMatrix* matrix,
-                               std::unordered_map<index_t, real_t>& w,
+                               std::map<index_t, real_t>& w,
                                real_t* sum,
-                               std::unordered_map<index_t, real_t>& g,
+                               std::map<index_t, real_t>& g,
                                index_t start_idx,
                                index_t end_idx) = 0;
 

@@ -74,7 +74,8 @@ namespace xLearn {
 class Loss {
  public:
   // Constructor and Desstructor
-  Loss() : loss_sum_(0), total_example_ (0) { 
+  Loss() : loss_sum_(0), total_example_(0), 
+           score_func_(nullptr), dist_score_func_(nullptr) { 
     kv_w_ = new ps::KVWorker<float>(0);
     kv_v_ = new ps::KVWorker<float>(1);
   };

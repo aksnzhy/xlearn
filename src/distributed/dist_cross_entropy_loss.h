@@ -38,6 +38,10 @@ class DistCrossEntropyLoss : public Loss {
   DistCrossEntropyLoss() { }
   ~DistCrossEntropyLoss() { }
 
+  void Predict(const DMatrix* data_matrix,
+      Model& model,
+      std::vector<real_t>& pred);
+
   // Given predictions and labels, accumulate cross-entropy loss.
   void Evalute(const std::vector<real_t>& pred,
                const std::vector<real_t>& label);
