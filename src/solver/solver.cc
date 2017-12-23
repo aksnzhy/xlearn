@@ -54,7 +54,7 @@ void Solver::print_logo() const {
                     "     \\ \\/ / |    / _ \\/ _` | '__| '_ \\ \n"
                     "      >  <| |___|  __/ (_| | |  | | | |\n"
                     "     /_/\\_\\_____/\\___|\\__,_|_|  |_| |_|\n\n"
-                    "        xLearn   -- 0.10 Version --\n"
+                    "        xLearn   -- 0.20 Version --\n"
 "----------------------------------------------------------------------------------------------\n"
 "\n";
   Color::Modifier green(Color::FG_GREEN);
@@ -193,7 +193,10 @@ void Solver::init_train() {
   /*********************************************************
    *  Initialize thread pool                               *
    *********************************************************/
-  size_t threadNumber = std::thread::hardware_concurrency();
+  size_t threadNumber = std::thread::hardware_concurrency();;
+  if (hyper_param_.thread_number != 0) {
+    threadNumber = hyper_param_.thread_number;
+  }
   pool_ = new ThreadPool(threadNumber);
   /*********************************************************
    *  Initialize Reader                                    *

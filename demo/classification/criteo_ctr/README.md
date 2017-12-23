@@ -1,1 +1,0 @@
-This demo shows how to solve a binary class problem.

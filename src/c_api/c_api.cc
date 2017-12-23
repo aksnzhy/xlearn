@@ -41,7 +41,7 @@ XL_DLL int XLearnHello() {
                     "     \\ \\/ / |    / _ \\/ _` | '__| '_ \\ \n"
                     "      >  <| |___|  __/ (_| | |  | | | |\n"
                     "     /_/\\_\\_____/\\___|\\__,_|_|  |_| |_|\n\n"
-                    "        xLearn   -- 0.10 Version --\n"
+                    "        xLearn   -- 0.20 Version --\n"
 "----------------------------------------------------------------------------------------------\n"
 "\n";
   Color::Modifier green(Color::FG_GREEN);
@@ -165,7 +165,9 @@ XL_DLL int XLearnSetStr(XL *out, const char *key, const char *value) {
   	  xl->GetHyperParam().loss_func = std::string("cross-entropy");
   	} else if (strcmp(value, "reg") == 0) {
   	  xl->GetHyperParam().loss_func = std::string("squared");
-  	}
+  	} else {
+      xl->GetHyperParam().loss_func = std::string("unknow");
+    }
   } else if (strcmp(key, "metric") == 0) {
   	xl->GetHyperParam().metric = std::string(value);
   } else if (strcmp(key, "log") == 0) {
@@ -190,6 +192,8 @@ XL_DLL int XLearnSetInt(XL *out, const char *key, const int value) {
   	xl->GetHyperParam().num_folds = value;
   } else if (strcmp(key, "block_size") == 0) {
   	xl->GetHyperParam().block_size = value;
+  } else if (strcmp(key, "nthread") == 0) {
+    xl->GetHyperParam().thread_number = value;
   }
   API_END();
 }

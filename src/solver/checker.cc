@@ -91,6 +91,8 @@ std::string Checker::option_help() const {
 "                          perform early-stopping by default, so this value is just a upper bound. \n"
 "                                                                                       \n"
 "  -f <fold_number>     :  Number of folds for cross-validation. Using 5 by default.      \n"
+"                                                                                         \n"
+"  -nthread <thread number> :  Number of thread for multi-thread training                 \n"
 "                                                                                      \n"
 "  --disk               :  Open on-disk training for large-scale machine learning problems. \n"
 "                                                                    \n"
@@ -128,8 +130,10 @@ std::string Checker::option_help() const {
 "                                                                           \n"
 "OPTIONS: \n"
 "  -o <output_file>     :  Path of the output file. On default, this value will be set \n"
-"                          to 'test_file' + '.out'     \n"
-"                                                             \n"
+"                          to 'test_file' + '.out'                    \n"
+"                                                                         \n"
+"  -nthread <thread number> :  Number of thread for multi-thread learning. \n"
+"                                                                             \n"
 "  -l <log_file_path>   :  Path of the log file. Using '/tmp/xlearn_log' by default. \n"
 "----------------------------------------------------------------------------------------------\n"
     );
@@ -153,6 +157,7 @@ void Checker::Initialize(bool is_train, int argc, char* argv[]) {
     menu_.push_back(std::string("-u"));
     menu_.push_back(std::string("-e"));
     menu_.push_back(std::string("-f"));
+    menu_.push_back(std::string("-nthread"));
     menu_.push_back(std::string("--disk"));
     menu_.push_back(std::string("--cv"));
     menu_.push_back(std::string("--dis-es"));
@@ -165,6 +170,7 @@ void Checker::Initialize(bool is_train, int argc, char* argv[]) {
   } else {  // for Prediction
     menu_.push_back(std::string("-o"));
     menu_.push_back(std::string("-l"));
+    menu_.push_back(std::string("-nthread"));
     menu_.push_back(std::string("--sign"));
     menu_.push_back(std::string("--sigmoid"));
   }
@@ -401,6 +407,18 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
         hyper_param.num_folds = value;
       }
       i += 2;
+    } else if (list[i].compare("-nthread") == 0) {  // number of thread
+      int value = atoi(list[i+1].c_str());
+      if (value <= 0) {
+        print_error(
+          StringPrintf("Illegal -nthread : '%i'. -nthread must be greater than zero.",
+               value)
+        );
+        bo = false;
+      } else {
+        hyper_param.thread_number = value;
+      }
+      i += 2;
     } else if (list[i].compare("--disk") == 0) {  // on-disk training
       hyper_param.on_disk = true;
       i += 1;
@@ -511,6 +529,29 @@ bool Checker::check_train_param(HyperParam& hyper_param) {
     print_error(
       StringPrintf("Training data file: %s does not exist.", 
                     hyper_param.train_set_file.c_str())
+    );
+    bo = false;
+  }
+  if (!hyper_param.validate_set_file.empty() &&
+      !FileExist(hyper_param.validate_set_file.c_str())) {
+    print_error(
+      StringPrintf("Validation data file: %s does not exist.", 
+                    hyper_param.validate_set_file.c_str())
+    );
+    bo = false;
+  }
+  /*********************************************************
+   *  Check invalid value                                  *
+   *********************************************************/
+  if (hyper_param.thread_number < 0) {
+    print_error(
+      StringPrintf("The thread number must be greater than zero.")
+    );
+    bo = false;
+  }
+  if (hyper_param.loss_func.compare("unknow") == 0) {
+    print_error(
+      StringPrintf("The task can only be 'binary' or 'reg'.")
     );
     bo = false;
   }
@@ -651,6 +692,18 @@ bool Checker::check_prediction_options(HyperParam& hyper_param) {
       i += 2;
     } else if (list[i].compare("-l") == 0) {  // path of the log file
       hyper_param.log_file = list[i+1];
+      i += 2;
+    } else if (list[i].compare("-nthread") == 0) {  // number of thread
+      int value = atoi(list[i+1].c_str());
+      if (value <= 0) {
+         print_error(
+          StringPrintf("Illegal -nthread : '%i'. -nthread must be greater than zero.",
+               value)
+        );
+        bo = false;
+      } else {
+        hyper_param.thread_number = value;
+      }
       i += 2;
     } else if (list[i].compare("--sign") == 0) {  // convert output to 0 and 1
       hyper_param.sign = true;
