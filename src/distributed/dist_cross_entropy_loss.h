@@ -23,7 +23,7 @@ This file defines the CrossEntropyLoss class.
 #define XLEARN_LOSS_DIST_CROSS_ENTROPY_LOSS_H_
 
 #include "src/base/common.h"
-#include "src/loss/loss.h"
+#include "src/distributed/dist_loss.h"
 
 namespace xLearn {
 
@@ -32,7 +32,7 @@ namespace xLearn {
 // has the following form:
 // loss = sum_all_example(log(1.0+exp(-y*pred)))
 //------------------------------------------------------------------------------
-class DistCrossEntropyLoss : public Loss {
+class DistCrossEntropyLoss : public DistLoss {
  public:
   // Constructor and Desstructor
   DistCrossEntropyLoss() { }
