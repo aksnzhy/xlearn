@@ -59,7 +59,7 @@ struct KVServerSGDHandle {
 };
 
 typedef struct AdaGradEntry {
-  AdaGradEntry(size_t k = 4) {
+  AdaGradEntry(size_t k = v_dim) {
     w.resize(k, 0.0);
     n.resize(k, 0.0);
   }
@@ -102,7 +102,7 @@ struct KVServerAdaGradHandle {
 };
 
 typedef struct FTRLEntry{
-  FTRLEntry(size_t k = 4) {
+  FTRLEntry(size_t k = v_dim) {
     w.resize(k, 0.0);
     n.resize(k, 0.0);
     z.resize(k, 0.0);
@@ -162,19 +162,17 @@ class XLearnServer{
     checker_->Initialize(hyper_param_.is_train, argc, argv);
     checker_->check_cmd(hyper_param_);
 
-    std::cout << hyper_param_.opt_type << std::endl;
-    std::cout << hyper_param_.auxiliary_size << std::endl;
-    std::cout << hyper_param_.score_func << std::endl;
     alpha = hyper_param_.alpha;
     beta = hyper_param_.beta;
     lambda1 = hyper_param_.lambda_1;
     lambda2 = hyper_param_.lambda_2;
     regu_lambda = hyper_param_.regu_lambda;
     learning_rate = hyper_param_.learning_rate;
+
     if (hyper_param_.score_func.compare("linear") == 0) {
       v_dim = 1;
     }
-    if (hyper_param_.score_func.compare("fm")  == 0||
+    if (hyper_param_.score_func.compare("fm")  == 0 ||
         hyper_param_.score_func.compare("ffm") == 0) {
       v_dim = hyper_param_.num_K;
     }
