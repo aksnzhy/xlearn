@@ -583,7 +583,17 @@ bool Checker::check_train_param(HyperParam& hyper_param) {
   }
   if (hyper_param.num_K > 999999) {
     print_error(
-      StringPrintf("Invalid size of K: %d.", hyper_param.num_K)
+      StringPrintf("Invalid size of K: %d. "
+                   "Size of K must be greater than zero.", 
+        hyper_param.num_K)
+    );
+    bo = false;
+  }
+  if (hyper_param.num_folds <= 0) {
+    print_error(
+      StringPrintf("Invalid size of folds: %d. "
+                   "Size of folds must be greater than zero.", 
+        hyper_param.num_folds)
     );
     bo = false;
   }
