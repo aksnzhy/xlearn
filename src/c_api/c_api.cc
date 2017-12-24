@@ -278,3 +278,12 @@ XL_DLL int XLDMatrixCreateFromCSR(const size_t* indptr,
                                   size_t nindptr,
                                   size_t nelem,
                                   XL* out);
+
+XL_DLL int XLDMatrixSetLabel(XL* out,
+                             const real_t* label,
+                             const size_t& len) {
+  API_BEGIN();
+  auto p = reinterpret_cast<xLearn::DMatrix*>(out);
+  p->SetLabel(label, len);
+  API_END();
+}

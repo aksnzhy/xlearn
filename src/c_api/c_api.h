@@ -130,4 +130,7 @@ XL_DLL int XLDMatrixCreateFromCSR(const size_t* indptr,
                                   size_t nelem,
                                   XL* out);
 
+XL_DLL int XLDMatrixSetLabel(XL* out,
+                             const real_t* label);
+
 #endif  // XLEARN_C_API_C_API_H_
