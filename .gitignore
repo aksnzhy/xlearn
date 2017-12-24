@@ -48,7 +48,7 @@ build/*
 xlearn/*
 
 # Python-package
-.pyc
-build_cpp/
-compile/
-xlearn.egg-info/
+*.pyc
+python-package/build_cpp/
+python-package/compile/
+python-package/xlearn.egg-info/
