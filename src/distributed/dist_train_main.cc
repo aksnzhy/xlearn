@@ -33,7 +33,7 @@ This file is the entry for training of the xLearn.
 
 int main(int argc, char* argv[]) {
   if (ps::IsServer()) {
-    xlearn::XLearnServer* server = new xlearn::XLearnServer();
+    xlearn::XLearnServer* server = new xlearn::XLearnServer(argc, argv);
   }
 
   ps::Start();

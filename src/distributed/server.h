@@ -1,5 +1,7 @@
 #include "iostream"
 #include "src/base/math.h"
+#include "src/data/hyper_parameters.h"
+#include "src/distributed/dist_checker.h"
 #include "src/distributed/dist_score_function.h"
 #include "ps/ps.h"
 
@@ -152,8 +154,12 @@ struct KVServerFTRLHandle {
 
 class XLearnServer{
  public:
-  XLearnServer(){
+  XLearnServer(int argc, char* argv[]){
     auto server_ = new ps::KVServer<float>(0);
+    xLearn::HyperParam hyper_param_;
+    xLearn::DistChecker* checker_ = new xLearn::DistChecker;
+    checker_->Initialize(hyper_param_.is_train, argc, argv);
+    checker_->check_cmd(hyper_param_);
     /*
     if (opt_type_.compare("sgd") == 0) {
       server_->set_request_handle(KVServerSGDHandle());
@@ -162,9 +168,11 @@ class XLearnServer{
       server_->set_request_handle(KVServerAdaGradHandle());
     }
     */
-    //if (opt_type_.compare("ftrl") == 0) {
+    std::cout << hyper_param_.opt_type << std::endl;
+    std::cout << hyper_param_.alpha << std::endl;
+    if (hyper_param_.opt_type.compare("ftrl") == 0) {
       server_->set_request_handle(KVServerFTRLHandle());
-    //}
+    }
     std::cout << "init server success " << std::endl;
   }
   ~XLearnServer(){}
