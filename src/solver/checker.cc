@@ -581,6 +581,12 @@ bool Checker::check_train_param(HyperParam& hyper_param) {
     );
     bo = false;
   }
+  if (hyper_param.num_K > 999999) {
+    print_error(
+      StringPrintf("Invalid size of K: %d.", hyper_param.num_K)
+    );
+    bo = false;
+  }
   if (!bo) return false;
   /*********************************************************
    *  Check warning and fix conflict                       *
