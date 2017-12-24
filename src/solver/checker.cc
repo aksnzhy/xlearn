@@ -795,15 +795,15 @@ bool Checker::check_prediction_param(HyperParam& hyper_param) {
   *  Check the path of test set file                      *
   *********************************************************/
  if (!FileExist(hyper_param.test_set_file.c_str())) {
-   print_error(
+    print_error(
       StringPrintf("Test set file: %s does not exist.",
            hyper_param.test_set_file.c_str())
     );
     bo =  false;
  }
  /*********************************************************
-   *  Check the path of model file                         *
-   *********************************************************/
+  *  Check the path of model file                         *
+  *********************************************************/
  if (!FileExist(hyper_param.model_file.c_str())) {
    print_error(
       StringPrintf("Test set file: %s does not exist.",
@@ -811,6 +811,16 @@ bool Checker::check_prediction_param(HyperParam& hyper_param) {
     );
     bo = false;
  }
+ /*********************************************************
+  *  Check invalid value                                  *
+  *********************************************************/
+ if (hyper_param.thread_number < 0) {
+    print_error(
+      StringPrintf("The thread number must be greater than zero: %d.",
+        hyper_param.thread_number)
+    );
+    bo = false;
+  }
  if (!bo) return false;
  /*********************************************************
   *  Check warning and fix conflict                       *
