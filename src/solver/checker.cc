@@ -597,6 +597,14 @@ bool Checker::check_train_param(HyperParam& hyper_param) {
     );
     bo = false;
   }
+  if (hyper_param.num_epoch <= 0) {
+    print_error(
+      StringPrintf("Invalid number of epoch: %d. "
+                   "Number of epoch must be greater than zero.", 
+        hyper_param.num_epoch)
+    );
+    bo = false;
+  }
   if (!bo) return false;
   /*********************************************************
    *  Check warning and fix conflict                       *
