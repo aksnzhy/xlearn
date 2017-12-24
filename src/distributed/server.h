@@ -13,13 +13,13 @@ float beta = 1.0;
 float lambda1 = 0.00001;
 float lambda2 = 2.0;
 
-float regu_lambda_ = 0.1;
-float learning_rate_ = 0.1;
+float regu_lambda = 0.1;
+float learning_rate = 0.1;
 
 int v_dim = 1;
 
 typedef struct SGDEntry{
-  SGDEntry(size_t k = 4) {
+  SGDEntry(size_t k = v_dim) {
     w.resize(k, 0.0);
   }
   std::vector<float> w;
@@ -43,8 +43,8 @@ struct KVServerSGDHandle {
       if (req_meta.push) {
         for (int j = 0; j < val.w.size(); ++j) {
           float gradient = req_data.vals[i * v_dim + j];
-          gradient += regu_lambda_ * gradient;
-          val.w[j] -= learning_rate_ * gradient;
+          gradient += regu_lambda * gradient;
+          val.w[j] -= learning_rate * gradient;
         }
       } else {
         for (int j = 0; j < val.w.size(); ++j) {
@@ -52,6 +52,7 @@ struct KVServerSGDHandle {
         }
       }
     }
+    server->Response(req_meta, res);
   }
  private:
   std::unordered_map<ps::Key, sgdentry> store_;
@@ -84,9 +85,9 @@ struct KVServerAdaGradHandle {
       if (req_meta.push) {
         for (int j = 0; j < val.w.size(); ++j) {
           float gradient = req_data.vals[i * v_dim + j];
-          gradient += regu_lambda_ * gradient;
+          gradient += regu_lambda * gradient;
           val.n[j] = gradient * gradient;
-          val.w[j] -= (learning_rate_ * gradient * InvSqrt(val.n[j]));
+          val.w[j] -= (learning_rate * gradient * InvSqrt(val.n[j]));
         }
       } else {
         for (int j = 0; j < val.w.size(); ++j) {
@@ -94,6 +95,7 @@ struct KVServerAdaGradHandle {
         }
       }
     }
+    server->Response(req_meta, res);
   }
  private:
   std::unordered_map<ps::Key, adagradentry> store_;
@@ -156,20 +158,33 @@ class XLearnServer{
  public:
   XLearnServer(int argc, char* argv[]){
     auto server_ = new ps::KVServer<float>(0);
-    xLearn::HyperParam hyper_param_;
-    xLearn::DistChecker* checker_ = new xLearn::DistChecker;
+    checker_ = new xLearn::DistChecker;
     checker_->Initialize(hyper_param_.is_train, argc, argv);
     checker_->check_cmd(hyper_param_);
-    /*
-    if (opt_type_.compare("sgd") == 0) {
+
+    std::cout << hyper_param_.opt_type << std::endl;
+    std::cout << hyper_param_.auxiliary_size << std::endl;
+    std::cout << hyper_param_.score_func << std::endl;
+    alpha = hyper_param_.alpha;
+    beta = hyper_param_.beta;
+    lambda1 = hyper_param_.lambda_1;
+    lambda2 = hyper_param_.lambda_2;
+    regu_lambda = hyper_param_.regu_lambda;
+    learning_rate = hyper_param_.learning_rate;
+    if (hyper_param_.score_func.compare("linear") == 0) {
+      v_dim = 1;
+    }
+    if (hyper_param_.score_func.compare("fm")  == 0||
+        hyper_param_.score_func.compare("ffm") == 0) {
+      v_dim = hyper_param_.num_K;
+    }
+
+    if (hyper_param_.opt_type.compare("sgd") == 0) {
       server_->set_request_handle(KVServerSGDHandle());
     }
-    if (opt_type_.compare("adagrad") == 0) {
+    if (hyper_param_.opt_type.compare("adagrad") == 0) {
       server_->set_request_handle(KVServerAdaGradHandle());
     }
-    */
-    std::cout << hyper_param_.opt_type << std::endl;
-    std::cout << hyper_param_.alpha << std::endl;
     if (hyper_param_.opt_type.compare("ftrl") == 0) {
       server_->set_request_handle(KVServerFTRLHandle());
     }
@@ -177,5 +192,7 @@ class XLearnServer{
   }
   ~XLearnServer(){}
   ps::KVServer<float>* server_;
+  xLearn::HyperParam hyper_param_;
+  xLearn::DistChecker* checker_;
 };//end class Server
 }
