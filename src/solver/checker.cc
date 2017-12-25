@@ -545,13 +545,63 @@ bool Checker::check_train_param(HyperParam& hyper_param) {
    *********************************************************/
   if (hyper_param.thread_number < 0) {
     print_error(
-      StringPrintf("The thread number must be greater than zero.")
+      StringPrintf("The thread number must be greater than zero: %d.",
+        hyper_param.thread_number)
     );
     bo = false;
   }
   if (hyper_param.loss_func.compare("unknow") == 0) {
     print_error(
       StringPrintf("The task can only be 'binary' or 'reg'.")
+    );
+    bo = false;
+  }
+  if (hyper_param.metric.compare("acc") != 0 &&
+      hyper_param.metric.compare("prec") != 0 &&
+      hyper_param.metric.compare("recall") != 0 &&
+      hyper_param.metric.compare("f1") != 0 &&
+      hyper_param.metric.compare("auc") != 0 &&
+      hyper_param.metric.compare("mae") != 0 &&
+      hyper_param.metric.compare("mape") != 0 &&
+      hyper_param.metric.compare("rmsd") != 0 &&
+      hyper_param.metric.compare("rmse") != 0 &&
+      hyper_param.metric.compare("none") != 0) {
+    print_error(
+      StringPrintf("Unknow evaluation metric: %s.",
+        hyper_param.metric.c_str())
+    );
+    bo = false;
+  }
+  if (hyper_param.opt_type.compare("sgd") != 0 &&
+      hyper_param.opt_type.compare("ftrl") != 0 &&
+      hyper_param.opt_type.compare("adagrad") != 0) {
+    print_error(
+      StringPrintf("Unknow optimization method: %s.",
+        hyper_param.opt_type.c_str())
+    );
+    bo = false;
+  }
+  if (hyper_param.num_K > 999999) {
+    print_error(
+      StringPrintf("Invalid size of K: %d. "
+                   "Size of K must be greater than zero.", 
+        hyper_param.num_K)
+    );
+    bo = false;
+  }
+  if (hyper_param.num_folds <= 0) {
+    print_error(
+      StringPrintf("Invalid size of folds: %d. "
+                   "Size of folds must be greater than zero.", 
+        hyper_param.num_folds)
+    );
+    bo = false;
+  }
+  if (hyper_param.num_epoch <= 0) {
+    print_error(
+      StringPrintf("Invalid number of epoch: %d. "
+                   "Number of epoch must be greater than zero.", 
+        hyper_param.num_epoch)
     );
     bo = false;
   }
@@ -745,15 +795,15 @@ bool Checker::check_prediction_param(HyperParam& hyper_param) {
   *  Check the path of test set file                      *
   *********************************************************/
  if (!FileExist(hyper_param.test_set_file.c_str())) {
-   print_error(
+    print_error(
       StringPrintf("Test set file: %s does not exist.",
            hyper_param.test_set_file.c_str())
     );
     bo =  false;
  }
  /*********************************************************
-   *  Check the path of model file                         *
-   *********************************************************/
+  *  Check the path of model file                         *
+  *********************************************************/
  if (!FileExist(hyper_param.model_file.c_str())) {
    print_error(
       StringPrintf("Test set file: %s does not exist.",
@@ -761,6 +811,16 @@ bool Checker::check_prediction_param(HyperParam& hyper_param) {
     );
     bo = false;
  }
+ /*********************************************************
+  *  Check invalid value                                  *
+  *********************************************************/
+ if (hyper_param.thread_number < 0) {
+    print_error(
+      StringPrintf("The thread number must be greater than zero: %d.",
+        hyper_param.thread_number)
+    );
+    bo = false;
+  }
  if (!bo) return false;
  /*********************************************************
   *  Check warning and fix conflict                       *
