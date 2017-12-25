@@ -12,7 +12,7 @@ try {
 #define R_API_END()                             \
 } catch(...) {                                  \
     PutRNGstate();                              \
-    Rf_error("Error");                             \
+    Rf_error("Error");                          \
 }                                               \
 PutRNGstate();
 
@@ -21,7 +21,7 @@ PutRNGstate();
 */
 #define CHECK_CALL(x)                           \
 if ((x) != 0) {                                 \
-    Rf_error(XLearnGetLastError());                \
+    Rf_error(XLearnGetLastError());             \
 }
 
 // Say hello to user

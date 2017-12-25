@@ -6,16 +6,6 @@ set(STA_DEPS base)
 add_library(data STATIC model_parameters.cc)
 target_link_libraries(data ${STA_DEPS})
 
-# Build shared library
-set(SHA_DEPS base_shared)
-add_library(data_shared SHARED model_parameters.cc)
-target_link_libraries(data_shared ${SHA_DEPS})
-
-# Set properties
-set_target_properties(data_shared PROPERTIES OUTPUT_NAME "data")
-set_target_properties(data_shared PROPERTIES CLEAN_DIRECT_OUTPUT 1)
-set_target_properties(data PROPERTIES CLEAN_DIRECT_OUTPUT 1)
-
 # Build unittests.
 set(LIBS data base gtest)
 
