@@ -79,7 +79,7 @@ namespace xLearn {
 //    /* Also, we can load model from this file. */
 //    Model new_model("/tmp/model.txt");
 //
-// The Model class can support early-stopping technique. We can set
+// The Model class can support early-stopping technique. We can set
 // a record for the best model parameter by using SetBestModel() and
 // we can shrink back to find the best model by using Shrink() method.
 //------------------------------------------------------------------------------
