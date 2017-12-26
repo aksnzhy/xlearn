@@ -21,6 +21,7 @@ This file is the implementation of the base Score class.
 
 #include "src/distributed/dist_score_function.h"
 #include "src/distributed/dist_linear_score.h"
+#include "src/distributed/dist_fm_score.h"
 
 namespace xLearn {
 
@@ -29,5 +30,6 @@ namespace xLearn {
 //------------------------------------------------------------------------------
 CLASS_REGISTER_IMPLEMENT_REGISTRY(xLearn_dist_score_registry, DistScore);
 REGISTER_SCORE("dist_linear", DistLinearScore);
+REGISTER_SCORE("dist_fm", DistFMScore);
 
 }  // namespace xLearn
