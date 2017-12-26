@@ -279,6 +279,31 @@ XL_DLL int XLDMatrixCreateFromCSR(const size_t* indptr,
                                   size_t nelem,
                                   XL* out);
 
+XL_DLL int XLDMatrixCreateFromCSCEx(const size_t* indptr,
+                                    const unsigned* indices,
+                                    const real_t* data,
+                                    size_t nindptr,
+                                    size_t nelem,
+                                    size_t num_row,
+                                    XL* out) {
+  API_BEGIN();
+  xLearn::DMatrix* mat = new xLearn::DMatrix();
+  mat->row_length = num_row;
+  mat->row.reserve(num_row);
+  for (size_t i = 0; i < num_row; ++ i) {
+    mat->row.emplace_back(new xLearn::SparseRow());
+  }
+  for (size_t i = 1; i < nindptr; ++ i) {
+    for (size_t j = indptr[i - 1]; j < indptr[i]; ++ j) {
+      if (!std::isnan(data[j])) {
+        mat->row[indices[j]]->emplace_back(xLearn::Node(0, i - 1, data[j]));
+      }
+    }
+  }
+  *out = mat;
+  API_END();
+}
+
 XL_DLL int XLDMatrixSetLabel(XL* out,
                              const real_t* label,
                              const size_t& len) {
@@ -287,3 +312,6 @@ XL_DLL int XLDMatrixSetLabel(XL* out,
   p->SetLabel(label, len);
   API_END();
 }
+
+// TODO: add the method of setting field
+XL_DLL int XLDMatrixSetField(XL* out);

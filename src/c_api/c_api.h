@@ -130,6 +130,14 @@ XL_DLL int XLDMatrixCreateFromCSR(const size_t* indptr,
                                   size_t nelem,
                                   XL* out);
 
+XL_DLL int XLDMatrixCreateFromCSCEx(const size_t* indptr,
+                                    const unsigned* indices,
+                                    const real_t* data,
+                                    size_t nindptr,
+                                    size_t nelem,
+                                    size_t num_row,
+                                    XL* out);
+
 XL_DLL int XLDMatrixSetLabel(XL* out,
                              const real_t* label);
 
