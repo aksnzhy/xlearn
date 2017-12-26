@@ -21,6 +21,10 @@ def silent_call(cmd, raise_error=False, error_msg=''):
         with open(os.devnull, 'w') as shut_up:
             subprocess.check_output(cmd, stderr=shut_up)
             return 0
+    except OSError:
+        if raise_error:
+            raise Exception("open devnull error")
+        return 1
     except Exception:
         if raise_error:
             raise Exception(error_msg);
