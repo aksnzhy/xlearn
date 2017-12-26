@@ -272,12 +272,14 @@ XL_DLL int XLDMatrixCreateFromCSREx(const size_t* indptr,
   API_END();
 }
 
+/*
 XL_DLL int XLDMatrixCreateFromCSR(const size_t* indptr,
                                   const unsigned* indices,
                                   const real_t* data,
                                   size_t nindptr,
                                   size_t nelem,
                                   XL* out);
+                                  */
 
 XL_DLL int XLDMatrixCreateFromCSCEx(const size_t* indptr,
                                     const unsigned* indices,
@@ -314,4 +316,4 @@ XL_DLL int XLDMatrixSetLabel(XL* out,
 }
 
 // TODO: add the method of setting field
-XL_DLL int XLDMatrixSetField(XL* out);
+//XL_DLL int XLDMatrixSetField(XL* out);

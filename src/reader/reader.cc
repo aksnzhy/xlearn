@@ -110,6 +110,18 @@ void InmemReader::Initialize(const std::string& filename) {
   }
 }
 
+void InmemReader::Initialize(const DMatrix *const matrix) {
+  data_buf_ = *matrix;
+  data_buf_.has_label = matrix->has_label;
+  // Init data_samples_
+  num_samples_ = data_buf_.row_length;
+  // for shuffle
+  order_.resize(num_samples_);
+  for (int i = 0; i < order_.size(); ++i) {
+    order_[i] = i;
+  }
+}
+
 // Check wheter current path has a binary file.
 // We use double check here, that is, we first check 
 // the hash value of a small data block, then check the whole file.
