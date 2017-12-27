@@ -136,4 +136,40 @@ TEST(DMATRIX_TEST, CopyFrom) {
   }
 }
 
+/*
+TEST(DMATRIX_TEST, Compress) {
+  // Init matrix
+  DMatrix matrix;
+  matrix.ResetMatrix(3);
+  // row_1
+  matrix.AddNode(0, 0, 0.1);
+  matrix.AddNode(0, 5, 0.1);
+  matrix.AddNode(0, 10, 0.1);
+  // row_2
+  matrix.AddNode(1, 3, 0.1);
+  matrix.AddNode(1, 5, 0.1);
+  matrix.AddNode(1, 10, 0.1);
+  // row_3
+  matrix.AddNode(2, 0, 0.1);
+  matrix.AddNode(2, 3, 0.1);
+  // Compress
+  DMatrix dense_matrix;
+  feature_map mp;
+  matrix.Compress(dense_matrix, mp);
+  // row_1
+  SparseRow* row = dense_matrix.row[0];
+  EXPECT_EQ((*row)[0].feat_id, 0);
+  EXPECT_EQ((*row)[1].feat_id, 2);
+  EXPECT_EQ((*row)[2].feat_id, 3);
+  // row_2
+  row = dense_matrix.row[1];
+  EXPECT_EQ((*row)[0].feat_id, 1);
+  EXPECT_EQ((*row)[1].feat_id, 2);
+  EXPECT_EQ((*row)[2].feat_id, 3);
+  // row_3
+  row = dense_matrix.row[2];
+  EXPECT_EQ((*row)[0].feat_id, 0);
+  EXPECT_EQ((*row)[1].feat_id, 3);
+}*/
+
 }  // namespace xLearn

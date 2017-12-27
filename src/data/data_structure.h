@@ -264,7 +264,7 @@ struct DMatrix {
   //  | new id     :   0   1   2   3   |
   //  ----------------------------------
   void Compress(DMatrix& dense_matrix, feature_map& mp) {
-
+    // TODO(zpk)
   }
 
   // Serialize current DMatrix to disk file.
