@@ -37,7 +37,7 @@ std::ofstream Logger::erro_log_file_;
 const char *cross_plat_ctime_r(time_t *cur_time, char *buffer)
 {
 #ifdef _WIN32
-	size_t bufsize = sizeof(buffer);
+	size_t bufsize = 26; // The str length is always 26 after formatting
 	errno_t e = ctime_s(buffer, bufsize, cur_time);
 	//assert(e == 0 && "Huh? ctime_s returned an error");
 	return buffer;
