@@ -44,8 +44,8 @@ typedef float real_t;
 typedef uint32 index_t;
 
 //------------------------------------------------------------------------------
-// We use 32-bits unsigned integer to store the index 
-// of the feature and the model parameters.
+// Mapping sparse feature to dense feature.
+// Used by distributed training.
 //------------------------------------------------------------------------------
 typedef std::unordered_map<index_t, index_t> feature_map;
 
@@ -252,7 +252,7 @@ struct DMatrix {
   //  |    3:0.1    5:0.1   10:0.1    |
   //  |    0:0.1    10:0.1            |
   //  ---------------------------------
-  // After compress, we can a dense matrix like this:
+  // After compress, we can get a dense matrix like this:
   //  ------------------------------
   //  |    0:0.1   2:0.1   3:0.1   |
   //  |    1:0.1   2:0.1   3:0.1   |
