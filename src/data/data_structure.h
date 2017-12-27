@@ -24,6 +24,7 @@ This file defines the basic data structures used by xLearn.
 #define XLEARN_DATA_DATA_STRUCTURE_H_
 
 #include <vector>
+#include <unordered_map>
 
 #include "src/base/common.h"
 #include "src/base/file_util.h"
@@ -41,6 +42,12 @@ typedef float real_t;
 // of the feature and the model parameters.
 //------------------------------------------------------------------------------
 typedef uint32 index_t;
+
+//------------------------------------------------------------------------------
+// We use 32-bits unsigned integer to store the index 
+// of the feature and the model parameters.
+//------------------------------------------------------------------------------
+typedef std::unordered_map<index_t, index_t> feature_map;
 
 //------------------------------------------------------------------------------
 // We use SSE to accelerate our training, so some 
@@ -236,6 +243,28 @@ struct DMatrix {
     this->norm = matrix->norm;
     // Copy has label
     this->has_label = matrix->has_label;
+  }
+
+  // Compress current sparse matrix to a dense matrix.
+  // For example, the sparse matrix is:
+  //  ---------------------------------
+  //  |    0:0.1    5:0.1   10:0.1    |
+  //  |    3:0.1    5:0.1   10:0.1    |
+  //  |    0:0.1    10:0.1            |
+  //  ---------------------------------
+  // After compress, we can a dense matrix like this:
+  //  ------------------------------
+  //  |    0:0.1   2:0.1   3:0.1   |
+  //  |    1:0.1   2:0.1   3:0.1   |
+  //  |    0:0.1   3:0.1           |
+  //  ------------------------------
+  // Also, we can get a hash map to store the mapping relations:
+  //  ----------------------------------
+  //  | original id:   0   3   5   10  |
+  //  | new id     :   0   1   2   3   |
+  //  ----------------------------------
+  void Compress(DMatrix& dense_matrix, feature_map& mp) {
+
   }
 
   // Serialize current DMatrix to disk file.
