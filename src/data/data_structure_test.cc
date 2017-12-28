@@ -172,4 +172,66 @@ TEST(DMATRIX_TEST, Compress) {
   EXPECT_EQ((*row)[1].feat_id, 3);
 }*/
 
+TEST(DMATRIX_TEST, GetMiniBatch) {
+  // Init matrix
+  DMatrix matrix;
+  matrix.ResetMatrix(10);
+  for (size_t i = 0; i < 10; ++i) {
+    matrix.AddNode(i, i, 2.5, i);
+    matrix.Y[i] = i;
+    matrix.norm[i] = 0.25;
+  }
+  DMatrix mini_batch;
+  mini_batch.ResetMatrix(4);
+  index_t res = 0;
+  // Get mini-batch (4 samples)
+  res = matrix.GetMiniBatch(4, mini_batch);
+  EXPECT_EQ(res, 4);
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_EQ(mini_batch.Y[i], i);
+    EXPECT_EQ(mini_batch.norm[i], 0.25);
+    SparseRow *row =mini_batch.row[i];
+    for (SparseRow::iterator iter = row->begin();
+         iter != row->end(); ++iter) {
+      EXPECT_EQ(iter->field_id, i);
+      EXPECT_EQ(iter->feat_id, i);
+      EXPECT_FLOAT_EQ(iter->feat_val, 2.5);
+    }
+  }
+  // Get mini-batch (4 samples)
+  res = matrix.GetMiniBatch(4, mini_batch);
+  EXPECT_EQ(res, 4);
+  for (int i = 4; i < 8; ++i) {
+    EXPECT_EQ(mini_batch.Y[i-4], i);
+    EXPECT_EQ(mini_batch.norm[i-4], 0.25);
+    SparseRow *row =mini_batch.row[i-4];
+    for (SparseRow::iterator iter = row->begin();
+         iter != row->end(); ++iter) {
+      EXPECT_EQ(iter->field_id, i);
+      EXPECT_EQ(iter->feat_id, i);
+      EXPECT_FLOAT_EQ(iter->feat_val, 2.5);
+    }
+  }
+  // Get mini-batch (2 samples)
+  res = matrix.GetMiniBatch(4, mini_batch);
+  EXPECT_EQ(res, 2);
+  for (int i = 8; i < 10; ++i) {
+    EXPECT_EQ(mini_batch.Y[i-8], i);
+    EXPECT_EQ(mini_batch.norm[i-8], 0.25);
+    SparseRow *row =mini_batch.row[i-8];
+    for (SparseRow::iterator iter = row->begin();
+         iter != row->end(); ++iter) {
+      EXPECT_EQ(iter->field_id, i);
+      EXPECT_EQ(iter->feat_id, i);
+      EXPECT_FLOAT_EQ(iter->feat_val, 2.5);
+    }
+  }
+  // Get mini-batch (0 samples)
+  res = matrix.GetMiniBatch(4, mini_batch);
+  EXPECT_EQ(res, 0);
+  // Get mini-batch (0 samples)
+  res = matrix.GetMiniBatch(4, mini_batch);
+  EXPECT_EQ(res, 0);
+}
+
 }  // namespace xLearn

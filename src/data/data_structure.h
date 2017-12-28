@@ -140,7 +140,8 @@ struct DMatrix {
      row(0),
      Y(0),
      norm(0),
-     has_label(false) { }
+     has_label(false),
+     pos(0) { }
 
   // Destructor
   ~DMatrix() { Release(); }
@@ -165,6 +166,7 @@ struct DMatrix {
     norm.resize(length, 1.0);
     // Indicate that if current dataset has the label y
     has_label = label;
+    pos = 0;
   }
 
   // Release memory for DMatrix.
@@ -186,6 +188,7 @@ struct DMatrix {
     std::vector<real_t>().swap(norm);
     has_label = false;
     row_length = 0;
+    pos = 0;
   }
 
   // Add node to current data matrix.
@@ -243,6 +246,8 @@ struct DMatrix {
     this->norm = matrix->norm;
     // Copy has label
     this->has_label = matrix->has_label;
+    // Copy pos
+    this->pos = matrix->pos;
   }
 
   // Compress current sparse matrix to a dense matrix.
@@ -268,18 +273,22 @@ struct DMatrix {
     // TODO(zpk)
   }
 
-  // Given a simple size, get a mini-batch of data from 
-  // curremt data matrix. This method will be used for mini-batch 
-  // GD with distributed training. Return the sample size. Note that 
-  // sample_size <= batch_size
+  // Get a mini-batch of data from curremt data matrix. 
+  // This method will be used for distributed computation. 
+  // Return the count of sample for each function call.
   index_t GetMiniBatch(index_t batch_size, DMatrix& mini_batch) {
-    CHECK_EQ(mini_batch.row_length, batch_size);
+    CHECK_EQ(batch_size, mini_batch.row_length);
+    // Copy mini-batch
     for (index_t i = 0; i < batch_size; ++i) {
-      mini_batch.row[i] = this->row[i];
-      mini_batch.Y[i] = this->Y[i];
-      mini_batch.norm[i] = this->norm[i];
+      if (this->pos >= this->row_length) {
+        return i;
+      }
+      mini_batch.row[i] = this->row[pos];
+      mini_batch.Y[i] = this->Y[pos];
+      mini_batch.norm[i] = this->norm[pos];
+      this->pos++;
     }
-    return 0;
+    return batch_size;
   }
 
   // Serialize current DMatrix to disk file.
@@ -304,6 +313,8 @@ struct DMatrix {
     WriteVectorToFile(file, norm);
     // Write has_label
     WriteDataToDisk(file, (char*)&has_label, sizeof(has_label));
+    // Write pos
+    WriteDataToDisk(file, (char*)&pos, sizeof(pos));
     Close(file);
   }
 
@@ -330,6 +341,8 @@ struct DMatrix {
     ReadVectorFromFile(file, norm);
     // Read has label
     ReadDataFromDisk(file, (char*)&has_label, sizeof(has_label));
+    // Read pos
+    ReadDataFromDisk(file, (char*)&pos, sizeof(pos));
     Close(file);
   }
 
@@ -374,7 +387,8 @@ struct DMatrix {
   std::vector<real_t> norm;
   /* If current dataset has label y */
   bool has_label;
-  index_t cur_pos;
+  /* Current position for GetMiniBatch() */
+  index_t pos;
 };
 
 }  // namespace xLearn
