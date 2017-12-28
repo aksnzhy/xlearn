@@ -272,7 +272,7 @@ struct DMatrix {
   void Compress(std::vector<index_t>& feature_list) {
     // Using a map to store the mapping relations
     feature_map mp; 
-    index_t idx = 0;
+    index_t idx = 1;
     for (index_t i = 0; i < this->row_length; ++i) {
       SparseRow* row = this->row[i];
       for (SparseRow::iterator iter = row->begin();
@@ -281,7 +281,8 @@ struct DMatrix {
         // find a new feature
         if (got == mp.end()) {
           mp[iter->feat_id] = idx;
-          feature_list.push_back(idx);
+          feature_list.push_back(iter->feat_id);
+          iter->feat_id = idx;
           idx++;
         } else {
           iter->feat_id = got->second;
