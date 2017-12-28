@@ -51,9 +51,9 @@ class CrossEntropyLoss : public Loss {
   // Note that this method doesn't update local model, and the
   // gradient will be pushed to the parameter server, which is 
   // used for distributed computation.
-  void CalcGrad(const DMatrix* data_matrix,
-                Model& model,
-                Gradient& grad);
+  void CalcGradDist(const DMatrix* data_matrix,
+                    Model& model,
+                    Gradient& grad);
 
   // Return current loss type.
   std::string loss_type() { return "log_loss"; }

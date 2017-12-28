@@ -246,6 +246,7 @@ struct DMatrix {
   }
 
   // Compress current sparse matrix to a dense matrix.
+  // This method will be used in distributed computation.
   // For example, the sparse matrix is:
   //  ---------------------------------
   //  |    0:0.1    5:0.1   10:0.1    |
@@ -260,8 +261,8 @@ struct DMatrix {
   //  ------------------------------
   // Also, we can get a hash map to store the mapping relations:
   //  ----------------------------------
-  //  | original id:   0   3   5   10  |
-  //  | new id     :   0   1   2   3   |
+  //  | Original id:   0   3   5   10  |
+  //  | New id     :   0   1   2   3   |
   //  ----------------------------------
   void Compress(DMatrix& dense_matrix, feature_map& mp) {
     // TODO(zpk)
