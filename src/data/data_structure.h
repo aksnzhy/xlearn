@@ -44,8 +44,7 @@ typedef float real_t;
 typedef uint32 index_t;
 
 //------------------------------------------------------------------------------
-// Mapping sparse feature to dense feature.
-// Used by distributed training.
+// Mapping sparse feature to dense feature. Used by distributed computation.
 //------------------------------------------------------------------------------
 typedef std::unordered_map<index_t, index_t> feature_map;
 
@@ -253,24 +252,42 @@ struct DMatrix {
   // Compress current sparse matrix to a dense matrix.
   // This method will be used in distributed computation.
   // For example, the sparse matrix is:
-  //  ---------------------------------
-  //  |    0:0.1    5:0.1   10:0.1    |
-  //  |    3:0.1    5:0.1   10:0.1    |
-  //  |    0:0.1    10:0.1            |
-  //  ---------------------------------
+  //  ------------------------------------------
+  //  |    1:0.1    5:0.1    8:0.1   10:0.1    |
+  //  |    3:0.1    12:0.1   20:0.1            |
+  //  |    5:0.1    8:0.1    11:0.1            |
+  //  |    2:0.1    4:0.1    7:0.1             |
+  //  ------------------------------------------
   // After compress, we can get a dense matrix like this:
-  //  ------------------------------
-  //  |    0:0.1   2:0.1   3:0.1   |
-  //  |    1:0.1   2:0.1   3:0.1   |
-  //  |    0:0.1   3:0.1           |
-  //  ------------------------------
-  // Also, we can get a hash map to store the mapping relations:
-  //  ----------------------------------
-  //  | Original id:   0   3   5   10  |
-  //  | New id     :   0   1   2   3   |
-  //  ----------------------------------
-  void Compress(DMatrix& dense_matrix, feature_map& mp) {
-    // TODO(zpk)
+  //  ------------------------------------------
+  //  |    1:0.1    2:0.1    3:0.1    4:0.1    |
+  //  |    5:0.1    6:0.1    7:0.1             |
+  //  |    2:0.1    3:0.1    8:0.1             |
+  //  |    9:0.1   10:0.1    11:0.1            |
+  //  ------------------------------------------
+  // Also, we can get a vector to store the mapping relations:
+  //  -------------------------------------------------
+  //  | 1 | 5 | 8 | 10 | 3 | 12 | 20 | 11 | 2 | 4 | 7 |
+  //  -------------------------------------------------
+  void Compress(std::vector<index_t>& feature_list) {
+    // Using a map to store the mapping relations
+    feature_map mp; 
+    index_t idx = 0;
+    for (index_t i = 0; i < this->row_length; ++i) {
+      SparseRow* row = this->row[i];
+      for (SparseRow::iterator iter = row->begin();
+           iter != row->end(); ++iter) {
+        feature_map::const_iterator got = mp.find(iter->feat_id);
+        // find a new feature
+        if (got == mp.end()) {
+          mp[iter->feat_id] = idx;
+          feature_list.push_back(idx);
+          idx++;
+        } else {
+          iter->feat_id = got->second;
+        }
+      }
+    } 
   }
 
   // Get a mini-batch of data from curremt data matrix. 
@@ -289,6 +306,12 @@ struct DMatrix {
       this->pos++;
     }
     return batch_size;
+  }
+
+  // Go through the data matrix and get the feature list.
+  // This method will be use in distributed computation.
+  void GetFeatureList(std::vector<real_t>& list) {
+
   }
 
   // Serialize current DMatrix to disk file.

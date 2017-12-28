@@ -146,7 +146,7 @@ void SquaredLoss::CalcGrad(const DMatrix* matrix,
 // Note that this method doesn't update local model, and the
 // gradient will be pushed to the parameter server, which is 
 // used for distributed computation.
-void SquaredLoss::CalcGradDist(const DMatrix* data_matrix,
+void SquaredLoss::CalcGradDist(DMatrix* matrix,
                                Model& model,
                                std::vector<real_t>& grad) {}
 
