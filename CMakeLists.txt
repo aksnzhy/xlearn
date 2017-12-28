@@ -44,13 +44,6 @@ set(CMAKE_INSTALL_PREFIX "xLearn")
 set(CMAKE_MACOSX_RPATH TRUE)
 
 #-------------------------------------------------------------------------------
-# Ensure executables are statically linked with libraries.
-#-------------------------------------------------------------------------------
-if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  set(CMAKE_EXE_LINKER_FLAGS "-static -static-libgcc")
-endif()
-
-#-------------------------------------------------------------------------------
 # Set include paths and library paths.
 #-------------------------------------------------------------------------------
 include_directories(

@@ -150,6 +150,17 @@ void CrossEntropyLoss::CalcGrad(const DMatrix* matrix,
 // used for distributed computation.
 void CrossEntropyLoss::CalcGradDist(const DMatrix* data_matrix,
                                     Model& model,
-                                    std::vector<real_t>& grad) {}
+                                    std::vector<real_t>& grad) {
+  // Get a mini-batch from the data_matrix
+
+  // Go through the mini-batch, and pull the 
+  // model from parameter server
+
+  // Compress the sparse data matrix and sparse model to dense format
+
+  // Calculate gradient
+
+  // push gradient to the parameter server
+}
 
 } // namespace xLearn

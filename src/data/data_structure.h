@@ -268,6 +268,20 @@ struct DMatrix {
     // TODO(zpk)
   }
 
+  // Given a simple size, get a mini-batch of data from 
+  // curremt data matrix. This method will be used for mini-batch 
+  // GD with distributed training. Return the sample size. Note that 
+  // sample_size <= batch_size
+  index_t GetMiniBatch(index_t batch_size, DMatrix& mini_batch) {
+    CHECK_EQ(mini_batch.row_length, batch_size);
+    for (index_t i = 0; i < batch_size; ++i) {
+      mini_batch.row[i] = this->row[i];
+      mini_batch.Y[i] = this->Y[i];
+      mini_batch.norm[i] = this->norm[i];
+    }
+    return 0;
+  }
+
   // Serialize current DMatrix to disk file.
   void Serialize(const std::string& filename) {
     CHECK_NE(filename.empty(), true);
@@ -360,6 +374,7 @@ struct DMatrix {
   std::vector<real_t> norm;
   /* If current dataset has label y */
   bool has_label;
+  index_t cur_pos;
 };
 
 }  // namespace xLearn
