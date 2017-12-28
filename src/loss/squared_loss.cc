@@ -148,6 +148,6 @@ void SquaredLoss::CalcGrad(const DMatrix* matrix,
 // used for distributed computation.
 void SquaredLoss::CalcGradDist(const DMatrix* data_matrix,
                                Model& model,
-                               Gradient& grad) {}
+                               std::vector<real_t>& grad) {}
 
 } // namespace xLearn

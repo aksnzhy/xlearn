@@ -362,8 +362,6 @@ struct DMatrix {
   bool has_label;
 };
 
-struct Gradient {};
-
 }  // namespace xLearn
 
 #endif  // XLEARN_DATA_DATA_STRUCTURE_H_

@@ -53,7 +53,7 @@ class SquaredLoss : public Loss {
   // used for distributed computation.
   void CalcGradDist(const DMatrix* data_matrix,
                     Model& model,
-                    Gradient& grad);
+                    std::vector<real_t>& grad);
 
   // Return current loss type
   std::string loss_type() { return "mse_loss"; }
