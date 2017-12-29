@@ -79,14 +79,17 @@ class Loss {
   void Initialize(Score* score, 
                   ThreadPool* pool, 
                   bool norm = true,
-                  bool lock_free = false) {
+                  bool lock_free = false,
+                  index_t batch_size = 0) {
     CHECK_NOTNULL(score);
     CHECK_NOTNULL(pool);
+    CHECK_GE(batch_size, 0);
     score_func_ = score;
     pool_ = pool;
     norm_ = norm;
     threadNumber_ = pool_->ThreadNumber();
     lock_free_ = lock_free;
+    batch_size_ = batch_size;
   }
 
   // Given predictions and labels, accumulate loss value.
@@ -103,6 +106,14 @@ class Loss {
   // This function will also acummulate loss value.
   virtual void CalcGrad(const DMatrix* data_matrix, 
                         Model& model) = 0;
+
+  // Given data sample and current model, calculate gradient.
+  // Note that this method doesn't update local model, and the
+  // gradient will be pushed to the parameter server, which is 
+  // used for distributed computation.
+  virtual void CalcGradDist(DMatrix* data_matrix,
+                            Model& model,
+                            std::vector<real_t>& grad) = 0;
 
   // Return the calculated loss value
   virtual real_t GetLoss() {
@@ -134,6 +145,8 @@ class Loss {
   real_t loss_sum_;
   /* Used to store the number of example */
   index_t total_example_;
+  /* Mini-batch size */
+  index_t batch_size_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Loss);

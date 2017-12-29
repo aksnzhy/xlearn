@@ -136,4 +136,125 @@ TEST(DMATRIX_TEST, CopyFrom) {
   }
 }
 
+TEST(DMATRIX_TEST, Compress) {
+  // Init matrix
+  DMatrix matrix;
+  matrix.ResetMatrix(4);
+  // row_0
+  matrix.AddNode(0, 1, 0.1);
+  matrix.AddNode(0, 5, 0.1);
+  matrix.AddNode(0, 8, 0.1);
+  matrix.AddNode(0, 10, 0.1);
+  // row_1
+  matrix.AddNode(1, 3, 0.1);
+  matrix.AddNode(1, 12, 0.1);
+  matrix.AddNode(1, 20, 0.1);
+  // row_2
+  matrix.AddNode(2, 5, 0.1);
+  matrix.AddNode(2, 8, 0.1);
+  matrix.AddNode(2, 11, 0.1);
+  // row_3
+  matrix.AddNode(3, 2, 0.1);
+  matrix.AddNode(3, 4, 0.1);
+  matrix.AddNode(3, 7, 0.1);
+  // Compress
+  std::vector<index_t> feature_list;
+  matrix.Compress(feature_list);
+  // row_0
+  SparseRow* row = matrix.row[0];
+  EXPECT_EQ((*row)[0].feat_id, 1);
+  EXPECT_EQ((*row)[1].feat_id, 2);
+  EXPECT_EQ((*row)[2].feat_id, 3);
+  EXPECT_EQ((*row)[3].feat_id, 4);
+  // row_1
+  row = matrix.row[1];
+  EXPECT_EQ((*row)[0].feat_id, 5);
+  EXPECT_EQ((*row)[1].feat_id, 6);
+  EXPECT_EQ((*row)[2].feat_id, 7);
+  // row_2
+  row = matrix.row[2];
+  EXPECT_EQ((*row)[0].feat_id, 2);
+  EXPECT_EQ((*row)[1].feat_id, 3);
+  EXPECT_EQ((*row)[2].feat_id, 8);
+  // row_3
+  row = matrix.row[3];
+  EXPECT_EQ((*row)[0].feat_id, 9);
+  EXPECT_EQ((*row)[1].feat_id, 10);
+  EXPECT_EQ((*row)[2].feat_id, 11);
+  // feature list
+  EXPECT_EQ(feature_list[0], 1);
+  EXPECT_EQ(feature_list[1], 5);
+  EXPECT_EQ(feature_list[2], 8);
+  EXPECT_EQ(feature_list[3], 10);
+  EXPECT_EQ(feature_list[4], 3);
+  EXPECT_EQ(feature_list[5], 12);
+  EXPECT_EQ(feature_list[6], 20);
+  EXPECT_EQ(feature_list[7], 11);
+  EXPECT_EQ(feature_list[8], 2);
+  EXPECT_EQ(feature_list[9], 4);
+  EXPECT_EQ(feature_list[10], 7);
+}
+
+TEST(DMATRIX_TEST, GetMiniBatch) {
+  // Init matrix
+  DMatrix matrix;
+  matrix.ResetMatrix(10);
+  for (size_t i = 0; i < 10; ++i) {
+    matrix.AddNode(i, i, 2.5, i);
+    matrix.Y[i] = i;
+    matrix.norm[i] = 0.25;
+  }
+  DMatrix mini_batch;
+  mini_batch.ResetMatrix(4);
+  index_t res = 0;
+  // Get mini-batch (4 samples)
+  res = matrix.GetMiniBatch(4, mini_batch);
+  EXPECT_EQ(res, 4);
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_EQ(mini_batch.Y[i], i);
+    EXPECT_EQ(mini_batch.norm[i], 0.25);
+    SparseRow *row =mini_batch.row[i];
+    for (SparseRow::iterator iter = row->begin();
+         iter != row->end(); ++iter) {
+      EXPECT_EQ(iter->field_id, i);
+      EXPECT_EQ(iter->feat_id, i);
+      EXPECT_FLOAT_EQ(iter->feat_val, 2.5);
+    }
+  }
+  // Get mini-batch (4 samples)
+  res = matrix.GetMiniBatch(4, mini_batch);
+  EXPECT_EQ(res, 4);
+  for (int i = 4; i < 8; ++i) {
+    EXPECT_EQ(mini_batch.Y[i-4], i);
+    EXPECT_EQ(mini_batch.norm[i-4], 0.25);
+    SparseRow *row =mini_batch.row[i-4];
+    for (SparseRow::iterator iter = row->begin();
+         iter != row->end(); ++iter) {
+      EXPECT_EQ(iter->field_id, i);
+      EXPECT_EQ(iter->feat_id, i);
+      EXPECT_FLOAT_EQ(iter->feat_val, 2.5);
+    }
+  }
+  // Get mini-batch (2 samples)
+  res = matrix.GetMiniBatch(4, mini_batch);
+  EXPECT_EQ(res, 2);
+  for (int i = 8; i < 10; ++i) {
+    EXPECT_EQ(mini_batch.Y[i-8], i);
+    EXPECT_EQ(mini_batch.norm[i-8], 0.25);
+    SparseRow *row =mini_batch.row[i-8];
+    for (SparseRow::iterator iter = row->begin();
+         iter != row->end(); ++iter) {
+      EXPECT_EQ(iter->field_id, i);
+      EXPECT_EQ(iter->feat_id, i);
+      EXPECT_FLOAT_EQ(iter->feat_val, 2.5);
+    }
+  }
+  // Get mini-batch (0 samples)
+  res = matrix.GetMiniBatch(4, mini_batch);
+  EXPECT_EQ(res, 0);
+  // Get mini-batch (0 samples)
+  res = matrix.GetMiniBatch(4, mini_batch);
+  EXPECT_EQ(res, 0);
+}
+
 }  // namespace xLearn

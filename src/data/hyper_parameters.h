@@ -134,6 +134,15 @@ struct HyperParam {
   bool sign = false;
   /* Convert predition output using sigmoid */
   bool sigmoid = false;
+//------------------------------------------------------------------------------
+// Parameters for distributed learning
+//------------------------------------------------------------------------------
+  /* Batch size for gradient descent */
+  int batch_size = 1000000;
+  /* Number of worker for compute gradient */
+  int num_worker = 0;
+  /* Number of parameter server for store model parameters */
+  int num_server = 0;
 };
 
 }  // namespace XLEARN
