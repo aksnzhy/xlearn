@@ -309,12 +309,6 @@ struct DMatrix {
     return batch_size;
   }
 
-  // Go through the data matrix and get the feature list.
-  // This method will be use in distributed computation.
-  void GetFeatureList(std::vector<real_t>& list) {
-
-  }
-
   // Serialize current DMatrix to disk file.
   void Serialize(const std::string& filename) {
     CHECK_NE(filename.empty(), true);
