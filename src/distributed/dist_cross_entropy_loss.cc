@@ -172,9 +172,15 @@ void DistCrossEntropyLoss::CalcGrad(const DMatrix* matrix,
   total_example_ += row_len;
   auto feature_ids = std::vector<ps::Key>();
   auto gradient_pull = std::make_shared<std::vector<float>>();
+  auto v_pull = std::make_shared<std::vector<float>>();
   std::map<index_t, real_t> weight_map;
+  std::map<index_t, std::vector<real_t>> v_map;
+
   std::map<index_t, real_t> gradient_push_map;
+  std::map<index_t, real_t> v_push_map;
+
   auto gradient_push = std::make_shared<std::vector<float>>();
+  auto v_push = std::make_shared<std::vector<float>>();
 
   for (index_t i = 0; i < row_len; ++i) {
     SparseRow* row = matrix->row[i];
@@ -190,14 +196,25 @@ void DistCrossEntropyLoss::CalcGrad(const DMatrix* matrix,
                       feature_ids.end());
 
   gradient_pull->resize(feature_ids.size());
-  if (model.GetScoreFunction().compare("linear") == 0) {
-    kv_w_->Wait(kv_w_->Pull(feature_ids, &(*gradient_pull)));
+  kv_w_->Wait(kv_w_->Pull(feature_ids, &(*gradient_pull)));
+  v_pull->resize(feature_ids.size() * hyper_param_.num_K);
+  if (model.GetScoreFunction().compare("fm") == 0 ||
+      model.GetScoreFunction().compare("ffm") == 0) {
+    kv_v_->Wait(kv_v_->Pull(feature_ids, &(*v_pull)));
   }
   for (int i = 0; i < gradient_pull->size(); ++i) {
     index_t idx = feature_ids[i];
     real_t weight = (*gradient_pull)[i];
     weight_map[idx] = weight;
     gradient_push_map[idx] = 0.0;
+  }
+  for (int i = 0; i < v_pull; ++i) {
+    index_t idx = feature_ids[i];
+    std::vector<real_t> vec_k;
+    for(int j = 0; j < hyper_param_.num_K; ++j) {
+      vec_k.push_back(v_pull[i+j]);
+    }
+    v_map[idx] = vec_k;
   }
   // multi-thread training
   int count = lock_free_ ? threadNumber_ : 1;
@@ -208,10 +225,12 @@ void DistCrossEntropyLoss::CalcGrad(const DMatrix* matrix,
     pool_->enqueue(std::bind(ce_gradient_thread,
                              matrix,
                              std::ref(weight_map),
+                             std::ref(v_map);
                              dist_score_func_,
                              norm_,
                              &(sum[i]),
                              std::ref(gradient_push_map),
+                             std::ref(v_push_map),
                              start_idx,
                              end_idx));
   }
@@ -223,8 +242,17 @@ void DistCrossEntropyLoss::CalcGrad(const DMatrix* matrix,
     real_t g = gradient_push_map[idx];
     (*gradient_push)[i] = g;
   }
-  if (model.GetScoreFunction().compare("linear") == 0) {
-    kv_w_->Wait(kv_w_->Push(feature_ids, *gradient_push));
+  kv_w_->Wait(kv_w_->Push(feature_ids, *gradient_push));
+  v_push->resize(feature_ids.size() * hyper_param_.num_K);
+  for (int i = 0; i < feature_ids.size(); ++i) {
+    index_t idx = feature_ids[i];
+    for (int j = 0; j < v_push_map[idx].size(); ++j) {
+      v_push->push_back(v_push_map[idx][j]);
+    }
+  }
+  if (model.GetScoreFunction().compare("fm") == 0 ||
+      model.GetScoreFunction().compare("ffm") == 0) {
+    kv_v_.Wait(kv_v_.Push(feature_ids, *v_push));
   }
   // Accumulate loss
   for (int i = 0; i < sum.size(); ++i) {

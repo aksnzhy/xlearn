@@ -42,12 +42,15 @@ class DistLinearScore : public DistScore {
   // returns the linear score wTx.
   real_t CalcScore(const SparseRow* row,
                    std::map<index_t, real_t>* w,
+                   std::map<index_t, std::vector<real_t>>* v,
                    real_t norm = 1.0);
 
   void DistCalcGrad(const DMatrix* matrix,
                      std::map<index_t, real_t>& w,
+                     std::map<index_t, std::vector<real_t>>* v,
                      real_t* sum,
                      std::map<index_t, real_t>& g,
+                     std::map<index_t, real_t>& v_g,
                      index_t start_idx,
                      index_t end_idx);
 
@@ -55,8 +58,10 @@ class DistLinearScore : public DistScore {
   // Calculate gradient and update model using sgd
   void calc_grad_sgd(const DMatrix* matrix,
                      std::map<index_t, real_t>& w,
+                     std::map<index_t, std::vector<real_t>>* v,
                      real_t* sum,
                      std::map<index_t, real_t>& g,
+                     std::map<index_t, real_t>& v_g,
                      real_t start_idx,
                      real_t end_idx
                     );
@@ -64,8 +69,10 @@ class DistLinearScore : public DistScore {
   // Calculate gradient and update model using adagrad
   void calc_grad_adagrad(const DMatrix* matrix,
                          std::map<index_t, real_t>& w,
+                         std::map<index_t, std::vector<real_t>>* v,
                          real_t* sum,
                          std::map<index_t, real_t>& g,
+                         std::map<index_t, real_t>& v_g,
                          real_t start_idx,
                          real_t end_idx
                         );
@@ -73,8 +80,10 @@ class DistLinearScore : public DistScore {
   // Calculate gradient and update model using ftrl
   void calc_grad_ftrl(const DMatrix* matrix,
                       std::map<index_t, real_t>& w,
+                      std::map<index_t, std::vector<real_t>>* v,
                       real_t* sum,
                       std::map<index_t, real_t>& g,
+                      std::map<index_t, real_t>& v_g,
                       real_t start_idx,
                       real_t end_idx
                      );

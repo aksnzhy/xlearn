@@ -90,7 +90,7 @@ namespace xLearn {
 
 // Calculate gradient and update current model parameters.
 // Using SSE to accelerate vector operation.
-void DistFMScore::CalcGrad(const DMatrix* matrix,
+void DistFMScore::DistCalcGrad(const DMatrix* matrix,
     std::map<index_t, real_t>& w,
     std::map<index_t, std::vector<real_t>>* v,
     real_t* sum,
