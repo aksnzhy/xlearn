@@ -163,36 +163,36 @@ TEST(DMATRIX_TEST, Compress) {
   // row_0
   SparseRow* row = matrix.row[0];
   EXPECT_EQ((*row)[0].feat_id, 1);
-  EXPECT_EQ((*row)[1].feat_id, 2);
-  EXPECT_EQ((*row)[2].feat_id, 3);
-  EXPECT_EQ((*row)[3].feat_id, 4);
+  EXPECT_EQ((*row)[1].feat_id, 5);
+  EXPECT_EQ((*row)[2].feat_id, 7);
+  EXPECT_EQ((*row)[3].feat_id, 8);
   // row_1
   row = matrix.row[1];
-  EXPECT_EQ((*row)[0].feat_id, 5);
-  EXPECT_EQ((*row)[1].feat_id, 6);
-  EXPECT_EQ((*row)[2].feat_id, 7);
-  // row_2
-  row = matrix.row[2];
-  EXPECT_EQ((*row)[0].feat_id, 2);
-  EXPECT_EQ((*row)[1].feat_id, 3);
-  EXPECT_EQ((*row)[2].feat_id, 8);
-  // row_3
-  row = matrix.row[3];
-  EXPECT_EQ((*row)[0].feat_id, 9);
+  EXPECT_EQ((*row)[0].feat_id, 3);
   EXPECT_EQ((*row)[1].feat_id, 10);
   EXPECT_EQ((*row)[2].feat_id, 11);
+  // row_2
+  row = matrix.row[2];
+  EXPECT_EQ((*row)[0].feat_id, 5);
+  EXPECT_EQ((*row)[1].feat_id, 7);
+  EXPECT_EQ((*row)[2].feat_id, 9);
+  // row_3
+  row = matrix.row[3];
+  EXPECT_EQ((*row)[0].feat_id, 2);
+  EXPECT_EQ((*row)[1].feat_id, 4);
+  EXPECT_EQ((*row)[2].feat_id, 6);
   // feature list
   EXPECT_EQ(feature_list[0], 1);
-  EXPECT_EQ(feature_list[1], 5);
-  EXPECT_EQ(feature_list[2], 8);
-  EXPECT_EQ(feature_list[3], 10);
-  EXPECT_EQ(feature_list[4], 3);
-  EXPECT_EQ(feature_list[5], 12);
-  EXPECT_EQ(feature_list[6], 20);
-  EXPECT_EQ(feature_list[7], 11);
-  EXPECT_EQ(feature_list[8], 2);
-  EXPECT_EQ(feature_list[9], 4);
-  EXPECT_EQ(feature_list[10], 7);
+  EXPECT_EQ(feature_list[1], 2);
+  EXPECT_EQ(feature_list[2], 3);
+  EXPECT_EQ(feature_list[3], 4);
+  EXPECT_EQ(feature_list[4], 5);
+  EXPECT_EQ(feature_list[5], 7);
+  EXPECT_EQ(feature_list[6], 8);
+  EXPECT_EQ(feature_list[7], 10);
+  EXPECT_EQ(feature_list[8], 11);
+  EXPECT_EQ(feature_list[9], 12);
+  EXPECT_EQ(feature_list[10], 20);
 }
 
 TEST(DMATRIX_TEST, GetMiniBatch) {

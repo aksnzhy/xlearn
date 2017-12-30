@@ -24,6 +24,7 @@ This file defines the basic data structures used by xLearn.
 #define XLEARN_DATA_DATA_STRUCTURE_H_
 
 #include <vector>
+#include <unordered_set>
 #include <unordered_map>
 
 #include "src/base/common.h"
@@ -271,24 +272,36 @@ struct DMatrix {
   //  -------------------------------------------------
   void Compress(std::vector<index_t>& feature_list) {
     // Using a map to store the mapping relations
-    feature_map mp; 
-    index_t idx = 1;
+    size_t node_num {0};
+    for (auto row : this->row) {
+        node_num += row->size();
+    }
+    std::unordered_set<index_t> feat_set;
+    feat_set.reserve(node_num);
     for (index_t i = 0; i < this->row_length; ++i) {
       SparseRow* row = this->row[i];
       for (SparseRow::iterator iter = row->begin();
            iter != row->end(); ++iter) {
-        feature_map::const_iterator got = mp.find(iter->feat_id);
-        // find a new feature
-        if (got == mp.end()) {
-          mp[iter->feat_id] = idx;
-          feature_list.push_back(iter->feat_id);
-          iter->feat_id = idx;
-          idx++;
-        } else {
-          iter->feat_id = got->second;
+        if (feat_set.count(iter->feat_id) == 0) {
+          feat_set.insert(iter->feat_id);
         }
       }
-    } 
+    }
+    feature_list.reserve(feat_set.size());
+    std::copy(feat_set.begin(), feat_set.end(), 
+              std::back_inserter(feature_list));
+    std::sort(begin(feature_list), end(feature_list));
+    feature_map mp;
+    mp.reserve(feature_list.size());
+    for (index_t i = 0; i < feature_list.size(); ++ i) {
+      mp[feature_list[i]] = i + 1;
+    }
+    for (index_t i = 0; i < this->row_length; ++ i) {
+      for (auto &iter: *this->row[i]) {
+        // using map is better than lower_bound
+        iter.feat_id = mp[iter.feat_id];
+      }
+    }
   }
 
   // Get a mini-batch of data from curremt data matrix. 
