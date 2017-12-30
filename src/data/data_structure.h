@@ -274,7 +274,7 @@ struct DMatrix {
     // Using a map to store the mapping relations
     size_t node_num {0};
     for (auto row : this->row) {
-        node_num += row->size();
+      node_num += row->size();
     }
     std::unordered_set<index_t> feat_set;
     feat_set.reserve(node_num);
