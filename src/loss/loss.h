@@ -112,7 +112,7 @@ class Loss {
   // used for distributed computation.
   virtual void CalcGradDist(DMatrix* data_matrix,
                             Model& model,
-                            std::vector<real_t>& grad) = 0;
+                            std::vector<real_t>& grad);
 
   // Return the calculated loss value
   virtual real_t GetLoss() {

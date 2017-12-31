@@ -47,14 +47,6 @@ class CrossEntropyLoss : public Loss {
   // This function will also accumulate the loss value.
   void CalcGrad(const DMatrix* data_matrix, Model& model);
 
-  // Given data sample and current model, calculate gradient.
-  // Note that this method doesn't update local model, and the
-  // gradient will be pushed to the parameter server, which is 
-  // used for distributed computation.
-  void CalcGradDist(DMatrix* data_matrix,
-                    Model& model,
-                    std::vector<real_t>& grad);
-
   // Return current loss type.
   std::string loss_type() { return "log_loss"; }
 
