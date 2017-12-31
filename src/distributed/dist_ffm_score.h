@@ -93,7 +93,7 @@ public:
      std::map<index_t, std::vector<real_t>>& v,
      real_t* sum,
      std::map<index_t, real_t>& w_g,
-     std::map<index_t, real_t>& v_g,
+     std::map<index_t, std::vector<real_t>>& v_g,
      index_t start_idx,
      index_t end_idx
      );

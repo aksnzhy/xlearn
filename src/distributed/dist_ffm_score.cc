@@ -21,7 +21,7 @@ This file is the implementation of FFMScore class.
 
 #include <pmmintrin.h>  // for SSE
 
-#include "src/score/ffm_score.h"
+#include "src/distributed/dist_ffm_score.h"
 #include "src/base/math.h"
 
 namespace xLearn {
@@ -32,7 +32,7 @@ namespace xLearn {
       Model& model,
       std::map<index_t, real_t>* weight,
       std::map<index_t, std::vector<real_t>>* v,
-      real_t norm = 1.0
+      real_t norm
       ) {
     /*********************************************************
    *  linear term and bias term                            *
@@ -42,16 +42,15 @@ namespace xLearn {
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
     sum_w += (iter->feat_val * 
-              weight[iter->feat_id] * 
+              (*weight)[iter->feat_id] * 
               sqrt_norm);
   }
   /*********************************************************
    *  latent factor                                        *
    *********************************************************/
-  index_t align0 = aux_size * model.get_aligned_k();
+  index_t align0 = model.get_aligned_k();
   index_t align1 = model.GetNumField() * align0;
-  int align = kAlign * aux_size;
-  //w = model.GetParameter_v();
+  int align = kAlign;
   __m128 XMMt = _mm_setzero_ps();
   for (SparseRow::const_iterator iter_i = row->begin();
        iter_i != row->end(); ++iter_i) {
@@ -63,8 +62,8 @@ namespace xLearn {
       index_t j2 = iter_j->feat_id;
       index_t f2 = iter_j->field_id;
       real_t v2 = iter_j->feat_val;
-      real_t* w1_base = v[j1].data();
-      real_t* w2_base = v[j2].data();
+      real_t* w1_base = (*v)[j1].data();
+      real_t* w2_base = (*v)[j2].data();
       __m128 XMMv = _mm_set1_ps(v1*v2*norm);
       for (index_t d = 0; d < align0; d += align) {
         __m128 XMMw1 = _mm_load_ps(w1_base + d);
@@ -85,13 +84,13 @@ namespace xLearn {
 
 // Calculate gradient and update current model.
 // Using the SSE to accelerate vector operation.
-void DistFFMScore::CalcGrad(const DMatrix* matrix,
+void DistFFMScore::DistCalcGrad(const DMatrix* matrix,
     Model& model,
     std::map<index_t, real_t>& w,
     std::map<index_t, std::vector<real_t>>& v,
     real_t* sum,
     std::map<index_t, real_t>& w_g,
-    std::map<index_t, real_t>& v_g,
+    std::map<index_t, std::vector<real_t>>& v_g,
     index_t start_idx,
     index_t end_idx
     ) {
@@ -122,7 +121,7 @@ void DistFFMScore::calc_grad_sgd(const DMatrix* matrix,
     ) {
   for (index_t i = start_idx; i < end_idx; ++i) {
     SparseRow* row = matrix->row[i];
-    real_t pred = CalcScore(row, model, &w, &v);
+    real_t pred = CalcScore(row, model, &weight, &v);
     real_t y = matrix->Y[i] > 0 ? 1.0 : -1.0;
     (*sum) += log1p(exp(-y*pred));
     real_t pg = -y / (1.0 + (1.0 / exp(-y * pred)));
@@ -193,7 +192,7 @@ void DistFFMScore::calc_grad_adagrad(const DMatrix* matrix,
     ) {
   for (index_t i = start_idx; i < end_idx; ++i) {
     SparseRow* row = matrix->row[i];
-    real_t pred = CalcScore(row, model, &w, &v);
+    real_t pred = CalcScore(row, model, &weight, &v);
     real_t y = matrix->Y[i] > 0 ? 1.0 : -1.0;
     (*sum) += log1p(exp(-y*pred));
     real_t pg = -y / (1.0 + (1.0 / exp(-y * pred)));
@@ -234,6 +233,10 @@ void DistFFMScore::calc_grad_adagrad(const DMatrix* matrix,
           real_t *w2 = w2_base + d;
           __m128 XMMw1 = _mm_load_ps(w1);
           __m128 XMMw2 = _mm_load_ps(w2);
+          real_t *wg1 = w1 + kAlign;
+          real_t *wg2 = w2 + kAlign;
+          __m128 XMMwg1 = _mm_load_ps(wg1);
+          __m128 XMMwg2 = _mm_load_ps(wg2);
           __m128 XMMg1 = _mm_add_ps(
               _mm_mul_ps(XMMlamb, XMMw1),
               _mm_mul_ps(XMMpgv, XMMw2));
@@ -263,7 +266,7 @@ void DistFFMScore::calc_grad_ftrl(const DMatrix* matrix,
     ) {
   for (index_t i = start_idx; i < end_idx; ++i) {
     SparseRow* row = matrix->row[i];
-    real_t pred = CalcScore(row, model, &w, &v);
+    real_t pred = CalcScore(row, model, &weight, &v);
     real_t y = matrix->Y[i] > 0 ? 1.0 : -1.0;
     (*sum) += log1p(exp(-y*pred));
     real_t pg = -y / (1.0 + (1.0 / exp(-y * pred)));
@@ -274,7 +277,7 @@ void DistFFMScore::calc_grad_ftrl(const DMatrix* matrix,
         iter != row->end(); ++iter) {
       real_t &wl = weight[iter->feat_id];
       real_t g = lambda_2_*wl+pg*iter->feat_val; 
-      v_g[iter->feat_id] += g;
+      w_g[iter->feat_id] += g;
     }
     /*********************************************************
      *  latent factor                                        *
@@ -305,6 +308,10 @@ void DistFFMScore::calc_grad_ftrl(const DMatrix* matrix,
           real_t *w2 = w2_base + d;
           __m128 XMMw1 = _mm_load_ps(w1);
           __m128 XMMw2 = _mm_load_ps(w2);
+          real_t *wg1 = w1 + kAlign;
+          real_t *wg2 = w2 + kAlign;
+          __m128 XMMwg1 = _mm_load_ps(wg1);
+          __m128 XMMwg2 = _mm_load_ps(wg2);
           __m128 XMMg1 = _mm_add_ps(
               _mm_mul_ps(XMML2, XMMw1),
               _mm_mul_ps(XMMpgv, XMMw2));
