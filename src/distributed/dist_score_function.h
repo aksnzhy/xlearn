@@ -73,16 +73,18 @@ class DistScore {
   // Given one exmaple and current model, this method
   // returns the score
   virtual real_t CalcScore(const SparseRow* row,
+                           Model& model,
                            std::map<index_t, real_t>* w,
                            std::map<index_t, std::vector<real_t>>* v,
                            real_t norm = 1.0) = 0;
 
   virtual void DistCalcGrad(const DMatrix* matrix,
+                            Model& model,
                                std::map<index_t, real_t>& w,
-                               std::map<index_t, std::vector<real_t>>* v,
+                               std::map<index_t, std::vector<real_t>>& v,
                                real_t* sum,
                                std::map<index_t, real_t>& g,
-                               std::map<index_t, real_t>& v_g,
+                               std::map<index_t, std::vector<real_t>>& v_g,
                                index_t start_idx,
                                index_t end_idx) = 0;
 

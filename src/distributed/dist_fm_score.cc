@@ -28,11 +28,11 @@ namespace xLearn {
 
 // y = sum( (V_i*V_j)(x_i * x_j) )
 // Using SSE to accelerate vector operation.
-  real_t DistFMScore::CalcScore(const SparseRow* row,
+real_t DistFMScore::CalcScore(const SparseRow* row,
+      Model& model,
       std::map<index_t, real_t>* weight,
       std::map<index_t, std::vector<real_t>>* v,
-      real_t norm = 1.0
-      ) {
+      real_t norm) {
   /*********************************************************
    *  linear term and bias term                            *
    *********************************************************/
@@ -40,8 +40,7 @@ namespace xLearn {
   real_t t = 0;
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
-    t += (iter->feat_val *
-          weight[iter->feat_id] *
+    t += (iter->feat_val * ((*weight)[iter->feat_id]) *
           sqrt_norm);
   }
   /*********************************************************
@@ -54,9 +53,9 @@ namespace xLearn {
        iter != row->end(); ++iter) {
     index_t j1 = iter->feat_id;
     real_t v1 = iter->feat_val;
-    real_t *w = v[j1].data();
+    real_t *w = (*v)[j1].data();
     __m128 XMMv = _mm_set1_ps(v1*norm);
-    real_t* s = v[j1].data();
+    real_t* s = (*v)[j1].data();
     for (index_t d = 0; d < aligned_k; d += kAlign) {
       __m128 XMMs = _mm_load_ps(s+d);
       __m128 const XMMw = _mm_load_ps(w+d);
@@ -69,7 +68,7 @@ namespace xLearn {
        iter != row->end(); ++iter) {
     index_t j1 = iter->feat_id;
     real_t v1 = iter->feat_val;
-    real_t* w = v[j1].data();
+    real_t* w = (*v)[j1].data();
     __m128 XMMv = _mm_set1_ps(v1*norm);
     for (index_t d = 0; d < aligned_k; d += kAlign) {
       __m128 XMMs = _mm_load_ps(s+d);
@@ -91,8 +90,9 @@ namespace xLearn {
 // Calculate gradient and update current model parameters.
 // Using SSE to accelerate vector operation.
 void DistFMScore::DistCalcGrad(const DMatrix* matrix,
+    Model& model,
     std::map<index_t, real_t>& w,
-    std::map<index_t, std::vector<real_t>>* v,
+    std::map<index_t, std::vector<real_t>>& v,
     real_t* sum,
     std::map<index_t, real_t>& w_g,
     std::map<index_t, std::vector<real_t>>& v_g,
@@ -101,199 +101,210 @@ void DistFMScore::DistCalcGrad(const DMatrix* matrix,
     ) {
   // Using sgd
   if (opt_type_.compare("sgd") == 0) {
-    this->calc_grad_sgd(matrix, w, v, sum, w_g, v_g, start_idx, end_idx);
+    this->calc_grad_sgd(matrix, model, w, v, sum, w_g, v_g, start_idx, end_idx);
   }
   // Using adagrad
   else if (opt_type_.compare("adagrad") == 0) {
-    this->calc_grad_adagrad(matrix, w, v, sum, w_g, v_g, start_idx, end_idx);
+    this->calc_grad_adagrad(matrix, model, w, v, sum, w_g, v_g, start_idx, end_idx);
   }
   // Using ftrl 
   else if (opt_type_.compare("ftrl") == 0) {
-    this->calc_grad_ftrl(matrix, w, v, sum, w_g, v_g, start_idx, end_idx);
+    this->calc_grad_ftrl(matrix, model, w, v, sum, w_g, v_g, start_idx, end_idx);
   }
 }
 
 // Calculate gradient and update current model using sgd
 void DistFMScore::calc_grad_sgd(const DMatrix* matrix,
-    std::map<index_t, real_t>& w,
-    std::map<index_t, std::vector<real_t>>* v,
+    Model& model,
+    std::map<index_t, real_t>& weight,
+    std::map<index_t, std::vector<real_t>>& v,
     real_t* sum,
     std::map<index_t, real_t>& w_g,
     std::map<index_t, std::vector<real_t>>& v_g,
     index_t start_idx,
     index_t end_idx
     ) {
-  /*********************************************************
-   *  linear term and bias term                            *
-   *********************************************************/  
-  real_t sqrt_norm = sqrt(norm);
-  for (SparseRow::const_iterator iter = row->begin();
-       iter != row->end(); ++iter) {
-    real_t &wl = weight[iter->feat_id];
-    real_t g = pg*iter->feat_val*sqrt_norm;
-    w_g[iter->feat_id] += g;
-  }
-  /*********************************************************
-   *  latent factor                                        *
-   *********************************************************/
-  index_t aligned_k = model.get_aligned_k();
-  __m128 XMMpg = _mm_set1_ps(pg);
-  __m128 XMMlr = _mm_set1_ps(learning_rate_);
-  __m128 XMMlamb = _mm_set1_ps(regu_lambda_);
-  std::vector<real_t> sv(aligned_k, 0);
-  real_t* s = sv.data();
-  for (SparseRow::const_iterator iter = row->begin();
-       iter != row->end(); ++iter) {
-    index_t j1 = iter->feat_id;
-    real_t v1 = iter->feat_val;
-    real_t* w = v[j1].data();
-    __m128 XMMv = _mm_set1_ps(v1*norm);
-    for (index_t d = 0; d < aligned_k; d += kAlign) {
-      __m128 XMMs = _mm_load_ps(s+d);
-      __m128 const XMMw = _mm_load_ps(w+d);
-      XMMs = _mm_add_ps(XMMs, _mm_mul_ps(XMMw, XMMv));
-      _mm_store_ps(s+d, XMMs);
+  for (index_t i = start_idx; i < end_idx; ++i) {
+    SparseRow* row = matrix->row[i];
+    real_t pred = CalcScore(row, model, &weight, &v);
+    real_t y = matrix->Y[i] > 0 ? 1.0 : -1.0;
+    (*sum) += log1p(exp(-y*pred));
+    real_t pg = -y / (1.0 + (1.0 / exp(-y * pred)));
+    /*********************************************************
+     *  linear term and bias term                            *
+     *********************************************************/  
+    for (SparseRow::const_iterator iter = row->begin();
+         iter != row->end(); ++iter) {
+      real_t g = pg*iter->feat_val;
+      w_g[iter->feat_id] += g;
     }
-  }
-  for (SparseRow::const_iterator iter = row->begin();
-       iter != row->end(); ++iter) {
-    index_t j1 = iter->feat_id;
-    real_t v1 = iter->feat_val;
-    real_t* w = v[j1].data();
-    __m128 XMMv = _mm_set1_ps(v1*norm);
-    __m128 XMMpgv = _mm_mul_ps(XMMpg, XMMv);
-    real_t* v_gradient = v_g[j1].data();
-    for(index_t d = 0; d < aligned_k; d += kAlign) {
-      __m128 XMMs = _mm_load_ps(s+d);
-      __m128 XMMw = _mm_load_ps(w+d);
-      __m128 XMMg = _mm_add_ps(_mm_mul_ps(XMMlamb, XMMw),
-        _mm_mul_ps(XMMpgv, _mm_sub_ps(XMMs,
-        _mm_mul_ps(XMMw, XMMv))));
-      _mm_store_ps(v_gradient+d, XMMg);
+    /*********************************************************
+     *  latent factor                                        *
+     *********************************************************/
+    index_t aligned_k = model.get_aligned_k();
+    __m128 XMMpg = _mm_set1_ps(pg);
+    std::vector<real_t> sv(aligned_k, 0);
+    real_t* s = sv.data();
+    for (SparseRow::const_iterator iter = row->begin();
+        iter != row->end(); ++iter) {
+      index_t j1 = iter->feat_id;
+      real_t v1 = iter->feat_val;
+      real_t* w = v[j1].data();
+      __m128 XMMv = _mm_set1_ps(v1);
+      for (index_t d = 0; d < aligned_k; d += kAlign) {
+        __m128 XMMs = _mm_load_ps(s+d);
+        __m128 const XMMw = _mm_load_ps(w+d);
+        XMMs = _mm_add_ps(XMMs, _mm_mul_ps(XMMw, XMMv));
+        _mm_store_ps(s+d, XMMs);
+      }
+    }
+    for (SparseRow::const_iterator iter = row->begin();
+        iter != row->end(); ++iter) {
+      index_t j1 = iter->feat_id;
+      real_t v1 = iter->feat_val;
+      real_t* w = v[j1].data();
+      __m128 XMMv = _mm_set1_ps(v1);
+      __m128 XMMpgv = _mm_mul_ps(XMMpg, XMMv);
+      real_t* v_gradient = v_g[j1].data();
+      for(index_t d = 0; d < aligned_k; d += kAlign) {
+        __m128 XMMs = _mm_load_ps(s+d);
+        __m128 XMMw = _mm_load_ps(w+d);
+        __m128 XMMg = _mm_mul_ps(XMMpgv, _mm_sub_ps(XMMs,
+                _mm_mul_ps(XMMw, XMMv)));
+        _mm_store_ps(v_gradient+d, XMMg);
+      }
     }
   }
 }
 
 // Calculate gradient and update current model using adagrad
 void DistFMScore::calc_grad_adagrad(const DMatrix* matrix,
+    Model& model,
     std::map<index_t, real_t>& weight,
-    std::map<index_t, std::vector<real_t>>* v,
+    std::map<index_t, std::vector<real_t>>& v,
     real_t* sum,
     std::map<index_t, real_t>& w_g,
     std::map<index_t, std::vector<real_t>>& v_g,
     index_t start_idx,
     index_t end_idx
     ) {
-  /*********************************************************
-   *  linear term and bias term                            *
-   *********************************************************/
-  real_t sqrt_norm = sqrt(norm);
-  for (SparseRow::const_iterator iter = row->begin();
-      iter != row->end(); ++iter) {
-    real_t &wl = weight[iter->feat_id];
-    real_t g = regu_lambda_*wl+pg*iter->feat_val*sqrt_norm;
-    w_g[iter->feat_id] += g;
-  }
-  /*********************************************************
-   *  latent factor                                        *
-   *********************************************************/
-  index_t aligned_k = model.get_aligned_k();
-  __m128 XMMpg = _mm_set1_ps(pg);
-  __m128 XMMlr = _mm_set1_ps(learning_rate_);
-  __m128 XMMlamb = _mm_set1_ps(regu_lambda_);
-  std::vector<real_t> sv(aligned_k, 0);
-  real_t* s = sv.data();
-  for (SparseRow::const_iterator iter = row->begin();
-       iter != row->end(); ++iter) {
-    index_t j1 = iter->feat_id;
-    real_t v1 = iter->feat_val;
-    real_t *w = v[j1].data();
-    __m128 XMMv = _mm_set1_ps(v1*norm);
-    for (index_t d = 0; d < aligned_k; d += kAlign) {
-      __m128 XMMs = _mm_load_ps(s+d);
-      __m128 const XMMw = _mm_load_ps(w+d);
-      XMMs = _mm_add_ps(XMMs, _mm_mul_ps(XMMw, XMMv));
-      _mm_store_ps(s+d, XMMs);
+  for (index_t i = start_idx; i < end_idx; ++i) {
+    SparseRow* row = matrix->row[i];
+    real_t pred = CalcScore(row, model, &weight, &v);
+    real_t y = matrix->Y[i] > 0 ? 1.0 : -1.0;
+    (*sum) += log1p(exp(-y*pred));
+    real_t pg = -y / (1.0 + (1.0 / exp(-y * pred)));
+    /*********************************************************
+     *  linear term and bias term                            *
+     *********************************************************/
+    for (SparseRow::const_iterator iter = row->begin();
+        iter != row->end(); ++iter) {
+      real_t &wl = weight[iter->feat_id];
+      real_t g = regu_lambda_*wl+pg*iter->feat_val;
+      w_g[iter->feat_id] += g;
     }
-  }
-  for (SparseRow::const_iterator iter = row->begin();
-       iter != row->end(); ++iter) {
-    index_t j1 = iter->feat_id;
-    real_t v1 = iter->feat_val;
-    real_t* w = v[j1].data();
-    __m128 XMMv = _mm_set1_ps(v1*norm);
-    __m128 XMMpgv = _mm_mul_ps(XMMpg, XMMv);
-    real_t* v_gradient = v_g[j1].data();
-    for(index_t d = 0; d < aligned_k; d += kAlign) {
-      __m128 XMMs = _mm_load_ps(s+d);
-      __m128 XMMg = _mm_add_ps(_mm_mul_ps(XMMlamb, XMMw),
-      _mm_mul_ps(XMMpgv, _mm_sub_ps(XMMs,
-        _mm_mul_ps(XMMw, XMMv))));
-      _mm_store_ps(v_gradient+d, XMMpgv);
+    /*********************************************************
+     *  latent factor                                        *
+     *********************************************************/
+    index_t aligned_k = model.get_aligned_k();
+    __m128 XMMpg = _mm_set1_ps(pg);
+    std::vector<real_t> sv(aligned_k, 0);
+    real_t* s = sv.data();
+    for (SparseRow::const_iterator iter = row->begin();
+        iter != row->end(); ++iter) {
+      index_t j1 = iter->feat_id;
+      real_t v1 = iter->feat_val;
+      real_t *w = v[j1].data();
+      __m128 XMMv = _mm_set1_ps(v1);
+      for (index_t d = 0; d < aligned_k; d += kAlign) {
+        __m128 XMMs = _mm_load_ps(s+d);
+        __m128 const XMMw = _mm_load_ps(w+d);
+        XMMs = _mm_add_ps(XMMs, _mm_mul_ps(XMMw, XMMv));
+        _mm_store_ps(s+d, XMMs);
+      }
+    }
+    for (SparseRow::const_iterator iter = row->begin();
+        iter != row->end(); ++iter) {
+      index_t j1 = iter->feat_id;
+      real_t v1 = iter->feat_val;
+      real_t* w = v[j1].data();
+      __m128 XMMv = _mm_set1_ps(v1);
+      __m128 XMMpgv = _mm_mul_ps(XMMpg, XMMv);
+      real_t* v_gradient = v_g[j1].data();
+      for(index_t d = 0; d < aligned_k; d += kAlign) {
+        __m128 XMMw = _mm_load_ps(w+d);
+        __m128 XMMs = _mm_load_ps(s+d);
+        __m128 XMMg = _mm_mul_ps(XMMpgv, _mm_sub_ps(XMMs,
+                _mm_mul_ps(XMMw, XMMv)));
+        _mm_store_ps(v_gradient+d, XMMg);
+      }
     }
   }
 }
 
 // Calculate gradient and update current model using ftrl
 void DistFMScore::calc_grad_ftrl(const DMatrix* matrix,
+    Model& model,
     std::map<index_t, real_t>& w,
-    std::map<index_t, std::vector<real_t>>* v,
+    std::map<index_t, std::vector<real_t>>& v,
     real_t* sum,
     std::map<index_t, real_t>& w_g,
     std::map<index_t, std::vector<real_t>>& v_g,
     index_t start_idx,
     index_t end_idx
     ) {
-  /*********************************************************
-   *  linear term and bias term                            *
-   *********************************************************/
-  real_t sqrt_norm = sqrt(norm);
-  for (SparseRow::const_iterator iter = row->begin();
-       iter != row->end(); ++iter) {
-    real_t g = pg*iter->feat_val*sqrt_norm; 
-    w_g[iter->feat_id] += g;
-  }
-  /*********************************************************
-   *  latent factor                                        *
-   *********************************************************/
-  index_t aligned_k = model.get_aligned_k();
-  __m128 XMMpg = _mm_set1_ps(pg);
-  __m128 XMMalpha = _mm_set1_ps(alpha_);
-  __m128 XMML2 = _mm_set1_ps(lambda_2_);
-  std::vector<real_t> sv(aligned_k, 0);
-  real_t* s = sv.data();
- for (SparseRow::const_iterator iter = row->begin();
-       iter != row->end(); ++iter) {
-    index_t j1 = iter->feat_id;
-    real_t v1 = iter->feat_val;
-    real_t *w = v[j1].data();
-    __m128 XMMv = _mm_set1_ps(v1*norm);
-    for (index_t d = 0; d < aligned_k; d += kAlign) {
-      __m128 XMMs = _mm_load_ps(s+d);
-      __m128 const XMMw = _mm_load_ps(w+d);
-      XMMs = _mm_add_ps(XMMs, _mm_mul_ps(XMMw, XMMv));
-      _mm_store_ps(s+d, XMMs);
+  for (index_t i = start_idx; i < end_idx; ++i) {
+    SparseRow* row = matrix->row[i];
+    real_t pred = CalcScore(row, model, &w, &v);
+    real_t y = matrix->Y[i] > 0 ? 1.0 : -1.0;
+    (*sum) += log1p(exp(-y*pred));
+    real_t pg = -y / (1.0 + (1.0 / exp(-y * pred)));
+    /*********************************************************
+     *  linear term and bias term                            *
+     *********************************************************/
+    for (SparseRow::const_iterator iter = row->begin();
+        iter != row->end(); ++iter) {
+      real_t g = pg*iter->feat_val;
+      w_g[iter->feat_id] += g;
     }
-  }
-  for (SparseRow::const_iterator iter = row->begin();
-       iter != row->end(); ++iter) {
-    index_t j1 = iter->feat_id;
-    real_t v1 = iter->feat_val;
-    real_t *w_base = v[j1].data();
-    __m128 XMMv = _mm_set1_ps(v1*norm);
-    __m128 XMMpgv = _mm_mul_ps(XMMpg, XMMv);
-    real_t* v_gradient = v_g[j1].data();
-    for (index_t d = 0; d < aligned_k; d += kAlign) {
-      real_t* w = w_base + d;
-      __m128 XMMs = _mm_load_ps(s+d);
-      __m128 XMMw = _mm_load_ps(w);
-      __m128 XMMg = _mm_add_ps(
-                    _mm_mul_ps(XMML2, XMMw),
-                    _mm_mul_ps(XMMpgv,
-                    _mm_sub_ps(XMMs,
-                      _mm_mul_ps(XMMw, XMMv))));
-      // Update w. SSE mat not faster.
-      __mm_store_ps(v_gradient+d, XMMg);
+    /*********************************************************
+     *  latent factor                                        *
+     *********************************************************/
+    index_t aligned_k = model.get_aligned_k();
+    __m128 XMMpg = _mm_set1_ps(pg);
+    std::vector<real_t> sv(aligned_k, 0);
+    real_t* s = sv.data();
+    for (SparseRow::const_iterator iter = row->begin();
+        iter != row->end(); ++iter) {
+      index_t j1 = iter->feat_id;
+      real_t v1 = iter->feat_val;
+      real_t *w = v[j1].data();
+      __m128 XMMv = _mm_set1_ps(v1);
+      for (index_t d = 0; d < aligned_k; d += kAlign) {
+        __m128 XMMs = _mm_load_ps(s+d);
+        __m128 const XMMw = _mm_load_ps(w+d);
+        XMMs = _mm_add_ps(XMMs, _mm_mul_ps(XMMw, XMMv));
+        _mm_store_ps(s+d, XMMs);
+      }
+    }
+    for (SparseRow::const_iterator iter = row->begin();
+        iter != row->end(); ++iter) {
+      index_t j1 = iter->feat_id;
+      real_t v1 = iter->feat_val;
+      real_t *w_base = v[j1].data();
+      __m128 XMMv = _mm_set1_ps(v1);
+      __m128 XMMpgv = _mm_mul_ps(XMMpg, XMMv);
+      real_t* v_gradient = v_g[j1].data();
+      for (index_t d = 0; d < aligned_k; d += kAlign) {
+        real_t* w = w_base + d;
+        __m128 XMMs = _mm_load_ps(s+d);
+        __m128 XMMw = _mm_load_ps(w);
+        __m128 XMMg = _mm_mul_ps(XMMpgv,
+              _mm_sub_ps(XMMs,
+                _mm_mul_ps(XMMw, XMMv)));
+        // Update w. SSE mat not faster.
+        _mm_store_ps(v_gradient+d, XMMg);
+      }
     }
   }
 }
