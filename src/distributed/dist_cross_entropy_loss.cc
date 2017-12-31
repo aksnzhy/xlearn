@@ -28,6 +28,7 @@ This file is the implementation of CrossEntropyLoss class.
 namespace xLearn {
 
 static void pred_thread(const DMatrix* data_matrix,
+                        Model* model,
                         std::map<index_t, real_t>& w,
                         std::map<index_t, std::vector<real_t>>& v,
                         std::vector<real_t>* pred,
@@ -39,7 +40,7 @@ static void pred_thread(const DMatrix* data_matrix,
   for (size_t i = start_idx; i < end_idx; ++i) {
     SparseRow* row = data_matrix->row[i];
     real_t norm = is_norm ? data_matrix->norm[i] : 1.0;
-    (*pred)[i] = dist_score_func->CalcScore(row, &w, &v, norm);
+    (*pred)[i] = dist_score_func->CalcScore(row, *model, &w, &v, norm);
   }
 }
 
@@ -86,6 +87,7 @@ void DistCrossEntropyLoss::Predict(const DMatrix* data_matrix,
     size_t end_idx = getEnd(row_len, threadNumber_, i);
     pool_->enqueue(std::bind(pred_thread,
           data_matrix,
+          &model,
           std::ref(weight_map),
           std::ref(v_map),
           &pred,
@@ -152,6 +154,7 @@ void DistCrossEntropyLoss::Evalute(const std::vector<real_t>& pred,
 
 // Calculate gradient in one thread.
 static void ce_gradient_thread(const DMatrix* matrix,
+                               Model* model,
                                std::map<index_t, real_t>& w,
                                std::map<index_t, std::vector<real_t>>& v,
                                DistScore* dist_score_func,
@@ -162,7 +165,7 @@ static void ce_gradient_thread(const DMatrix* matrix,
                                size_t start_idx,
                                size_t end_idx) {
   CHECK_GE(end_idx, start_idx);
-  dist_score_func->DistCalcGrad(matrix, w, v, sum, w_g, v_g, start_idx, end_idx);
+  dist_score_func->DistCalcGrad(matrix, *model, w, v, sum, w_g, v_g, start_idx, end_idx);
 }
 
 //------------------------------------------------------------------------------
@@ -238,6 +241,7 @@ void DistCrossEntropyLoss::CalcGrad(const DMatrix* matrix,
     index_t end_idx = getEnd(row_len, count, i);
     pool_->enqueue(std::bind(ce_gradient_thread,
                              matrix,
+                             &model,
                              std::ref(weight_map),
                              std::ref(v_map),
                              dist_score_func_,
