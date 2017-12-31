@@ -46,3 +46,6 @@ build/*
 .Rhistory
 *.tar.gz
 xlearn/*
+
+# Python-package
+*.pyc

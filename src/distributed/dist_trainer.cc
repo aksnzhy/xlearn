@@ -23,7 +23,7 @@ This file is the implementation of the Trainer class.
 #include <vector>
 #include <string>
 
-#include "src/solver/trainer.h"
+#include "src/distributed/dist_trainer.h"
 #include "src/data/data_structure.h"
 #include "src/base/timer.h"
 
@@ -34,7 +34,7 @@ const int kStopWindow = 2;
 /*********************************************************
  *  Show head info                                       *
  *********************************************************/
-void Trainer::show_head_info(bool validate) {
+void DistTrainer::show_head_info(bool validate) {
   std::vector<std::string> str_list;
   std::vector<int> width_list;
   str_list.push_back("Epoch");
@@ -60,7 +60,7 @@ void Trainer::show_head_info(bool validate) {
 /*********************************************************
  *  Show train info                                      *
  *********************************************************/
-void Trainer::show_train_info(real_t tr_loss, 
+void DistTrainer::show_train_info(real_t tr_loss, 
                               real_t te_loss,
                               real_t te_metric,
                               real_t time_cost, 
@@ -94,7 +94,7 @@ void Trainer::show_train_info(real_t tr_loss,
 /*********************************************************
  *  Basic train                                          *
  *********************************************************/
-void Trainer::Train() {
+void DistTrainer::Train() {
   // Get train Reader and test Reader
   std::vector<Reader*> tr_reader;
   tr_reader.push_back(reader_list_[0]);
@@ -108,7 +108,7 @@ void Trainer::Train() {
 /*********************************************************
  *  Cross-Validation                                     *
  *********************************************************/
-void Trainer::CVTrain() {
+void DistTrainer::CVTrain() {
   // Use the i-th reader as validation Reader
   for (int i = 0; i < reader_list_.size(); ++i) {
     print_action(
@@ -136,7 +136,7 @@ void Trainer::CVTrain() {
 /*********************************************************
  *  Calc average evaluation metric for CV                *
  *********************************************************/
-void Trainer::show_average_metric() {
+void DistTrainer::show_average_metric() {
   real_t loss = 0;
   real_t metric = 0;
   for (size_t i = 0; i < metric_info_.size(); ++i) {
@@ -162,7 +162,7 @@ void Trainer::show_average_metric() {
 /*********************************************************
  *  Basic train function                                 *
  *********************************************************/
-void Trainer::train(std::vector<Reader*>& train_reader,
+void DistTrainer::train(std::vector<Reader*>& train_reader,
                     std::vector<Reader*>& test_reader) {
   int best_epoch = 0;
   int stop_window = 0;
@@ -179,50 +179,52 @@ void Trainer::train(std::vector<Reader*>& train_reader,
     // Calc grad and update model
     real_t tr_loss = calc_gradient(train_reader);
     // we don't do any evaluation in a quiet model
-    if (!quiet_) {
-      if (!test_reader.empty()) { 
-        te_info = calc_metric(test_reader); 
-      }
-      // show evaludation metric info
-      show_train_info(tr_loss, 
-          te_info.loss_val,
-          te_info.metric_val,
-          timer.toc(), 
-          !test_reader.empty(), 
-          n);
-      // Early-stopping
-      if (early_stop_) {
-        if (te_info.loss_val < best_loss) {
-          best_loss = te_info.loss_val;
-          best_epoch = n;
-          model_->SetBestModel();
+    if (ps::MyRank() == 0) {
+      if (!quiet_) {
+        if (!test_reader.empty()) { 
+          te_info = calc_metric(test_reader); 
         }
-        if (te_info.loss_val >= prev_loss) {
-          stop_window++;
-          // If the validation loss goes up conntinuously
-          // in 3 epoch, we stop training
-          if (stop_window == kStopWindow) { break; }
-        } else {
-          stop_window = 0;
+        // show evaludation metric info
+        show_train_info(tr_loss, 
+            te_info.loss_val,
+            te_info.metric_val,
+            timer.toc(), 
+            !test_reader.empty(), 
+            n);
+        // Early-stopping
+        if (early_stop_) {
+          if (te_info.loss_val < best_loss) {
+            best_loss = te_info.loss_val;
+            best_epoch = n;
+            model_->SetBestModel();
+          }
+          if (te_info.loss_val >= prev_loss) {
+            stop_window++;
+            // If the validation loss goes up conntinuously
+            // in 3 epoch, we stop training
+            if (stop_window == kStopWindow) { break; }
+          } else {
+            stop_window = 0;
+          }
+          prev_loss = te_info.loss_val;
         }
-        prev_loss = te_info.loss_val;
       }
-    }
-    if (early_stop_ && best_epoch != epoch_) {  // not for cv
-      print_action(
-          StringPrintf("Early-stopping at epoch %d", best_epoch)
-          );
-      model_->Shrink();
-    } else {  // for cv
-      metric_info_.push_back(te_info);
-    }
+      if (early_stop_ && best_epoch != epoch_) {  // not for cv
+        print_action(
+            StringPrintf("Early-stopping at epoch %d", best_epoch)
+            );
+        model_->Shrink();
+      } else {  // for cv
+        metric_info_.push_back(te_info);
+      }
+    }  // for ps::MyRank
   }
 }
 
 /*********************************************************
  *  Calc gradient and update model                       *
  *********************************************************/
-real_t Trainer::calc_gradient(std::vector<Reader*>& reader) {
+real_t DistTrainer::calc_gradient(std::vector<Reader*>& reader) {
   CHECK_NE(reader.empty(), true);
   loss_->Reset();
   for (int i = 0; i < reader.size(); ++i) {
@@ -240,7 +242,7 @@ real_t Trainer::calc_gradient(std::vector<Reader*>& reader) {
 /*********************************************************
  *  Calc evaluation metric                               *
  *********************************************************/
-MetricInfo Trainer::calc_metric(std::vector<Reader*>& reader_list) {
+MetricInfo DistTrainer::calc_metric(std::vector<Reader*>& reader_list) {
   CHECK_NE(reader_list.empty(), true);
   DMatrix* matrix = nullptr;
   std::vector<real_t> pred;

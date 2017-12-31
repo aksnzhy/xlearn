@@ -26,14 +26,14 @@ This file is the implementation of the Checker class.
 
 #include "src/base/common.h"
 #include "src/base/format_print.h"
-#include "src/solver/checker.h"
+#include "src/distributed/dist_checker.h"
 #include "src/base/levenshtein_distance.h"
 #include "src/base/file_util.h"
 
 namespace xLearn {
 
 // Option help menu
-std::string Checker::option_help() const {
+std::string DistChecker::option_help() const {
   if (is_train_) {
     return std::string(
 "----------------------------------------  Training task  -------------------------------------\n"
@@ -141,7 +141,7 @@ std::string Checker::option_help() const {
 }
 
 // Initialize Checker
-void Checker::Initialize(bool is_train, int argc, char* argv[]) {
+void DistChecker::Initialize(bool is_train, int argc, char* argv[]) {
   is_train_ = is_train;
   if (is_train_) {  // for training
     menu_.push_back(std::string("-s"));
@@ -181,7 +181,7 @@ void Checker::Initialize(bool is_train, int argc, char* argv[]) {
 }
 
 // Check and parse user's input
-bool Checker::check_cmd(HyperParam& hyper_param) {
+bool DistChecker::check_cmd(HyperParam& hyper_param) {
   // Do not have any args
   if (args_.size() == 1) {
     printf("%s\n", option_help().c_str());
@@ -196,7 +196,7 @@ bool Checker::check_cmd(HyperParam& hyper_param) {
 }
 
 // Check hyper-param. Used by c_api
-bool Checker::check_param(HyperParam& hyper_param) {
+bool DistChecker::check_param(HyperParam& hyper_param) {
   if (hyper_param.is_train) {
     return check_train_param(hyper_param);
   } else {
@@ -205,7 +205,7 @@ bool Checker::check_param(HyperParam& hyper_param) {
 }
 
 // Check options for training tasks
-bool Checker::check_train_options(HyperParam& hyper_param) {
+bool DistChecker::check_train_options(HyperParam& hyper_param) {
   bool bo = true;
   /*********************************************************
    *  Check the file path of the training data             *
@@ -242,15 +242,15 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       } else {
         switch (value) {
           case 0:
-            hyper_param.loss_func = "cross-entropy";
+            hyper_param.loss_func = "dist-cross-entropy";
             hyper_param.score_func = "linear";
             break;
           case 1:
-            hyper_param.loss_func = "cross-entropy";
+            hyper_param.loss_func = "dist-cross-entropy";
             hyper_param.score_func = "fm";
             break;
           case 2:
-            hyper_param.loss_func = "cross-entropy";
+            hyper_param.loss_func = "dist-cross-entropy";
             hyper_param.score_func = "ffm";
             break;
           case 3:
@@ -520,7 +520,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
 }
 
 // Check the given hyper-param. Used by c_api
-bool Checker::check_train_param(HyperParam& hyper_param) {
+bool DistChecker::check_train_param(HyperParam& hyper_param) {
   bool bo = true;
   /*********************************************************
    *  Check file path                                      *
@@ -545,63 +545,13 @@ bool Checker::check_train_param(HyperParam& hyper_param) {
    *********************************************************/
   if (hyper_param.thread_number < 0) {
     print_error(
-      StringPrintf("The thread number must be greater than zero: %d.",
-        hyper_param.thread_number)
+      StringPrintf("The thread number must be greater than zero.")
     );
     bo = false;
   }
   if (hyper_param.loss_func.compare("unknow") == 0) {
     print_error(
       StringPrintf("The task can only be 'binary' or 'reg'.")
-    );
-    bo = false;
-  }
-  if (hyper_param.metric.compare("acc") != 0 &&
-      hyper_param.metric.compare("prec") != 0 &&
-      hyper_param.metric.compare("recall") != 0 &&
-      hyper_param.metric.compare("f1") != 0 &&
-      hyper_param.metric.compare("auc") != 0 &&
-      hyper_param.metric.compare("mae") != 0 &&
-      hyper_param.metric.compare("mape") != 0 &&
-      hyper_param.metric.compare("rmsd") != 0 &&
-      hyper_param.metric.compare("rmse") != 0 &&
-      hyper_param.metric.compare("none") != 0) {
-    print_error(
-      StringPrintf("Unknow evaluation metric: %s.",
-        hyper_param.metric.c_str())
-    );
-    bo = false;
-  }
-  if (hyper_param.opt_type.compare("sgd") != 0 &&
-      hyper_param.opt_type.compare("ftrl") != 0 &&
-      hyper_param.opt_type.compare("adagrad") != 0) {
-    print_error(
-      StringPrintf("Unknow optimization method: %s.",
-        hyper_param.opt_type.c_str())
-    );
-    bo = false;
-  }
-  if (hyper_param.num_K > 999999) {
-    print_error(
-      StringPrintf("Invalid size of K: %d. "
-                   "Size of K must be greater than zero.", 
-        hyper_param.num_K)
-    );
-    bo = false;
-  }
-  if (hyper_param.num_folds <= 0) {
-    print_error(
-      StringPrintf("Invalid size of folds: %d. "
-                   "Size of folds must be greater than zero.", 
-        hyper_param.num_folds)
-    );
-    bo = false;
-  }
-  if (hyper_param.num_epoch <= 0) {
-    print_error(
-      StringPrintf("Invalid number of epoch: %d. "
-                   "Number of epoch must be greater than zero.", 
-        hyper_param.num_epoch)
     );
     bo = false;
   }
@@ -624,7 +574,7 @@ bool Checker::check_train_param(HyperParam& hyper_param) {
 }
 
 // Check warning and fix conflict
-void Checker::check_conflict_train(HyperParam& hyper_param) {
+void DistChecker::check_conflict_train(HyperParam& hyper_param) {
   if (hyper_param.on_disk && hyper_param.cross_validation) {
     print_warning("On-disk training doesn't support cross-validation. "
                   "xLearn has already disable the -cv option.");
@@ -698,7 +648,7 @@ void Checker::check_conflict_train(HyperParam& hyper_param) {
 }
 
 // Check options for prediction tasks
-bool Checker::check_prediction_options(HyperParam& hyper_param) {
+bool DistChecker::check_prediction_options(HyperParam& hyper_param) {
   bool bo = true;
   /*********************************************************
    *  Check size                                           *
@@ -789,21 +739,21 @@ bool Checker::check_prediction_options(HyperParam& hyper_param) {
 }
 
 // Check the given param. Used by c_api
-bool Checker::check_prediction_param(HyperParam& hyper_param) {
+bool DistChecker::check_prediction_param(HyperParam& hyper_param) {
  bool bo = true;
  /*********************************************************
   *  Check the path of test set file                      *
   *********************************************************/
  if (!FileExist(hyper_param.test_set_file.c_str())) {
-    print_error(
+   print_error(
       StringPrintf("Test set file: %s does not exist.",
            hyper_param.test_set_file.c_str())
     );
     bo =  false;
  }
  /*********************************************************
-  *  Check the path of model file                         *
-  *********************************************************/
+   *  Check the path of model file                         *
+   *********************************************************/
  if (!FileExist(hyper_param.model_file.c_str())) {
    print_error(
       StringPrintf("Test set file: %s does not exist.",
@@ -811,16 +761,6 @@ bool Checker::check_prediction_param(HyperParam& hyper_param) {
     );
     bo = false;
  }
- /*********************************************************
-  *  Check invalid value                                  *
-  *********************************************************/
- if (hyper_param.thread_number < 0) {
-    print_error(
-      StringPrintf("The thread number must be greater than zero: %d.",
-        hyper_param.thread_number)
-    );
-    bo = false;
-  }
  if (!bo) return false;
  /*********************************************************
   *  Check warning and fix conflict                       *
@@ -837,7 +777,7 @@ bool Checker::check_prediction_param(HyperParam& hyper_param) {
 }
 
 // Check warning and fix conflict
-void Checker::check_conflict_predict(HyperParam& hyper_param) {
+void DistChecker::check_conflict_predict(HyperParam& hyper_param) {
   if (hyper_param.sign && hyper_param.sigmoid) {
     print_warning("Both of --sign and --sigmoid have been set. "
                   "xLearn has already disable --sign and --sigmoid.");

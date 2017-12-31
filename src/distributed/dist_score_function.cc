@@ -16,30 +16,22 @@
 
 /*
 Author: Chao Ma (mctt90@gmail.com)
-
-This file is the entry for training of the xLearn.
+This file is the implementation of the base Score class.
 */
 
-#include "src/base/common.h"
-#include "src/base/timer.h"
-#include "src/base/stringprintf.h"
-#include "src/solver/solver.h"
+#include "src/distributed/dist_score_function.h"
+#include "src/distributed/dist_linear_score.h"
+#include "src/distributed/dist_fm_score.h"
+#include "src/distributed/dist_ffm_score.h"
+
+namespace xLearn {
 
 //------------------------------------------------------------------------------
-// The pre-defined main function
+// Class register
 //------------------------------------------------------------------------------
+CLASS_REGISTER_IMPLEMENT_REGISTRY(xLearn_dist_score_registry, DistScore);
+REGISTER_SCORE("dist_linear", DistLinearScore);
+REGISTER_SCORE("dist_fm", DistFMScore);
+REGISTER_SCORE("dist_ffm", DistFFMScore);
 
-int main(int argc, char* argv[]) {
-  Timer timer;
-  timer.tic();
-  xLearn::Solver solver;
-  solver.SetTrain();
-  solver.Initialize(argc, argv);
-  solver.StartWork();
-  solver.Clear();
-  print_info(
-            StringPrintf("Total time cost: %.2f (sec)", 
-            timer.toc()), false);
-
-  return 0;
-}
+}  // namespace xLearn

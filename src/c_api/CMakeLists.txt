@@ -21,13 +21,15 @@ add_library(xlearn_api_shared SHARED c_api.cc c_api_error.cc
 ../solver/checker.cc ../solver/trainer.cc 
 ../solver/inference.cc ../solver/solver.cc)
 
+target_link_libraries(xlearn_api_shared)
+
 # Set properties
 set_target_properties(xlearn_api_shared PROPERTIES OUTPUT_NAME "xlearn_api")
 set_target_properties(xlearn_api_shared PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 set_target_properties(xlearn_api PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 
 # Build unittests.
-set(LIBS xlearn_api solver reader loss score data base pthread gtest)
+set(LIBS xlearn_api solver reader loss score data base)
 
 add_executable(c_api_test c_api_test.cc)
 target_link_libraries(c_api_test gtest_main ${LIBS})

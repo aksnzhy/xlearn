@@ -19,7 +19,7 @@ Author: Chao Ma (mctt90@gmail.com)
 This file is the implementation of the Solver class.
 */
 
-#include "src/solver/solver.h"
+#include "src/distributed/dist_solver.h"
 
 #include <vector>
 #include <string>
@@ -45,7 +45,7 @@ namespace xLearn {
 //
 //      xLearn   -- 0.10 Version --
 //------------------------------------------------------------------------------
-void Solver::print_logo() const {
+void DistSolver::print_logo() const {
   std::string logo = 
 "----------------------------------------------------------------------------------------------\n"
                     "           _\n"
@@ -69,7 +69,7 @@ void Solver::print_logo() const {
  ******************************************************************************/
 
 // Create Reader by a given string
-Reader* Solver::create_reader() {
+Reader* DistSolver::create_reader() {
   Reader* reader;
   std::string str = hyper_param_.on_disk ? "disk" : "memory";
   reader = CREATE_READER(str.c_str());
@@ -80,20 +80,20 @@ Reader* Solver::create_reader() {
 }
 
 // Create Score by a given string
-Score* Solver::create_score() {
-  Score* score;
-  score = CREATE_SCORE(hyper_param_.score_func.c_str());
-  if (score == nullptr) {
+DistScore* DistSolver::create_score() {
+  DistScore* dist_score;
+  dist_score = CREATE_DIST_SCORE("dist_linear");
+  if (dist_score == nullptr) {
     LOG(FATAL) << "Cannot create score: "
                << hyper_param_.score_func;
   }
-  return score;
+  return dist_score;
 }
 
 // Create Loss by a given string
-Loss* Solver::create_loss() {
-  Loss* loss;
-  loss = CREATE_LOSS(hyper_param_.loss_func.c_str());
+DistLoss* DistSolver::create_loss() {
+  DistLoss* loss;
+  loss = CREATE_DIST_LOSS(hyper_param_.loss_func.c_str());
   if (loss == nullptr) {
     LOG(FATAL) << "Cannot create loss: "
                << hyper_param_.loss_func;
@@ -102,7 +102,7 @@ Loss* Solver::create_loss() {
 }
 
 // Create Metric by a given string
-Metric* Solver::create_metric() {
+Metric* DistSolver::create_metric() {
   Metric* metric;
   metric = CREATE_METRIC(hyper_param_.metric.c_str());
   // Note that here we do not cheack metric == nullptr
@@ -117,7 +117,7 @@ Metric* Solver::create_metric() {
  ******************************************************************************/
 
 // Initialize Solver
-void Solver::Initialize(int argc, char* argv[]) {
+void DistSolver::Initialize(int argc, char* argv[]) {
   //  Print logo
   print_logo();
   // Check and parse command line arguments
@@ -135,7 +135,7 @@ void Solver::Initialize(int argc, char* argv[]) {
 // Initialize the xLearn environment through the
 // given hyper-parameters. This function will be 
 // used for python API.
-void Solver::Initialize(HyperParam& hyper_param) {
+void DistSolver::Initialize(HyperParam& hyper_param) {
   // Print logo
   print_logo();
   // Check the arguments
@@ -152,10 +152,10 @@ void Solver::Initialize(HyperParam& hyper_param) {
 }
 
 // Check and parse command line arguments
-void Solver::checker(int argc, char* argv[]) {
+void DistSolver::checker(int argc, char* argv[]) {
   try {
-    checker_.Initialize(hyper_param_.is_train, argc, argv);
-    if (!checker_.check_cmd(hyper_param_)) {
+    dist_checker_.Initialize(hyper_param_.is_train, argc, argv);
+    if (!dist_checker_.check_cmd(hyper_param_)) {
       print_error("Arguments error");
       exit(0);
     }
@@ -166,15 +166,15 @@ void Solver::checker(int argc, char* argv[]) {
 }
 
 // Check the given hyper-parameters
-void Solver::checker(HyperParam& hyper_param) {
-  if (!checker_.check_param(hyper_param)) {
+void DistSolver::checker(HyperParam& hyper_param) {
+  if (!dist_checker_.check_param(hyper_param)) {
     print_error("Arguments error");
     exit(0);
   }
 }
 
 // Initialize log file
-void Solver::init_log() {
+void DistSolver::init_log() {
   std::string prefix = get_log_file(hyper_param_.log_file);
   if (hyper_param_.is_train) {
     prefix += "_train";
@@ -187,7 +187,7 @@ void Solver::init_log() {
 }
 
 // Initialize training task
-void Solver::init_train() {
+void DistSolver::init_train() {
   /*********************************************************
    *  Initialize thread pool                               *
    *********************************************************/
@@ -320,8 +320,8 @@ void Solver::init_train() {
   /*********************************************************
    *  Initialize score function                            *
    *********************************************************/
-  score_ = create_score();
-  score_->Initialize(hyper_param_.learning_rate,
+  dist_score_ = create_score();
+  dist_score_->Initialize(hyper_param_.learning_rate,
                      hyper_param_.regu_lambda,
                      hyper_param_.alpha,
                      hyper_param_.beta,
@@ -332,8 +332,8 @@ void Solver::init_train() {
   /*********************************************************
    *  Initialize loss function                             *
    *********************************************************/
-  loss_ = create_loss();
-  loss_->Initialize(score_, pool_,
+  dist_loss_ = create_loss();
+  dist_loss_->DistInitialize(dist_score_, pool_, 
          hyper_param_.norm, 
          hyper_param_.lock_free);
   LOG(INFO) << "Initialize loss function.";
@@ -348,7 +348,7 @@ void Solver::init_train() {
 }
 
 // Initialize predict task
-void Solver::init_predict() {
+void DistSolver::init_predict() {
   /*********************************************************
    *  Initialize thread pool                               *
    *********************************************************/
@@ -432,13 +432,13 @@ void Solver::init_predict() {
   /*********************************************************
    *  Init score function                                  *
    *********************************************************/
-  score_ = create_score();
+  dist_score_ = create_score();
   LOG(INFO) << "Initialize score function.";
   /*********************************************************
    *  Init loss function                                   *
    *********************************************************/
-  loss_ = create_loss();
-  loss_->Initialize(score_, pool_, hyper_param_.norm);
+  dist_loss_ = create_loss();
+  dist_loss_->DistInitialize(dist_score_, pool_, hyper_param_.norm);
   LOG(INFO) << "Initialize score function.";
 }
 
@@ -447,7 +447,7 @@ void Solver::init_predict() {
  ******************************************************************************/
 
 // Start training or inference
-void Solver::StartWork() {
+void DistSolver::StartWork() {
   if (hyper_param_.is_train) {
     LOG(INFO) << "Start training work.";
     start_train_work();
@@ -458,7 +458,7 @@ void Solver::StartWork() {
 }
 
 // Train
-void Solver::start_train_work() {
+void DistSolver::start_train_work() {
   int epoch = hyper_param_.num_epoch;
   bool early_stop = hyper_param_.early_stop &&
                    !hyper_param_.cross_validation;
@@ -474,11 +474,11 @@ void Solver::start_train_work() {
       hyper_param_.cross_validation) {
     save_txt_model = false;
   }
-  Trainer trainer;
+  DistTrainer trainer;
   trainer.Initialize(reader_,  /* Reader list */
                      epoch,
                      model_,
-                     loss_,
+                     dist_loss_,
                      metric_,
                      early_stop,
                      quiet);
@@ -528,12 +528,12 @@ void Solver::start_train_work() {
 }
 
 // Inference
-void Solver::start_prediction_work() {
+void DistSolver::start_prediction_work() {
   print_action("Start to predict ...");
-  Predictor pdc;
+  DistPredictor pdc;
   pdc.Initialize(reader_[0],
                  model_,
-                 loss_,
+                 dist_loss_,
                  hyper_param_.output_file,
                  hyper_param_.sign,
                  hyper_param_.sigmoid);
@@ -546,7 +546,7 @@ void Solver::start_prediction_work() {
  ******************************************************************************/
 
 // Finalize xLearn
-void Solver::Clear() {
+void DistSolver::Clear() {
   LOG(INFO) << "Clear the xLearn environment ...";
   print_action("Clear the xLearn environment ...");
   // Clear model

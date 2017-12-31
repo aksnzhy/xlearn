@@ -20,8 +20,8 @@ This file defines the Loss class, which is also called error
 function or objective function.
 */
 
-#ifndef XLEARN_LOSS_LOSS_H_
-#define XLEARN_LOSS_LOSS_H_
+#ifndef XLEARN_DISTRIBUTED_DIST_LOSS_H_
+#define XLEARN_DISTRIBUTED_DIST_LOSS_H_
 
 #include <vector>
 #include <string>
@@ -31,7 +31,9 @@ function or objective function.
 #include "src/base/math.h"
 #include "src/base/thread_pool.h"
 #include "src/data/model_parameters.h"
-#include "src/score/score_function.h"
+#include "src/distributed/dist_score_function.h"
+
+#include "ps/ps.h"
 
 namespace xLearn {
 
@@ -68,28 +70,27 @@ namespace xLearn {
 //   }
 //   loss_val = sq_loss->GetLoss()
 //------------------------------------------------------------------------------
-class Loss {
+class DistLoss {
  public:
   // Constructor and Desstructor
-  Loss() : loss_sum_(0), total_example_(0) { };
-  virtual ~Loss() { }
+  DistLoss() : loss_sum_(0), total_example_(0){ 
+    kv_w_ = new ps::KVWorker<float>(0);
+    kv_v_ = new ps::KVWorker<float>(1);
+  };
+  virtual ~DistLoss() { }
 
   // This function needs to be invoked before using this class
-  //void Initialize(Score* score, 
-  void Initialize(Score* score, 
-                  ThreadPool* pool, 
+  void DistInitialize(DistScore* score,
+                  ThreadPool* pool,
                   bool norm = true,
-                  bool lock_free = false,
-                  index_t batch_size = 0) {
+                  bool lock_free = false) {
     CHECK_NOTNULL(score);
     CHECK_NOTNULL(pool);
-    CHECK_GE(batch_size, 0);
-    score_func_ = score;
+    dist_score_func_ = score;
     pool_ = pool;
     norm_ = norm;
     threadNumber_ = pool_->ThreadNumber();
     lock_free_ = lock_free;
-    batch_size_ = batch_size;
   }
 
   // Given predictions and labels, accumulate loss value.
@@ -106,14 +107,6 @@ class Loss {
   // This function will also acummulate loss value.
   virtual void CalcGrad(const DMatrix* data_matrix, 
                         Model& model) = 0;
-
-  // Given data sample and current model, calculate gradient.
-  // Note that this method doesn't update local model, and the
-  // gradient will be pushed to the parameter server, which is 
-  // used for distributed computation.
-  virtual void CalcGradDist(DMatrix* data_matrix,
-                            Model& model,
-                            std::vector<real_t>& grad);
 
   // Return the calculated loss value
   virtual real_t GetLoss() {
@@ -132,7 +125,7 @@ class Loss {
  protected:
   /* The score function, including LinearScore,
   FMScore, FFMScore, etc */
-  Score* score_func_;
+  DistScore* dist_score_func_;
   /* Use instance-wise normalization */
   bool norm_;
   /* Open lock-free training ? */
@@ -145,28 +138,31 @@ class Loss {
   real_t loss_sum_;
   /* Used to store the number of example */
   index_t total_example_;
-  /* Mini-batch size */
-  index_t batch_size_;
+  /* kv store for w */
+  ps::KVWorker<float>* kv_w_;
+  /* kv store for v */
+  ps::KVWorker<float>* kv_v_;
+
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(Loss);
+  DISALLOW_COPY_AND_ASSIGN(DistLoss);
 };
 
 //------------------------------------------------------------------------------
 // Class register
 //------------------------------------------------------------------------------
-CLASS_REGISTER_DEFINE_REGISTRY(xLearn_loss_registry, Loss);
+CLASS_REGISTER_DEFINE_REGISTRY(xLearn_dist_loss_registry, DistLoss);
 
-#define REGISTER_LOSS(format_name, loss_name)               \
+#define REGISTER_DIST_LOSS(format_name, loss_name)               \
   CLASS_REGISTER_OBJECT_CREATOR(                            \
-      xLearn_loss_registry,                                 \
-      Loss,                                                 \
+      xLearn_dist_loss_registry,                                 \
+      DistLoss,                                                 \
       format_name,                                          \
       loss_name)
 
-#define CREATE_LOSS(format_name)                            \
+#define CREATE_DIST_LOSS(format_name)                            \
   CLASS_REGISTER_CREATE_OBJECT(                             \
-      xLearn_loss_registry,                                 \
+      xLearn_dist_loss_registry,                                 \
       format_name)
 
 }  // namespace xLearn

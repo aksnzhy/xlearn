@@ -23,23 +23,33 @@ This file is the entry for training of the xLearn.
 #include "src/base/common.h"
 #include "src/base/timer.h"
 #include "src/base/stringprintf.h"
-#include "src/solver/solver.h"
+#include "src/distributed/dist_solver.h"
+#include "src/distributed/server.h"
+#include "src/distributed/worker.h"
 
 //------------------------------------------------------------------------------
 // The pre-defined main function
 //------------------------------------------------------------------------------
 
 int main(int argc, char* argv[]) {
-  Timer timer;
-  timer.tic();
-  xLearn::Solver solver;
-  solver.SetTrain();
-  solver.Initialize(argc, argv);
-  solver.StartWork();
-  solver.Clear();
-  print_info(
-            StringPrintf("Total time cost: %.2f (sec)", 
-            timer.toc()), false);
+  if (ps::IsServer()) {
+    xlearn::XLearnServer* server = new xlearn::XLearnServer(argc, argv);
+  }
+
+  ps::Start();
+  if (ps::IsWorker()) {
+    Timer timer;
+    timer.tic();
+    xLearn::DistSolver dist_solver;
+    dist_solver.SetTrain();
+    dist_solver.Initialize(argc, argv);
+    dist_solver.StartWork();
+    dist_solver.Clear();
+    print_info(
+      StringPrintf("Total time cost: %.2f (sec)", 
+      timer.toc()), false);
+  }
+  ps::Finalize();
 
   return 0;
 }

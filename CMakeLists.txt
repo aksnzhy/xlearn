@@ -30,8 +30,9 @@ cmake_minimum_required(VERSION 2.8)
 # Using c++11;
 # Optimization on architecture
 #-------------------------------------------------------------------------------
-add_definitions("-Wall -Wno-sign-compare -O3 -std=c++11 
--march=native -Wno-strict-aliasing -Wno-comment")
+#add_definitions("-Wall -Wno-sign-compare -O3 -std=c++11 -march=native 
+add_definitions("-Wall -Wno-sign-compare -std=c++11 -march=native 
+-Wno-strict-aliasing -Wno-comment")
 
 #-------------------------------------------------------------------------------
 # Declare where our project will be installed.
@@ -50,6 +51,7 @@ include_directories(
   "${PROJECT_SOURCE_DIR}"
   "${PROJECT_BINARY_DIR}"
   "${PROJECT_SOURCE_DIR}/gtest/include"
+  "${PROJECT_SOURCE_DIR}/ps-lite/include"
 )
 
 link_directories(
@@ -59,21 +61,24 @@ link_directories(
   "${PROJECT_BINARY_DIR}/src/score"
   "${PROJECT_BINARY_DIR}/src/loss"
   "${PROJECT_BINARY_DIR}/src/solver"
+  "${PROJECT_BINARY_DIR}/src/distributed"
   "${PROJECT_BINARY_DIR}/src/c_api"
+  "${PROJECT_BINARY_DIR}/ps-lite"
 )
 
 #-------------------------------------------------------------------------------
 # Declare packages in xLearn project.
 #-------------------------------------------------------------------------------
+add_subdirectory(ps-lite)
 add_subdirectory(gtest)
 add_subdirectory(demo)
-add_subdirectory(scripts)
 add_subdirectory(src/base)
 add_subdirectory(src/data)
 add_subdirectory(src/reader)
 add_subdirectory(src/score)
 add_subdirectory(src/loss)
 add_subdirectory(src/solver)
+add_subdirectory(src/distributed)
 add_subdirectory(src/c_api)
 add_subdirectory(python-package)
-#add_subdirectory(R-package)
+add_subdirectory(scripts)
