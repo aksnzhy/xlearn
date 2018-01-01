@@ -83,6 +83,7 @@ class KVStore {
    // |         | 0.2 | 1.2 | 1.4 | 1.8 | 0.5  |  1.1 |  1.8 |
    // |         | ..  | ..  | ..  | ..  | ..   |  ..  |  ..  |
    //  ------------------------------------------------------
+   // This method is useful for the FM and FFM task.
    virtual void Pull(const std::vector<index_t>& key,
    	                 std::vector<real_t>* value_list,
    	                 const size_t length);
