@@ -57,7 +57,7 @@ std::string Checker::option_help() const {
 "                          'mae', 'mape', 'rmsd (rmse)' (regression). On defaurt, xLearn will not print \n"
 "                          any evaluation metric information.                                            \n"
 "                                                                                                      \n"
-"  -p <opt_method>      :  Choose the optimization method, including 'sgd', adagrad' and 'ftrl'. On default, \n"
+"  -p <opt_method>      :  Choose the optimization method, including 'sgd', adagrad', and 'ftrl'. On default, \n"
 "                          we use the adagrad optimization. \n"
 "                                                                                                 \n"
 "  -v <validate_file>   :  Path of the validation data file. This option will be empty by default, \n"

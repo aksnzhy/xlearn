@@ -15,5 +15,3 @@ fi
 if command -v python3; then
     sudo python3 setup.py install
 fi
-
-
