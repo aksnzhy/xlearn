@@ -13,3 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //------------------------------------------------------------------------------
+
+/*
+Author: Chao Ma (mctt90@gmail.com)
+
+This file is the implementation of KVStore.
+*/
