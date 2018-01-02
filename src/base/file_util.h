@@ -323,7 +323,7 @@ inline uint64_t HashFile(const std::string& filename, bool one_block=false) {
 // Return size (byte) of current file.
 inline uint64 ReadFileToMemory(const std::string& filename, char **buf) {
   CHECK(!filename.empty());
-  FILE* file = OpenFileOrDie(filename.c_str(), "r");
+  FILE* file = OpenFileOrDie(filename.c_str(), "rb");
   uint64 len = GetFileSize(file);
   try {
     *buf = new char[len];
