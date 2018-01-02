@@ -245,7 +245,7 @@ struct DMatrix {
     CHECK_EQ(row_length, row.size());
     CHECK_EQ(row_length, Y.size());
     CHECK_EQ(row_length, norm.size());
-    FILE* file = OpenFileOrDie(filename.c_str(), "w");
+    FILE* file = OpenFileOrDie(filename.c_str(), "wb");
     // Write hash_value
     WriteDataToDisk(file, (char*)&hash_value_1, sizeof(hash_value_1));
     WriteDataToDisk(file, (char*)&hash_value_2, sizeof(hash_value_2));
@@ -268,7 +268,7 @@ struct DMatrix {
   void Deserialize(const std::string& filename) {
     CHECK(!filename.empty());
     this->Release();
-    FILE* file = OpenFileOrDie(filename.c_str(), "r");
+    FILE* file = OpenFileOrDie(filename.c_str(), "rb");
     // Read hash_value
     ReadDataFromDisk(file, (char*)&hash_value_1, sizeof(hash_value_1));
     ReadDataFromDisk(file, (char*)&hash_value_2, sizeof(hash_value_2));
