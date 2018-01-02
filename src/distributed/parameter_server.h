@@ -88,6 +88,31 @@ class KVStore {
    virtual void Pull(const std::vector<index_t>& key,
    	                 std::vector<real_t>* value_list,
    	                 const size_t length);
+
+   // In xLearn, we use a simple range strategy for model partiton
+   // on parameter server. For example, we have 10 features and 3 
+   // server nodes.
+   //
+   //  ---------------------------------------
+   // | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
+   //  ---------------------------------------
+   //   |   |   |   |   |   |   |   |   |   |
+   //  s1  s2  s3  s4  s5  s6  s7  s8  s9  s10
+   //
+   // On each local server:
+   //
+   //        s1                  s2               s3
+   //  ---------------      -----------      -----------
+   // | 0 | 1 | 2 | 3 |    | 0 | 1 | 2 |    | 0 | 1 | 2 |
+   //  ---------------      -----------      -----------
+   //   |   |   |   |         |  |   |        |   |   |
+   //   0   3   6   9         1  4   7        2   5   8
+
+   // Given a feature id, return the server id, which stores that feature.
+   virtual size_t GetServerId(const index_t feat_id) const;
+
+   // Mapping the global feature id to the local server id.
+   virtual index_t Map(const index_t feat_id) const;
 };
 
 }  // namespace xLearn

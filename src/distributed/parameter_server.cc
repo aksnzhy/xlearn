@@ -80,4 +80,33 @@ void KVStore::Pull(const std::vector<index_t>& key,
 
 }
 
+// In xLearn, we use a simple range strategy for model partiton
+// on parameter server. For example, we have 10 features and 3 
+// server nodes.
+//
+//  ---------------------------------------
+// | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
+//  ---------------------------------------
+//   |   |   |   |   |   |   |   |   |   |
+//  s1  s2  s3  s4  s5  s6  s7  s8  s9  s10
+//
+// On each local server:
+//
+//        s1                  s2               s3
+//  ---------------      -----------      -----------
+// | 0 | 1 | 2 | 3 |    | 0 | 1 | 2 |    | 0 | 1 | 2 |
+//  ---------------      -----------      -----------
+//   |   |   |   |         |  |   |        |   |   |
+//   0   3   6   9         1  4   7        2   5   8
+
+// Given a feature id, return the server id, which stores that feature.
+size_t KVStore::GetServerId(const index_t feat_id) const {
+  return 0;
+}
+
+// Mapping the global feature id to the local server id.
+index_t KVStore::Map(const index_t feat_id) const {
+  return 0;
+}
+
 }  // namespace xLearn
