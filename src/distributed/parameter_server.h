@@ -27,6 +27,7 @@ and set the model parameters.
 #include <vector>
 
 #include "src/base/common.h"
+#include "src/data/data_structure.h"
 
 namespace xLearn {
 
