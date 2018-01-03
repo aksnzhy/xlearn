@@ -41,6 +41,12 @@ class KVStore {
    KVStore() { }
    ~KVStore() { }
 
+   // Initial KVStore
+   virtual void Initialize(size_t server_num) {
+   	 CHECK_GT(server_num, 0);
+     server_num_ = server_num;
+   }
+
    // Push a list of (key, value) into store.
    // For example:
    //  ------------------------------------------------------
@@ -89,7 +95,6 @@ class KVStore {
    	                 std::vector<real_t>* value_list, 
    	                 const size_t length);
 
- protected:
    //---------------------------------------------------------------------------
    // In xLearn, we use a simple range strategy for model partiton
    // on parameter server. For example, we have 10 features and 3 
@@ -103,23 +108,23 @@ class KVStore {
    //
    // On each local server:
    //
-   //        s1                  s2               s3
+   //        s0                  s1               s2
    //  ---------------      -----------      -----------
    // | 0 | 1 | 2 | 3 |    | 0 | 1 | 2 |    | 0 | 1 | 2 |
    //  ---------------      -----------      -----------
-   //   |   |   |   |         |  |   |        |   |   |
-   //   0   3   6   9         1  4   7        2   5   8
+   //   |   |   |   |        |   |   |        |   |   |
+   //   0   3   6   9        1   4   7        2   5   8
    //---------------------------------------------------------------------------
 
    // Given a feature id, return the server id
    virtual size_t GetServerId(const index_t feat_id) const;
 
    // Mapping the global feature id to a local feature id
-   virtual index_t Map(const index_t feat_id) const;
+   virtual index_t FeatMap(const index_t feat_id) const;
 
  private:
   /* The number of server */
-  int server_num_;  
+  size_t server_num_;  
 
   DISALLOW_COPY_AND_ASSIGN(KVStore);
 };
