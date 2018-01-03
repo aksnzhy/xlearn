@@ -47,7 +47,7 @@ class KVStore {
    // |  key:   |  0  |  2  |  4  |  5  |  6   |  7   |  9   |
    // | value:  | 0.2 | 1.0 | 0.5 | 1.0 | 0.33 |  0.7 |  0.8 |
    //  ------------------------------------------------------
-   virtual void Push(const std::vector<index_t>& key,
+   virtual void Push(const std::vector<index_t>& key, 
    	                 const std::vector<real_t>& value);
 
    // Push a list of (key, value_list) into store.
@@ -61,8 +61,8 @@ class KVStore {
    // |         | ..  | ..  | ..  | ..  | ..   |  ..  |  ..  |
    //  ------------------------------------------------------
    // This method is useful for the FM and FFM task.
-   virtual void Push(const std::vector<index_t>& key,
-   	                 const std::vector<real_t>& value_list,
+   virtual void Push(const std::vector<index_t>& key, 
+   	                 const std::vector<real_t>& value_list, 
    	                 const size_t length);
 
    // Pull the values for a list of keys from store.
@@ -71,7 +71,7 @@ class KVStore {
    // |  key:   |  0  |  2  |  4  |  5  |  6   |  7   |  9   |
    // | value:  | 0.2 | 1.0 | 0.5 | 1.0 | 0.33 |  0.7 |  0.8 |
    //  ------------------------------------------------------
-   virtual void Pull(const std::vector<index_t>& key,
+   virtual void Pull(const std::vector<index_t>& key, 
    	                 std::vector<real_t>* value);
 
    // Pull the value list for a list of keys from store.
@@ -85,8 +85,8 @@ class KVStore {
    // |         | ..  | ..  | ..  | ..  | ..   |  ..  |  ..  |
    //  ------------------------------------------------------
    // This method is useful for the FM and FFM task.
-   virtual void Pull(const std::vector<index_t>& key,
-   	                 std::vector<real_t>* value_list,
+   virtual void Pull(const std::vector<index_t>& key, 
+   	                 std::vector<real_t>* value_list, 
    	                 const size_t length);
 
  protected:
