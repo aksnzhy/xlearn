@@ -116,6 +116,12 @@ class KVStore {
 
    // Mapping the global feature id to a local feature id
    virtual index_t Map(const index_t feat_id) const;
+
+ private:
+  /* The number of server */
+  int server_num_;  
+
+  DISALLOW_COPY_AND_ASSIGN(KVStore);
 };
 
 }  // namespace xLearn

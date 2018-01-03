@@ -88,11 +88,11 @@ void KVStore::Pull(const std::vector<index_t>& key,
 // | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
 //  ---------------------------------------
 //   |   |   |   |   |   |   |   |   |   |
-//  s1  s2  s3  s1  s2  s3  s1  s2  s3  s1
+//  s0  s1  s2  s0  s1  s2  s0  s1  s2  s0
 //
 // On each local server:
 //
-//        s1                  s2               s3
+//        s0                  s1               s2
 //  ---------------      -----------      -----------
 // | 0 | 1 | 2 | 3 |    | 0 | 1 | 2 |    | 0 | 1 | 2 |
 //  ---------------      -----------      -----------
@@ -101,12 +101,12 @@ void KVStore::Pull(const std::vector<index_t>& key,
 
 // Given a feature id, return the server id, which stores that feature.
 size_t KVStore::GetServerId(const index_t feat_id) const {
-  return 0;
+  return feat_id % server_num_;
 }
 
 // Mapping the global feature id to the local server id.
 index_t KVStore::Map(const index_t feat_id) const {
-  return 0;
+  return feat_id ;
 }
 
 }  // namespace xLearn
