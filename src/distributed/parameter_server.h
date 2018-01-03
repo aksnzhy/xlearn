@@ -88,7 +88,8 @@ class KVStore {
    virtual void Pull(const std::vector<index_t>& key,
    	                 std::vector<real_t>* value_list,
    	                 const size_t length);
-
+   
+ protected:
    // In xLearn, we use a simple range strategy for model partiton
    // on parameter server. For example, we have 10 features and 3 
    // server nodes.
