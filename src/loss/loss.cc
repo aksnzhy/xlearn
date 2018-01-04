@@ -94,16 +94,14 @@ void Loss::CalcGradDist(DMatrix* matrix,
     std::vector<index_t> feature_list;
     mini_batch.Compress(feature_list);
     /*
-
     // Pull the model parameter from parameter server
-    ps->pull(feature_list, model);
+    store->pull(feature_list, model);
 
     // Calculate gradient
     this->CalcGrad(matrix, model, grad);
 
     // Push gradient to the parameter server
     ps->push(grad, feature_list);
-
     */
   }
 }
