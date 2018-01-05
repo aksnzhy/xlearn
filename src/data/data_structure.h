@@ -23,6 +23,7 @@ This file defines the basic data structures used by xLearn.
 #ifndef XLEARN_DATA_DATA_STRUCTURE_H_
 #define XLEARN_DATA_DATA_STRUCTURE_H_
 
+#include <algorithm>
 #include <vector>
 #include <unordered_set>
 #include <unordered_map>

@@ -253,7 +253,8 @@ XL_DLL int XLDMatrixCreateFromFile(const char *fname,
 
 XL_DLL int XLDMatrixCreateFromCSREx(const size_t* indptr,
                                     const unsigned* indices,
-                                    const real_t* data,
+                                    const real_t* features,
+                                    const real_t* fields,
                                     size_t nindptr,
                                     size_t nelem,
                                     size_t num_col,
@@ -261,10 +262,14 @@ XL_DLL int XLDMatrixCreateFromCSREx(const size_t* indptr,
   API_BEGIN();
   xLearn::DMatrix* mat = new xLearn::DMatrix();
   mat->ResetMatrix(nindptr, false);
-  for (size_t i = 1; i < nindptr; ++ i) {
+  for (size_t i = 1; i <= nindptr; ++ i) {
     for (size_t j = indptr[i - 1]; j < indptr[i]; ++ j) {
-      if (!std::isnan(data[j])) {
-          mat->AddNode(i, indices[j], data[j]);
+      if (!std::isnan(features[j])) {
+        if (fields) {
+          mat->AddNode(i - 1, indices[j], features[j], fields[j]);
+        } else {
+          mat->AddNode(i - 1, indices[j], features[j]);
+        }
       }
     }
   }
@@ -283,7 +288,8 @@ XL_DLL int XLDMatrixCreateFromCSR(const size_t* indptr,
 
 XL_DLL int XLDMatrixCreateFromCSCEx(const size_t* indptr,
                                     const unsigned* indices,
-                                    const real_t* data,
+                                    const real_t* features,
+                                    const real_t* fields,
                                     size_t nindptr,
                                     size_t nelem,
                                     size_t num_row,
@@ -291,10 +297,14 @@ XL_DLL int XLDMatrixCreateFromCSCEx(const size_t* indptr,
   API_BEGIN();
   xLearn::DMatrix* mat = new xLearn::DMatrix();
   mat->ResetMatrix(num_row, false);
-  for (size_t i = 1; i < nindptr; ++ i) {
+  for (size_t i = 1; i <= nindptr; ++ i) {
     for (size_t j = indptr[i - 1]; j < indptr[i]; ++ j) {
-      if (!std::isnan(data[j])) {
-        mat->AddNode(indices[j], i - 1, data[j]);
+      if (!std::isnan(features[j])) {
+        if (fields) {
+          mat->AddNode(indices[j], i - 1, features[j], fields[j]);
+        } else {
+          mat->AddNode(indices[j], i - 1, features[j]);
+        }
       }
     }
   }
