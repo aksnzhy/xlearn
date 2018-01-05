@@ -168,13 +168,22 @@ void Model::set_value() {
 // Free the allocated memory
 void Model::free_model() {
   free(param_w_);
+#ifdef WIN32
+  _aligned_free(param_v_);
+#else
   free(param_v_);
+#endif
   free(param_b_);
   if (param_best_w_ != nullptr) {
     free(param_best_w_);
   }
   if (param_best_v_ != nullptr) {
-    free(param_best_v_);
+#ifdef WIN32
+	  _aligned_free(param_best_v_);
+#else
+	free(param_best_v_);
+
+#endif
   }
   if (param_best_b_ != nullptr) {
     free(param_best_b_);
