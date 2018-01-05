@@ -256,17 +256,13 @@ XL_DLL int XLDMatrixCreateFromCSREx(const size_t* indptr,
                                     XL* out) {
   API_BEGIN();
   xLearn::DMatrix* mat = new xLearn::DMatrix();
-  mat->row_length = nindptr;
-  mat->row.reserve(nindptr - 1);
+  mat->ResetMatrix(nindptr, false);
   for (size_t i = 1; i < nindptr; ++ i) {
-    xLearn::SparseRow* row = new xLearn::SparseRow();
-    row->reserve(indptr[i] - indptr[i - 1]);
     for (size_t j = indptr[i - 1]; j < indptr[i]; ++ j) {
       if (!std::isnan(data[j])) {
-          row->emplace_back(xLearn::Node(0, indices[j], data[j]));
+          mat->AddNode(i, indices[j], data[j]);
       }
     }
-    mat->row.push_back(row);
   }
   *out = mat;
   API_END();
@@ -290,15 +286,11 @@ XL_DLL int XLDMatrixCreateFromCSCEx(const size_t* indptr,
                                     XL* out) {
   API_BEGIN();
   xLearn::DMatrix* mat = new xLearn::DMatrix();
-  mat->row_length = num_row;
-  mat->row.reserve(num_row);
-  for (size_t i = 0; i < num_row; ++ i) {
-    mat->row.emplace_back(new xLearn::SparseRow());
-  }
+  mat->ResetMatrix(num_row, false);
   for (size_t i = 1; i < nindptr; ++ i) {
     for (size_t j = indptr[i - 1]; j < indptr[i]; ++ j) {
       if (!std::isnan(data[j])) {
-        mat->row[indices[j]]->emplace_back(xLearn::Node(0, i - 1, data[j]));
+        mat->AddNode(indices[j], i - 1, data[j]);
       }
     }
   }
