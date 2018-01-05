@@ -33,6 +33,10 @@ This file is the implementation of the Solver class.
 #include "src/base/timer.h"
 #include "src/base/system.h"
 
+#ifdef WIN32
+#include <Windows.h>
+#endif
+
 namespace xLearn {
 
 //------------------------------------------------------------------------------
@@ -118,6 +122,14 @@ Metric* Solver::create_metric() {
 
 // Initialize Solver
 void Solver::Initialize(int argc, char* argv[]) {
+#ifdef WIN32
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	DWORD mode;
+	GetConsoleMode(hConsole, &mode);
+	mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+	SetConsoleMode(hConsole, mode);
+#endif // WIN32
+
   //  Print logo
   print_logo();
   // Check and parse command line arguments

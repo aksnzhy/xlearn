@@ -95,7 +95,7 @@ inline void print_warning(const std::string& out) {
   Color::Modifier mag(Color::FG_MAGENTA);
   Color::Modifier bold(Color::BOLD);
   Color::Modifier reset(Color::RESET);
-  std::cout << mag << bold << "[ WARNING    ] " 
+  std::cout << mag << bold << "[ WARNING    ] "
             << out << reset << std::endl;
 }
 
