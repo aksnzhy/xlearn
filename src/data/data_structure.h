@@ -26,6 +26,7 @@ This file defines the basic data structures used by xLearn.
 #include <vector>
 #include <unordered_set>
 #include <unordered_map>
+#include <algorithm>
 
 #include "src/base/common.h"
 #include "src/base/file_util.h"
