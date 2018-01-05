@@ -76,6 +76,7 @@ uint64 Parser::get_line_from_buffer(char* line,
 // LibsvmParser parses the following data format:
 // [y1 idx:value idx:value ...]
 // [y2 idx:value idx:value ...]
+// idx can start from 0
 //------------------------------------------------------------------------------
 void LibsvmParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
   CHECK_NOTNULL(buf);
@@ -128,6 +129,7 @@ void LibsvmParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
 // FFMParser parses the following data format:
 // [y1 field:idx:value field:idx:value ...]
 // [y2 field:idx:value field:idx:value ...]
+// idx can start from 0
 //------------------------------------------------------------------------------
 void FFMParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
   CHECK_NOTNULL(buf);
@@ -188,6 +190,7 @@ void FFMParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
 // label y, the user should add a placeholder to the dataset
 // by themselves. Otherwise, the parser will treat the last
 // element as the label y.
+// Note that we treat the first feature as feature 0.
 //------------------------------------------------------------------------------
 void CSVParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
   CHECK_NOTNULL(buf);

@@ -191,7 +191,10 @@ void Solver::init_train() {
   /*********************************************************
    *  Initialize thread pool                               *
    *********************************************************/
-  size_t threadNumber = std::thread::hardware_concurrency();
+  size_t threadNumber = std::thread::hardware_concurrency();;
+  if (hyper_param_.thread_number != 0) {
+    threadNumber = hyper_param_.thread_number;
+  }
   pool_ = new ThreadPool(threadNumber);
   /*********************************************************
    *  Initialize Reader                                    *

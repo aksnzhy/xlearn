@@ -1,7 +1,7 @@
 <img src="https://github.com/aksnzhy/xLearn/raw/master/img/xlearn_logo.png" width = "400"/>    
 
 [![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](./LICENCE)
-![Project Status](https://img.shields.io/badge/version-0.1.0-green.svg)
+![Project Status](https://img.shields.io/badge/version-0.2.0-green.svg)
 [![Travis](https://img.shields.io/travis/rust-lang/rust.svg)]()
 
 [Installation](http://xlearn-doc.readthedocs.io/en/latest/install.html) |
@@ -13,7 +13,9 @@
 
 xLearn is a ***high performance***, ***easy-to-use***, and ***scalable*** machine learning package, 
 which can be used to solve large-scale machine learning problems. xLearn is especially useful for solving machine
-learning problems on large-scale sparse data, which is very common in Internet services such as online advertisement and recommender systems in recent years.  If you are the user  of liblinear, libfm, or libffm, now the xLearn is your another better choice. 
+learning problems on large-scale sparse data, which is very common in Internet services such as online advertisement 
+and recommender systems in recent years.  If you are the user  of liblinear, libfm, or libffm, now the xLearn is your 
+another better choice. 
 
 [homepage](http://zhenxiao.com/xlearn/)
 

@@ -3,7 +3,7 @@
  - 18/12/2017 xLearn 0.2.0 version release. Main update:
 
     * Fix bugs in previous version
-    * Support pip installation
+    * Support *pip* installation
     * New Documents
     * Faster *FTRL* algorithm
 

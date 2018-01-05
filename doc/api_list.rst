@@ -26,7 +26,7 @@ Options: ::
                           'mae', 'mape', 'rmsd (rmse)' (regression). On defaurt, xLearn will not print
                           any evaluation metric information.                                           
                                                                                                      
-  -p <opt_method>      :  Choose the optimization method, including 'sgd', adagrad' and 'ftrl'. On default,
+  -p <opt_method>      :  Choose the optimization method, including 'sgd', adagrad', and 'ftrl'. On default,
                           we use the adagrad optimization.
                                                                                                 
   -v <validate_file>   :  Path of the validation data file. This option will be empty by default,

@@ -1,4 +1,7 @@
-This dataset comes from UCI Machine Learning Repositpry (`Link`__)
+Mushroom Classification
+---------------------------
+
+This dataset comes from *UCI Machine Learning Repositpry* (`Link`__)
 
 This data set includes descriptions of hypothetical samples corresponding to 23 species of gilled mushrooms in 
 the Agaricus and Lepiota Family (pp. 500-525). Each species is identified as definitely edible, definitely poisonous, 

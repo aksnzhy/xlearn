@@ -21,7 +21,7 @@
 #
 project ("xLearn")
 
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 2.8)
 
 #-------------------------------------------------------------------------------
 # Take almost all warnings;
@@ -39,11 +39,9 @@ add_definitions("-Wall -Wno-sign-compare -O3 -std=c++11
 set(CMAKE_INSTALL_PREFIX "xLearn")
 
 #-------------------------------------------------------------------------------
-# Ensure executables are statically linked with libraries.
+# For Mac OSX
 #-------------------------------------------------------------------------------
-if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  set(CMAKE_EXE_LINKER_FLAGS "-static -static-libgcc")
-endif()
+set(CMAKE_MACOSX_RPATH TRUE)
 
 #-------------------------------------------------------------------------------
 # Set include paths and library paths.
@@ -52,7 +50,6 @@ include_directories(
   "${PROJECT_SOURCE_DIR}"
   "${PROJECT_BINARY_DIR}"
   "${PROJECT_SOURCE_DIR}/gtest/include"
-#  "/usr/share/R/include"
 )
 
 link_directories(
@@ -63,7 +60,6 @@ link_directories(
   "${PROJECT_BINARY_DIR}/src/loss"
   "${PROJECT_BINARY_DIR}/src/solver"
   "${PROJECT_BINARY_DIR}/src/c_api"
-#  "/usr/lib/R/lib"
 )
 
 #-------------------------------------------------------------------------------
@@ -78,6 +74,7 @@ add_subdirectory(src/reader)
 add_subdirectory(src/score)
 add_subdirectory(src/loss)
 add_subdirectory(src/solver)
+add_subdirectory(src/distributed)
 add_subdirectory(src/c_api)
 add_subdirectory(python-package)
 #add_subdirectory(R-package)

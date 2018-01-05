@@ -5,15 +5,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/test/base)
 add_library(base STATIC logging.cc stringprintf.cc split_string.cc 
 levenshtein_distance.cc timer.cc)
 
-# Build shared library
-add_library(base_shared SHARED logging.cc stringprintf.cc split_string.cc 
-levenshtein_distance.cc timer.cc)
-
-# Set properties
-set_target_properties(base_shared PROPERTIES OUTPUT_NAME "base")
-set_target_properties(base_shared PROPERTIES CLEAN_DIRECT_OUTPUT 1)
-set_target_properties(base PROPERTIES CLEAN_DIRECT_OUTPUT 1)
-
 # Build unittests.
 set(LIBS base pthread gtest)
 

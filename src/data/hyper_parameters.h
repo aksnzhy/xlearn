@@ -60,6 +60,8 @@ struct HyperParam {
   /* Block size for on-disk training.
   On default this value will be set to 500 MB */
   uint64 block_size = 500;
+  /* Number of thread existing in the thread pool */
+  int thread_number = 0;
 //------------------------------------------------------------------------------
 // Parameters for optimization method
 //------------------------------------------------------------------------------
@@ -132,6 +134,15 @@ struct HyperParam {
   bool sign = false;
   /* Convert predition output using sigmoid */
   bool sigmoid = false;
+//------------------------------------------------------------------------------
+// Parameters for distributed learning
+//------------------------------------------------------------------------------
+  /* Batch size for gradient descent */
+  int batch_size = 1000000;
+  /* Number of worker for compute gradient */
+  int num_worker = 0;
+  /* Number of parameter server for store model parameters */
+  int num_server = 0;
 };
 
 }  // namespace XLEARN

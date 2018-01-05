@@ -24,6 +24,8 @@ This file defines the basic data structures used by xLearn.
 #define XLEARN_DATA_DATA_STRUCTURE_H_
 
 #include <vector>
+#include <unordered_set>
+#include <unordered_map>
 
 #include "src/base/common.h"
 #include "src/base/file_util.h"
@@ -41,6 +43,11 @@ typedef float real_t;
 // of the feature and the model parameters.
 //------------------------------------------------------------------------------
 typedef uint32 index_t;
+
+//------------------------------------------------------------------------------
+// Mapping sparse feature to dense feature. Used by distributed computation.
+//------------------------------------------------------------------------------
+typedef std::unordered_map<index_t, index_t> feature_map;
 
 //------------------------------------------------------------------------------
 // We use SSE to accelerate our training, so some 
@@ -133,7 +140,8 @@ struct DMatrix {
      row(0),
      Y(0),
      norm(0),
-     has_label(false) { }
+     has_label(false),
+     pos(0) { }
 
   // Destructor
   ~DMatrix() { Release(); }
@@ -158,6 +166,7 @@ struct DMatrix {
     norm.resize(length, 1.0);
     // Indicate that if current dataset has the label y
     has_label = label;
+    pos = 0;
   }
 
   // Release memory for DMatrix.
@@ -179,6 +188,7 @@ struct DMatrix {
     std::vector<real_t>().swap(norm);
     has_label = false;
     row_length = 0;
+    pos = 0;
   }
 
   // Add node to current data matrix.
@@ -251,6 +261,80 @@ struct DMatrix {
     this->norm = matrix->norm;
     // Copy has label
     this->has_label = matrix->has_label;
+    // Copy pos
+    this->pos = matrix->pos;
+  }
+
+  // Compress current sparse matrix to a dense matrix.
+  // This method will be used in distributed computation.
+  // For example, the sparse matrix is:
+  //  ------------------------------------------
+  //  |    1:0.1    5:0.1    8:0.1   10:0.1    |
+  //  |    3:0.1    12:0.1   20:0.1            |
+  //  |    5:0.1    8:0.1    11:0.1            |
+  //  |    2:0.1    4:0.1    7:0.1             |
+  //  ------------------------------------------
+  // After compress, we can get a dense matrix like this:
+  //  ------------------------------------------
+  //  |    1:0.1    5:0.1    7:0.1    8:0.1    |
+  //  |    3:0.1    10:0.1   11:0.1            |
+  //  |    5:0.1    7:0.1    9:0.1             |
+  //  |    2:0.1    4:0.1    6:0.1             |
+  //  ------------------------------------------
+  // Also, we can get a vector to store the mapping relations:
+  //  -------------------------------------------------
+  //  | 1 | 2 | 3 | 4 | 5 | 7 | 8 | 10 | 11 | 12 | 20 |
+  //  -------------------------------------------------
+  void Compress(std::vector<index_t>& feature_list) {
+    // Using a map to store the mapping relations
+    size_t node_num {0};
+    for (auto row : this->row) {
+      node_num += row->size();
+    }
+    std::unordered_set<index_t> feat_set;
+    feat_set.reserve(node_num);
+    for (index_t i = 0; i < this->row_length; ++i) {
+      SparseRow* row = this->row[i];
+      for (SparseRow::iterator iter = row->begin();
+           iter != row->end(); ++iter) {
+        if (feat_set.count(iter->feat_id) == 0) {
+          feat_set.insert(iter->feat_id);
+        }
+      }
+    }
+    feature_list.reserve(feat_set.size());
+    std::copy(feat_set.begin(), feat_set.end(), 
+              std::back_inserter(feature_list));
+    std::sort(begin(feature_list), end(feature_list));
+    feature_map mp;
+    mp.reserve(feature_list.size());
+    for (index_t i = 0; i < feature_list.size(); ++ i) {
+      mp[feature_list[i]] = i + 1;
+    }
+    for (index_t i = 0; i < this->row_length; ++ i) {
+      for (auto &iter: *this->row[i]) {
+        // using map is better than lower_bound
+        iter.feat_id = mp[iter.feat_id];
+      }
+    }
+  }
+
+  // Get a mini-batch of data from curremt data matrix. 
+  // This method will be used for distributed computation. 
+  // Return the count of sample for each function call.
+  index_t GetMiniBatch(index_t batch_size, DMatrix& mini_batch) {
+    CHECK_EQ(batch_size, mini_batch.row_length);
+    // Copy mini-batch
+    for (index_t i = 0; i < batch_size; ++i) {
+      if (this->pos >= this->row_length) {
+        return i;
+      }
+      mini_batch.row[i] = this->row[pos];
+      mini_batch.Y[i] = this->Y[pos];
+      mini_batch.norm[i] = this->norm[pos];
+      this->pos++;
+    }
+    return batch_size;
   }
 
   // Serialize current DMatrix to disk file.
@@ -275,6 +359,8 @@ struct DMatrix {
     WriteVectorToFile(file, norm);
     // Write has_label
     WriteDataToDisk(file, (char*)&has_label, sizeof(has_label));
+    // Write pos
+    WriteDataToDisk(file, (char*)&pos, sizeof(pos));
     Close(file);
   }
 
@@ -301,6 +387,8 @@ struct DMatrix {
     ReadVectorFromFile(file, norm);
     // Read has label
     ReadDataFromDisk(file, (char*)&has_label, sizeof(has_label));
+    // Read pos
+    ReadDataFromDisk(file, (char*)&pos, sizeof(pos));
     Close(file);
   }
 
@@ -345,6 +433,8 @@ struct DMatrix {
   std::vector<real_t> norm;
   /* If current dataset has label y */
   bool has_label;
+  /* Current position for GetMiniBatch() */
+  index_t pos;
 };
 
 }  // namespace xLearn

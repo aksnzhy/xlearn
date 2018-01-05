@@ -46,6 +46,10 @@ class TestLoss : public Loss {
   void CalcGrad(const DMatrix* data_matrix,
                 Model& model) { return; }
 
+  void CalcGradDist(DMatrix* data_matrix,
+                    Model& model,
+                    std::vector<real_t>& grad) { return; }
+
   std::string loss_type() { return "test"; }
 
  private:
