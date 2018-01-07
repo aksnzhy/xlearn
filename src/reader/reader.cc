@@ -110,9 +110,10 @@ void InmemReader::Initialize(const std::string& filename) {
   }
 }
 
+
 void InmemReader::Initialize(const DMatrix *const matrix) {
   data_buf_ = *matrix;
-  data_buf_.has_label = matrix->has_label;
+  has_label_ = data_buf_.has_label;
   // Init data_samples_
   num_samples_ = data_buf_.row_length;
   // for shuffle
@@ -123,7 +124,7 @@ void InmemReader::Initialize(const DMatrix *const matrix) {
 }
 
 // Check wheter current path has a binary file.
-// We use double check here, that is, we first check 
+// We use double check here, that is, we first check
 // the hash value of a small data block, then check the whole file.
 bool InmemReader::hash_binary(const std::string& filename) {
   std::string bin_file = filename + ".bin";
@@ -216,6 +217,45 @@ index_t InmemReader::Samples(DMatrix* &matrix) {
 
 // Return to the begining of the data buffer.
 void InmemReader::Reset() { pos_ = 0; }
+
+void PythonReader::Initialize(const DMatrix *const matrix) {
+  data_buf_ = *matrix;
+  has_label_ = data_buf_.has_label;
+  // Init data_samples_
+  num_samples_ = data_buf_.row_length;
+  // for shuffle
+  order_.resize(num_samples_);
+  for (int i = 0; i < order_.size(); ++i) {
+    order_[i] = i;
+  }
+}
+
+// Smaple data from memory buffer.
+index_t PythonReader::Samples(DMatrix* &matrix) {
+  for (int i = 0; i < num_samples_; ++i) {
+    if (pos_ >= data_buf_.row_length) {
+      // End of the data buffer
+      if (i == 0) {
+        if (shuffle_) {
+          random_shuffle(order_.begin(), order_.end());
+        }
+        matrix = nullptr;
+        return 0;
+      }
+      break;
+    }
+    // Copy data between different DMatrix.
+    data_samples_.row[i] = data_buf_.row[order_[pos_]];
+    data_samples_.Y[i] = data_buf_.Y[order_[pos_]];
+    data_samples_.norm[i] = data_buf_.norm[order_[pos_]];
+    pos_++;
+  }
+  matrix = &data_samples_;
+  return num_samples_;
+}
+
+// Return to the begining of the data buffer.
+void PythonReader::Reset() { pos_ = 0; }
 
 //------------------------------------------------------------------------------
 // Implementation of OndiskReader.

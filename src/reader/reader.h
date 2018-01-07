@@ -199,6 +199,53 @@ class InmemReader : public Reader {
 };
 
 //------------------------------------------------------------------------------
+// PythonReader is used for Python
+// Sampling data from memory buffer.
+//------------------------------------------------------------------------------
+class PythonReader : public Reader {
+ public:
+  // Constructor and Destructor
+  PythonReader() : pos_(0) { }
+  ~PythonReader() { }
+
+  // Initialized from DMatrix
+  virtual void Initialize(const DMatrix* const matrix);
+
+  // Sample data from the memory buffer.
+  virtual index_t Samples(DMatrix* &matrix);
+
+  // Return to the begining of the data.
+  virtual void Reset();
+
+  // Free the memory of data matrix.
+  virtual void Clear() {
+      data_buf_.Release();
+  }
+
+  // If shuffle data ?
+  virtual inline void SetShuffle(bool shuffle) {
+      this->shuffle_ = shuffle;
+      if (shuffle_ && !order_.empty()) {
+          random_shuffle(order_.begin(), order_.end());
+      }
+  }
+
+ protected:
+  /* Reader will load all the data
+  into this buffer */
+  DMatrix data_buf_;
+  /* Number of record at each samplling */
+  index_t num_samples_;
+  /* Position for samplling */
+  index_t pos_;
+  /* For random shuffle */
+  std::vector<index_t> order_;
+
+ private:
+  DISALLOW_COPY_AND_ASSIGN(PythonReader);
+};
+
+//------------------------------------------------------------------------------
 // Samplling data from disk file.
 // OndiskReader is used to train very big data, which cannot be
 // loaded into main memory of current single machine.

@@ -135,7 +135,7 @@ programming convenient.
   } while (0)
 
 //------------------------------------------------------------------------------
-// This marcro is used to disallow copy constructor and assign operator in
+// This macro is used to disallow copy constructor and assign operator in
 // class definition. For more details, please refer to Google coding style
 // document
 // [http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml
