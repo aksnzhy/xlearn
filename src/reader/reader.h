@@ -89,6 +89,12 @@ class Reader {
   // training, and this is good for SGD.
   virtual void Initialize(const std::string& filename) = 0;
 
+  // initialize from DMatrix
+  // this method should be implemented by PythonReader
+  virtual void Initialize(const DMatrix* const dmatrix) {
+    CHECK(false);
+  }
+
   // Sample data from disk or from memory buffer.
   // Return the number of record in each samplling.
   // Samples() will return 0 when reaching end of the data.
@@ -207,6 +213,9 @@ class PythonReader : public Reader {
   // Constructor and Destructor
   PythonReader() : pos_(0) { }
   ~PythonReader() { }
+
+  // Pre-load all the data into memory buffer.
+  virtual void Initialize(const std::string& filename);
 
   // Initialized from DMatrix
   virtual void Initialize(const DMatrix* const matrix);

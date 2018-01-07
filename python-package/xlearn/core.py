@@ -72,6 +72,3 @@ class DMatrix(object):
                                                   ctypes.c_size_t(csc.shape[0]),
                                                   ctypes.byref(self.handle)))
 
-def train(dmatrix, params={}):
-
-    pass

@@ -37,6 +37,7 @@ namespace xLearn {
 CLASS_REGISTER_IMPLEMENT_REGISTRY(xLearn_reader_registry, Reader);
 REGISTER_READER("memory", InmemReader);
 REGISTER_READER("disk", OndiskReader);
+REGISTER_READER("python", PythonReader);
 
 // Check current file format and
 // return 'libsvm', 'libffm', or 'csv'.
@@ -217,6 +218,11 @@ index_t InmemReader::Samples(DMatrix* &matrix) {
 
 // Return to the begining of the data buffer.
 void InmemReader::Reset() { pos_ = 0; }
+
+void PythonReader::Initialize(const std::string &filename) {
+  // cause the Initialize is pure abstruct func
+  CHECK(false);
+}
 
 void PythonReader::Initialize(const DMatrix *const matrix) {
   data_buf_ = *matrix;

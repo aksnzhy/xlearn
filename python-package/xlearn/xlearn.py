@@ -4,6 +4,8 @@ import os
 import ctypes
 from .base import _LIB, XLearnHandle
 from .base import _check_call, c_str
+from .compat import STRING_TYPES
+from .core import DMatrix
 
 class XLearn(object):
 	"""XLearn is the core interface used by python API."""
@@ -83,27 +85,37 @@ class XLearn(object):
 		"""
 		_check_call(_LIB.XLearnShow(ctypes.byref(self.handle)))
 
-	def setTrain(self, train_path):
-		"""Set file path of training data.
+	def setTrain(self, train_data):
+		"""Set file path of training data / DMatrix of training
 
 		Parameters
 		----------
-		train_path : str
-		   the path of training data
+		train_path : str / DMatrix
+		   the path of training data / DMatrix of training
 		"""
-		_check_call(_LIB.XLearnSetTrain(ctypes.byref(self.handle), c_str(train_path)))
+		if isinstance(train_data, STRING_TYPES):
+		    _check_call(_LIB.XLearnSetTrain(ctypes.byref(self.handle), c_str(train_data)))
+		elif isinstance(train_data, DMatrix):
+			_check_call(_LIB.XLearnSetTrainDMatrix(ctypes.byref(self.handle), ctypes.byref(train_data.handle)))
+		else:
+			raise Exception("Unkown Type")
 
-	def setTest(self, test_path):
-		"""Set file path of test data.
+	def setTest(self, test_data):
+		"""Set file path of test data / DMatrix
 
 		Parameters
 		----------
 		test_path : str
 		   the path of test data.
 		"""
-		_check_call(_LIB.XLearnSetTest(ctypes.byref(self.handle), c_str(test_path)))
+		if isinstance(test_data, STRING_TYPES):
+		    _check_call(_LIB.XLearnSetTest(ctypes.byref(self.handle), c_str(test_data)))
+		elif isinstance(test_data, DMatrix):
+			_check_call(_LIB.XLearnSetTestDMatrix(ctypes.byref(self.handle), ctypes.byref(test_data.handle)))
+		else:
+			raise Exception("Unkown Type")
 
-	def setValidate(self, val_path):
+	def setValidate(self, val_data):
 		"""Set file path of validation data.
 
 		Parameters
@@ -111,7 +123,12 @@ class XLearn(object):
 		val_path : str
 		   the path of validation data.
 		"""
-		_check_call(_LIB.XLearnSetValidate(ctypes.byref(self.handle), c_str(val_path)))
+		if isinstance(val_data, STRING_TYPES):
+		    _check_call(_LIB.XLearnSetValidate(ctypes.byref(self.handle), c_str(val_path)))
+		elif isinstance(val_data, DMatrix):
+			_check_call(_LIB.XLearnSetValidateDMatrix(ctypes.byref(self.handle), ctypes.byref(val_data.handle)))
+		else:
+			raise Exception("Unkown Type")
 
 	def setQuiet(self):
 		"""Set xlearn to quiet model"""
@@ -155,7 +172,7 @@ class XLearn(object):
 		_check_call(_LIB.XLearnSetBool(ctypes.byref(self.handle), 
 			c_str(key), ctypes.c_bool(True)))
 
-	def fit(self, param, model_path):
+	def fit(self, dmatrix, param, model_path):
 		"""Check hyper-parameters, train model, and dump model.
 
 		Parameters
@@ -165,6 +182,7 @@ class XLearn(object):
 		model_path : str
 		  path of model checkpoint.
 		"""
+		self.setTrain(dmatrix)
 		self._set_Param(param)
 		_check_call(_LIB.XLearnFit(ctypes.byref(self.handle), c_str(model_path)))
 

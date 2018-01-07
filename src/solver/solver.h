@@ -116,6 +116,8 @@ class Solver {
   void init_train();
   void init_predict();
   void init_log();
+  void init_reader_by_dmatrix();
+  void init_reader_by_file();
   void checker(int argc, char* argv[]);
   void checker(HyperParam& hyper_param);
 

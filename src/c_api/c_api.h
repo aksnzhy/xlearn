@@ -26,6 +26,7 @@ to other languages.
 
 #include "src/base/common.h"
 #include "src/data/hyper_parameters.h"
+#include "src/data/data_structure.h"
 #include "src/solver/solver.h"
 
 #ifdef __cplusplus
@@ -61,11 +62,18 @@ XL_DLL int XLearnShow(XL *out);
 // Set file path of the training data
 XL_DLL int XLearnSetTrain(XL *out, const char *train_path);
 
+// Set DMatrix of training data
+XL_DLL int XLearnSetTrainDMatrix(XL *out, xLearn::DMatrix *dmatrix);
+
 // Set file path of the test data
 XL_DLL int XLearnSetTest(XL *out, const char *test_path);
 
+XL_DLL int XLearnSetTestDMatrix(XL *out, xLearn::DMatrix *dmatrix);
+
 // Set file path of the validation data
 XL_DLL int XLearnSetValidate(XL *out, const char *val_path);
+
+XL_DLL int XLearnSetValidateDMatrix(XL *out, xLearn::DMatrix *dmatrix);
 
 // Start to train
 XL_DLL int XLearnFit(XL *out, const char *model_path);

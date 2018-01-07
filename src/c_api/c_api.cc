@@ -30,7 +30,6 @@ This file is the implementation of C API for xLearn.
 #include "src/base/timer.h"
 #include "src/c_api/c_api.h"
 #include "src/c_api/c_api_error.h"
-#include "src/data/data_structure.h"
 
 // Say hello to user
 XL_DLL int XLearnHello() {
@@ -88,6 +87,13 @@ XL_DLL int XLearnSetTrain(XL *out, const char *train_path) {
   API_END();
 }
 
+XL_DLL int XLearnSetTrainDMatrix(XL *out, xLearn::DMatrix* dmatrix) {
+  API_BEGIN();
+  XLearn* xl = reinterpret_cast<XLearn*>(*out);
+  xl->GetHyperParam().train_dmatrix = dmatrix;
+  API_END();
+}
+
 // Set file path of the test data
 XL_DLL int XLearnSetTest(XL *out, const char *test_path) {
   API_BEGIN();
@@ -96,11 +102,25 @@ XL_DLL int XLearnSetTest(XL *out, const char *test_path) {
   API_END();
 }
 
+XL_DLL int XLearnSetTestDMatrix(XL *out, xLearn::DMatrix* dmatrix) {
+  API_BEGIN();
+    XLearn* xl = reinterpret_cast<XLearn*>(*out);
+    xl->GetHyperParam().test_dmatrix = dmatrix;
+  API_END();
+}
+
 // Set file path of the validation data
 XL_DLL int XLearnSetValidate(XL *out, const char *val_path) {
   API_BEGIN();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   xl->GetHyperParam().validate_set_file = std::string(val_path);
+  API_END();
+}
+
+XL_DLL int XLearnSetValidateDMatrix(XL *out, xLearn::DMatrix* dmatrix) {
+  API_BEGIN();
+    XLearn* xl = reinterpret_cast<XLearn*>(*out);
+    xl->GetHyperParam().validate_dmatrix = dmatrix;
   API_END();
 }
 

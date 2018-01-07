@@ -72,7 +72,11 @@ void Solver::print_logo() const {
 Reader* Solver::create_reader() {
   Reader* reader;
   std::string str = hyper_param_.on_disk ? "disk" : "memory";
-  reader = CREATE_READER(str.c_str());
+  if (!hyper_param_.reader_type.empty()) {
+    reader = CREATE_READER(hyper_param_.reader_type.c_str());
+  } else {
+    reader = CREATE_READER(str.c_str());
+  }
   if (reader == nullptr) {
     LOG(FATAL) << "Cannot create reader: " << str;
   }
@@ -184,6 +188,57 @@ void Solver::init_log() {
   InitializeLogger(StringPrintf("%s.INFO", prefix.c_str()),
               StringPrintf("%s.WARN", prefix.c_str()),
               StringPrintf("%s.ERROR", prefix.c_str()));
+}
+
+// Initialize reader
+void Solver::init_reader_by_dmatrix() {
+  std::vector<DMatrix> dmatrix_list;
+  if (hyper_param_.cross_validation) {
+    CHECK_GT(hyper_param_.num_folds, 0);
+    LOG(ERR) << "python interface not support cross validation";
+  }
+  int num_reader{0};
+  if (hyper_param_.cross_validation) {
+    num_reader += hyper_param_.num_folds;
+    int batch_size = std::ceil(
+      static_cast<double>(hyper_param_.train_dmatrix->row_length) / hyper_param_.num_folds);
+    DMatrix batch;
+    batch.ResetMatrix(batch_size, hyper_param_.train_dmatrix->has_label);
+    for (int i = 0; i < hyper_param_.num_folds; ++ i) {
+      size_t real_size = hyper_param_.train_dmatrix->GetMiniBatch(batch_size, batch);
+      dmatrix_list.emplace_back(batch);
+    }
+  } else {
+    num_reader += 1;
+    CHECK(hyper_param_.train_dmatrix != nullptr);
+    dmatrix_list.push_back(*hyper_param_.train_dmatrix);
+    if (hyper_param_.validate_dmatrix != nullptr) {
+      num_reader += 1;
+      dmatrix_list.push_back(*hyper_param_.validate_dmatrix);
+    }
+  }
+  LOG(INFO) << "Number of Readers: " << num_reader;
+  reader_.resize(num_reader, nullptr);
+  // Create Reader
+  for (int i = 0; i < num_reader; ++i) {
+    reader_[i] = create_reader();
+    reader_[i]->Initialize(&dmatrix_list[i]);
+    if (!hyper_param_.on_disk) {
+      reader_[i]->SetShuffle(true);
+    }
+    if (reader_[i] == nullptr) {
+      print_error(
+        StringPrintf("Cannot create reader from DMatrix %d",
+                     i)
+      );
+      exit(0);
+    }
+    LOG(INFO) << "Init Reader Number: " << i;
+  }
+}
+
+// Initialize reader
+void Solver::init_reader_by_file() {
 }
 
 // Initialize training task
