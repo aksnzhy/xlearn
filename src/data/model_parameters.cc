@@ -205,7 +205,7 @@ Model::Model(const std::string& filename) {
 // Serialize current model to a disk file
 void Model::Serialize(const std::string& filename) {
   CHECK_NE(filename.empty(), true);
-  FILE* file = OpenFileOrDie(filename.c_str(), "w");
+  FILE* file = OpenFileOrDie(filename.c_str(), "wb");
   // Write score function
   WriteStringToFile(file, score_func_);
   // Write loss function
@@ -239,7 +239,7 @@ void Model::SerializeToTxt(const std::string& filename) {
 // Deserialize model from a checkpoint file
 bool Model::Deserialize(const std::string& filename) {
   CHECK_NE(filename.empty(), true);
-  FILE* file = OpenFileOrDie(filename.c_str(), "r");
+  FILE* file = OpenFileOrDie(filename.c_str(), "rb");
   if (file == NULL) { return false; }
   // Read score function
   ReadStringFromFile(file, score_func_);

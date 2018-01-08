@@ -123,6 +123,10 @@ Metric* Solver::create_metric() {
 // Initialize Solver
 void Solver::Initialize(int argc, char* argv[]) {
 #ifdef WIN32
+	// We need to set ENABLE_VIRTUAL_TERMINAL_PROCESSING to enable ANSI sequence parsing in Windows console
+	// in order to achieve colorful output.
+	// *Note this is only supported on Windows 10.*
+	// See https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences for details.
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	DWORD mode;
 	GetConsoleMode(hConsole, &mode);

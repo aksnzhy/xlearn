@@ -43,7 +43,7 @@ REGISTER_READER("disk", OndiskReader);
 // This function will also check if current
 // data has the label y.
 std::string Reader::check_file_format() {
-  FILE* file = OpenFileOrDie(filename_.c_str(), "r");
+  FILE* file = OpenFileOrDie(filename_.c_str(), "rb");
   // get the first line of data
   std::string data_line;
   GetLine(file, data_line);
@@ -117,7 +117,7 @@ bool InmemReader::hash_binary(const std::string& filename) {
   std::string bin_file = filename + ".bin";
   // If the ".bin" file does not exists, return false.
   if (!FileExist(bin_file.c_str())) { return false; }
-  FILE* file = OpenFileOrDie(bin_file.c_str(), "r");
+  FILE* file = OpenFileOrDie(bin_file.c_str(), "rb");
   // Check the first hash value
   uint64 hash_1 = 0;
   ReadDataFromDisk(file, (char*)&hash_1, sizeof(hash_1));
@@ -227,7 +227,7 @@ void OndiskReader::Initialize(const std::string& filename) {
                << "You set change the block size via configuration.";
   }
   // Open file
-  file_ptr_ = OpenFileOrDie(filename_.c_str(), "r");
+  file_ptr_ = OpenFileOrDie(filename_.c_str(), "rb");
 }
 
 // Return to the begining of the file

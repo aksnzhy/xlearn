@@ -38,7 +38,7 @@ void FileSpliter::split(const std::string& filename, int num_blocks) {
   CHECK_NE(filename.empty(), true);
   CHECK_GE(num_blocks, 2); // At least we need two blocks for CV.
   // Input
-  FILE* file_ptr_read = OpenFileOrDie(filename.c_str(), "r");
+  FILE* file_ptr_read = OpenFileOrDie(filename.c_str(), "rb");
   int file_desc_read = fileno(file_ptr_read);
   uint64 file_size = GetFileSize(file_ptr_read);
   uint64 average_block_size = file_size / num_blocks;
@@ -51,7 +51,7 @@ void FileSpliter::split(const std::string& filename, int num_blocks) {
 
   for (int i = 0; i < num_blocks; ++i) {
     std::string name = StringPrintf("%s_%d", filename.c_str(), i);
-    file_ptr_write[i] = OpenFileOrDie(name.c_str(), "w+");
+    file_ptr_write[i] = OpenFileOrDie(name.c_str(), "wb+");
     file_desc_write[i] = fileno(file_ptr_write[i]);
     int ret = ftruncate(file_desc_write[i], 
       next_block_size + kMaxLineSize);
