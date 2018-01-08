@@ -525,11 +525,17 @@ bool Checker::check_train_param(HyperParam& hyper_param) {
   /*********************************************************
    *  Check file path                                      *
    *********************************************************/
-  if (!FileExist(hyper_param.train_set_file.c_str())) {
+  if (!FileExist(hyper_param.train_set_file.c_str()) &&
+      hyper_param.reader_type != "python") {
     print_error(
       StringPrintf("Training data file: %s does not exist.", 
                     hyper_param.train_set_file.c_str())
     );
+    bo = false;
+  }
+  if (hyper_param.reader_type == "python" &&
+      hyper_param.train_dmatrix == nullptr) {
+    print_error("Training DMatrix does not exist.");
     bo = false;
   }
   if (!hyper_param.validate_set_file.empty() &&
@@ -794,12 +800,18 @@ bool Checker::check_prediction_param(HyperParam& hyper_param) {
  /*********************************************************
   *  Check the path of test set file                      *
   *********************************************************/
- if (!FileExist(hyper_param.test_set_file.c_str())) {
+ if (!FileExist(hyper_param.test_set_file.c_str()) &&
+     hyper_param.reader_type != "python") {
     print_error(
       StringPrintf("Test set file: %s does not exist.",
            hyper_param.test_set_file.c_str())
     );
     bo =  false;
+ }
+ if (hyper_param.reader_type == "python" &&
+     hyper_param.test_dmatrix == nullptr) {
+   print_error("Test DMatrix is null");
+   bo = false;
  }
  /*********************************************************
   *  Check the path of model file                         *

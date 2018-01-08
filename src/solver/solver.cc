@@ -191,13 +191,13 @@ void Solver::init_log() {
 }
 
 // Initialize reader
-void Solver::init_reader_by_dmatrix() {
+void Solver::init_reader_by_dmatrix(int &num_reader) {
   std::vector<DMatrix> dmatrix_list;
   if (hyper_param_.cross_validation) {
     CHECK_GT(hyper_param_.num_folds, 0);
     LOG(ERR) << "python interface not support cross validation";
   }
-  int num_reader{0};
+  num_reader = 0;
   if (hyper_param_.cross_validation) {
     num_reader += hyper_param_.num_folds;
     int batch_size = std::ceil(
@@ -211,8 +211,14 @@ void Solver::init_reader_by_dmatrix() {
   } else {
     num_reader += 1;
     CHECK(hyper_param_.train_dmatrix != nullptr);
+    std::cout << "check train dmatrix" << std::endl;
+    std::cout << hyper_param_.train_dmatrix->row_length << std::endl;
+    DMatrix tmp = *hyper_param_.train_dmatrix;
+    std::cout << "copy is ok" << std::endl;
     dmatrix_list.push_back(*hyper_param_.train_dmatrix);
+    std::cout << "push back ok" << std::endl;
     if (hyper_param_.validate_dmatrix != nullptr) {
+      std::cout << "in validate" << std::endl;
       num_reader += 1;
       dmatrix_list.push_back(*hyper_param_.validate_dmatrix);
     }
@@ -238,26 +244,7 @@ void Solver::init_reader_by_dmatrix() {
 }
 
 // Initialize reader
-void Solver::init_reader_by_file() {
-}
-
-// Initialize training task
-void Solver::init_train() {
-  /*********************************************************
-   *  Initialize thread pool                               *
-   *********************************************************/
-  size_t threadNumber = std::thread::hardware_concurrency();;
-  if (hyper_param_.thread_number != 0) {
-    threadNumber = hyper_param_.thread_number;
-  }
-  pool_ = new ThreadPool(threadNumber);
-  /*********************************************************
-   *  Initialize Reader                                    *
-   *********************************************************/
-  Timer timer;
-  timer.tic();
-  print_action("Read Problem ...");
-  LOG(INFO) << "Start to init Reader";
+void Solver::init_reader_by_file(int &num_reader) {
   // Split file
   if (hyper_param_.cross_validation) {
     CHECK_GT(hyper_param_.num_folds, 0);
@@ -268,7 +255,7 @@ void Solver::init_train() {
               << " parts.";
   }
   // Get the Reader list
-  int num_reader = 0;
+  num_reader = 0;
   std::vector<std::string> file_list;
   if (hyper_param_.cross_validation) {
     num_reader += hyper_param_.num_folds;
@@ -304,12 +291,42 @@ void Solver::init_train() {
     }
     LOG(INFO) << "Init Reader: " << file_list[i];
   }
+}
+
+// Initialize training task
+void Solver::init_train() {
+  /*********************************************************
+   *  Initialize thread pool                               *
+   *********************************************************/
+  size_t threadNumber = std::thread::hardware_concurrency();;
+  if (hyper_param_.thread_number != 0) {
+    threadNumber = hyper_param_.thread_number;
+  }
+  pool_ = new ThreadPool(threadNumber);
+  /*********************************************************
+   *  Initialize Reader                                    *
+   *********************************************************/
+  Timer timer;
+  timer.tic();
+  print_action("Read Problem ...");
+  LOG(INFO) << "Start to init Reader";
+  int num_reader{0};
+  if (hyper_param_.reader_type == "python" &&
+      hyper_param_.train_set_file.empty()) {
+    std::cout << "using python" << std::endl;
+    init_reader_by_dmatrix(num_reader);
+  } else {
+    init_reader_by_file(num_reader);
+  }
+  std::cout << "finish create reader" << std::endl;
+
   /*********************************************************
    *  Read problem                                         *
    *********************************************************/
   DMatrix* matrix = nullptr;
   index_t max_feat = 0, max_field = 0;
   for (int i = 0; i < num_reader; ++i) {
+    std::cout << "start count" << std::endl;
     while(reader_[i]->Samples(matrix)) {
       int tmp = matrix->MaxFeat();
       if (tmp > max_feat) { max_feat = tmp; }
@@ -317,6 +334,7 @@ void Solver::init_train() {
         tmp = matrix->MaxField();
         if (tmp > max_field) { max_field = tmp; }
       }
+      std::cout << "Counting" << std::endl;
     }
     // Return to the begining of target file.
     reader_[i]->Reset();
@@ -469,8 +487,14 @@ void Solver::init_predict() {
   timer.tic();
   // Create Reader
   reader_.resize(1, create_reader());
-  CHECK_NE(hyper_param_.test_set_file.empty(), true);
-  reader_[0]->Initialize(hyper_param_.test_set_file);
+  if (hyper_param_.reader_type == "python" &&
+      hyper_param_.test_set_file.empty()) {
+    CHECK(hyper_param_.test_dmatrix != nullptr);
+    reader_[0]->Initialize(hyper_param_.test_dmatrix);
+  } else {
+    CHECK_NE(hyper_param_.test_set_file.empty(), true);
+    reader_[0]->Initialize(hyper_param_.test_set_file);
+  }
   reader_[0]->SetShuffle(false);
   if (reader_[0] == nullptr) {
    print_info(
@@ -502,14 +526,15 @@ void Solver::init_predict() {
  ******************************************************************************/
 
 // Start training or inference
-void Solver::StartWork() {
+std::vector<real_t> Solver::StartWork() {
   if (hyper_param_.is_train) {
     LOG(INFO) << "Start training work.";
     start_train_work();
   } else {
     LOG(INFO) << "Start inference work.";
-    start_prediction_work();
+    return start_prediction_work();
   }
+  return std::vector<real_t> ();
 }
 
 // Train
@@ -583,7 +608,7 @@ void Solver::start_train_work() {
 }
 
 // Inference
-void Solver::start_prediction_work() {
+std::vector<real_t> Solver::start_prediction_work() {
   print_action("Start to predict ...");
   Predictor pdc;
   pdc.Initialize(reader_[0],
@@ -593,7 +618,7 @@ void Solver::start_prediction_work() {
                  hyper_param_.sign,
                  hyper_param_.sigmoid);
   // Predict and write output
-  pdc.Predict();
+  return pdc.Predict();
 }
 
 /******************************************************************************

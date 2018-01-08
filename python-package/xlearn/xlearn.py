@@ -124,7 +124,7 @@ class XLearn(object):
 		   the path of validation data.
 		"""
 		if isinstance(val_data, STRING_TYPES):
-		    _check_call(_LIB.XLearnSetValidate(ctypes.byref(self.handle), c_str(val_path)))
+		    _check_call(_LIB.XLearnSetValidate(ctypes.byref(self.handle), c_str(val_data)))
 		elif isinstance(val_data, DMatrix):
 			_check_call(_LIB.XLearnSetValidateDMatrix(ctypes.byref(self.handle), ctypes.byref(val_data.handle)))
 		else:
@@ -172,7 +172,7 @@ class XLearn(object):
 		_check_call(_LIB.XLearnSetBool(ctypes.byref(self.handle), 
 			c_str(key), ctypes.c_bool(True)))
 
-	def fit(self, dmatrix, param, model_path):
+	def fit(self, param, model_path):
 		"""Check hyper-parameters, train model, and dump model.
 
 		Parameters
@@ -182,7 +182,6 @@ class XLearn(object):
 		model_path : str
 		  path of model checkpoint.
 		"""
-		self.setTrain(dmatrix)
 		self._set_Param(param)
 		_check_call(_LIB.XLearnFit(ctypes.byref(self.handle), c_str(model_path)))
 

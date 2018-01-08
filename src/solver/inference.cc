@@ -30,7 +30,7 @@ namespace xLearn {
 
 // Given a pre-trained model and test data, the predictor
 // will return the prediction output
-void Predictor::Predict() {
+std::vector<real_t> Predictor::Predict() {
   std::ofstream o_file(out_file_);
   static std::vector<real_t> out;
   DMatrix* matrix = nullptr;
@@ -59,6 +59,7 @@ void Predictor::Predict() {
         loss_->GetLoss())
     );
   }
+  return std::vector<real_t>(out);
 }
 
 // Convert output by using the sigmoid function.

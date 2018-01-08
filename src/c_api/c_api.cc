@@ -87,10 +87,11 @@ XL_DLL int XLearnSetTrain(XL *out, const char *train_path) {
   API_END();
 }
 
-XL_DLL int XLearnSetTrainDMatrix(XL *out, xLearn::DMatrix* dmatrix) {
+XL_DLL int XLearnSetTrainDMatrix(XL *out, XL *dmatrix) {
   API_BEGIN();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
-  xl->GetHyperParam().train_dmatrix = dmatrix;
+  xl->GetHyperParam().train_dmatrix = reinterpret_cast<xLearn::DMatrix*>(*dmatrix);
+  xl->GetHyperParam().reader_type = "python";
   API_END();
 }
 
@@ -102,10 +103,10 @@ XL_DLL int XLearnSetTest(XL *out, const char *test_path) {
   API_END();
 }
 
-XL_DLL int XLearnSetTestDMatrix(XL *out, xLearn::DMatrix* dmatrix) {
+XL_DLL int XLearnSetTestDMatrix(XL *out, XL* dmatrix) {
   API_BEGIN();
     XLearn* xl = reinterpret_cast<XLearn*>(*out);
-    xl->GetHyperParam().test_dmatrix = dmatrix;
+    xl->GetHyperParam().test_dmatrix = reinterpret_cast<xLearn::DMatrix*>(*dmatrix);
   API_END();
 }
 
@@ -117,10 +118,10 @@ XL_DLL int XLearnSetValidate(XL *out, const char *val_path) {
   API_END();
 }
 
-XL_DLL int XLearnSetValidateDMatrix(XL *out, xLearn::DMatrix* dmatrix) {
+XL_DLL int XLearnSetValidateDMatrix(XL *out, XL *dmatrix) {
   API_BEGIN();
     XLearn* xl = reinterpret_cast<XLearn*>(*out);
-    xl->GetHyperParam().validate_dmatrix = dmatrix;
+    xl->GetHyperParam().validate_dmatrix = reinterpret_cast<xLearn::DMatrix*>(*dmatrix);
   API_END();
 }
 
@@ -170,7 +171,7 @@ XL_DLL int XLearnPredict(XL *out, const char *model_path, const char *out_path) 
   xl->GetHyperParam().is_train = false;
   xl->GetSolver().Initialize(xl->GetHyperParam());
   xl->GetSolver().SetPredict();
-  xl->GetSolver().StartWork();
+  std::vector<real_t> out = xl->GetSolver().StartWork();
   xl->GetSolver().Clear();
   print_info(
     StringPrintf("Total time cost: %.2f (sec)", 
@@ -268,6 +269,14 @@ XL_DLL int XLDMatrixCreateFromFile(const char *fname,
                                    int silent,
                                    XL* out) {
   API_BEGIN();
+  xLearn::InmemReader *reader = new xLearn::InmemReader();
+  reader->Initialize(fname);
+  std::cout << reader->GetDataBuf().row_length << std::endl;
+  xLearn::DMatrix *mat = new xLearn::DMatrix();
+  mat->CopyFrom(&reader->GetDataBuf());
+  *out = mat;
+  xLearn::DMatrix *tmp = reinterpret_cast<xLearn::DMatrix*>(*out);
+  std::cout << tmp->row_length << std::endl;
   API_END();
 }
 

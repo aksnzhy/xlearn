@@ -229,6 +229,7 @@ void PythonReader::Initialize(const DMatrix *const matrix) {
   has_label_ = data_buf_.has_label;
   // Init data_samples_
   num_samples_ = data_buf_.row_length;
+  data_samples_.ResetMatrix(num_samples_, has_label_);
   // for shuffle
   order_.resize(num_samples_);
   for (int i = 0; i < order_.size(); ++i) {
@@ -238,6 +239,8 @@ void PythonReader::Initialize(const DMatrix *const matrix) {
 
 // Smaple data from memory buffer.
 index_t PythonReader::Samples(DMatrix* &matrix) {
+  std::cout << "num samples: " << num_samples_ << std::endl;
+  std::cout << "row_length: " << data_buf_.row_length << " " << pos_ << std::endl;
   for (int i = 0; i < num_samples_; ++i) {
     if (pos_ >= data_buf_.row_length) {
       // End of the data buffer
@@ -257,6 +260,7 @@ index_t PythonReader::Samples(DMatrix* &matrix) {
     pos_++;
   }
   matrix = &data_samples_;
+  std::cout << "finish samples" << std::endl;
   return num_samples_;
 }
 

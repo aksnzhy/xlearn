@@ -112,11 +112,11 @@ struct HyperParam {
   This value can be empty. */
   std::string validate_set_file;
   /* DMatrix of training dataset from python*/
-  DMatrix* train_dmatrix;
+  DMatrix* train_dmatrix = nullptr;
   /* DMatrix of test dataset from python*/
-  DMatrix* test_dmatrix;
+  DMatrix* test_dmatrix = nullptr;
   /* DMatrix of validation set from python */
-  DMatrix* validate_dmatrix;
+  DMatrix* validate_dmatrix = nullptr;
   /* Filename of model checkpoint
   On default, model_file = train_set_file + ".model" */
   std::string model_file;

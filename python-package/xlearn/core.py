@@ -21,7 +21,7 @@ class DMatrix(object):
     _feature_names = None
     _field_names = None
 
-    def __init__(self, data, label=None, field=None, silent=None,
+    def __init__(self, data, label=None, field=None, silent=1,
                  feature_names=None):
         if data is None:
             self.handle = None

@@ -180,6 +180,10 @@ class InmemReader : public Reader {
     }
   }
 
+  DMatrix& GetDataBuf() {
+    return data_buf_;
+  }
+
  protected:
   /* Reader will load all the data 
   into this buffer */

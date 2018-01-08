@@ -78,7 +78,7 @@ class Solver {
   void Initialize(HyperParam& hyper_param);
 
   // Start a training task or start an inference task.
-  void StartWork();
+  std::vector<real_t> StartWork();
 
   // Clear the xLearn environment.
   void Clear();
@@ -116,14 +116,14 @@ class Solver {
   void init_train();
   void init_predict();
   void init_log();
-  void init_reader_by_dmatrix();
-  void init_reader_by_file();
+  void init_reader_by_dmatrix(int &num_reader);
+  void init_reader_by_file(int &num_reader);
   void checker(int argc, char* argv[]);
   void checker(HyperParam& hyper_param);
 
   // Start function
   void start_train_work();
-  void start_prediction_work();
+  std::vector<real_t> start_prediction_work();
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Solver);
