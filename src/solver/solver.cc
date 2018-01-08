@@ -211,14 +211,9 @@ void Solver::init_reader_by_dmatrix(int &num_reader) {
   } else {
     num_reader += 1;
     CHECK(hyper_param_.train_dmatrix != nullptr);
-    std::cout << "check train dmatrix" << std::endl;
-    std::cout << hyper_param_.train_dmatrix->row_length << std::endl;
     DMatrix tmp = *hyper_param_.train_dmatrix;
-    std::cout << "copy is ok" << std::endl;
     dmatrix_list.push_back(*hyper_param_.train_dmatrix);
-    std::cout << "push back ok" << std::endl;
     if (hyper_param_.validate_dmatrix != nullptr) {
-      std::cout << "in validate" << std::endl;
       num_reader += 1;
       dmatrix_list.push_back(*hyper_param_.validate_dmatrix);
     }
@@ -313,12 +308,10 @@ void Solver::init_train() {
   int num_reader{0};
   if (hyper_param_.reader_type == "python" &&
       hyper_param_.train_set_file.empty()) {
-    std::cout << "using python" << std::endl;
     init_reader_by_dmatrix(num_reader);
   } else {
     init_reader_by_file(num_reader);
   }
-  std::cout << "finish create reader" << std::endl;
 
   /*********************************************************
    *  Read problem                                         *
@@ -326,7 +319,6 @@ void Solver::init_train() {
   DMatrix* matrix = nullptr;
   index_t max_feat = 0, max_field = 0;
   for (int i = 0; i < num_reader; ++i) {
-    std::cout << "start count" << std::endl;
     while(reader_[i]->Samples(matrix)) {
       int tmp = matrix->MaxFeat();
       if (tmp > max_feat) { max_feat = tmp; }
@@ -334,7 +326,6 @@ void Solver::init_train() {
         tmp = matrix->MaxField();
         if (tmp > max_field) { max_field = tmp; }
       }
-      std::cout << "Counting" << std::endl;
     }
     // Return to the begining of target file.
     reader_[i]->Reset();

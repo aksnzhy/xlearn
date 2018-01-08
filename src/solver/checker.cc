@@ -659,13 +659,16 @@ void Checker::check_conflict_train(HyperParam& hyper_param) {
                   "xLearn will not dump model checkpoint to disk.");
     hyper_param.model_file.clear();
   }
-  if (hyper_param.validate_set_file.empty() && hyper_param.early_stop) {
+  if (hyper_param.validate_set_file.empty() &&
+      hyper_param.validate_dmatrix == nullptr &&
+      hyper_param.early_stop) {
     print_warning("Validation file not found, xLearn has already "
                   "disable early-stopping.");
     hyper_param.early_stop = false;
   }
   if (hyper_param.metric.compare("none") != 0 &&
       hyper_param.validate_set_file.empty() &&
+      hyper_param.validate_dmatrix == nullptr &&
       !hyper_param.cross_validation) {
     print_warning(
       StringPrintf("Validation file not found, xLearn has already "

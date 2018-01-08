@@ -239,8 +239,6 @@ void PythonReader::Initialize(const DMatrix *const matrix) {
 
 // Smaple data from memory buffer.
 index_t PythonReader::Samples(DMatrix* &matrix) {
-  std::cout << "num samples: " << num_samples_ << std::endl;
-  std::cout << "row_length: " << data_buf_.row_length << " " << pos_ << std::endl;
   for (int i = 0; i < num_samples_; ++i) {
     if (pos_ >= data_buf_.row_length) {
       // End of the data buffer
@@ -260,7 +258,6 @@ index_t PythonReader::Samples(DMatrix* &matrix) {
     pos_++;
   }
   matrix = &data_samples_;
-  std::cout << "finish samples" << std::endl;
   return num_samples_;
 }
 

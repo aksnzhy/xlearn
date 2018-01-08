@@ -271,12 +271,9 @@ XL_DLL int XLDMatrixCreateFromFile(const char *fname,
   API_BEGIN();
   xLearn::InmemReader *reader = new xLearn::InmemReader();
   reader->Initialize(fname);
-  std::cout << reader->GetDataBuf().row_length << std::endl;
   xLearn::DMatrix *mat = new xLearn::DMatrix();
   mat->CopyFrom(&reader->GetDataBuf());
   *out = mat;
-  xLearn::DMatrix *tmp = reinterpret_cast<xLearn::DMatrix*>(*out);
-  std::cout << tmp->row_length << std::endl;
   API_END();
 }
 
