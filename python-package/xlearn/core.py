@@ -43,6 +43,10 @@ class DMatrix(object):
                 self._init_from_csr(csr, csr_field)
             except:
                 raise TypeError('can not initialize DMatrix from {}'.format(type(data).__name__))
+        if label is not None:
+            _check_call(_LIB.XLDMatrixSetLabel(ctypes.byref(self.handle),
+                                               c_array(ctypes.c_float, label),
+                                               ctypes.c_size_t(len(label))))
 
     def _init_from_csr(self, csr, field):
         if len(csr.indices) != len(csr.data):
@@ -56,6 +60,7 @@ class DMatrix(object):
                                                   ctypes.c_size_t(len(csr.indptr) - 1),
                                                   ctypes.c_size_t(len(csr.data)),
                                                   ctypes.c_size_t(csr.shape[1]),
+                                                  ctypes.c_bool(field is not None),
                                                   ctypes.byref(self.handle)))
 
     def _init_from_csc(self, csc, field):
@@ -70,5 +75,6 @@ class DMatrix(object):
                                                   ctypes.c_size_t(len(csc.indptr) - 1),
                                                   ctypes.c_size_t(len(csc.data)),
                                                   ctypes.c_size_t(csc.shape[0]),
+                                                  ctypes.c_bool(field is not None),
                                                   ctypes.byref(self.handle)))
 

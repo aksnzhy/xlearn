@@ -224,15 +224,6 @@ struct DMatrix {
     this->Y = label;
   }
 
-  void SetLabel(const real_t* label,
-                const size_t& len) {
-    has_label = true;
-    this->Y.reserve(len);
-    for (size_t i = 0; i < len; ++ i) {
-      this->Y.push_back(label[i]);
-    }
-  }
-
   // Copy another data matrix to this matrix.
   // Note that here we do the deep copy and we will
   // allocate memory if current matrix is empty.

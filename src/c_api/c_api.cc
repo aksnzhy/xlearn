@@ -284,6 +284,7 @@ XL_DLL int XLDMatrixCreateFromCSREx(const size_t* indptr,
                                     size_t nindptr,
                                     size_t nelem,
                                     size_t num_col,
+                                    bool have_field,
                                     XL* out) {
   API_BEGIN();
   xLearn::DMatrix* mat = new xLearn::DMatrix();
@@ -291,7 +292,7 @@ XL_DLL int XLDMatrixCreateFromCSREx(const size_t* indptr,
   for (size_t i = 1; i <= nindptr; ++ i) {
     for (size_t j = indptr[i - 1]; j < indptr[i]; ++ j) {
       if (!std::isnan(features[j])) {
-        if (fields) {
+        if (have_field) {
           mat->AddNode(i - 1, indices[j], features[j], fields[j]);
         } else {
           mat->AddNode(i - 1, indices[j], features[j]);
@@ -319,6 +320,7 @@ XL_DLL int XLDMatrixCreateFromCSCEx(const size_t* indptr,
                                     size_t nindptr,
                                     size_t nelem,
                                     size_t num_row,
+                                    bool have_field,
                                     XL* out) {
   API_BEGIN();
   xLearn::DMatrix* mat = new xLearn::DMatrix();
@@ -326,7 +328,7 @@ XL_DLL int XLDMatrixCreateFromCSCEx(const size_t* indptr,
   for (size_t i = 1; i <= nindptr; ++ i) {
     for (size_t j = indptr[i - 1]; j < indptr[i]; ++ j) {
       if (!std::isnan(features[j])) {
-        if (fields) {
+        if (have_field) {
           mat->AddNode(indices[j], i - 1, features[j], fields[j]);
         } else {
           mat->AddNode(indices[j], i - 1, features[j]);
@@ -340,10 +342,14 @@ XL_DLL int XLDMatrixCreateFromCSCEx(const size_t* indptr,
 
 XL_DLL int XLDMatrixSetLabel(XL* out,
                              const real_t* label,
-                             const size_t& len) {
+                             const size_t len) {
   API_BEGIN();
-  auto p = reinterpret_cast<xLearn::DMatrix*>(out);
-  p->SetLabel(label, len);
+  xLearn::DMatrix *p = reinterpret_cast<xLearn::DMatrix*>(*out);
+  std::vector<real_t> Y(len);
+  for (size_t i = 0; i < len; ++ i) {
+    Y[i] = label[i];
+  }
+  p->SetLabel(Y);
   API_END();
 }
 
