@@ -41,7 +41,8 @@ class KVStore {
    KVStore() { }
    ~KVStore() { }
 
-   // Initial KVStore
+   // Initial KVStore. 
+   // Invoke this function before we use it.
    virtual void Initialize(size_t server_num) {
    	 CHECK_GT(server_num, 0);
      server_num_ = server_num;
