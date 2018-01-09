@@ -29,11 +29,14 @@ cmake_minimum_required(VERSION 3.0)
 # Using c++11;
 # Optimization on architecture
 #-------------------------------------------------------------------------------
-add_definitions("-Wall -O3 -std=c++11 -march=native")
+if (UNIX)
+	add_definitions("-Wall -O3 -std=c++11 -march=native -Wno-sign-compare -Wno-strict-aliasing -Wno-comment")
+elseif (WIN32)
+    #TODO: Supress warnings in WIN32
+	add_definitions("-Wall -O3 -std=c++11 -march=native")
 
-#-Wno-sign-compare
-#-Wno-strict-aliasing
-#-Wno-comment
+endif()
+    
 
 #-------------------------------------------------------------------------------
 # Declare where our project will be installed.

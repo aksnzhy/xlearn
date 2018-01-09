@@ -1,7 +1,7 @@
-#ifndef _UNISTD_H
-#define _UNISTD_H    1
+#ifndef CROSS_UNISTD_H
+#define CROSS_UNISTD_H    1
 
-#ifdef linux
+#ifdef __unix__
 #include<unistd.h>
 
 #else //Windows

@@ -23,7 +23,7 @@ This file defines several system functions.
 #ifndef XLEARN_BASE_SYSTEM_H_
 #define XLEARN_BASE_SYSTEM_H_
 
-#ifdef _WIN32
+#ifdef WIN32
 #include "src/base/uname.h"
 #else
 #include <sys/utsname.h>
@@ -37,11 +37,11 @@ This file defines several system functions.
 
 struct tm *localtime_safe(const time_t *timep, struct tm *result)
 {
-#ifdef _WIN32
+#ifdef WIN32
 	localtime_s(result, timep);
 	return result;
 #else
-	return localtime_r(timep, result)
+  return localtime_r(timep, result);
 #endif
 }
 

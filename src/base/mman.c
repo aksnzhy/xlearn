@@ -1,6 +1,8 @@
 /* mman implementation for windows
 */
 
+#ifdef WIN32
+
 #include <windows.h>
 #include <errno.h>
 #include <io.h>
@@ -180,3 +182,5 @@ int munlock(const void *addr, size_t len)
 
 	return -1;
 }
+
+#endif //WIN32

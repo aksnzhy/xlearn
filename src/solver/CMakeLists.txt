@@ -17,7 +17,11 @@ set_target_properties(solver_shared PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 set_target_properties(solver PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 
 # Build xlearn exe
-set(LIBS solver reader loss score data base)
+if(UNIX)
+	set(LIBS solver reader loss score data base pthread)
+elseif(WIN32)
+	set(LIBS solver reader loss score data base)
+endif()
 
 add_executable(xlearn_train train_main.cc)
 target_link_libraries(xlearn_train ${LIBS})

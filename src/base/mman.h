@@ -4,10 +4,10 @@
 * comes from https://github.com/witwall/mman-win32/blob/master/mman.h
 */
 
-#ifndef _SYS_MMAN_H_
-#define _SYS_MMAN_H_
+#ifndef CROSS_SYS_MMAN_H_
+#define CROSS_SYS_MMAN_H_
 
-#ifdef linux
+#ifdef __unix__
 #include <sys/mman.h>
 #else //Windows
 
