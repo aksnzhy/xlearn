@@ -22,24 +22,24 @@ Options: ::
          4 -- factorization machines (FM)
          5 -- field-aware factorization machines (FFM)
                                                                            
-  -x <metric>          :  The metric can be 'acc', 'prec', 'recall', 'f1', 'auc' (classification), and
-                          'mae', 'mape', 'rmsd (rmse)' (regression). On defaurt, xLearn will not print
-                          any evaluation metric information.                                           
+  -x <metric>          :  The metric can be 'acc', 'prec', 'recall', 'f1', 'auc' for classification, and
+                          'mae', 'mape', 'rmsd (rmse)' for regression. On defaurt, xLearn will not print
+                          any evaluation metric information (only loss value).                                           
                                                                                                      
   -p <opt_method>      :  Choose the optimization method, including 'sgd', adagrad', and 'ftrl'. On default,
-                          we use the adagrad optimization.
+                          we use the 'adagrad' optimization.
                                                                                                 
   -v <validate_file>   :  Path of the validation data file. This option will be empty by default,
-                          and in this way, the xLearn will not perform validation.
+                          and in this way, the xLearn will not perform validation process.
                                                                                              
-  -m <model_file>      :  Path of the model checkpoint file. On default, the model file name will be.
-                          set to 'train_file' + '.model'. If we set this value to 'none', the xLearn will
-                          not dump the model checkpoint after training.
-  -t <txt_model_file>  :  Path of the txt model checkpoint file. On default, this option is empty
+  -m <model_file>      :  Path of the model dump file. On default, the model file name is 'train_file' + '.model'. 
+                          If we set this value to 'none', the xLearn will not dump the model checkpoint after training.
+
+  -t <txt_model_file>  :  Path of the txt model checkpoint file. On default, we do not set this option
                           and xLearn will not dump the txt model. For now, only the bias and linear term
-                          will dump to the txt model checkpoint file.
+                          will be dump to the txt model file.
                                                                             
-  -l <log_file>        :  Path of the log file. Using '/tmp/xlearn_log/' by default.
+  -l <log_file>        :  Path of the log file. Using '/tmp/xlearn_log.*' by default.
                                                                                       
   -k <number_of_K>     :  Number of the latent factor used by fm and ffm tasks. Using 4 by default.
                           Note that, we will get the same model size when setting k to 1 and 4.
