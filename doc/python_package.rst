@@ -38,8 +38,8 @@ Here is a simple Python demo to demonstrate how to use xLearn. You can check out
 
    # param:
    #  0. binary classification
-   #  1. learning rate
-   #  2. regular lambda
+   #  1. learning rate : 0.2
+   #  2. regular lambda : 0.002
    param = {'task':'binary', 'lr':0.2, 'lambda':0.002}
             
    # Train model
