@@ -9,6 +9,8 @@ or of unknown edibility and not recommended. This latter class was combined with
 states that there is no simple rule for determining the edibility of a mushroom; no rule like *leaflets three, let it be*
 for Poisonous Oak and Ivy.
 
-You can find a small portion of data used in this demo in the path ``/demo/classification/mushroom/``.
+We have already clear the data and generate a set of features.
+
+You can find the data used in this demo in the path ``/demo/classification/mushroom/``.
 
 .. __: https://archive.ics.uci.edu/ml/datasets/Mushroom
