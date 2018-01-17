@@ -46,9 +46,9 @@ Options: ::
                           This is because we use SSE instruction and the memory need to be aligned.
                           So even you assign k = 1, we still fill some dummy zeros from k = 2 to 4.
                                                                                          
-  -r <learning_rate>   :  Learning rate for stochastic gradient descent. Using 0.2 by default.
-                          xLearn uses adaptive gradient descent (AdaGrad) for optimization problem,
-                          and the learning rate will be changed adaptively.
+  -r <learning_rate>   :  Learning rate for optimization method. Using 0.2 by default.
+                          xLearn can use adaptive gradient descent (AdaGrad) for optimization problem,
+                          if you choose AdaGrad method, the learning rate will be changed adaptively.
                                                                                     
   -b <lambda_for_regu> :  Lambda for L2 regular. Using 0.00002 by default. We can disable the
                           regular term by setting this value to 0.0
@@ -59,7 +59,9 @@ Options: ::
   -e <epoch_number>    :  Number of epoch for training. Using 10 by default. Note that, xLearn will
                           perform early-stopping by default, so this value is just a upper bound.
                                                                                        
-  -f <fold_number>     :  Number of folds for cross-validation. Using 5 by default.     
+  -f <fold_number>     :  Number of folds for cross-validation. Using 5 by default.    
+
+  -nthread <thread number> :  Number of thread for multi-thread training.
                                                                                      
   --disk               :  Open on-disk training for large-scale machine learning problems.
                                                                    
@@ -79,13 +81,13 @@ Options: ::
   --quiet              :  Don't print any evaluation information during the training and
                           just train the model quietly.
 
-  -alpha               :  Used by ftrl.
+  -alpha               :  Hyper parameters used by ftrl.
                                        
-  -beta                :  Used by ftrl.
+  -beta                :  Hyper parameters used by ftrl.
                                        
-  -lambda_1            :  Used by ftrl.
+  -lambda_1            :  Hyper parameters used by ftrl.
                                        
-  -lambda_2            :  Used by ftrl.
+  -lambda_2            :  Hyper parameters used by ftrl.
 
 For Prediction: ::
 
@@ -97,6 +99,12 @@ Options: ::
                           to 'test_file' + '.out'
                                                       
   -l <log_file_path>   :  Path of the log file. Using '/tmp/xlearn_log' by default.  
+
+  -nthread <thread number> :  Number of thread for multi-thread training.
+
+  --sign                   :  Converting output to 0 and 1.
+
+  --sigmoid                :  Converting output to 0~1 (problebility).
 
 xLearn Python API
 ------------------------------
@@ -143,20 +151,33 @@ API List: ::
 
 Parameter List: ::
 
-    task     : {'binary', 'reg'}  # machine learning task
-    metric   : {'acc', 'prec', 'recall', 
-                'f1', 'mae', 'mape', 'rmse', 'rmsd'} # Evaludation metric
+    task     : {'binary',  # Binary classification
+                'reg'}     # Regression
+
+    metric   : {'acc', 'prec', 'recall', 'f1', 'auc',   # for classification
+                'mae', 'mape', 'rmse', 'rmsd'}  # for regression
+
     lr       : float value  # learning rate
+
     lambda   : float value  # regular lambda
-    k        : int value    # latent factor
+
+    k        : int value    # latent factor for fm and ffm
+
     init     : float value  # model initialize
-    alpha    : float value  # parameter for ftrl
-    beta     : float value  # parameter for ftrl
-    lambda_1 : float value  # parameter for ftrl
-    lambda_2 : float value  # parameter for ftrl
+
+    alpha    : float value  # hyper parameter for ftrl
+
+    beta     : float value  # hyper parameter for ftrl
+
+    lambda_1 : float value  # hyper parameter for ftrl
+
+    lambda_2 : float value  # hyper parameter for ftrl
+
     epoch    : int vlaue    # number of epoch
+
     fold     : int value    # number of fold for cross-validation
-    opt      : {'sgd', 'agagrad', 'ftrl'} # optimization method
+
+    opt      : {'sgd', 'agagrad', 'ftrl'}  # optimization method
 
 xLearn R API
 ------------------------------

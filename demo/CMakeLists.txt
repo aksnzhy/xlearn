@@ -15,6 +15,8 @@ FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/classification/criteo_ctr/run_demo_ctr.sh
 DESTINATION ${PROJECT_BINARY_DIR}/demo/criteo_ctr)
 FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/classification/criteo_ctr/run_demo_ctr.py" 
 DESTINATION ${PROJECT_BINARY_DIR}/demo/criteo_ctr)
+FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/classification/criteo_ctr/run_demo_ctr.py" 
+DESTINATION ${PROJECT_BINARY_DIR}/)
 
 # Mushroom
 FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/classification/mushroom/agaricus_test.txt" 

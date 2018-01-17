@@ -92,7 +92,7 @@ std::string Checker::option_help() const {
 "                                                                                       \n"
 "  -f <fold_number>     :  Number of folds for cross-validation. Using 5 by default.      \n"
 "                                                                                         \n"
-"  -nthread <thread number> :  Number of thread for multi-thread training                 \n"
+"  -nthread <thread number> :  Number of thread for multi-thread training.                \n"
 "                                                                                      \n"
 "  --disk               :  Open on-disk training for large-scale machine learning problems. \n"
 "                                                                    \n"
@@ -135,6 +135,10 @@ std::string Checker::option_help() const {
 "  -nthread <thread number> :  Number of thread for multi-thread learning. \n"
 "                                                                             \n"
 "  -l <log_file_path>   :  Path of the log file. Using '/tmp/xlearn_log' by default. \n"
+"                                                            \n"
+"  --sign                   :  Converting output to 0 and 1. \n"
+"                                                               \n"
+"  --sigmoid                :  Converting output to 0~1 (problebility). \n"
 "----------------------------------------------------------------------------------------------\n"
     );
   }
@@ -691,7 +695,7 @@ void Checker::check_conflict_train(HyperParam& hyper_param) {
                      "in regression tasks. xLearn will ignore "
                      "this option.",
                      hyper_param.metric.c_str())
-        );
+      );
       hyper_param.metric = "none";
     }
   }
