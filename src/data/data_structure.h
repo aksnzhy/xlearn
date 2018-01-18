@@ -23,6 +23,7 @@ This file defines the basic data structures used by xLearn.
 #ifndef XLEARN_DATA_DATA_STRUCTURE_H_
 #define XLEARN_DATA_DATA_STRUCTURE_H_
 
+#include <algorithm>
 #include <vector>
 #include <unordered_set>
 #include <unordered_map>
@@ -216,6 +217,12 @@ struct DMatrix {
   void SetHash(uint64 hash_1, uint64 hash_2) {
     hash_value_1 = hash_1;
     hash_value_2 = hash_2;
+  }
+
+  // set label of the matrix.
+  void SetLabel(const std::vector<real_t>& label) {
+    has_label = true;
+    this->Y = label;
   }
 
   // Copy another data matrix to this matrix.

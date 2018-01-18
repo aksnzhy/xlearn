@@ -21,6 +21,10 @@ def silent_call(cmd, raise_error=False, error_msg=''):
         with open(os.devnull, 'w') as shut_up:
             subprocess.check_output(cmd, stderr=shut_up)
             return 0
+    except OSError:
+        if raise_error:
+            raise Exception("open devnull error")
+        return 1
     except Exception:
         if raise_error:
             raise Exception(error_msg);
@@ -81,7 +85,7 @@ class CustomSdist(sdist):
 
 if __name__ == "__main__":
     setup(name='xlearn',
-          version="0.20.a1",
+          version=open(os.path.join(CURRENT_DIR, 'xlearn/VERSION')).read().strip(),
           description="xLearn Python Package",
           maintainer='Chao Ma',
           maintainer_email='mctt90@gmail.com',

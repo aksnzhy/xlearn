@@ -63,7 +63,7 @@ class Predictor {
   }
 
   // The core function
-  void Predict();
+  std::vector<real_t> Predict();
 
  protected:
   Reader* reader_;

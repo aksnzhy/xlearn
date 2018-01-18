@@ -1,7 +1,11 @@
 # Copy Python file
 FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/xlearn/base.py" 
 DESTINATION ${PROJECT_BINARY_DIR}/python-package/xlearn)
-FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/xlearn/libpath.py" 
+FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/xlearn/core.py" 
+DESTINATION ${PROJECT_BINARY_DIR}/python-package/xlearn)
+FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/xlearn/compat.py"
+DESTINATION ${PROJECT_BINARY_DIR}/python-package/xlearn)
+FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/xlearn/libpath.py"
 DESTINATION ${PROJECT_BINARY_DIR}/python-package/xlearn)
 FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/xlearn/xlearn.py" 
 DESTINATION ${PROJECT_BINARY_DIR}/python-package/xlearn)
@@ -15,5 +19,7 @@ FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/MANIFEST.in"
 DESTINATION ${PROJECT_BINARY_DIR}/python-package)
 FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/test_python.py" 
 DESTINATION ${PROJECT_BINARY_DIR}/python-package/test)
-FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/install-python.sh" 
+FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/test_python_module.py"
+DESTINATION ${PROJECT_BINARY_DIR}/python-package/)
+FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/install-python.sh"
 DESTINATION ${PROJECT_BINARY_DIR}/python-package)

@@ -26,6 +26,7 @@ to other languages.
 
 #include "src/base/common.h"
 #include "src/data/hyper_parameters.h"
+#include "src/data/data_structure.h"
 #include "src/solver/solver.h"
 
 #ifdef __cplusplus
@@ -61,11 +62,18 @@ XL_DLL int XLearnShow(XL *out);
 // Set file path of the training data
 XL_DLL int XLearnSetTrain(XL *out, const char *train_path);
 
+// Set DMatrix of training data
+XL_DLL int XLearnSetTrainDMatrix(XL *out, XL *dmatrix);
+
 // Set file path of the test data
 XL_DLL int XLearnSetTest(XL *out, const char *test_path);
 
+XL_DLL int XLearnSetTestDMatrix(XL *out, XL *dmatrix);
+
 // Set file path of the validation data
 XL_DLL int XLearnSetValidate(XL *out, const char *val_path);
+
+XL_DLL int XLearnSetValidateDMatrix(XL *out, XL *dmatrix);
 
 // Start to train
 XL_DLL int XLearnFit(XL *out, const char *model_path);
@@ -110,5 +118,40 @@ class XLearn {
  private:
   DISALLOW_COPY_AND_ASSIGN(XLearn);
 };
+
+XL_DLL int XLDMatrixCreateFromFile(const char *fname,
+                                   int silent,
+                                   XL* out);
+
+XL_DLL int XLDMatrixCreateFromCSREx(const size_t* indptr,
+                                    const unsigned* indices,
+                                    const real_t* features,
+                                    const real_t* fields,
+                                    size_t nindptr,
+                                    size_t nelem,
+                                    size_t num_col,
+                                    bool have_field,
+                                    XL* out);
+
+XL_DLL int XLDMatrixCreateFromCSR(const size_t* indptr,
+                                  const unsigned* indices,
+                                  const real_t* data,
+                                  size_t nindptr,
+                                  size_t nelem,
+                                  XL* out);
+
+XL_DLL int XLDMatrixCreateFromCSCEx(const size_t* indptr,
+                                    const unsigned* indices,
+                                    const real_t* features,
+                                    const real_t* fields,
+                                    size_t nindptr,
+                                    size_t nelem,
+                                    size_t num_row,
+                                    bool have_field,
+                                    XL* out);
+
+XL_DLL int XLDMatrixSetLabel(XL* out,
+                             const real_t* label,
+                             const size_t len);
 
 #endif  // XLEARN_C_API_C_API_H_

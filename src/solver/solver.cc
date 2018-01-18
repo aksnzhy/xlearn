@@ -72,7 +72,11 @@ void Solver::print_logo() const {
 Reader* Solver::create_reader() {
   Reader* reader;
   std::string str = hyper_param_.on_disk ? "disk" : "memory";
-  reader = CREATE_READER(str.c_str());
+  if (!hyper_param_.reader_type.empty()) {
+    reader = CREATE_READER(hyper_param_.reader_type.c_str());
+  } else {
+    reader = CREATE_READER(str.c_str());
+  }
   if (reader == nullptr) {
     LOG(FATAL) << "Cannot create reader: " << str;
   }
@@ -186,23 +190,56 @@ void Solver::init_log() {
               StringPrintf("%s.ERROR", prefix.c_str()));
 }
 
-// Initialize training task
-void Solver::init_train() {
-  /*********************************************************
-   *  Initialize thread pool                               *
-   *********************************************************/
-  size_t threadNumber = std::thread::hardware_concurrency();;
-  if (hyper_param_.thread_number != 0) {
-    threadNumber = hyper_param_.thread_number;
+// Initialize reader
+void Solver::init_reader_by_dmatrix(int &num_reader) {
+  std::vector<DMatrix> dmatrix_list;
+  if (hyper_param_.cross_validation) {
+    CHECK_GT(hyper_param_.num_folds, 0);
+    LOG(ERR) << "python interface not support cross validation";
   }
-  pool_ = new ThreadPool(threadNumber);
-  /*********************************************************
-   *  Initialize Reader                                    *
-   *********************************************************/
-  Timer timer;
-  timer.tic();
-  print_action("Read Problem ...");
-  LOG(INFO) << "Start to init Reader";
+  num_reader = 0;
+  if (hyper_param_.cross_validation) {
+    num_reader += hyper_param_.num_folds;
+    int batch_size = std::ceil(
+      static_cast<double>(hyper_param_.train_dmatrix->row_length) / hyper_param_.num_folds);
+    DMatrix batch;
+    batch.ResetMatrix(batch_size, hyper_param_.train_dmatrix->has_label);
+    for (int i = 0; i < hyper_param_.num_folds; ++ i) {
+      size_t real_size = hyper_param_.train_dmatrix->GetMiniBatch(batch_size, batch);
+      dmatrix_list.emplace_back(batch);
+    }
+  } else {
+    num_reader += 1;
+    CHECK(hyper_param_.train_dmatrix != nullptr);
+    DMatrix tmp = *hyper_param_.train_dmatrix;
+    dmatrix_list.push_back(*hyper_param_.train_dmatrix);
+    if (hyper_param_.validate_dmatrix != nullptr) {
+      num_reader += 1;
+      dmatrix_list.push_back(*hyper_param_.validate_dmatrix);
+    }
+  }
+  LOG(INFO) << "Number of Readers: " << num_reader;
+  reader_.resize(num_reader, nullptr);
+  // Create Reader
+  for (int i = 0; i < num_reader; ++i) {
+    reader_[i] = create_reader();
+    reader_[i]->Initialize(&dmatrix_list[i]);
+    if (!hyper_param_.on_disk) {
+      reader_[i]->SetShuffle(true);
+    }
+    if (reader_[i] == nullptr) {
+      print_error(
+        StringPrintf("Cannot create reader from DMatrix %d",
+                     i)
+      );
+      exit(0);
+    }
+    LOG(INFO) << "Init Reader Number: " << i;
+  }
+}
+
+// Initialize reader
+void Solver::init_reader_by_file(int &num_reader) {
   // Split file
   if (hyper_param_.cross_validation) {
     CHECK_GT(hyper_param_.num_folds, 0);
@@ -213,7 +250,7 @@ void Solver::init_train() {
               << " parts.";
   }
   // Get the Reader list
-  int num_reader = 0;
+  num_reader = 0;
   std::vector<std::string> file_list;
   if (hyper_param_.cross_validation) {
     num_reader += hyper_param_.num_folds;
@@ -249,6 +286,33 @@ void Solver::init_train() {
     }
     LOG(INFO) << "Init Reader: " << file_list[i];
   }
+}
+
+// Initialize training task
+void Solver::init_train() {
+  /*********************************************************
+   *  Initialize thread pool                               *
+   *********************************************************/
+  size_t threadNumber = std::thread::hardware_concurrency();;
+  if (hyper_param_.thread_number != 0) {
+    threadNumber = hyper_param_.thread_number;
+  }
+  pool_ = new ThreadPool(threadNumber);
+  /*********************************************************
+   *  Initialize Reader                                    *
+   *********************************************************/
+  Timer timer;
+  timer.tic();
+  print_action("Read Problem ...");
+  LOG(INFO) << "Start to init Reader";
+  int num_reader{0};
+  if (hyper_param_.reader_type == "python" &&
+      hyper_param_.train_set_file.empty()) {
+    init_reader_by_dmatrix(num_reader);
+  } else {
+    init_reader_by_file(num_reader);
+  }
+
   /*********************************************************
    *  Read problem                                         *
    *********************************************************/
@@ -414,8 +478,14 @@ void Solver::init_predict() {
   timer.tic();
   // Create Reader
   reader_.resize(1, create_reader());
-  CHECK_NE(hyper_param_.test_set_file.empty(), true);
-  reader_[0]->Initialize(hyper_param_.test_set_file);
+  if (hyper_param_.reader_type == "python" &&
+      hyper_param_.test_set_file.empty()) {
+    CHECK(hyper_param_.test_dmatrix != nullptr);
+    reader_[0]->Initialize(hyper_param_.test_dmatrix);
+  } else {
+    CHECK_NE(hyper_param_.test_set_file.empty(), true);
+    reader_[0]->Initialize(hyper_param_.test_set_file);
+  }
   reader_[0]->SetShuffle(false);
   if (reader_[0] == nullptr) {
    print_info(
@@ -447,14 +517,15 @@ void Solver::init_predict() {
  ******************************************************************************/
 
 // Start training or inference
-void Solver::StartWork() {
+std::vector<real_t> Solver::StartWork() {
   if (hyper_param_.is_train) {
     LOG(INFO) << "Start training work.";
     start_train_work();
   } else {
     LOG(INFO) << "Start inference work.";
-    start_prediction_work();
+    return start_prediction_work();
   }
+  return std::vector<real_t> ();
 }
 
 // Train
@@ -528,7 +599,7 @@ void Solver::start_train_work() {
 }
 
 // Inference
-void Solver::start_prediction_work() {
+std::vector<real_t> Solver::start_prediction_work() {
   print_action("Start to predict ...");
   Predictor pdc;
   pdc.Initialize(reader_[0],
@@ -538,7 +609,7 @@ void Solver::start_prediction_work() {
                  hyper_param_.sign,
                  hyper_param_.sigmoid);
   // Predict and write output
-  pdc.Predict();
+  return pdc.Predict();
 }
 
 /******************************************************************************

@@ -3,6 +3,7 @@
 from __future__ import absolute_import
 import os
 from .xlearn import *
+from .core import DMatrix
 
 VERSION_FILE = os.path.join(os.path.dirname(__file__), 'VERSION')
 with open(VERSION_FILE) as f:

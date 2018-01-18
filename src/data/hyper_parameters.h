@@ -57,6 +57,9 @@ struct HyperParam {
   For now, it can be 'acc', 'prec', 'recall', 
   'f1', 'mae', 'rmsd', 'mape', or 'none' */
   std::string metric = "none";
+  /* Reader Type.
+   For now, it can be 'memory', 'disk', 'python'*/
+  std::string reader_type;
   /* Block size for on-disk training.
   On default this value will be set to 500 MB */
   uint64 block_size = 500;
@@ -108,6 +111,12 @@ struct HyperParam {
   /* Filename for validation set
   This value can be empty. */
   std::string validate_set_file;
+  /* DMatrix of training dataset from python*/
+  DMatrix* train_dmatrix = nullptr;
+  /* DMatrix of test dataset from python*/
+  DMatrix* test_dmatrix = nullptr;
+  /* DMatrix of validation set from python */
+  DMatrix* validate_dmatrix = nullptr;
   /* Filename of model checkpoint
   On default, model_file = train_set_file + ".model" */
   std::string model_file;

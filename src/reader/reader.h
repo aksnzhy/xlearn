@@ -89,6 +89,12 @@ class Reader {
   // training, and this is good for SGD.
   virtual void Initialize(const std::string& filename) = 0;
 
+  // initialize from DMatrix
+  // this method should be implemented by PythonReader
+  virtual void Initialize(const DMatrix* const dmatrix) {
+    CHECK(false);
+  }
+
   // Sample data from disk or from memory buffer.
   // Return the number of record in each samplling.
   // Samples() will return 0 when reaching end of the data.
@@ -152,6 +158,9 @@ class InmemReader : public Reader {
   // Pre-load all the data into memory buffer.
   virtual void Initialize(const std::string& filename);
 
+  // Initialized from DMatrix
+  virtual void Initialize(const DMatrix* const matrix);
+
   // Sample data from the memory buffer.
   virtual index_t Samples(DMatrix* &matrix);
 
@@ -169,6 +178,10 @@ class InmemReader : public Reader {
     if (shuffle_ && !order_.empty()) {
       random_shuffle(order_.begin(), order_.end());
     }
+  }
+
+  DMatrix& GetDataBuf() {
+    return data_buf_;
   }
 
  protected:
@@ -193,6 +206,56 @@ class InmemReader : public Reader {
 
  private:
   DISALLOW_COPY_AND_ASSIGN(InmemReader);
+};
+
+//------------------------------------------------------------------------------
+// PythonReader is used for Python
+// Sampling data from memory buffer.
+//------------------------------------------------------------------------------
+class PythonReader : public Reader {
+ public:
+  // Constructor and Destructor
+  PythonReader() : pos_(0) { }
+  ~PythonReader() { }
+
+  // Pre-load all the data into memory buffer.
+  virtual void Initialize(const std::string& filename);
+
+  // Initialized from DMatrix
+  virtual void Initialize(const DMatrix* const matrix);
+
+  // Sample data from the memory buffer.
+  virtual index_t Samples(DMatrix* &matrix);
+
+  // Return to the begining of the data.
+  virtual void Reset();
+
+  // Free the memory of data matrix.
+  virtual void Clear() {
+      data_buf_.Release();
+  }
+
+  // If shuffle data ?
+  virtual inline void SetShuffle(bool shuffle) {
+      this->shuffle_ = shuffle;
+      if (shuffle_ && !order_.empty()) {
+          random_shuffle(order_.begin(), order_.end());
+      }
+  }
+
+ protected:
+  /* Reader will load all the data
+  into this buffer */
+  DMatrix data_buf_;
+  /* Number of record at each samplling */
+  index_t num_samples_;
+  /* Position for samplling */
+  index_t pos_;
+  /* For random shuffle */
+  std::vector<index_t> order_;
+
+ private:
+  DISALLOW_COPY_AND_ASSIGN(PythonReader);
 };
 
 //------------------------------------------------------------------------------

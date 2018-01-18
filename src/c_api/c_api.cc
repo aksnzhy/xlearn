@@ -20,15 +20,16 @@ Author: Chao Ma (mctt90@gmail.com)
 This file is the implementation of C API for xLearn.
 */
 
-#include <string>
+#include <cmath>
 #include <iostream>
+#include <string>
 
 #include <string.h>
 
-#include "src/c_api/c_api.h"
-#include "src/c_api/c_api_error.h"
 #include "src/base/format_print.h"
 #include "src/base/timer.h"
+#include "src/c_api/c_api.h"
+#include "src/c_api/c_api_error.h"
 
 // Say hello to user
 XL_DLL int XLearnHello() {
@@ -86,6 +87,14 @@ XL_DLL int XLearnSetTrain(XL *out, const char *train_path) {
   API_END();
 }
 
+XL_DLL int XLearnSetTrainDMatrix(XL *out, XL *dmatrix) {
+  API_BEGIN();
+  XLearn* xl = reinterpret_cast<XLearn*>(*out);
+  xl->GetHyperParam().train_dmatrix = reinterpret_cast<xLearn::DMatrix*>(*dmatrix);
+  xl->GetHyperParam().reader_type = "python";
+  API_END();
+}
+
 // Set file path of the test data
 XL_DLL int XLearnSetTest(XL *out, const char *test_path) {
   API_BEGIN();
@@ -94,11 +103,25 @@ XL_DLL int XLearnSetTest(XL *out, const char *test_path) {
   API_END();
 }
 
+XL_DLL int XLearnSetTestDMatrix(XL *out, XL* dmatrix) {
+  API_BEGIN();
+    XLearn* xl = reinterpret_cast<XLearn*>(*out);
+    xl->GetHyperParam().test_dmatrix = reinterpret_cast<xLearn::DMatrix*>(*dmatrix);
+  API_END();
+}
+
 // Set file path of the validation data
 XL_DLL int XLearnSetValidate(XL *out, const char *val_path) {
   API_BEGIN();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   xl->GetHyperParam().validate_set_file = std::string(val_path);
+  API_END();
+}
+
+XL_DLL int XLearnSetValidateDMatrix(XL *out, XL *dmatrix) {
+  API_BEGIN();
+    XLearn* xl = reinterpret_cast<XLearn*>(*out);
+    xl->GetHyperParam().validate_dmatrix = reinterpret_cast<xLearn::DMatrix*>(*dmatrix);
   API_END();
 }
 
@@ -148,7 +171,7 @@ XL_DLL int XLearnPredict(XL *out, const char *model_path, const char *out_path) 
   xl->GetHyperParam().is_train = false;
   xl->GetSolver().Initialize(xl->GetHyperParam());
   xl->GetSolver().SetPredict();
-  xl->GetSolver().StartWork();
+  std::vector<real_t> out = xl->GetSolver().StartWork();
   xl->GetSolver().Clear();
   print_info(
     StringPrintf("Total time cost: %.2f (sec)", 
@@ -241,3 +264,94 @@ XL_DLL int XLearnSetBool(XL *out, const char *key, const bool value) {
   }
   API_END();
 }
+
+XL_DLL int XLDMatrixCreateFromFile(const char *fname,
+                                   int silent,
+                                   XL* out) {
+  API_BEGIN();
+  xLearn::InmemReader *reader = new xLearn::InmemReader();
+  reader->Initialize(fname);
+  xLearn::DMatrix *mat = new xLearn::DMatrix();
+  mat->CopyFrom(&reader->GetDataBuf());
+  *out = mat;
+  API_END();
+}
+
+XL_DLL int XLDMatrixCreateFromCSREx(const size_t* indptr,
+                                    const unsigned* indices,
+                                    const real_t* features,
+                                    const real_t* fields,
+                                    size_t nindptr,
+                                    size_t nelem,
+                                    size_t num_col,
+                                    bool have_field,
+                                    XL* out) {
+  API_BEGIN();
+  xLearn::DMatrix* mat = new xLearn::DMatrix();
+  mat->ResetMatrix(nindptr, false);
+  for (size_t i = 1; i <= nindptr; ++ i) {
+    for (size_t j = indptr[i - 1]; j < indptr[i]; ++ j) {
+      if (!std::isnan(features[j])) {
+        if (have_field) {
+          mat->AddNode(i - 1, indices[j], features[j], fields[j]);
+        } else {
+          mat->AddNode(i - 1, indices[j], features[j]);
+        }
+      }
+    }
+  }
+  *out = mat;
+  API_END();
+}
+
+/*
+XL_DLL int XLDMatrixCreateFromCSR(const size_t* indptr,
+                                  const unsigned* indices,
+                                  const real_t* data,
+                                  size_t nindptr,
+                                  size_t nelem,
+                                  XL* out);
+                                  */
+
+XL_DLL int XLDMatrixCreateFromCSCEx(const size_t* indptr,
+                                    const unsigned* indices,
+                                    const real_t* features,
+                                    const real_t* fields,
+                                    size_t nindptr,
+                                    size_t nelem,
+                                    size_t num_row,
+                                    bool have_field,
+                                    XL* out) {
+  API_BEGIN();
+  xLearn::DMatrix* mat = new xLearn::DMatrix();
+  mat->ResetMatrix(num_row, false);
+  for (size_t i = 1; i <= nindptr; ++ i) {
+    for (size_t j = indptr[i - 1]; j < indptr[i]; ++ j) {
+      if (!std::isnan(features[j])) {
+        if (have_field) {
+          mat->AddNode(indices[j], i - 1, features[j], fields[j]);
+        } else {
+          mat->AddNode(indices[j], i - 1, features[j]);
+        }
+      }
+    }
+  }
+  *out = mat;
+  API_END();
+}
+
+XL_DLL int XLDMatrixSetLabel(XL* out,
+                             const real_t* label,
+                             const size_t len) {
+  API_BEGIN();
+  xLearn::DMatrix *p = reinterpret_cast<xLearn::DMatrix*>(*out);
+  std::vector<real_t> Y(len);
+  for (size_t i = 0; i < len; ++ i) {
+    Y[i] = label[i];
+  }
+  p->SetLabel(Y);
+  API_END();
+}
+
+// TODO: add the method of setting field
+//XL_DLL int XLDMatrixSetField(XL* out);
