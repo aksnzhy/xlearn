@@ -83,7 +83,7 @@ void LibsvmParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
   CHECK_GT(size, 0);
   index_t line_num = get_line_number(buf, size);
   matrix.ResetMatrix(line_num);
-  static char* line_buf = new char[kMaxLineSize];
+  char* line_buf = new char[kMaxLineSize];
   // Parse every line
   uint64 pos = 0;
   for (index_t i = 0; i < line_num; ++i) {
