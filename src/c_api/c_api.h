@@ -67,6 +67,9 @@ XL_DLL int XLearnSetTest(XL *out, const char *test_path);
 // Set file path of the validation data
 XL_DLL int XLearnSetValidate(XL *out, const char *val_path);
 
+// Set file path of the txt model data
+XL_DLL int XLearnSetTXTModel(XL *out, const char *model_path);
+
 // Start to train
 XL_DLL int XLearnFit(XL *out, const char *model_path);
 

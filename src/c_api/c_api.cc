@@ -102,6 +102,14 @@ XL_DLL int XLearnSetValidate(XL *out, const char *val_path) {
   API_END();
 }
 
+// Set file path of the txt model data
+XL_DLL int XLearnSetTXTModel(XL *out, const char *model_path) {
+  API_BEGIN();
+  XLearn* xl = reinterpret_cast<XLearn*>(*out);
+  xl->GetHyperParam().txt_model_file = std::string(model_path);
+  API_END();
+}
+
 // Start to train
 XL_DLL int XLearnFit(XL *out, const char *model_path) {
   API_BEGIN();

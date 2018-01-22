@@ -36,6 +36,9 @@ class XLearn(object):
 			elif key == 'metric':
 				_check_call(_LIB.XLearnSetStr(ctypes.byref(self.handle), 
 					c_str(key), c_str(value)))
+			elif key == 'opt':
+				_check_call(_LIB.XLearnSetStr(ctypes.byref(self.handle),
+					c_str(key), c_str(value)))
 			elif key == 'log':
 				_check_call(_LIB.XLearnSetStr(ctypes.byref(self.handle), 
 					c_str(key), c_str(value)))
@@ -57,9 +60,6 @@ class XLearn(object):
 			elif key == 'fold':
 				_check_call(_LIB.XLearnSetInt(ctypes.byref(self.handle), 
 					c_str(key), ctypes.c_uint(value)))
-			elif key == 'opt':
-				_check_call(_LIB.XLearnSetStr(ctypes.byref(self.handle), 
-					c_str(key), c_str(value)))
 			elif key == 'alpha':
 				_check_call(_LIB.XLearnSetFloat(ctypes.byref(self.handle), 
 					c_str(key), ctypes.c_float(value)))
@@ -112,6 +112,16 @@ class XLearn(object):
 		   the path of validation data.
 		"""
 		_check_call(_LIB.XLearnSetValidate(ctypes.byref(self.handle), c_str(val_path)))
+
+	def setTXTModel(self, model_path):
+		"""Set the path of TXT model file.
+
+		Parameters
+		----------
+		model_path : str
+		    the path of the TXT model file.
+		"""
+		_check_call(_LIB.XLearnSetTXTModel(ctypes.byref(self.handle), c_str(model_path)))
 
 	def setQuiet(self):
 		"""Set xlearn to quiet model"""
