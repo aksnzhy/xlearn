@@ -93,6 +93,17 @@ class XLearn(object):
 		"""
 		_check_call(_LIB.XLearnSetTrain(ctypes.byref(self.handle), c_str(train_path)))
 
+	def setTrainDMatrix(self, train_data):
+		""" Set the data matrix for training set.
+
+		Parameters
+		----------
+		train_data : DMatrix
+			the data matrix for training set
+		"""
+		_check_call(_LIB.XLearnSetTrainDMatrix(ctypes.byref(self.handle), 
+			ctypes.byref(train_data.handle)))
+
 	def setTest(self, test_path):
 		"""Set file path of test data.
 
@@ -103,6 +114,17 @@ class XLearn(object):
 		"""
 		_check_call(_LIB.XLearnSetTest(ctypes.byref(self.handle), c_str(test_path)))
 
+	def setTestDMatrix(self, test_data):
+		""" Set the data matrix for test set.
+
+		Parameters
+		----------
+		test_data : DMatrix
+			the test matrix for test set
+		"""
+		_check_call(_LIB.XLearnSetTestDMatrix(ctypes.byref(self.handle), 
+			ctypes.byref(test_data.handle)))
+
 	def setValidate(self, val_path):
 		"""Set file path of validation data.
 
@@ -112,6 +134,17 @@ class XLearn(object):
 		   the path of validation data.
 		"""
 		_check_call(_LIB.XLearnSetValidate(ctypes.byref(self.handle), c_str(val_path)))
+
+	def setValidateDMatrix(self, val_data):
+		"""Set the data matrix for validation set
+
+		Parameters
+		----------
+		val_data : DMatrix
+			the validation matrix for validation set
+		"""
+		_check_call(_LIB.XLearnSetValidateDMatrix(ctypes.byref(self.handle), 
+			ctypes.byref(val_data.handle)))
 
 	def setTXTModel(self, model_path):
 		"""Set the path of TXT model file.
