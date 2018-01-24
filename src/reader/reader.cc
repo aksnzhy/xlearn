@@ -268,4 +268,46 @@ index_t OndiskReader::Samples(DMatrix* &matrix) {
   return data_samples_.row_length;
 }
 
+//------------------------------------------------------------------------------
+// Implementation of CopyReader
+//------------------------------------------------------------------------------
+
+// Copy DMatrix from some other data source
+void CopyReader::Initialize(const std::string& filename) {
+  // We do nothing in this function
+  return;
+}
+
+// Copy DMatrix from the other data source
+void CopyReader::CopyDMatrix(DMatrix* matrix) {
+
+}
+
+// Smaple data from memory buffer.
+index_t CopyReader::Samples(DMatrix* &matrix) {
+  for (int i = 0; i < num_samples_; ++i) {
+    if (pos_ >= data_buf_.row_length) {
+      // End of the data buffer
+      if (i == 0) {
+        if (shuffle_) {
+          random_shuffle(order_.begin(), order_.end());
+        }
+        matrix = nullptr;
+        return 0;
+      }
+      break;
+    }
+    // Copy data between different DMatrix.
+    data_samples_.row[i] = data_buf_.row[order_[pos_]];
+    data_samples_.Y[i] = data_buf_.Y[order_[pos_]];
+    data_samples_.norm[i] = data_buf_.norm[order_[pos_]];
+    pos_++;
+  }
+  matrix = &data_samples_;
+  return num_samples_;
+}
+
+// Return to the begining of the data buffer.
+void CopyReader::Reset() { pos_ = 0; }
+
 }  // namespace xLearn

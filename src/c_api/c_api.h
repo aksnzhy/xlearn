@@ -111,6 +111,7 @@ class XLearn {
   inline xLearn::HyperParam& GetHyperParam() { 
   	return hyper_param; 
   }
+  
   inline xLearn::Solver& GetSolver() { 
   	return solver; 
   }
