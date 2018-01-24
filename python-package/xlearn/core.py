@@ -39,7 +39,7 @@ class DMatrix(object):
         else:
             try:
                 csr = scipy.sparse.csr_matrix(data)
-                csr_field = scipy.sparse.csr_matrix(field);
+                csr_field = scipy.sparse.csr_matrix(field) if field else None;
                 self._init_from_csr(csr, csr_field)
             except:
                 raise TypeError('can not initialize DMatrix from {}'.format(type(data).__name__))
