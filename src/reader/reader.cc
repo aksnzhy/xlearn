@@ -37,6 +37,7 @@ namespace xLearn {
 CLASS_REGISTER_IMPLEMENT_REGISTRY(xLearn_reader_registry, Reader);
 REGISTER_READER("memory", InmemReader);
 REGISTER_READER("disk", OndiskReader);
+REGISTER_READER("copy", CopyReader);
 
 // Check current file format and
 // return 'libsvm', 'libffm', or 'csv'.
@@ -280,7 +281,17 @@ void CopyReader::Initialize(const std::string& filename) {
 
 // Copy DMatrix from the other data source
 void CopyReader::CopyDMatrix(DMatrix* matrix) {
-
+  CHECK_NOTNULL(matrix);
+  // Copy matrix to data_buf_
+  this->data_buf_.CopyFrom(matrix);
+  // Init data_samples_ 
+  num_samples_ = data_buf_.row_length;
+  data_samples_.ResetMatrix(num_samples_, has_label_);
+  // for shuffle
+  order_.resize(num_samples_);
+  for (int i = 0; i < order_.size(); ++i) {
+    order_[i] = i;
+  }
 }
 
 // Smaple data from memory buffer.

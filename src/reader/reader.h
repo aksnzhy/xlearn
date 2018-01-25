@@ -171,6 +171,11 @@ class InmemReader : public Reader {
     }
   }
 
+  // Get data buffer
+  virtual inline DMatrix* GetMatrix() {
+    return &data_buf_;
+  }
+
  protected:
   /* Reader will load all the data 
   into this buffer */
@@ -291,6 +296,11 @@ class CopyReader : public Reader {
     if (shuffle_ && !order_.empty()) {
       random_shuffle(order_.begin(), order_.end());
     }
+  }
+
+  // Get data buffer
+  virtual inline DMatrix* GetMatrix() {
+    return &data_buf_;
   }
 
  protected:

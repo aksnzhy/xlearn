@@ -171,15 +171,23 @@ void CheckCSV(const DMatrix* matrix, bool disk) {
   }
 }
 
-void read_from_memory(const std::string& filename, int task_id) {
-  InmemReader reader;
-  reader.Initialize(filename);
+void read_from_memory(const std::string& filename, int task_id, bool copy = false) {
+  InmemReader in_mem_reader;
+  CopyReader copy_reader;
+  Reader* reader = nullptr;
+  in_mem_reader.Initialize(filename);
+  if (copy) {
+    copy_reader.CopyDMatrix(in_mem_reader.GetMatrix());
+    reader = &copy_reader;
+  } else {
+    reader = &in_mem_reader;
+  }
   DMatrix* matrix = nullptr;
   for (int i = 0; i < iteration_num; ++i) {
-    int record_num = reader.Samples(matrix);
+    int record_num = reader->Samples(matrix);
     if (record_num == 0) {
       --i;
-      reader.Reset();
+      reader->Reset();
       continue;
     }
     switch (task_id) {
@@ -266,6 +274,22 @@ TEST(ReaderTest, ReadFromBinary) {
   read_from_memory(csv_file, 2);
   read_from_memory(lr_no_file, 3);
   read_from_memory(ffm_no_file, 4);  
+}
+
+TEST(ReaderTest, CopyReader) {
+  // has label
+  string lr_file = kTestfilename + "_LR.txt";
+  string ffm_file = kTestfilename + "_ffm.txt";
+  string csv_file = kTestfilename + "_csv.txt";
+  // has no label
+  string lr_no_file = kTestfilename + "_LR_no.txt";
+  string ffm_no_file = kTestfilename + "_ffm_no.txt";
+  // check
+  read_from_memory(lr_file, 0, true);
+  read_from_memory(ffm_file, 1, true);
+  read_from_memory(csv_file, 2, true);
+  read_from_memory(lr_no_file, 3, true);
+  read_from_memory(ffm_no_file, 4, true); 
 }
 
 TEST(ReaderTest, SampleFromDisk) { 

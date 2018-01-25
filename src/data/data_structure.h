@@ -180,7 +180,9 @@ struct DMatrix {
     std::vector<real_t>().swap(Y);
     // Delete Node
     for (int i = 0; i < row_length; ++i) {
-      std::vector<Node>().swap(*(row[i]));
+      if (row[i] != nullptr) {
+        std::vector<Node>().swap(*(row[i]));
+      }
     }
     // Delete SparseRow
     std::vector<SparseRow*>().swap(row);
