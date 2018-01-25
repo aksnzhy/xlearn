@@ -5,6 +5,7 @@
 # The dataset comes from the criteo CTR.
 from __future__ import absolute_import
 import numpy as np
+import pandas as pd
 import xlearn as xl
 
 from scipy.sparse import csr_matrix
@@ -20,6 +21,14 @@ X, Y = load_svmlight_file("./test_dmatrix.txt")
 print(type(X), type(Y))
 print(Y.dtype)
 tmp_dmatrix = xl.DMatrix(X, Y)
+fm_model = xl.create_fm()
+fm_model.setTrain(tmp_dmatrix)
+fm_model.setValidate(tmp_dmatrix)
+fm_model.fit(param, "fm_model.out")
+
+# Test Pandas
+df_x = pd.DataFrame(X.todense())
+tmp_dmatrix = xl.DMatrix(df_X, Y)
 fm_model = xl.create_fm()
 fm_model.setTrain(tmp_dmatrix)
 fm_model.setValidate(tmp_dmatrix)
