@@ -231,6 +231,47 @@ void Model::SerializeToTxt(const std::string& filename) {
   for (index_t n = 0; n < param_num_w_; n+=aux_size_) {
     o_file << *(param_w_+n) << "\n";
   }
+  /* letent factor */
+  index_t k_aligned = get_aligned_k();
+  if (score_func_.compare("fm") == 0) {
+    real_t* w = param_v_;
+    for (index_t j = 0; j < num_feat_; ++j) {
+      for(index_t d = 0; d < num_K_; d++, w++) {
+        o_file << *w;
+        if (d != num_K_-1) {
+          o_file << " ";
+        }
+      }
+      for(index_t d = num_K_; d < k_aligned; d++, w++) {
+        // do nothing
+      }
+      for(index_t d = k_aligned; d < aux_size_*k_aligned; d++, w++) {
+        // do nothing
+      }
+      o_file << "\n";
+    }
+  } else if (score_func_.compare("ffm") == 0) {
+    real_t* w = param_v_;
+    for (index_t j = 0; j < num_feat_; ++j) {
+      for (index_t f = 0; f < num_field_; ++f) {
+        for (index_t d = 0; d < k_aligned; ) {
+          for (index_t s = 0; s < kAlign; s++, w++, d++) {
+            if (d < num_K_) {
+              o_file << *w;
+              if (d != num_K_-1) {
+                o_file << " ";
+              }
+            }
+            for (index_t j = 1; j < aux_size_; ++j) {
+              // do nothing
+            }
+          }
+          w += (aux_size_-1) * kAlign;
+        }
+      }
+      o_file << "\n";
+    }
+  }
 }
 
 // Deserialize model from a checkpoint file
