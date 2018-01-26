@@ -36,8 +36,7 @@ Options: ::
                           If we set this value to 'none', the xLearn will not dump the model checkpoint after training.
 
   -t <txt_model_file>  :  Path of the txt model checkpoint file. On default, we do not set this option
-                          and xLearn will not dump the txt model. For now, only the bias and linear term
-                          will be dump to the txt model file.
+                          and xLearn will not dump the txt model.
                                                                             
   -l <log_file>        :  Path of the log file. Using '/tmp/xlearn_log.*' by default.
                                                                                       
