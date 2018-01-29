@@ -91,6 +91,9 @@ After that, we get a new file called ``model.txt``, which stores the trained mod
   0
   0
 
+For the linear and bias term, we store each parameter in each line. For FM and FFM, we store one 
+vector of the latent factor in each line.
+
 Users can also set ``-o`` option to specify the output file. For example: ::
 
   ./xlearn_predict ./small_test.txt ./small_train.txt.model -o output.txt  
