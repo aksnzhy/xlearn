@@ -24,7 +24,7 @@ If you install xLearn Python package successfully, you will see ::
 Quick Start
 ----------------------------------------
 
-Here is a simple Python demo to demonstrate how to use xLearn. You can check out the demo data 
+Here is a simple Python demo to demonstrate how to use xLearn. You can checkout the demo data 
 (``small_train.txt`` and ``small_test.txt``) from the path ``demo/classification/criteo_ctr``.
 
 .. code-block:: python
