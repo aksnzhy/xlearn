@@ -32,7 +32,7 @@ namespace xLearn {
 //  ------------------------------------------------------
 void KVStore::Push(const std::vector<index_t>& key,
    	               const std::vector<real_t>& value) {
-
+ // TODO(chao)
 }
 
 // Push a list of (key, value_list) into store.
@@ -49,7 +49,7 @@ void KVStore::Push(const std::vector<index_t>& key,
 void KVStore::Push(const std::vector<index_t>& key,
    	               const std::vector<real_t>& value_list,
    	               const size_t length) {
-
+ // TODO(chao)
 }
 
 // Pull the values for a list of keys from store.
@@ -60,7 +60,7 @@ void KVStore::Push(const std::vector<index_t>& key,
 //  ------------------------------------------------------
 void KVStore::Pull(const std::vector<index_t>& key,
    	               std::vector<real_t>* value) {
-
+  // TODO(chao)
 }
 
 // Pull the value list for a list of keys from store.
@@ -77,7 +77,7 @@ void KVStore::Pull(const std::vector<index_t>& key,
 void KVStore::Pull(const std::vector<index_t>& key,
    	               std::vector<real_t>* value_list,
    	               const size_t length) {
-
+ // TODO(Chao)
 }
 
 //------------------------------------------------------------------------------
