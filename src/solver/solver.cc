@@ -267,6 +267,12 @@ void Solver::init_train() {
     reader_[i]->Reset();
   }
   hyper_param_.num_feature = max_feat + 1;
+  // Check overflow:
+  // INT_MAX +  = 0
+  if (hyper_param_.num_feature == 0) {
+    print_error("Feature index is too large (overflow).");
+    LOG(FATAL) << "Feature index is too large (overflow).";
+  }
   LOG(INFO) << "Number of feature: " << hyper_param_.num_feature;
   print_info(
     StringPrintf("Number of Feature: %d", 
