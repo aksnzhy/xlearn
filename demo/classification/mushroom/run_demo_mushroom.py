@@ -16,6 +16,7 @@ param = {'task':'binary', 'lr':0.2,
          'opt':'sgd'}
 
 # Start to train
+# The trained model will be stored in model.out
 linear_model.fit(param, './model.out')
 
 # Prediction task
@@ -23,4 +24,5 @@ linear_model.setTest("./agaricus_test.txt")  # Test data
 linear_model.setSigmoid()  # Convert output to 0-1
 
 # Start to predict
+# The output result will be stored in output.txt
 linear_model.predict("./model.out", "./output.txt")

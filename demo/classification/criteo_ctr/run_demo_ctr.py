@@ -14,6 +14,7 @@ param = {'task':'binary', 'lr':0.2,
          'lambda':0.002, 'metric':'acc'}
 
 # Start to train
+# The trained model will be stored in model.out
 ffm_model.fit(param, './model.out')
 
 # Prediction task
@@ -21,4 +22,5 @@ ffm_model.setTest("./small_test.txt")  # Test data
 ffm_model.setSigmoid()  # Convert output to 0-1
 
 # Start to predict
+# The output result will be stored in output.txt
 ffm_model.predict("./model.out", "./output.txt")

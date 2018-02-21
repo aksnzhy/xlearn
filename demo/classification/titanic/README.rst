@@ -2,7 +2,7 @@ Predict Survival in Titanic
 -----------------------------
 
 This demo comes from the Kaggle. In this demo, we will predict the people who were 
-likely to survive. (`Link`__)
+likely to survive in Titanic. (`Link`__)
 
 We have already clear the data and generate a set of features.
 
