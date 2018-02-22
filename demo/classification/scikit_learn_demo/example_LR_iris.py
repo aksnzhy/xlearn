@@ -6,7 +6,7 @@ from xlearn.sklearn import LRModel
 # load dataset
 iris_data = load_iris()
 X = iris_data['data']
-y = (iris_data['target']==2)
+y = (iris_data['target'] == 2)
 
 X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, random_state=0)
 

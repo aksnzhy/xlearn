@@ -77,8 +77,9 @@ class BaseXLearnModel(BaseEstimator):
                  **kwargs):
         """
         :param model_type: one of 'lr', 'fm', 'ffm'
-        :param task: 'binary'
-        :param metric: 'auc'
+        :param task: 'binary' for classification or 'reg' for regression
+        :param metric: 'acc', 'prec', 'recall', 'f1', 'auc' for classification,
+         and 'mae', 'mape', 'rmsd (rmse)' for regression.
         :param log: location of log
         :param lr: learning rate
         :param k: latent factor for factorization
@@ -86,7 +87,7 @@ class BaseXLearnModel(BaseEstimator):
         :param init: initial value
         :param fold: number of fold used in cross validation
         :param epoch: number of training epoch
-        :param opt: optimizer option, one of 'sgd', 'adam', 'ftrl'
+        :param opt: optimizer option, one of 'sgd', 'adagrad', 'ftrl'
         :param nthread: number of threads
         :param alpha: alpha for FTRL
         :param beta: beta for FTRL
