@@ -224,13 +224,24 @@ void Model::Serialize(const std::string& filename) {
 void Model::SerializeToTxt(const std::string& filename) {
   CHECK_NE(filename.empty(), true);
   std::ofstream o_file(filename);
-  // For now, only LR model can dump to txt file.
+  
   /* bias */
   o_file << (*param_b_) << "\n";
   /* linear term */ 
   for (index_t n = 0; n < param_num_w_; n+=aux_size_) {
     o_file << *(param_w_+n) << "\n";
   }
+
+  /* save param_v_ */
+  index_t k_aligned = get_aligned_k();
+  for (index_t j = 0; j < num_feat_; j++) {
+      real_t *w = param_v_ + j * aux_size_ * k_aligned;
+      o_file << "\n";
+      for (index_t d = 0; d < num_K_; d++, w++) {
+          o_file << *w << " ";
+      }
+  }
+
 }
 
 // Deserialize model from a checkpoint file
