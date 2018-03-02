@@ -371,7 +371,6 @@ following Python code multiple times, we may get different loss value at each ep
             
    ffm_model.fit(param, "./model.out") 
 
-
    The 1st time: 0.449056
    The 2nd time: 0.449302
    The 3nd time: 0.449185
