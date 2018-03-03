@@ -1,5 +1,5 @@
 import numpy as np
-from xlearn.sklearn import FFMModel
+from xlearn import FFMModel
 
 # initialize and fit model
 print('Testing FFMModel')

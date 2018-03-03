@@ -18,4 +18,4 @@ except ImportError:
 	SKLEARN_INSTALLED = False
 
 if SKLEARN_INSTALLED:
-	from .sklearn import FMModel, LRModel, FFMModel, write_data_to_xlearn_format
+	from ._sklearn import FMModel, LRModel, FFMModel, write_data_to_xlearn_format

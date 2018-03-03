@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
-from xlearn.sklearn import LRModel
+from xlearn import LRModel
 
 # load dataset
 iris_data = load_iris()

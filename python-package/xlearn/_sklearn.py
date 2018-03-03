@@ -143,7 +143,7 @@ class BaseXLearnModel(BaseEstimator):
         params.pop('model_type')
         return params
 
-    def fit(self, *args, fields=None,
+    def fit(self, X, y=None, fields=None,
             is_lock_free=True, is_instance_norm=True, eval_set=None, is_quiet=False):
         """ Fit the XLearn model given feature matrix X and label y
 
@@ -171,13 +171,13 @@ class BaseXLearnModel(BaseEstimator):
         # create temporary files for training data
         temp_train_file = tempfile.NamedTemporaryFile(delete=True)
 
-        if len(args) == 1:
-            assert isinstance(args[0], str), 'X must be a string specifying training file location' \
+        if y is None:
+            assert isinstance(X, str), 'X must be a string specifying training file location' \
                                              ' when only X specified'
-            self._XLearnModel.setTrain(args[0])
+            self._XLearnModel.setTrain(X)
 
-        elif len(args) == 2:
-            X, y = check_X_y(args[0], args[1], accept_sparse=['csr'], y_numeric=True, multi_output=False)
+        else:
+            X, y = check_X_y(X, y, accept_sparse=['csr'], y_numeric=True, multi_output=False)
 
             if self.model_type == 'ffm':
                 assert fields is not None, 'Must specify fields in FFMModel'
@@ -187,9 +187,6 @@ class BaseXLearnModel(BaseEstimator):
             # TODO: replace conversion with DMatrix
             self._convert_data(X, y, temp_train_file.name, fields=self.fields)
             self._XLearnModel.setTrain(temp_train_file.name)
-
-        else:
-            raise Exception('The fit method only accepts single string argument X or two input arguments X and y')
 
         #TODO: find out what task need to set sigmoid
         if self.task == 'binary':

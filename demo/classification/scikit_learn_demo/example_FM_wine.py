@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.datasets import load_wine
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-from xlearn.sklearn import FMModel
+from xlearn import FMModel
 
 # load dataset
 wine_data = load_wine()
