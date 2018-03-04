@@ -5,6 +5,8 @@ FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/xlearn/libpath.py"
 DESTINATION ${PROJECT_BINARY_DIR}/python-package/xlearn)
 FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/xlearn/xlearn.py" 
 DESTINATION ${PROJECT_BINARY_DIR}/python-package/xlearn)
+FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/xlearn/_sklearn.py"
+DESTINATION ${PROJECT_BINARY_DIR}/python-package/xlearn)
 FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/xlearn/VERSION" 
 DESTINATION ${PROJECT_BINARY_DIR}/python-package/xlearn)
 FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/xlearn/__init__.py" 
