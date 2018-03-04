@@ -34,6 +34,14 @@ DESTINATION ${PROJECT_BINARY_DIR}/demo/titanic)
 FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/classification/titanic/run_demo_titanic.py" 
 DESTINATION ${PROJECT_BINARY_DIR}/demo/titanic)
 
+# Scikit-Learn
+FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/classification/scikit_learn_demo/example_FFM_criteo.py" 
+DESTINATION ${PROJECT_BINARY_DIR}/demo/scikit_learn_demo)
+FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/classification/scikit_learn_demo/example_FM_wine.py" 
+DESTINATION ${PROJECT_BINARY_DIR}/demo/scikit_learn_demo)
+FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/classification/scikit_learn_demo/example_LR_iris.py" 
+DESTINATION ${PROJECT_BINARY_DIR}/demo/scikit_learn_demo)
+
 # House price
 FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/regression/house_price/house_price_train.txt" 
 DESTINATION ${PROJECT_BINARY_DIR}/demo/house_price)

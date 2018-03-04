@@ -6,11 +6,11 @@ linear_model.setTrain("./agaricus_train.txt")  # Training data
 linear_model.setValidate("./agaricus_test.txt")  # Validation data
 
 # param:
-#  0. Binary classification
+#  0. binary classification
 #  1. learning rate: 0.2
 #  2. lambda: 0.002
 #  3. evaluation metric: accuarcy
-#  4. Use sgd optimization method
+#  4. use sgd optimization method
 param = {'task':'binary', 'lr':0.2, 
          'lambda':0.002, 'metric':'acc', 
          'opt':'sgd'}
