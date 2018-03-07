@@ -1,5 +1,5 @@
 #!/bin/bash
-# This script runs all of the unit test
+# This script runs all of the unit test for C++
 ./base/file_util_test
 ./base/levenshtein_distance_test
 ./base/thread_pool_test
