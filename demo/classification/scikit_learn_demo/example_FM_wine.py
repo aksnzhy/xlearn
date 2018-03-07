@@ -9,7 +9,10 @@ wine_data = load_wine()
 X = wine_data['data']
 y = (wine_data['target'] == 1)
 
-X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=0)
+X_train,    \
+X_val,      \
+y_train,    \
+y_val = train_test_split(X, y, test_size=0.2, random_state=0)
 
 # Standardize input
 scaler = StandardScaler()
@@ -25,13 +28,9 @@ X_val = scaler.transform(X_val)
 #  5. regular lambda: 0.01
 #  6. use sgd optimization method
 #  7. evaluation metric: accuarcy
-fm_model = xl.FMModel(task='binary', 
-                      init=0.1, 
-                      epoch=10, 
-                      k=4, 
-                      lr=0.1, 
-                      reg_lambda=0.01, 
-                      opt='sgd', 
+fm_model = xl.FMModel(task='binary', init=0.1, 
+                      epoch=10, k=4, lr=0.1, 
+                      reg_lambda=0.01, opt='sgd', 
                       metric='acc')
 # Start to train
 fm_model.fit(X_train, 

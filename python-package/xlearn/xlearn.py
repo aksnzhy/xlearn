@@ -5,7 +5,6 @@ import ctypes
 from .base import _LIB, XLearnHandle
 from .base import _check_call, c_str
 
-
 class XLearn(object):
     """XLearn is the core interface used by python API."""
 
@@ -95,16 +94,6 @@ class XLearn(object):
         """
         _check_call(_LIB.XLearnSetTrain(ctypes.byref(self.handle), c_str(train_path)))
 
-    def setTrainDMatrix(self, train_data):
-        """ Set the data matrix for training set.
-
-        Parameters
-        ----------
-        train_data : DMatrix
-            the data matrix for training set
-        """
-        _check_call(_LIB.XLearnSetTrainDMatrix(ctypes.byref(self.handle),
-                                               ctypes.byref(train_data.handle)))
 
     def setTest(self, test_path):
         """Set file path of test data.
@@ -116,16 +105,6 @@ class XLearn(object):
         """
         _check_call(_LIB.XLearnSetTest(ctypes.byref(self.handle), c_str(test_path)))
 
-    def setTestDMatrix(self, test_data):
-        """ Set the data matrix for test set.
-
-        Parameters
-        ----------
-        test_data : DMatrix
-            the test matrix for test set
-        """
-        _check_call(_LIB.XLearnSetTestDMatrix(ctypes.byref(self.handle),
-                                              ctypes.byref(test_data.handle)))
 
     def setValidate(self, val_path):
         """Set file path of validation data.
@@ -234,7 +213,6 @@ class XLearn(object):
         """
         _check_call(_LIB.XLearnPredict(ctypes.byref(self.handle),
                                        c_str(model_path), c_str(out_path)))
-
 
 def create_linear():
     """

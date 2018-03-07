@@ -28,6 +28,8 @@ to other languages.
 #include "src/data/hyper_parameters.h"
 #include "src/solver/solver.h"
 
+#include <string>
+
 #ifdef __cplusplus
 #define XL_EXTERN_C extern "C"
 #include <cstdio>
@@ -91,14 +93,26 @@ XL_DLL int XLearnPredict(XL *out, const char *model_path, const char *out_path);
 // Set string param
 XL_DLL int XLearnSetStr(XL *out, const char *key, const char *value);
 
+// Get string params
+XL_DLL int XLearnGetStr(XL* out, const char *key, std::string& value);
+
 // Set int param
 XL_DLL int XLearnSetInt(XL *out, const char *key, const int value);
+
+// Get int param
+XL_DLL int XLearnGetInt(XL *out, const char *key, int *value);
 
 // Set float param
 XL_DLL int XLearnSetFloat(XL *out, const char *key, const float value);
 
+// Get float param
+XL_DLL int XLearnGetFloat(XL *out, const char *key, float *value);
+
 // Set bool param
 XL_DLL int XLearnSetBool(XL *out, const char *key, const bool value);
+
+// Get bool param
+XL_DLL int XLearnGetBool(XL *out, const char *key, bool *value);
 
 // This is the entry class used by c_api.
 class XLearn {

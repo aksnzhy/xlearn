@@ -86,14 +86,6 @@ XL_DLL int XLearnSetTrain(XL *out, const char *train_path) {
   API_END();
 }
 
-// Set data matrix for the training set
-XL_DLL int XLearnSetTrainDMatrix(XL *out, XL *train_matrix) {
-  API_BEGIN();
-  //XLearn* xl = reinterpret_cast<XLearn*>(*out);
-
-  API_END();
-}
-
 // Set file path of the test data
 XL_DLL int XLearnSetTest(XL *out, const char *test_path) {
   API_BEGIN();
@@ -102,27 +94,11 @@ XL_DLL int XLearnSetTest(XL *out, const char *test_path) {
   API_END();
 }
 
-// Set data matrix for the test set
-XL_DLL int XLearnSetTestDMatrix(XL *out, XL *test_matrix) {
-  API_BEGIN();
-  //XLearn* xl = reinterpret_cast<XLearn*>(*out);
-
-  API_END();
-}
-
 // Set file path of the validation data
 XL_DLL int XLearnSetValidate(XL *out, const char *val_path) {
   API_BEGIN();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   xl->GetHyperParam().validate_set_file = std::string(val_path);
-  API_END();
-}
-
-// Set data matrix for the validation set
-XL_DLL int XLearnSetValidateDMatrix(XL *out, XL *val_matrix) {
-  API_BEGIN();
-  //XLearn* xl = reinterpret_cast<XLearn*>(*out);
-
   API_END();
 }
 
@@ -212,6 +188,24 @@ XL_DLL int XLearnSetStr(XL *out, const char *key, const char *value) {
   API_END();
 }
 
+// Get string param
+XL_DLL int XLearnGetStr(XL *out, const char *key, std::string& value) {
+  API_BEGIN();
+  XLearn* xl = reinterpret_cast<XLearn*>(*out);
+  if (strcmp(key, "task") == 0) {
+    value = xl->GetHyperParam().loss_func;
+  } else if (strcmp(key, "metric") == 0) {
+    value = xl->GetHyperParam().metric;
+  } else if (strcmp(key, "log") == 0) {
+    value = xl->GetHyperParam().log_file;
+  } else if (strcmp(key, "loss") == 0) {
+    value = xl->GetHyperParam().loss_func;
+  } else if (strcmp(key, "opt") == 0) {
+    value = xl->GetHyperParam().opt_type;
+  }
+  API_END();
+}
+
 // Set int param
 XL_DLL int XLearnSetInt(XL *out, const char *key, const int value) {
   API_BEGIN();
@@ -226,6 +220,24 @@ XL_DLL int XLearnSetInt(XL *out, const char *key, const int value) {
   	xl->GetHyperParam().block_size = value;
   } else if (strcmp(key, "nthread") == 0) {
     xl->GetHyperParam().thread_number = value;
+  }
+  API_END();
+}
+
+// Get int param
+XL_DLL int XLearnGetInt(XL *out, const char *key, int *value) {
+  API_BEGIN();
+  XLearn* xl = reinterpret_cast<XLearn*>(*out);
+  if (strcmp(key, "k") == 0) {
+    *value = xl->GetHyperParam().num_K;
+  } else if (strcmp(key, "epoch") == 0) {
+    *value = xl->GetHyperParam().num_epoch;
+  } else if (strcmp(key, "fold") == 0) {
+    *value = xl->GetHyperParam().num_folds;
+  } else if (strcmp(key, "block_size") == 0) {
+    *value = xl->GetHyperParam().block_size;
+  } else if (strcmp(key, "nthread") == 0) {
+    *value = xl->GetHyperParam().thread_number;
   }
   API_END();
 }
@@ -252,6 +264,28 @@ XL_DLL int XLearnSetFloat(XL *out, const char *key, const float value) {
   API_END();
 }
 
+// Get float param
+XL_DLL int XLearnGetFloat(XL *out, const char *key, float *value) {
+  API_BEGIN();
+  XLearn* xl = reinterpret_cast<XLearn*>(*out);
+  if (strcmp(key, "lr") == 0) {
+    *value = xl->GetHyperParam().learning_rate;
+  } else if (strcmp(key, "lambda") == 0) {
+    *value = xl->GetHyperParam().regu_lambda;
+  } else if (strcmp(key, "init") == 0) {
+    *value = xl->GetHyperParam().model_scale;
+  } else if (strcmp(key, "alpha") == 0) {
+    *value = xl->GetHyperParam().alpha;
+  } else if (strcmp(key, "beta") == 0) {
+    *value = xl->GetHyperParam().beta;
+  } else if (strcmp(key, "lambda_1") == 0) {
+    *value = xl->GetHyperParam().lambda_1;
+  } else if (strcmp(key, "lambda_2") == 0) {
+    *value = xl->GetHyperParam().lambda_2;
+  }
+  API_END();
+}
+
 // Set bool param
 XL_DLL int XLearnSetBool(XL *out, const char *key, const bool value) {
   API_BEGIN();
@@ -270,6 +304,28 @@ XL_DLL int XLearnSetBool(XL *out, const char *key, const bool value) {
   	xl->GetHyperParam().sign = value;
   } else if (strcmp(key, "sigmoid") == 0) {
   	xl->GetHyperParam().sigmoid = value;
+  }
+  API_END();
+}
+
+// Get bool param
+XL_DLL int XLearnGetBool(XL *out, const char *key, bool *value) {
+  API_BEGIN();
+  XLearn* xl = reinterpret_cast<XLearn*>(*out);
+  if (strcmp(key, "on_disk") == 0) {
+    *value = xl->GetHyperParam().on_disk;
+  } else if (strcmp(key, "quiet") == 0) {
+    *value = xl->GetHyperParam().quiet;
+  } else if (strcmp(key, "norm") == 0) {
+    *value = xl->GetHyperParam().norm;
+  } else if (strcmp(key, "lock_free") == 0) {
+    *value = xl->GetHyperParam().lock_free;
+  } else if (strcmp(key, "early_stop") == 0) {
+    *value = xl->GetHyperParam().early_stop;
+  } else if (strcmp(key, "sign") == 0) {
+    *value = xl->GetHyperParam().sign = value;
+  } else if (strcmp(key, "sigmoid") == 0) {
+    *value = xl->GetHyperParam().sigmoid;
   }
   API_END();
 }
