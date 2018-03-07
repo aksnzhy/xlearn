@@ -76,6 +76,9 @@ class XLearn(object):
             elif key == 'nthread':
                 _check_call(_LIB.XLearnSetInt(ctypes.byref(self.handle),
                                               c_str(key), ctypes.c_uint(value)))
+            elif key == 'block_size':
+                _check_call(_LIB.XLearnSetInt(ctypes.byref(self.handle),
+                                              c_str(key), ctypes.c_uint(value)))
             else:
                 raise Exception("Invalid key!", key)
 

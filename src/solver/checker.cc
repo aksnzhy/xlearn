@@ -99,7 +99,9 @@ std::string Checker::option_help() const {
 "                                                                                       \n"
 "  -f <fold_number>     :  Number of folds for cross-validation. Using 5 by default.      \n"
 "                                                                                         \n"
-"  -nthread <thread number> :  Number of thread for multi-thread training.                \n"
+"  -nthread <thread_number> :  Number of thread for multi-thread training.                \n"
+"                                                                                       \n"
+"  -block <block_size>  :  Block size fot on-disk training.                             \n"
 "                                                                                      \n"
 "  --disk               :  Open on-disk training for large-scale machine learning problems. \n"
 "                                                                    \n"
@@ -162,6 +164,7 @@ void Checker::Initialize(bool is_train, int argc, char* argv[]) {
     menu_.push_back(std::string("-e"));
     menu_.push_back(std::string("-f"));
     menu_.push_back(std::string("-nthread"));
+    menu_.push_back(std::string("-block"));
     menu_.push_back(std::string("--disk"));
     menu_.push_back(std::string("--cv"));
     menu_.push_back(std::string("--dis-es"));
@@ -421,6 +424,18 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
         bo = false;
       } else {
         hyper_param.thread_number = value;
+      }
+      i += 2;
+    } else if (list[i].compare("-block") == 0) {  // block size for on-disk training
+      int value = atoi(list[i+1].c_str());
+      if (value <= 0) {
+        print_error(
+          StringPrintf("Illegal -block : '%i'. -block must be greater than zero.",
+               value)
+        );
+        bo = false;
+      } else {
+        hyper_param.block_size = value;
       }
       i += 2;
     } else if (list[i].compare("--disk") == 0) {  // on-disk training

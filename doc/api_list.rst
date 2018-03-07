@@ -67,7 +67,9 @@ Options: ::
                                                                                        
   -f <fold_number>     :  Number of folds for cross-validation (If we set --cv option). Using 5 by default.    
 
-  -nthread <thread number> :  Number of thread for multiple thread lock-free learning (Hogwild!).
+  -nthread <thread_number> :  Number of thread for multiple thread lock-free learning (Hogwild!).
+
+  -block <block_size>  :  Block size for on-disk training.
                                                                                      
   --disk               :  Open on-disk training for large-scale machine learning problems.
                                                                    
@@ -175,6 +177,8 @@ Parameter List: ::
     fold     : int value    # number of fold for cross-validation
 
     opt      : {'sgd', 'agagrad', 'ftrl'}  # optimization method
+
+    block_size : int value  # block size for on-disk training
 
 xLearn R API
 ------------------------------
