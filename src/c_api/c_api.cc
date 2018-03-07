@@ -86,11 +86,27 @@ XL_DLL int XLearnSetTrain(XL *out, const char *train_path) {
   API_END();
 }
 
+// Get file path of the training data
+XL_DLL int XLearnGetTrain(XL *out, std::string& train_path) {
+  API_BEGIN();
+  XLearn* xl = reinterpret_cast<XLearn*>(*out);
+  train_path = xl->GetHyperParam().train_set_file;
+  API_END();
+}
+
 // Set file path of the test data
 XL_DLL int XLearnSetTest(XL *out, const char *test_path) {
   API_BEGIN();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   xl->GetHyperParam().test_set_file = std::string(test_path);
+  API_END();
+}
+
+// Get file path of the test data
+XL_DLL int XLearnGetTest(XL *out, std::string& test_path) {
+  API_BEGIN();
+  XLearn* xl = reinterpret_cast<XLearn*>(*out);
+  test_path = xl->GetHyperParam().test_set_file;
   API_END();
 }
 
@@ -102,11 +118,26 @@ XL_DLL int XLearnSetValidate(XL *out, const char *val_path) {
   API_END();
 }
 
+// Get file path of the validation data
+XL_DLL int XLearnGetValidate(XL *out, std::string& val_path) {
+  API_BEGIN();
+  XLearn* xl = reinterpret_cast<XLearn*>(*out);
+  val_path = xl->GetHyperParam().validate_set_file;
+  API_END();
+}
+
 // Set file path of the txt model data
 XL_DLL int XLearnSetTXTModel(XL *out, const char *model_path) {
   API_BEGIN();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   xl->GetHyperParam().txt_model_file = std::string(model_path);
+  API_END();
+}
+
+XL_DLL int XLearnGetTXTModel(XL *out, std::string& model_path) {
+  API_BEGIN();
+  XLearn* xl = reinterpret_cast<XLearn*>(*out);
+  model_path = xl->GetHyperParam().txt_model_file;
   API_END();
 }
 

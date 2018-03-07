@@ -1,3 +1,5 @@
+# coding: utf-8
+# This file test the data conversion for sklearn API
 import unittest
 import tempfile
 
@@ -116,6 +118,6 @@ class TestDataConversion(unittest.TestCase):
         assert np.all(np.isclose(X_sparse.todense(), X_true))
         assert np.all(self.y.ravel() == y_true.ravel())
         assert np.all(self.fields.ravel() == field_true.ravel())
-        
+
 if __name__ == '__main__':
     unittest.main()

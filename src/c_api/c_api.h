@@ -63,23 +63,26 @@ XL_DLL int XLearnShow(XL *out);
 // Set file path of the training data
 XL_DLL int XLearnSetTrain(XL *out, const char *train_path);
 
-// Set data matrix for the training set
-XL_DLL int XLearnSetTrainDMatrix(XL *out, XL *train_matrix);
+// Get file path of th training data
+XL_DLL int XLearnGetTrain(XL *out, std::string& train_path);
 
 // Set file path of the test data
 XL_DLL int XLearnSetTest(XL *out, const char *test_path);
 
-// Set data matrix for the test set
-XL_DLL int XLearnSetTestDMatrix(XL *out, XL *test_matrix);
+// Get file path of the test data
+XL_DLL int XLearnGetTest(XL *out, std::string& test_path);
 
 // Set file path of the validation data
 XL_DLL int XLearnSetValidate(XL *out, const char *val_path);
 
-// Set data matrix for the validation set
-XL_DLL int XLearnSetValidateDMatrix(XL *out, XL *val_matrix);
+// Get file path of the validation data
+XL_DLL int XLearnGetValidate(XL *out, std::string& val_path);
 
-// Set file path of the txt model data
+// Set file path of the txt model
 XL_DLL int XLearnSetTXTModel(XL *out, const char *model_path);
+
+// Get file path of the txt model
+XL_DLL int XLearnGetTXTModel(XL *out, std::string& model_path);
 
 // Start to train
 XL_DLL int XLearnFit(XL *out, const char *model_path);
