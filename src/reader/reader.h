@@ -211,6 +211,7 @@ class OndiskReader : public Reader {
   OndiskReader() 
     : block_size_(500) {  }  /* 500 MB on default */
   ~OndiskReader() { 
+    Clear();
     Close(file_ptr_); 
   }
 
@@ -226,7 +227,9 @@ class OndiskReader : public Reader {
   // Free the memory of data matrix.
   virtual void Clear() {
     data_samples_.Release();
-    delete [] block_;
+    if (block_ != nullptr) {
+      delete [] block_;
+    }
   }
 
   // We cannot set shuffle for OndiskReader

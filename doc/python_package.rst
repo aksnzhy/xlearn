@@ -18,7 +18,7 @@ If you install xLearn Python package successfully, you will see ::
       >  <| |___|  __/ (_| | |  | | | |
      /_/\_\_____/\___|\__,_|_|  |_| |_|
 
-        xLearn   -- 0.20 Version --
+        xLearn   -- 0.30 Version --
   -------------------------------------------------------------------------
 
 Quick Start
