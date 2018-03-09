@@ -4,7 +4,7 @@
 
     * Fix bugs in previous version
     * Solved the memory leak problem for on-disk learning
-    * Support dump TXT model to checkpoint
+    * Support TXT model checkpoint
     * Support Scikit-Learn API
 
  - 18/12/2017 xLearn 0.2.0 version release. Main update:
