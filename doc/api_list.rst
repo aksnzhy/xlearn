@@ -154,7 +154,7 @@ Parameter List: ::
                 'reg'}     # Regression
 
     metric   : {'acc', 'prec', 'recall', 'f1', 'auc',   # for classification
-                'mae', 'mape', 'rmse', 'rmsd'}  # for regression
+                'mae', 'mape', 'rmse', 'rmsd'}          # for regression
 
     lr       : float value  # learning rate
 

@@ -30,6 +30,7 @@ This file defines the basic data structures used by xLearn.
 
 #include "src/base/common.h"
 #include "src/base/file_util.h"
+#include "src/base/stl-util.h"
 
 namespace xLearn {
 
@@ -145,7 +146,7 @@ struct DMatrix {
      pos(0) { }
 
   // Destructor
-  ~DMatrix() { Release(); }
+  ~DMatrix() { }
 
   // Reset data for the DMatrix.
   // This function will first release the original
@@ -181,7 +182,7 @@ struct DMatrix {
     // Delete Node
     for (int i = 0; i < row_length; ++i) {
       if (row[i] != nullptr) {
-        std::vector<Node>().swap(*(row[i]));
+        STLDeleteElementsAndClear(&row);
       }
     }
     // Delete SparseRow
@@ -410,7 +411,7 @@ struct DMatrix {
   uint64 hash_value_2;
   /* Row length of current matrix */
   index_t row_length;
-  /* Using pointer to implement zero-copy */
+  /* Using pointer for zero-copy */
   std::vector<SparseRow*> row;
   /* 0 or -1 for negative and +1 for positive
   example, and others for regression */
