@@ -131,12 +131,12 @@ USAGE:
  e.g.,  xlearn_predict ./test_data.txt ./model_file -o ./out.txt  
                                                                            
 OPTIONS: 
-  -o <output_file>     :  Path of the output file. On default, this value will be set 
-                          to 'test_file' + '.out'                    
+  -o <output_file>         :  Path of the output file. On default, this value will be set 
+                              to 'test_file' + '.out'                    
                                                                          
   -nthread <thread number> :  Number of thread for multi-thread learning. 
                                                                              
-  -l <log_file_path>   :  Path of the log file. Using '/tmp/xlearn_log' by default. 
+  -l <log_file_path>       :  Path of the log file. Using '/tmp/xlearn_log' by default. 
                                                             
   --sign                   :  Converting output to 0 and 1. 
                                                                
