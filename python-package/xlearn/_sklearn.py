@@ -18,9 +18,9 @@ def write_data_to_xlearn_format(X, y, filepath, fields=None):
     :param y: array-like
               Label in numpy or sparse format
     :param filepath: file location for writing data to
-    :param fields: An array specifying fields in each columns of X. It should have same length
-    as the number of columns in X. When set to None, convert data to libsvm format else
-    libffm format.
+    :param fields: An array specifying fields in each columns of X. It should have same length 
+        as the number of columns in X. When set to None, convert data to libsvm format else
+        libffm format.
     """
 
     with open(filepath, "wb") as f_handle:
@@ -70,32 +70,31 @@ def write_data_to_xlearn_format(X, y, filepath, fields=None):
 
 class BaseXLearnModel(BaseEstimator):
     """ Implementation of Scikit-learn interface for xlearn models.
+
+    :param model_type: one of 'lr', 'fm', 'ffm'
+    :param task: 'binary' for classification or 'reg' for regression
+    :param metric: 'acc', 'prec', 'recall', 'f1', 'auc' for classification,
+        and 'mae', 'mape', 'rmsd (rmse)' for regression.
+    :param log: location of log
+    :param lr: learning rate
+    :param k: latent factor for factorization
+    :param reg_lambda: alias for lambda
+    :param init: initial value
+    :param fold: number of fold used in cross validation
+    :param epoch: number of training epoch
+    :param opt: optimizer option, one of 'sgd', 'adagrad', 'ftrl'
+    :param nthread: number of threads
+    :param alpha: alpha for FTRL
+    :param beta: beta for FTRL
+    :param lambda_1: lambda_1 for FTRL
+    :param lambda_2: lambda_2 for FTRL
+    :param kwargs: extra input arguments
     """
+    
     def __init__(self, model_type='fm', task='binary', metric='auc',
                  lr=0.2, k=4, reg_lambda=0.1, init=0.1, fold=1, epoch=5,
                  opt='sgd', nthread=4, alpha=1, beta=1, lambda_1=1, lambda_2=1,
                  **kwargs):
-        """
-        :param model_type: one of 'lr', 'fm', 'ffm'
-        :param task: 'binary' for classification or 'reg' for regression
-        :param metric: 'acc', 'prec', 'recall', 'f1', 'auc' for classification,
-         and 'mae', 'mape', 'rmsd (rmse)' for regression.
-        :param log: location of log
-        :param lr: learning rate
-        :param k: latent factor for factorization
-        :param reg_lambda: alias for lambda
-        :param init: initial value
-        :param fold: number of fold used in cross validation
-        :param epoch: number of training epoch
-        :param opt: optimizer option, one of 'sgd', 'adagrad', 'ftrl'
-        :param nthread: number of threads
-        :param alpha: alpha for FTRL
-        :param beta: beta for FTRL
-        :param lambda_1: lambda_1 for FTRL
-        :param lambda_2: lambda_2 for FTRL
-        :param kwargs: extra input arguments
-        """
-
         self.model_type = model_type
         self.task = task
         self.metric = metric
@@ -299,8 +298,10 @@ class BaseXLearnModel(BaseEstimator):
 
 
 class FMModel(BaseXLearnModel):
-    """ Factorization machine model
-    """
+    __doc__ = """Implementation of the scikit-learn API for XLearn Factorization machine model.
+
+    """ + '\n'.join(BaseXLearnModel.__doc__.split('\n')[1:])
+
     def __init__(self, model_type='fm', task='binary', metric='auc',
                  lr=0.2, k =4, reg_lambda=0.1, init=0.1, fold=1, epoch=5,
                  opt='sgd', nthread=4, alpha=1, beta=1, lambda_1=1, lambda_2=1,
@@ -315,8 +316,10 @@ class FMModel(BaseXLearnModel):
         super(FMModel, self).__delete(instance)
 
 class LRModel(BaseXLearnModel):
-    """ Logistic regression model
-    """
+    __doc__ = """Implementation of the scikit-learn API for XLearn Logistic regression model.
+    
+    """ + '\n'.join(BaseXLearnModel.__doc__.split('\n')[1:])
+
     def __init__(self, model_type='lr', task='binary', metric='auc',
                  lr=0.2, k =4, reg_lambda=0.1, init=0.1, fold=1, epoch=5,
                  opt='sgd', nthread=4, alpha=1, beta=1, lambda_1=1, lambda_2=1,
@@ -331,8 +334,10 @@ class LRModel(BaseXLearnModel):
         super(LRModel, self).__delete(instance)
 
 class FFMModel(BaseXLearnModel):
-    """ Field-aware factorization machine model
-    """
+    __doc__ = """Implementation of the scikit-learn API for XLearn Field-aware factorization machine model.
+    
+    """ + '\n'.join(BaseXLearnModel.__doc__.split('\n')[1:])
+
     def __init__(self, model_type='ffm', task='binary', metric='auc',
                  lr=0.2, k =4, reg_lambda=0.1, init=0.1, fold=1, epoch=5,
                  opt='sgd', nthread=4, alpha=1, beta=1, lambda_1=1, lambda_2=1,
