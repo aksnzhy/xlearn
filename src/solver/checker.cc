@@ -66,6 +66,9 @@ OPTIONS:
   -m <model_file>      :  Path of the model checkpoint file. On default, the model file name will be. 
                           set to 'train_file' + '.model'. If we set this value to 'none', the xLearn will 
                           not dump the model checkpoint after training. 
+
+  -pre <pre-model>     :  Path of the pre-trained model. This can be used for online learning.
+
   -t <txt_model_file>  :  Path of the txt model checkpoint file. On default, this option is empty 
                           and xLearn will not dump the txt model. 
                                                                              
@@ -163,6 +166,7 @@ void Checker::Initialize(bool is_train, int argc, char* argv[]) {
     menu_.push_back(std::string("-u"));
     menu_.push_back(std::string("-e"));
     menu_.push_back(std::string("-f"));
+    menu_.push_back(std::string("-pre"));
     menu_.push_back(std::string("-nthread"));
     menu_.push_back(std::string("-block"));
     menu_.push_back(std::string("--disk"));
@@ -413,6 +417,9 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       } else {
         hyper_param.num_folds = value;
       }
+      i += 2;
+    } else if (list[i].compare("-pre") == 0) {  // pre-trained model
+      hyper_param.pre_model_file = list[i+1];
       i += 2;
     } else if (list[i].compare("-nthread") == 0) {  // number of thread
       int value = atoi(list[i+1].c_str());

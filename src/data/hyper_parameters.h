@@ -111,6 +111,8 @@ struct HyperParam {
   /* Filename of model checkpoint
   On default, model_file = train_set_file + ".model" */
   std::string model_file;
+  /* Pre-trained model for online learning */
+  std::string pre_model_file;
   /* Filename of the txt model checkpoint 
   On default, txt_model_file = none */
   std::string txt_model_file = "none";
