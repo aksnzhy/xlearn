@@ -14,7 +14,7 @@
 xLearn is a ***high performance***, ***easy-to-use***, and ***scalable*** machine learning package, 
 which can be used to solve large-scale machine learning problems. xLearn is especially useful for solving machine
 learning problems on large-scale sparse data, which is very common in Internet services such as online advertisement 
-and recommender systems in recent years.  If you are the user  of liblinear, libfm, or libffm, now the xLearn is your 
+and recommender systems in recent years.  If you are the user  of liblinear, libfm, or libffm, now xLearn is your 
 another better choice. 
 
 [Get Started!](http://xlearn-doc.readthedocs.io/en/latest/start.html)
