@@ -174,7 +174,7 @@ class BaseXLearnModel(BaseEstimator):
 
         if y is None:
             assert isinstance(X, str), 'X must be a string specifying training file location' \
-                                             ' when only X specified'
+                                       ' when only X specified'
             self._XLearnModel.setTrain(X)
 
         else:
@@ -217,7 +217,10 @@ class BaseXLearnModel(BaseEstimator):
                     raise Exception('eval_set must be a 2-element list')
 
                 # extract validation data
-                X_val, y_val = check_X_y(eval_set[0], eval_set[1], accept_sparse=['csr'], y_numeric=True, multi_output=False)
+                X_val, y_val = check_X_y(eval_set[0], eval_set[1], 
+                    accept_sparse=['csr'], 
+                    y_numeric=True, 
+                    multi_output=False)
 
                 temp_val_file = tempfile.NamedTemporaryFile(delete=True)
                 self._convert_data(X_val, y_val, temp_val_file.name, fields=self.fields)
