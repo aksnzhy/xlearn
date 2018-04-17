@@ -217,7 +217,6 @@ void read_from_disk(const std::string& filename, int task_id) {
   DMatrix* matrix = new DMatrix;
   for (int i = 0; i < iteration_num; ++i) {
     int record_num = reader.Samples(matrix);
-    //std::cout << i << std::endl;
     if (record_num == 0) {
       --i;
       reader.Reset();

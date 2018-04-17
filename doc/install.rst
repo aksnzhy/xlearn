@@ -32,11 +32,12 @@ You will see: ::
       >  <| |___|  __/ (_| | |  | | | |
      /_/\_\_____/\___|\__,_|_|  |_| |_|
 
-        xLearn   -- 0.10 Version --
+        xLearn   -- 0.30 Version --
   -------------------------------------------------------------------------
 
 If you want to build the latest code from `Github`__, or you want to use the xLearn command line 
-instead of the Python API, you can see how to build xLearn from source code as follow.
+instead of the Python API, you can see how to build xLearn from source code as follow. We highly
+recommend that you can build xLearn from source code.
 
 Install xLearn from Source Code
 ----------------------------------

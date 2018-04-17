@@ -43,7 +43,7 @@ namespace xLearn {
 //    >  <| |___|  __/ (_| | |  | | | |
 //   /_/\_\______\___|\__,_|_|  |_| |_|
 //
-//      xLearn   -- 0.10 Version --
+//      xLearn   -- 0.30 Version --
 //------------------------------------------------------------------------------
 void Solver::print_logo() const {
   std::string logo = 
@@ -54,7 +54,7 @@ void Solver::print_logo() const {
                     "     \\ \\/ / |    / _ \\/ _` | '__| '_ \\ \n"
                     "      >  <| |___|  __/ (_| | |  | | | |\n"
                     "     /_/\\_\\_____/\\___|\\__,_|_|  |_| |_|\n\n"
-                    "        xLearn   -- 0.20 Version --\n"
+                    "        xLearn   -- 0.31 Version --\n"
 "----------------------------------------------------------------------------------------------\n"
 "\n";
   Color::Modifier green(Color::FG_GREEN);
@@ -267,6 +267,12 @@ void Solver::init_train() {
     reader_[i]->Reset();
   }
   hyper_param_.num_feature = max_feat + 1;
+  // Check overflow:
+  // INT_MAX +  = 0
+  if (hyper_param_.num_feature == 0) {
+    print_error("Feature index is too large (overflow).");
+    LOG(FATAL) << "Feature index is too large (overflow).";
+  }
   LOG(INFO) << "Number of feature: " << hyper_param_.num_feature;
   print_info(
     StringPrintf("Number of Feature: %d", 

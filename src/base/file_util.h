@@ -29,6 +29,7 @@ This file contains facilitlies to control the file.
 
 #include "src/base/common.h"
 #include "src/base/stringprintf.h"
+#include "src/base/scoped_ptr.h"
 
 //------------------------------------------------------------------------------
 // Useage:
@@ -112,21 +113,22 @@ const size_t KB = 1024.0;
 const size_t MB = 1024.0 * 1024.0;
 const size_t GB = 1024.0 * 1024.0 * 1024.0;
 
-/* 100 KB for one line of txt data */
+/* 500 KB for one line of txt data */
 static const uint32 kMaxLineSize = 500 * 1024;  // 500 KB
-/* Chunk size for hash */
-static const uint32 kChunkSize = 10000000;
+/* Chunk size for hash block */
+static const uint32 kChunkSize = 1000 * 1024; // 1000 KB
 
 // Check whether the file exists.
 inline bool FileExist(const char* filename) {
   if (access(filename, F_OK) != -1) {
     return true;
   }
+  LOG(WARNING) << "File: " << filename << "doesn't exists.";
   return false;
 }
 
 // Open file using fopen() and return the file pointer.
-// model : "w" for write and "r" for read
+// mode : "w" for write and "r" for read
 inline FILE* OpenFileOrDie(const char* filename, const char* mode) {
   FILE* input_stream = fopen(filename, mode);
   if (input_stream == nullptr) {
@@ -152,17 +154,18 @@ inline uint64 GetFileSize(FILE* file) {
   if (total_size == -1) {
     LOG(FATAL) << "Error: invoke ftell().";
   }
-  rewind(file);  /* Return to the head */
+  // Return to the head of file
+  rewind(file);
   return total_size;
 }
 
 // Get one line of data from the file.
 inline void GetLine(FILE* file, std::string& str_line) {
   CHECK_NOTNULL(file);
-  static char* line = new char[kMaxLineSize];
- char* ret = fgets(line, kMaxLineSize, file);
- CHECK_NOTNULL(ret);
-  int read_len = strlen(line);
+  //static char* line = new char[kMaxLineSize];
+  scoped_array<char> line(new char[kMaxLineSize]);
+  CHECK_NOTNULL(fgets(line.get(), kMaxLineSize, file));
+  int read_len = strlen(line.get());
   if (line[read_len - 1] != '\n') {
     LOG(FATAL) << "Encountered a too-long line.     \
                    Please check the data.";
@@ -173,11 +176,11 @@ inline void GetLine(FILE* file, std::string& str_line) {
       line[read_len - 2] = '\0';
     }
   }
-  str_line.assign(line);
+  str_line.assign(line.get());
 }
 
 // Write data from a buffer to disk file.
-// Return the size (byte) of data we have written.
+// Return the size (byte) of data we write.
 inline size_t WriteDataToDisk(FILE* file, const char* buf, size_t len) {
   CHECK_NOTNULL(file);
   CHECK_NOTNULL(buf);
@@ -239,11 +242,15 @@ inline std::string PrintSize(uint64 file_size) {
 template <typename T>
 void WriteVectorToFile(FILE* file_ptr, const std::vector<T>& vec) {
   CHECK_NOTNULL(file_ptr);
-  // We do not allow Serialize an empty vector
+  // We do not allow to Serialize an empty vector
   CHECK(!vec.empty());
   size_t len = vec.size();
-  WriteDataToDisk(file_ptr, (char*)&len, sizeof(len));
-  WriteDataToDisk(file_ptr, (char*)vec.data(), sizeof(T)*len);
+  WriteDataToDisk(file_ptr, 
+    reinterpret_cast<char*>(&len), 
+    sizeof(len));
+  WriteDataToDisk(file_ptr, 
+    (char*)(vec.data()), 
+    sizeof(T)*len);
 }
 
 // Read a std::vector from disk file.
@@ -252,10 +259,15 @@ void ReadVectorFromFile(FILE* file_ptr, std::vector<T>& vec) {
   CHECK_NOTNULL(file_ptr);
   // First, read the size of vector
   size_t len = 0;
-  ReadDataFromDisk(file_ptr, (char*)(&len), sizeof(len));
+  ReadDataFromDisk(file_ptr, 
+    reinterpret_cast<char*>(&len), 
+    sizeof(len));
   CHECK_GT(len, 0);
+  std::vector<T>().swap(vec);
   vec.resize(len);
-  ReadDataFromDisk(file_ptr, (char*)vec.data(), sizeof(T)*len);
+  ReadDataFromDisk(file_ptr, 
+    reinterpret_cast<char*>(vec.data()), 
+    sizeof(T)*len);
 }
 
 // Write a std::string to disk file.
@@ -264,8 +276,12 @@ inline void WriteStringToFile(FILE* file_ptr, const std::string& str) {
   // We do not allow Serialize an empty string
   CHECK(!str.empty());
   size_t len = str.size();
-  WriteDataToDisk(file_ptr, (char*)&len, sizeof(len));
-  WriteDataToDisk(file_ptr, (char*)str.data(), len);
+  WriteDataToDisk(file_ptr, 
+    reinterpret_cast<char*>(&len), 
+    sizeof(len));
+  WriteDataToDisk(file_ptr, 
+    const_cast<char*>(str.data()), 
+    len);
 }
 
 // Read a std::string from disk file.
@@ -273,10 +289,15 @@ inline void ReadStringFromFile(FILE* file_ptr, std::string& str) {
   CHECK_NOTNULL(file_ptr);
   // First, read the size of vector
   size_t len = 0;
-  ReadDataFromDisk(file_ptr, (char*)(&len), sizeof(len));
+  ReadDataFromDisk(file_ptr, 
+    reinterpret_cast<char*>(&len), 
+    sizeof(len));
   CHECK_GT(len, 0);
+  std::string().swap(str);
   str.resize(len);
-  ReadDataFromDisk(file_ptr, (char*)str.data(), len);
+  ReadDataFromDisk(file_ptr, 
+    const_cast<char*>(str.data()), 
+    len);
 }
 
 //------------------------------------------------------------------------------

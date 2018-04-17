@@ -52,9 +52,9 @@ index_t Parser::get_line_number(char* buf, uint64 buf_size) {
 
 // Get one line from memory buffer
 uint64 Parser::get_line_from_buffer(char* line,
-                               char* buf,
-                               uint64 pos,
-                               uint64 size) {
+                                    char* buf,
+                                    uint64 pos,
+                                    uint64 size) {
   if (pos >= size) { return 0; }
   uint64 end_pos = pos;
   while (end_pos < size && buf[end_pos] != '\n') { end_pos++; }
@@ -123,6 +123,7 @@ void LibsvmParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
     norm = 1.0f / norm;
     matrix.norm[i] = norm;
   }
+  delete [] line_buf;
 }
 
 //------------------------------------------------------------------------------
@@ -136,7 +137,7 @@ void FFMParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
   CHECK_GT(size, 0);
   index_t line_num = get_line_number(buf, size);
   matrix.ResetMatrix(line_num);
-  static char* line_buf = new char[kMaxLineSize];
+  char* line_buf = new char[kMaxLineSize];
   // Parse every line
   uint64 pos = 0;
   for (index_t i = 0; i < line_num; ++i) {
@@ -180,6 +181,7 @@ void FFMParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
     norm = 1.0f / norm;
     matrix.norm[i] = norm;
   }
+  delete [] line_buf;
 }
 
 //------------------------------------------------------------------------------
@@ -197,7 +199,7 @@ void CSVParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
   CHECK_GT(size, 0);
   index_t line_num = get_line_number(buf, size);
   matrix.ResetMatrix(line_num);
-  static char* line_buf = new char[kMaxLineSize];
+  char* line_buf = new char[kMaxLineSize];
   // Parse every line
   uint64 pos = 0;
   std::vector<std::string> str_vec;
@@ -221,6 +223,7 @@ void CSVParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
     norm = 1.0f / norm;
     matrix.norm[i] = norm;
   }
+  delete [] line_buf;
 }
 
 } // namespace xLearn

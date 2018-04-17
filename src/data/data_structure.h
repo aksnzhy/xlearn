@@ -30,6 +30,7 @@ This file defines the basic data structures used by xLearn.
 
 #include "src/base/common.h"
 #include "src/base/file_util.h"
+#include "src/base/stl-util.h"
 
 namespace xLearn {
 
@@ -62,14 +63,14 @@ const int kAlignByte = 16;
 // will be printed for users during the training.
 //------------------------------------------------------------------------------
 struct MetricInfo {
-  real_t loss_val;    /* Loss info */
-  real_t metric_val;  /* Metric info */
+  real_t loss_val;    /* Loss value */
+  real_t metric_val;  /* Metric value */
 };
 
 //------------------------------------------------------------------------------
 // Node is used to store information for each column of the feature vector.
-// For tasks like lr and fm, we just need to store the feature id and the 
-// feature value. While for tasks like ffm, we also need to store the field id.
+// For tasks like LR and FM, we just need to store the feature id and the 
+// feature value. While for tasks like FFM, we also need to store field id.
 //------------------------------------------------------------------------------
 struct Node {
   // Default constructor
@@ -79,11 +80,11 @@ struct Node {
      feat_id(feat), 
      feat_val(val) { }
   /* Field id is start from 0 */
-  index_t field_id; 
+  index_t field_id;
   /* Feature id is start from 0 */ 
-  index_t feat_id;  
+  index_t feat_id;
   /* Feature value */ 
-  real_t feat_val;   
+  real_t feat_val;
 };
 
 //------------------------------------------------------------------------------
@@ -145,7 +146,7 @@ struct DMatrix {
      pos(0) { }
 
   // Destructor
-  ~DMatrix() { Release(); }
+  ~DMatrix() { }
 
   // Reset data for the DMatrix.
   // This function will first release the original
@@ -181,7 +182,7 @@ struct DMatrix {
     // Delete Node
     for (int i = 0; i < row_length; ++i) {
       if (row[i] != nullptr) {
-        std::vector<Node>().swap(*(row[i]));
+        STLDeleteElementsAndClear(&row);
       }
     }
     // Delete SparseRow
@@ -403,15 +404,14 @@ struct DMatrix {
     return max;
   }
 
-  /* The DMatrix has a hash value that is
-  geneerated from the txt file.
-  These two values are used to check whether
-  we can use binary file to speedup data reading */
+  /* The DMatrix has a hash value that is geneerated 
+  from the txt file. These two values are used to check 
+  whether we can use binary file to speedup data reading */
   uint64 hash_value_1;
   uint64 hash_value_2;
   /* Row length of current matrix */
   index_t row_length;
-  /* Using pointer to implement zero-copy */
+  /* Using pointer for zero-copy */
   std::vector<SparseRow*> row;
   /* 0 or -1 for negative and +1 for positive
   example, and others for regression */

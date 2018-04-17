@@ -35,111 +35,117 @@ namespace xLearn {
 // Option help menu
 std::string Checker::option_help() const {
   if (is_train_) {
-    return std::string(
-"----------------------------------------  Training task  -------------------------------------\n"
-"USAGE: \n"
-"     xlearn_train <train_file_path> [OPTIONS] \n"
-"                                                    \n"
-" e.g.,  xlearn_train train_data.txt -s 0 -v validate_data.txt -r 0.1 \n"
-"                                                                      \n"
-"OPTIONS: \n"
-"  -s <type> : Type of machine learning model (default 0) \n"
-"     for classification task: \n"
-"         0 -- linear model (GLM) \n"
-"         1 -- factorization machines (FM) \n"
-"         2 -- field-aware factorization machines (FFM) \n"
-"     for regression task: \n"
-"         3 -- linear model (GLM) \n"
-"         4 -- factorization machines (FM) \n"
-"         5 -- field-aware factorization machines (FFM) \n"
-"                                                                            \n"
-"  -x <metric>          :  The metric can be 'acc', 'prec', 'recall', 'f1', 'auc' (classification), and \n"
-"                          'mae', 'mape', 'rmsd (rmse)' (regression). On defaurt, xLearn will not print \n"
-"                          any evaluation metric information.                                            \n"
-"                                                                                                      \n"
-"  -p <opt_method>      :  Choose the optimization method, including 'sgd', adagrad', and 'ftrl'. On default, \n"
-"                          we use the adagrad optimization. \n"
-"                                                                                                 \n"
-"  -v <validate_file>   :  Path of the validation data file. This option will be empty by default, \n"
-"                          and in this way, the xLearn will not perform validation. \n"
-"                                                                                              \n"
-"  -m <model_file>      :  Path of the model checkpoint file. On default, the model file name will be. \n"
-"                          set to 'train_file' + '.model'. If we set this value to 'none', the xLearn will \n"
-"                          not dump the model checkpoint after training. \n"
-"  -t <txt_model_file>  :  Path of the txt model checkpoint file. On default, this option is empty \n"
-"                          and xLearn will not dump the txt model. \n"
-"                                                                             \n"
-"  -l <log_file>        :  Path of the log file. Using '/tmp/xlearn_log/' by default. \n"
-"                                                                                       \n"
-"  -k <number_of_K>     :  Number of the latent factor used by fm and ffm tasks. Using 4 by default. \n"
-"                          Note that, we will get the same model size when setting k to 1 and 4. \n"
-"                          This is because we use SSE instruction and the memory need to be aligned. \n"
-"                          So even you assign k = 1, we still fill some dummy zeros from k = 2 to 4. \n"
-"                                                                                         \n"
-"  -r <learning_rate>   :  Learning rate for stochastic gradient descent. Using 0.2 by default. \n"
-"                          xLearn uses adaptive gradient descent (AdaGrad) for optimization problem, \n"
-"                          and the learning rate will be changed adaptively. \n"
-"                                                                                     \n"
-"  -b <lambda_for_regu> :  Lambda for L2 regular. Using 0.00002 by default. We can disable the \n"
-"                          regular term by setting this value to 0.0 \n"
-"                                                                      \n"
-"  -alpha               :  Used by ftrl.                                \n"
-"                                                                        \n"
-"  -beta                :  Used by ftrl.                                 \n"
-"                                                                        \n"
-"  -lambda_1            :  Used by ftrl.                                 \n"
-"                                                                       \n"
-"  -lambda_2            :  Used by ftrl.                                \n"
-"                                                                      \n"
-"  -u <model_scale>     :  Hyper parameter used for initialize model parameters. \n"
-"                          Using 0.66 by default. \n"
-"                                                                                  \n"
-"  -e <epoch_number>    :  Number of epoch for training. Using 10 by default. Note that, xLearn will \n"
-"                          perform early-stopping by default, so this value is just a upper bound. \n"
-"                                                                                       \n"
-"  -f <fold_number>     :  Number of folds for cross-validation. Using 5 by default.      \n"
-"                                                                                         \n"
-"  -nthread <thread number> :  Number of thread for multi-thread training.                \n"
-"                                                                                      \n"
-"  --disk               :  Open on-disk training for large-scale machine learning problems. \n"
-"                                                                    \n"
-"  --cv                 :  Open cross-validation in training tasks. If we use this option, xLearn \n"
-"                          will ignore the validation file (-t).  \n"
-"                                                                   \n"
-"  --dis-lock-free      :  Disable lock-free training. Lock-free training can accelerate training but \n"
-"                          the result is non-deterministic. Our suggestion is that you can open this flag \n"
-"                          if the training data is big and sparse. \n"
-"                                                                        \n"
-"  --dis-es             :  Disable early-stopping in training. By default, xLearn will use early-stopping \n"
-"                          in training tasks, except for training in cross-validation. \n"
-"                                                                                          \n"
-"  --no-norm            :  Disable instance-wise normalization. By default, xLearn will use \n"
-"                          instance-wise normalization for both training and prediction. \n"
-"                                                                  \n"
-"  --quiet              :  Don't print any evaluation information during the training and \n"
-"                          just train the model quietly. \n"
-"----------------------------------------------------------------------------------------------\n"
+    return std::string(R"(
+----------------------------------------  Training task  -------------------------------------
+USAGE:
+     xlearn_train <train_file_path> [OPTIONS] 
+                                                    
+ e.g.,  xlearn_train train_data.txt -s 0 -v validate_data.txt -r 0.1
+                                                                    
+OPTIONS: 
+  -s <type> : Type of machine learning model (default 0) 
+     for classification task: 
+         0 -- linear model (GLM) 
+         1 -- factorization machines (FM) 
+         2 -- field-aware factorization machines (FFM) 
+     for regression task: 
+         3 -- linear model (GLM) 
+         4 -- factorization machines (FM) 
+         5 -- field-aware factorization machines (FFM) 
+                                                                            
+  -x <metric>          :  The metric can be 'acc', 'prec', 'recall', 'f1', 'auc' (classification), and 
+                          'mae', 'mape', 'rmsd (rmse)' (regression). On defaurt, xLearn will not print 
+                          any evaluation metric information.                                            
+                                                                                                      
+  -p <opt_method>      :  Choose the optimization method, including 'sgd', adagrad', and 'ftrl'. On default, 
+                          we use the adagrad optimization. 
+                                                                                                 
+  -v <validate_file>   :  Path of the validation data file. This option will be empty by default, 
+                          and in this way, the xLearn will not perform validation. 
+                                                                                              
+  -m <model_file>      :  Path of the model checkpoint file. On default, the model file name will be. 
+                          set to 'train_file' + '.model'. If we set this value to 'none', the xLearn will 
+                          not dump the model checkpoint after training. 
+
+  -pre <pre-model>     :  Path of the pre-trained model. This can be used for online learning. 
+                          (Under developing)
+
+  -t <txt_model_file>  :  Path of the txt model checkpoint file. On default, this option is empty 
+                          and xLearn will not dump the txt model. 
+                                                                             
+  -l <log_file>        :  Path of the log file. Using '/tmp/xlearn_log/' by default. 
+                                                                                       
+  -k <number_of_K>     :  Number of the latent factor used by fm and ffm tasks. Using 4 by default. 
+                          Note that, we will get the same model size when setting k to 1 and 4. 
+                          This is because we use SSE instruction and the memory need to be aligned. 
+                          So even you assign k = 1, we still fill some dummy zeros from k = 2 to 4. 
+                                                                                         
+  -r <learning_rate>   :  Learning rate for stochastic gradient descent. Using 0.2 by default. 
+                          xLearn uses adaptive gradient descent (AdaGrad) for optimization problem, 
+                          and the learning rate will be changed adaptively. 
+                                                                                     
+  -b <lambda_for_regu> :  Lambda for L2 regular. Using 0.00002 by default. We can disable the 
+                          regular term by setting this value to 0.0 
+                                                                      
+  -alpha               :  Used by ftrl.                                
+                                                                        
+  -beta                :  Used by ftrl.                                 
+                                                                        
+  -lambda_1            :  Used by ftrl.                                 
+                                                                       
+  -lambda_2            :  Used by ftrl.                                
+                                                                      
+  -u <model_scale>     :  Hyper parameter used for initialize model parameters. 
+                          Using 0.66 by default. 
+                                                                                  
+  -e <epoch_number>    :  Number of epoch for training. Using 10 by default. Note that, xLearn will 
+                          perform early-stopping by default, so this value is just a upper bound. 
+                                                                                       
+  -f <fold_number>     :  Number of folds for cross-validation. Using 5 by default.      
+                                                                                         
+  -nthread <thread_number> :  Number of thread for multi-thread training.                
+                                                                                       
+  -block <block_size>  :  Block size fot on-disk training.                             
+                                                                                      
+  --disk               :  Open on-disk training for large-scale machine learning problems. 
+                                                                    
+  --cv                 :  Open cross-validation in training tasks. If we use this option, xLearn 
+                          will ignore the validation file (-t).  
+                                                                   
+  --dis-lock-free      :  Disable lock-free training. Lock-free training can accelerate training but 
+                          the result is non-deterministic. Our suggestion is that you can open this flag 
+                          if the training data is big and sparse. 
+                                                                        
+  --dis-es             :  Disable early-stopping in training. By default, xLearn will use early-stopping 
+                          in training tasks, except for training in cross-validation. 
+                                                                                          
+  --no-norm            :  Disable instance-wise normalization. By default, xLearn will use 
+                          instance-wise normalization for both training and prediction. 
+                                                                  
+  --quiet              :  Don't print any evaluation information during the training and 
+                          just train the model quietly. 
+----------------------------------------------------------------------------------------------)"
     );
   } else {
-    return std::string(
-"-------------------------------------- Prediction task ---------------------------------------\n"
-"USAGE: \n"
-"     xlearn_predict <test_file> <model_file> [OPTIONS] \n"
-"                                                         \n"
-" e.g.,  xlearn_predict ./test_data.txt ./model_file -o ./out.txt  \n"
-"                                                                           \n"
-"OPTIONS: \n"
-"  -o <output_file>     :  Path of the output file. On default, this value will be set \n"
-"                          to 'test_file' + '.out'                    \n"
-"                                                                         \n"
-"  -nthread <thread number> :  Number of thread for multi-thread learning. \n"
-"                                                                             \n"
-"  -l <log_file_path>   :  Path of the log file. Using '/tmp/xlearn_log' by default. \n"
-"                                                            \n"
-"  --sign                   :  Converting output to 0 and 1. \n"
-"                                                               \n"
-"  --sigmoid                :  Converting output to 0~1 (problebility). \n"
-"----------------------------------------------------------------------------------------------\n"
+    return std::string(R"(
+-------------------------------------- Prediction task ---------------------------------------
+USAGE: 
+     xlearn_predict <test_file> <model_file> [OPTIONS] 
+                                                         
+ e.g.,  xlearn_predict ./test_data.txt ./model_file -o ./out.txt  
+                                                                           
+OPTIONS: 
+  -o <output_file>         :  Path of the output file. On default, this value will be set 
+                              to 'test_file' + '.out'                    
+                                                                         
+  -nthread <thread number> :  Number of thread for multi-thread learning. 
+                                                                             
+  -l <log_file_path>       :  Path of the log file. Using '/tmp/xlearn_log' by default. 
+                                                            
+  --sign                   :  Converting output to 0 and 1. 
+                                                               
+  --sigmoid                :  Converting output to 0~1 (problebility). 
+----------------------------------------------------------------------------------------------)"
     );
   }
 }
@@ -161,7 +167,9 @@ void Checker::Initialize(bool is_train, int argc, char* argv[]) {
     menu_.push_back(std::string("-u"));
     menu_.push_back(std::string("-e"));
     menu_.push_back(std::string("-f"));
+    menu_.push_back(std::string("-pre"));
     menu_.push_back(std::string("-nthread"));
+    menu_.push_back(std::string("-block"));
     menu_.push_back(std::string("--disk"));
     menu_.push_back(std::string("--cv"));
     menu_.push_back(std::string("--dis-es"));
@@ -411,6 +419,9 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
         hyper_param.num_folds = value;
       }
       i += 2;
+    } else if (list[i].compare("-pre") == 0) {  // pre-trained model
+      hyper_param.pre_model_file = list[i+1];
+      i += 2;
     } else if (list[i].compare("-nthread") == 0) {  // number of thread
       int value = atoi(list[i+1].c_str());
       if (value <= 0) {
@@ -421,6 +432,18 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
         bo = false;
       } else {
         hyper_param.thread_number = value;
+      }
+      i += 2;
+    } else if (list[i].compare("-block") == 0) {  // block size for on-disk training
+      int value = atoi(list[i+1].c_str());
+      if (value <= 0) {
+        print_error(
+          StringPrintf("Illegal -block : '%i'. -block must be greater than zero.",
+               value)
+        );
+        bo = false;
+      } else {
+        hyper_param.block_size = value;
       }
       i += 2;
     } else if (list[i].compare("--disk") == 0) {  // on-disk training

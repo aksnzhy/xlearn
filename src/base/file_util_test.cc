@@ -130,8 +130,7 @@ TEST(FileTest, Serialize_and_Deserialize_vector) {
      EXPECT_EQ(array[i], i);
    }
    array.clear();
-   std::vector<int> array_1;
-   ReadVectorFromFile(file, array_1);
+   ReadVectorFromFile(file, array);
    for (int i = 0; i < 12; ++i) {
      EXPECT_EQ(array[i], i);
    }

@@ -28,6 +28,8 @@ to other languages.
 #include "src/data/hyper_parameters.h"
 #include "src/solver/solver.h"
 
+#include <string>
+
 #ifdef __cplusplus
 #define XL_EXTERN_C extern "C"
 #include <cstdio>
@@ -61,23 +63,26 @@ XL_DLL int XLearnShow(XL *out);
 // Set file path of the training data
 XL_DLL int XLearnSetTrain(XL *out, const char *train_path);
 
-// Set data matrix for the training set
-XL_DLL int XLearnSetTrainDMatrix(XL *out, XL *train_matrix);
+// Get file path of th training data
+XL_DLL int XLearnGetTrain(XL *out, std::string& train_path);
 
 // Set file path of the test data
 XL_DLL int XLearnSetTest(XL *out, const char *test_path);
 
-// Set data matrix for the test set
-XL_DLL int XLearnSetTestDMatrix(XL *out, XL *test_matrix);
+// Get file path of the test data
+XL_DLL int XLearnGetTest(XL *out, std::string& test_path);
 
 // Set file path of the validation data
 XL_DLL int XLearnSetValidate(XL *out, const char *val_path);
 
-// Set data matrix for the validation set
-XL_DLL int XLearnSetValidateDMatrix(XL *out, XL *val_matrix);
+// Get file path of the validation data
+XL_DLL int XLearnGetValidate(XL *out, std::string& val_path);
 
-// Set file path of the txt model data
+// Set file path of the txt model
 XL_DLL int XLearnSetTXTModel(XL *out, const char *model_path);
+
+// Get file path of the txt model
+XL_DLL int XLearnGetTXTModel(XL *out, std::string& model_path);
 
 // Start to train
 XL_DLL int XLearnFit(XL *out, const char *model_path);
@@ -91,14 +96,26 @@ XL_DLL int XLearnPredict(XL *out, const char *model_path, const char *out_path);
 // Set string param
 XL_DLL int XLearnSetStr(XL *out, const char *key, const char *value);
 
+// Get string params
+XL_DLL int XLearnGetStr(XL* out, const char *key, std::string& value);
+
 // Set int param
 XL_DLL int XLearnSetInt(XL *out, const char *key, const int value);
+
+// Get int param
+XL_DLL int XLearnGetInt(XL *out, const char *key, int *value);
 
 // Set float param
 XL_DLL int XLearnSetFloat(XL *out, const char *key, const float value);
 
+// Get float param
+XL_DLL int XLearnGetFloat(XL *out, const char *key, float *value);
+
 // Set bool param
 XL_DLL int XLearnSetBool(XL *out, const char *key, const bool value);
+
+// Get bool param
+XL_DLL int XLearnGetBool(XL *out, const char *key, bool *value);
 
 // This is the entry class used by c_api.
 class XLearn {

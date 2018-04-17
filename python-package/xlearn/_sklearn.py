@@ -1,3 +1,4 @@
+# coding: utf-8
 import os
 import shutil
 import tempfile
@@ -7,7 +8,6 @@ import numpy as np
 from .xlearn import create_linear, create_fm, create_ffm
 from sklearn.base import BaseEstimator
 from sklearn.utils import check_array, check_X_y
-
 
 def write_data_to_xlearn_format(X, y, filepath, fields=None):
     """ Write data to xlearn format (libsvm or libffm). Modified from
@@ -143,7 +143,8 @@ class BaseXLearnModel(BaseEstimator):
         return params
 
     def fit(self, X, y=None, fields=None,
-            is_lock_free=True, is_instance_norm=True, eval_set=None, is_quiet=False):
+            is_lock_free=True, is_instance_norm=True, 
+            eval_set=None, is_quiet=False):
         """ Fit the XLearn model given feature matrix X and label y
 
         :param X: array-like or a string specifying file location
@@ -172,7 +173,7 @@ class BaseXLearnModel(BaseEstimator):
 
         if y is None:
             assert isinstance(X, str), 'X must be a string specifying training file location' \
-                                             ' when only X specified'
+                                       ' when only X specified'
             self._XLearnModel.setTrain(X)
 
         else:
@@ -187,7 +188,7 @@ class BaseXLearnModel(BaseEstimator):
             self._convert_data(X, y, temp_train_file.name, fields=self.fields)
             self._XLearnModel.setTrain(temp_train_file.name)
 
-        #TODO: find out what task need to set sigmoid
+        # TODO: find out what task need to set sigmoid
         if self.task == 'binary':
             self._XLearnModel.setSigmoid()
 
@@ -215,7 +216,10 @@ class BaseXLearnModel(BaseEstimator):
                     raise Exception('eval_set must be a 2-element list')
 
                 # extract validation data
-                X_val, y_val = check_X_y(eval_set[0], eval_set[1], accept_sparse=['csr'], y_numeric=True, multi_output=False)
+                X_val, y_val = check_X_y(eval_set[0], eval_set[1], 
+                    accept_sparse=['csr'], 
+                    y_numeric=True, 
+                    multi_output=False)
 
                 temp_val_file = tempfile.NamedTemporaryFile(delete=True)
                 self._convert_data(X_val, y_val, temp_val_file.name, fields=self.fields)
@@ -296,12 +300,9 @@ class BaseXLearnModel(BaseEstimator):
     def __delete__(self, instance):
         self._temp_model_file.close()
 
-
 class FMModel(BaseXLearnModel):
-    __doc__ = """Implementation of the scikit-learn API for XLearn Factorization machine model.
-
-    """ + '\n'.join(BaseXLearnModel.__doc__.split('\n')[1:])
-
+    """ Factorization machine (FM) model
+    """
     def __init__(self, model_type='fm', task='binary', metric='auc',
                  lr=0.2, k =4, reg_lambda=0.1, init=0.1, fold=1, epoch=5,
                  opt='sgd', nthread=4, alpha=1, beta=1, lambda_1=1, lambda_2=1,
@@ -316,10 +317,8 @@ class FMModel(BaseXLearnModel):
         super(FMModel, self).__delete(instance)
 
 class LRModel(BaseXLearnModel):
-    __doc__ = """Implementation of the scikit-learn API for XLearn Logistic regression model.
-    
-    """ + '\n'.join(BaseXLearnModel.__doc__.split('\n')[1:])
-
+    """ linear model
+    """
     def __init__(self, model_type='lr', task='binary', metric='auc',
                  lr=0.2, k =4, reg_lambda=0.1, init=0.1, fold=1, epoch=5,
                  opt='sgd', nthread=4, alpha=1, beta=1, lambda_1=1, lambda_2=1,
@@ -334,10 +333,8 @@ class LRModel(BaseXLearnModel):
         super(LRModel, self).__delete(instance)
 
 class FFMModel(BaseXLearnModel):
-    __doc__ = """Implementation of the scikit-learn API for XLearn Field-aware factorization machine model.
-    
-    """ + '\n'.join(BaseXLearnModel.__doc__.split('\n')[1:])
-
+    """ Field-aware factorization machine (FFM) model
+    """
     def __init__(self, model_type='ffm', task='binary', metric='auc',
                  lr=0.2, k =4, reg_lambda=0.1, init=0.1, fold=1, epoch=5,
                  opt='sgd', nthread=4, alpha=1, beta=1, lambda_1=1, lambda_2=1,

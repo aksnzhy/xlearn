@@ -1,3 +1,8 @@
+# coding: utf-8
+# This file test the xlearn python package.
+# We create a ffm model for binary classification problem.
+# The dataset comes from the criteo CTR.
+from __future__ import absolute_import
 import xlearn as xl
 
 # Training task

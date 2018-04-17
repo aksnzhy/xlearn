@@ -89,7 +89,6 @@ class Modifier {
 
 }  // namespace Color
 
-
 // [Warning] blablabla ...
 inline void print_warning(const std::string& out) {
   Color::Modifier mag(Color::FG_MAGENTA);
@@ -143,7 +142,7 @@ inline void print_info(const std::string& out, bool imp = false) {
 //------------------------------------------------------------------------------
 template <typename T>
 void print_row(const std::vector<T>& column, 
-	           const std::vector<int>& width) {
+	             const std::vector<int>& width) {
   CHECK_EQ(column.size(), width.size());
   for (size_t i = 0; i < column.size(); ++i) {
   	std::cout.width(width[i]);

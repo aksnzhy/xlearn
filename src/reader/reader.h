@@ -38,6 +38,8 @@ reading data from data source.
 
 namespace xLearn {
 
+const int kDefautBlockSize = 500;  // 500 MB
+
 //------------------------------------------------------------------------------
 // Reader is an abstract class which can be implemented in different way,
 // such as the InmemReader that reads data from memory, and the OndiskReader
@@ -209,8 +211,9 @@ class OndiskReader : public Reader {
  public:
   // Constructor and Destructor
   OndiskReader() 
-    : block_size_(500) {  }  /* 500 MB on default */
+    : block_size_(kDefautBlockSize) {  }
   ~OndiskReader() { 
+    Clear();
     Close(file_ptr_); 
   }
 
@@ -226,7 +229,9 @@ class OndiskReader : public Reader {
   // Free the memory of data matrix.
   virtual void Clear() {
     data_samples_.Release();
-    delete [] block_;
+    if (block_ != nullptr) {
+      delete [] block_;
+    }
   }
 
   // We cannot set shuffle for OndiskReader

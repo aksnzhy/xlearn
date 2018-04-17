@@ -1,0 +1,5 @@
+Scikit-Learn API
+---------------------------
+
+Nw, xLearn can support Scikit-Learn style API for users. This demo shows how to 
+use Scikit-Learn API for LR, FM and FFM to solve classification problems.
