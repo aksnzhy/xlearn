@@ -37,5 +37,8 @@ fm_model.fit(X_train,
              y_train, 
              eval_set=[X_val, y_val])
 
+# print model weights
+print(fm_model.weights)
+
 # Generate predictions
 y_pred = fm_model.predict(X_val)

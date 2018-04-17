@@ -18,9 +18,9 @@ def write_data_to_xlearn_format(X, y, filepath, fields=None):
     :param y: array-like
               Label in numpy or sparse format
     :param filepath: file location for writing data to
-    :param fields: An array specifying fields in each columns of X. It should have same length
-    as the number of columns in X. When set to None, convert data to libsvm format else
-    libffm format.
+    :param fields: An array specifying fields in each columns of X. It should have same length 
+        as the number of columns in X. When set to None, convert data to libsvm format else
+        libffm format.
     """
 
     with open(filepath, "wb") as f_handle:
@@ -70,32 +70,32 @@ def write_data_to_xlearn_format(X, y, filepath, fields=None):
 
 class BaseXLearnModel(BaseEstimator):
     """ Implementation of Scikit-learn interface for xlearn models.
+
+    :param model_type: one of 'lr', 'fm', 'ffm'
+    :param task: 'binary' for classification or 'reg' for regression
+    :param metric: 'acc', 'prec', 'recall', 'f1', 'auc' for classification,
+        and 'mae', 'mape', 'rmsd (rmse)' for regression.
+    :param log: location of log
+    :param lr: learning rate
+    :param k: latent factor for factorization
+    :param reg_lambda: alias for lambda
+    :param init: initial value
+    :param fold: number of fold used in cross validation
+    :param epoch: number of training epoch
+    :param opt: optimizer option, one of 'sgd', 'adagrad', 'ftrl'
+    :param nthread: number of threads (Deprecated, please use n_jobs)
+    :param n_jobs: number of threads used to run xlearn.
+    :param alpha: alpha for FTRL
+    :param beta: beta for FTRL
+    :param lambda_1: lambda_1 for FTRL
+    :param lambda_2: lambda_2 for FTRL
+    :param kwargs: extra input arguments
     """
+    
     def __init__(self, model_type='fm', task='binary', metric='auc',
                  lr=0.2, k=4, reg_lambda=0.1, init=0.1, fold=1, epoch=5,
-                 opt='sgd', nthread=4, alpha=1, beta=1, lambda_1=1, lambda_2=1,
+                 opt='sgd', nthread=None, n_jobs=4, alpha=1, beta=1, lambda_1=1, lambda_2=1,
                  **kwargs):
-        """
-        :param model_type: one of 'lr', 'fm', 'ffm'
-        :param task: 'binary' for classification or 'reg' for regression
-        :param metric: 'acc', 'prec', 'recall', 'f1', 'auc' for classification,
-         and 'mae', 'mape', 'rmsd (rmse)' for regression.
-        :param log: location of log
-        :param lr: learning rate
-        :param k: latent factor for factorization
-        :param reg_lambda: alias for lambda
-        :param init: initial value
-        :param fold: number of fold used in cross validation
-        :param epoch: number of training epoch
-        :param opt: optimizer option, one of 'sgd', 'adagrad', 'ftrl'
-        :param nthread: number of threads
-        :param alpha: alpha for FTRL
-        :param beta: beta for FTRL
-        :param lambda_1: lambda_1 for FTRL
-        :param lambda_2: lambda_2 for FTRL
-        :param kwargs: extra input arguments
-        """
-
         self.model_type = model_type
         self.task = task
         self.metric = metric
@@ -107,6 +107,7 @@ class BaseXLearnModel(BaseEstimator):
         self.epoch = epoch
         self.opt = opt
         self.nthread = nthread
+        self.n_jobs = n_jobs
         self.alpha = alpha
         self.beta = beta
         self.lambda_1 = lambda_1
@@ -116,6 +117,8 @@ class BaseXLearnModel(BaseEstimator):
         # initialize internal structure
         self._XLearnModel = None
         self._temp_model_file = tempfile.NamedTemporaryFile(delete=True)
+        self._temp_weight_file = tempfile.NamedTemporaryFile(delete=True)
+        self.weights = None
         self.fields = None
 
     def get_model(self):
@@ -138,10 +141,28 @@ class BaseXLearnModel(BaseEstimator):
         """
         params = super(BaseXLearnModel, self).get_params(deep=deep)
 
-        # rename reg_lambda as lambda, and remove model_type
-        params['lambda'] = params.pop('reg_lambda')
-        params.pop('model_type')
         return params
+
+    def get_xlearn_params(self):
+        """ Get xlearn model parameters
+
+        :return: model parameters used for training
+        """
+        xlearn_param = self.get_params()
+
+        # rename reg_lambda as lambda, and remove model_type
+        xlearn_param['lambda'] = xlearn_param.pop('reg_lambda')
+        xlearn_param.pop('model_type')
+
+        # rename n_jobs to nthread for _XLearnModel
+        n_jobs = xlearn_param.pop('n_jobs')
+        if 'nthread' in xlearn_param and xlearn_param['nthread'] is not None:
+            warnings.warn("The nthread parameter has been deprecated. Please use n_jobs instead."
+                          , DeprecationWarning)
+        else:
+            xlearn_param['nthread'] = n_jobs
+
+        return xlearn_param
 
     def fit(self, X, y=None, fields=None,
             is_lock_free=True, is_instance_norm=True, 
@@ -206,7 +227,7 @@ class BaseXLearnModel(BaseEstimator):
             else:
                 warnings.warn('Setting is_instance_norm to False is ignored. It only applies to fm or ffm.')
 
-        params = self.get_params(deep=True)
+        params = self.get_xlearn_params()
 
         # check if validation set exists or not
         if eval_set is not None:
@@ -226,8 +247,14 @@ class BaseXLearnModel(BaseEstimator):
                 self._convert_data(X_val, y_val, temp_val_file.name, fields=self.fields)
                 self._XLearnModel.setValidate(temp_val_file.name)
 
+        # set up files for storing weights
+        self._XLearnModel.setTXTModel(self._temp_weight_file.name)
+
         # fit model
         self._XLearnModel.fit(params, self._temp_model_file.name)
+
+        # acquire weights
+        self._parse_weight(self._temp_weight_file.name)
 
         # remove temporary files for training
         self._remove_temp_file(temp_train_file)
@@ -288,7 +315,21 @@ class BaseXLearnModel(BaseEstimator):
         try:
             write_data_to_xlearn_format(X, y, filepath, fields=fields)
         except:
-            raise Exception('failed to convert feature matrix X and label y to xlearn data format')
+            raise Exception('Failed to convert feature matrix X and label y to xlearn data format')
+
+    def _parse_weight(self, file_name):
+        # estimate number of features from txt file
+        num_lines = sum(1 for line in open(file_name))
+        num_features = int((num_lines-1)/2)
+
+        if self.model_type in ['fm', 'ffm']:
+            weight_vec = np.genfromtxt(file_name, skip_footer=num_features)
+            weight_mtx = np.genfromtxt(file_name, skip_header=num_features+1)
+        else:
+            weight_vec = np.genfromtxt(file_name)
+            weight_mtx = None
+
+        self.weights = (weight_vec, weight_mtx)
 
     def _remove_temp_file(self, temp_file):
         # The temp_file might be converted to binary file during training/inference.
@@ -300,51 +341,52 @@ class BaseXLearnModel(BaseEstimator):
 
     def __delete__(self, instance):
         self._temp_model_file.close()
+        self._temp_weight_file.close()
 
 class FMModel(BaseXLearnModel):
     """ Factorization machine (FM) model
     """
     def __init__(self, model_type='fm', task='binary', metric='auc',
-                 lr=0.2, k =4, reg_lambda=0.1, init=0.1, fold=1, epoch=5,
-                 opt='sgd', nthread=4, alpha=1, beta=1, lambda_1=1, lambda_2=1,
+                 lr=0.2, k=4, reg_lambda=0.1, init=0.1, fold=1, epoch=5,
+                 opt='sgd', nthread=None, n_jobs=4, alpha=1, beta=1, lambda_1=1, lambda_2=1,
                  **kwargs):
         assert model_type == 'fm', 'Model type must be set to fm for FMModel'
         super(FMModel, self).__init__(model_type, task, metric,
                                       lr, k, reg_lambda, init, fold, epoch,
-                                      opt, nthread, alpha, beta, lambda_1, lambda_2,
+                                      opt, nthread, n_jobs, alpha, beta, lambda_1, lambda_2,
                                       **kwargs)
 
     def __delete__(self, instance):
-        super(FMModel, self).__delete(instance)
+        super(FMModel, self).__delete__(instance)
 
 class LRModel(BaseXLearnModel):
     """ linear model
     """
     def __init__(self, model_type='lr', task='binary', metric='auc',
-                 lr=0.2, k =4, reg_lambda=0.1, init=0.1, fold=1, epoch=5,
-                 opt='sgd', nthread=4, alpha=1, beta=1, lambda_1=1, lambda_2=1,
+                 lr=0.2, k=4, reg_lambda=0.1, init=0.1, fold=1, epoch=5,
+                 opt='sgd', nthread=None, n_jobs=4, alpha=1, beta=1, lambda_1=1, lambda_2=1,
                  **kwargs):
         assert model_type == 'lr', 'Model type must be set to lr for LRModel'
         super(LRModel, self).__init__(model_type, task, metric,
                                       lr, k, reg_lambda, init, fold, epoch,
-                                      opt, nthread, alpha, beta, lambda_1, lambda_2,
+                                      opt, nthread, n_jobs, alpha, beta, lambda_1, lambda_2,
                                       **kwargs)
 
     def __delete__(self, instance):
-        super(LRModel, self).__delete(instance)
+        super(LRModel, self).__delete__(instance)
 
 class FFMModel(BaseXLearnModel):
     """ Field-aware factorization machine (FFM) model
     """
     def __init__(self, model_type='ffm', task='binary', metric='auc',
-                 lr=0.2, k =4, reg_lambda=0.1, init=0.1, fold=1, epoch=5,
-                 opt='sgd', nthread=4, alpha=1, beta=1, lambda_1=1, lambda_2=1,
+                 lr=0.2, k=4, reg_lambda=0.1, init=0.1, fold=1, epoch=5,
+                 opt='sgd', nthread=None, n_jobs=4, alpha=1, beta=1, lambda_1=1, lambda_2=1,
                  **kwargs):
         assert model_type == 'ffm', 'Model type must be set to ffm for FFMModel'
         super(FFMModel, self).__init__(model_type, task, metric,
                                        lr, k, reg_lambda, init, fold, epoch,
-                                       opt, nthread, alpha, beta, lambda_1, lambda_2,
+                                       opt, nthread, n_jobs, alpha, beta, lambda_1, lambda_2,
                                        **kwargs)
 
     def __delete__(self, instance):
-        super(FFMModel, self).__delete(instance)
+        super(FFMModel, self).__delete__(instance)
