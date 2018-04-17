@@ -29,5 +29,8 @@ linear_model.fit(X_train, y_train,
                  eval_set=[X_val, y_val], 
                  is_lock_free=False)
 
+# print model weights
+print(linear_model.weights)
+
 # Generate predictions
 y_pred = linear_model.predict(X_val)
