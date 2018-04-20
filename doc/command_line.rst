@@ -132,7 +132,11 @@ input data should be the ``libffm`` format. ::
 
   CSV format:
 
-     value_1 value_2 .. value_n label
+     label value_1 value_2 .. value_n
+
+Note that, if the csv file doesn't contain the label y, the user should add a 
+placeholder to the dataset by themselves (Also in test data). Otherwise, the parser 
+will treat the first element as the label y. 
 
   libffm format:
 
