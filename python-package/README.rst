@@ -24,7 +24,7 @@ If you install xLearn Python package successfully, you will see ::
 Quick Start
 ----------------------------------------
 
-Here is a simple Python demo to demonstrate how to use xLearn. You can check out the demo data 
+Here is a simple Python demo to demonstrate how to use xLearn. You can checkout the demo data 
 (``small_train.txt`` and ``small_test.txt``) from the path ``demo/classification/criteo_ctr``.
 
 .. code-block:: python
@@ -340,6 +340,16 @@ at that epoch (you may get different a stopping number on your machine) ::
     Early-stopping at epoch 7
     Start to save model ...
 
+Users can set stop window for early-stopping by using ``stop_window`` parameter ::
+
+    param = {'task':'binary', 
+             'lr':0.2, 
+             'lambda':0.002, 
+             'epoch':10,
+             'stop_window':3} 
+            
+    ffm_model.fit(param, "./model.out") 
+
 Users can disable early-stopping by using ``disableEarlyStop()`` API: ::
 
    import xlearn as xl
@@ -370,7 +380,6 @@ following Python code multiple times, we may get different loss value at each ep
    param = {'task':'binary', 'lr':0.2, 'lambda':0.002} 
             
    ffm_model.fit(param, "./model.out") 
-
 
    The 1st time: 0.449056
    The 2nd time: 0.449302
@@ -431,6 +440,51 @@ When using ``setQuiet()`` API, xLearn will not calculate any evaluation informat
    ffm_model.fit(param, "./model.out") 
 
 In this way, xLearn can accelerate its training speed.
+
+Scikit-learn api for xLearn
+----------------------------------------
+
+xLearn can support scikit-learn-like api for users. Here is an example: ::
+
+  import numpy as np
+  import xlearn as xl
+  from sklearn.datasets import load_iris
+  from sklearn.model_selection import train_test_split
+
+  # Load dataset
+  iris_data = load_iris()
+  X = iris_data['data']
+  y = (iris_data['target'] == 2)
+
+  X_train,   \
+  X_val,     \
+  y_train,   \
+  y_val = train_test_split(X, y, test_size=0.3, random_state=0)
+
+  # param:
+  #  0. binary classification
+  #  1. model scale: 0.1
+  #  2. epoch number: 10 (auto early-stop)
+  #  3. learning rate: 0.1
+  #  4. regular lambda: 1.0
+  #  5. use sgd optimization method
+  linear_model = xl.LRModel(task='binary', init=0.1, 
+                            epoch=10, lr=0.1, 
+                            reg_lambda=1.0, opt='sgd')
+
+  # Start to train
+  linear_model.fit(X_train, y_train, 
+                   eval_set=[X_val, y_val], 
+                   is_lock_free=False)
+
+  # Generate predictions
+  y_pred = linear_model.predict(X_val)
+
+In this example, we use linear model to train a binary classifier. We can also 
+create FM and FFM by using ``xl.FMModel()`` and ``xl.FMModel()`` . Please see 
+the details of these examples in (`Link`__)
+
+.. __: https://github.com/aksnzhy/xlearn/tree/master/demo/classification/scikit_learn_demo
 
  .. toctree::
    :hidden:
