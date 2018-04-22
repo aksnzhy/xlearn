@@ -340,6 +340,16 @@ at that epoch (you may get different a stopping number on your machine) ::
     Early-stopping at epoch 7
     Start to save model ...
 
+Users can set stop window for early-stopping by using ``stop_window`` parameter ::
+
+    param = {'task':'binary', 
+             'lr':0.2, 
+             'lambda':0.002, 
+             'epoch':10,
+             'stop_window':3} 
+            
+    ffm_model.fit(param, "./model.out") 
+
 Users can disable early-stopping by using ``disableEarlyStop()`` API: ::
 
    import xlearn as xl
