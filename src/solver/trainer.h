@@ -52,9 +52,11 @@ class Trainer {
                   Loss* loss,
                   Metric* metric,
                   bool early_stop,
+                  int stop_window,
                   bool quiet) {
     CHECK_NE(reader_list.empty(), true);
     CHECK_GT(epoch, 0);
+    CHECK_GT(stop_window, 0);
     CHECK_NOTNULL(model);
     CHECK_NOTNULL(loss);
     // Do not check metric == nullptr
@@ -64,6 +66,7 @@ class Trainer {
     loss_ = loss;
     metric_ = metric;
     early_stop_ = early_stop;
+    stop_window_ = stop_window;
     quiet_ = quiet;
   }
 
@@ -95,6 +98,8 @@ class Trainer {
   int epoch_;
   /* Using early-stopping ? */
   bool early_stop_;
+  /* Window size for early stopping */
+  int stop_window_;
   /* quiet training ? */
   bool quiet_;
   /* Model parameter */

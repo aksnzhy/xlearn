@@ -29,8 +29,6 @@ This file is the implementation of the Trainer class.
 
 namespace xLearn {
 
-const int kStopWindow = 2;
-
 /*********************************************************
  *  Show head info                                       *
  *********************************************************/
@@ -200,8 +198,8 @@ void Trainer::train(std::vector<Reader*>& train_reader,
         if (te_info.loss_val >= prev_loss) {
           stop_window++;
           // If the validation loss goes up conntinuously
-          // in 3 epoch, we stop training
-          if (stop_window == kStopWindow) { break; }
+          // in stop_window epoch, we stop training
+          if (stop_window == stop_window_) { break; }
         } else {
           stop_window = 0;
         }

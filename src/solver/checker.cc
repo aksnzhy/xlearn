@@ -105,7 +105,9 @@ OPTIONS:
                                                                                          
   -nthread <thread_number> :  Number of thread for multi-thread training.                
                                                                                        
-  -block <block_size>  :  Block size fot on-disk training.                             
+  -block <block_size>  :  Block size fot on-disk training.     
+
+  -sw <stop_window>    :  Size of stop window for early-stopping. Using 2 by default.                       
                                                                                       
   --disk               :  Open on-disk training for large-scale machine learning problems. 
                                                                     
@@ -170,6 +172,7 @@ void Checker::Initialize(bool is_train, int argc, char* argv[]) {
     menu_.push_back(std::string("-pre"));
     menu_.push_back(std::string("-nthread"));
     menu_.push_back(std::string("-block"));
+    menu_.push_back(std::string("-sw"));
     menu_.push_back(std::string("--disk"));
     menu_.push_back(std::string("--cv"));
     menu_.push_back(std::string("--dis-es"));
@@ -444,6 +447,18 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
         bo = false;
       } else {
         hyper_param.block_size = value;
+      }
+      i += 2;
+    } else if (list[i].compare("-sw") == 0) {  // window size for early stopping
+      int value = atoi(list[i+1].c_str());
+      if (value < 1) {
+        print_error(
+          StringPrintf("Illegal -sw : '%i'. -sw must be greater than or equal to 1.",
+               value)
+        );
+        bo = false;
+      } else {
+        hyper_param.stop_window = value;
       }
       i += 2;
     } else if (list[i].compare("--disk") == 0) {  // on-disk training

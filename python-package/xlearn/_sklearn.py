@@ -82,6 +82,7 @@ class BaseXLearnModel(BaseEstimator):
     :param init: initial value
     :param fold: number of fold used in cross validation
     :param epoch: number of training epoch
+    :param stop_window: window size for early stopping
     :param opt: optimizer option, one of 'sgd', 'adagrad', 'ftrl'
     :param nthread: number of threads (Deprecated, please use n_jobs)
     :param n_jobs: number of threads used to run xlearn.
@@ -93,7 +94,7 @@ class BaseXLearnModel(BaseEstimator):
     """
     
     def __init__(self, model_type='fm', task='binary', metric='auc',
-                 lr=0.2, k=4, reg_lambda=0.1, init=0.1, fold=1, epoch=5,
+                 lr=0.2, k=4, reg_lambda=0.1, init=0.1, fold=1, epoch=5, stop_window=2,
                  opt='sgd', nthread=None, n_jobs=4, alpha=1, beta=1, lambda_1=1, lambda_2=1,
                  **kwargs):
         self.model_type = model_type
@@ -108,6 +109,7 @@ class BaseXLearnModel(BaseEstimator):
         self.opt = opt
         self.nthread = nthread
         self.n_jobs = n_jobs
+        self.stop_window = stop_window
         self.alpha = alpha
         self.beta = beta
         self.lambda_1 = lambda_1
@@ -347,12 +349,12 @@ class FMModel(BaseXLearnModel):
     """ Factorization machine (FM) model
     """
     def __init__(self, model_type='fm', task='binary', metric='auc',
-                 lr=0.2, k=4, reg_lambda=0.1, init=0.1, fold=1, epoch=5,
+                 lr=0.2, k=4, reg_lambda=0.1, init=0.1, fold=1, epoch=5, stop_window=2,
                  opt='sgd', nthread=None, n_jobs=4, alpha=1, beta=1, lambda_1=1, lambda_2=1,
                  **kwargs):
         assert model_type == 'fm', 'Model type must be set to fm for FMModel'
         super(FMModel, self).__init__(model_type, task, metric,
-                                      lr, k, reg_lambda, init, fold, epoch,
+                                      lr, k, reg_lambda, init, fold, epoch, stop_window,
                                       opt, nthread, n_jobs, alpha, beta, lambda_1, lambda_2,
                                       **kwargs)
 
@@ -363,12 +365,12 @@ class LRModel(BaseXLearnModel):
     """ linear model
     """
     def __init__(self, model_type='lr', task='binary', metric='auc',
-                 lr=0.2, k=4, reg_lambda=0.1, init=0.1, fold=1, epoch=5,
+                 lr=0.2, k=4, reg_lambda=0.1, init=0.1, fold=1, epoch=5, stop_window=2,
                  opt='sgd', nthread=None, n_jobs=4, alpha=1, beta=1, lambda_1=1, lambda_2=1,
                  **kwargs):
         assert model_type == 'lr', 'Model type must be set to lr for LRModel'
         super(LRModel, self).__init__(model_type, task, metric,
-                                      lr, k, reg_lambda, init, fold, epoch,
+                                      lr, k, reg_lambda, init, fold, epoch, stop_window,
                                       opt, nthread, n_jobs, alpha, beta, lambda_1, lambda_2,
                                       **kwargs)
 
@@ -379,12 +381,12 @@ class FFMModel(BaseXLearnModel):
     """ Field-aware factorization machine (FFM) model
     """
     def __init__(self, model_type='ffm', task='binary', metric='auc',
-                 lr=0.2, k=4, reg_lambda=0.1, init=0.1, fold=1, epoch=5,
+                 lr=0.2, k=4, reg_lambda=0.1, init=0.1, fold=1, epoch=5, stop_window=2,
                  opt='sgd', nthread=None, n_jobs=4, alpha=1, beta=1, lambda_1=1, lambda_2=1,
                  **kwargs):
         assert model_type == 'ffm', 'Model type must be set to ffm for FFMModel'
         super(FFMModel, self).__init__(model_type, task, metric,
-                                       lr, k, reg_lambda, init, fold, epoch,
+                                       lr, k, reg_lambda, init, fold, epoch, stop_window,
                                        opt, nthread, n_jobs, alpha, beta, lambda_1, lambda_2,
                                        **kwargs)
 

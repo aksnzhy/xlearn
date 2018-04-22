@@ -251,6 +251,8 @@ XL_DLL int XLearnSetInt(XL *out, const char *key, const int value) {
   	xl->GetHyperParam().block_size = value;
   } else if (strcmp(key, "nthread") == 0) {
     xl->GetHyperParam().thread_number = value;
+  } else if (strcmp(key, "stop_window") == 0) {
+    xl->GetHyperParam().stop_window = value;
   }
   API_END();
 }
@@ -269,6 +271,8 @@ XL_DLL int XLearnGetInt(XL *out, const char *key, int *value) {
     *value = xl->GetHyperParam().block_size;
   } else if (strcmp(key, "nthread") == 0) {
     *value = xl->GetHyperParam().thread_number;
+  } else if (strcmp(key, "stop_window") == 0) {
+    *value = xl->GetHyperParam().stop_window;
   }
   API_END();
 }
