@@ -247,6 +247,9 @@ void Solver::init_train() {
       );
       exit(0);
     }
+    if (reader_[i]->Type().compare("on-disk") == 0) {
+      reader_[i]->SetBlockSize(hyper_param_.block_size);
+    }
     LOG(INFO) << "Init Reader: " << file_list[i];
   }
   /*********************************************************

@@ -57,9 +57,6 @@ struct HyperParam {
   For now, it can be 'acc', 'prec', 'recall', 
   'f1', 'mae', 'rmsd', 'mape', or 'none' */
   std::string metric = "none";
-  /* Block size for on-disk training.
-  On default this value will be set to 500 MB */
-  uint64 block_size = 500;
   /* Number of thread existing in the thread pool */
   int thread_number = 0;
 //------------------------------------------------------------------------------
@@ -121,6 +118,8 @@ struct HyperParam {
   std::string output_file;
   /* Filename of log file */
   std::string log_file = "/tmp/xlearn_log";
+  /* Block size for on-disk training */
+  int block_size = 500;  // 500 MB
 //------------------------------------------------------------------------------
 // Parameters for validation
 //------------------------------------------------------------------------------
