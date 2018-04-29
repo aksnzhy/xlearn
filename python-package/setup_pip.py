@@ -9,6 +9,7 @@ import sys
 
 from setuptools import find_packages
 from setuptools import setup
+from setuptools.command.build_py import build_py
 from setuptools.command.install import install
 from setuptools.command.sdist import sdist
 
@@ -64,13 +65,17 @@ def compile_cpp():
         for suffix in suffix_list:
             if os.path.isfile('lib/libxlearn_api.{}'.format(suffix)):
                 shutil.copy('lib/libxlearn_api.{}'.format(suffix), '../xlearn/')
+        if os.path.isdir('../build/lib/xlearn/'):
+            for suffix in suffix_list:
+                if os.path.isfile('lib/libxlearn_api.{}'.format(suffix)):
+                    shutil.copy('lib/libxlearn_api.{}'.format(suffix), '../build/lib/xlearn/')
 
     os.chdir(old_working_dir)
     
 class CustomInstall(install):
     
     def run(self):
-        compile_cpp();
+        # compile_cpp();
         install.run(self)
 
 class CustomSdist(sdist):
@@ -79,9 +84,15 @@ class CustomSdist(sdist):
         copy_files()
         sdist.run(self)
 
+class CustomBuildPy(build_py):
+
+    def run(self):
+        compile_cpp()
+        build_py.run(self)
+
 if __name__ == "__main__":
     setup(name='xlearn',
-          version="0.20.a1",
+          version="0.31.a1",
           description="xLearn Python Package",
           maintainer='Chao Ma',
           maintainer_email='mctt90@gmail.com',
@@ -89,6 +100,7 @@ if __name__ == "__main__":
           cmdclass={
               'install': CustomInstall,
               'sdist': CustomSdist,
+              'build_py': CustomBuildPy,
           },
           packages=find_packages(),
           # this will use MANIFEST.in during install where we specify additional files,
