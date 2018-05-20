@@ -298,34 +298,60 @@ void Solver::init_train() {
    *********************************************************/
   timer.reset();
   timer.tic();
-  print_action("Initialize model ...");
-  // Initialize parameters
-  model_ = new Model();
-  if (hyper_param_.opt_type.compare("sgd") == 0) {
-    hyper_param_.auxiliary_size = 1;
-  } else if (hyper_param_.opt_type.compare("adagrad") == 0) {
-    hyper_param_.auxiliary_size = 2;
-  } else if (hyper_param_.opt_type.compare("ftrl") == 0) {
-    hyper_param_.auxiliary_size = 3;
+  if (hyper_param_.pre_model_file.empty()) {
+    print_action("Initialize model ...");
+    // Initialize parameters
+    model_ = new Model();
+    if (hyper_param_.opt_type.compare("sgd") == 0) {
+      hyper_param_.auxiliary_size = 1;
+    } else if (hyper_param_.opt_type.compare("adagrad") == 0) {
+      hyper_param_.auxiliary_size = 2;
+    } else if (hyper_param_.opt_type.compare("ftrl") == 0) {
+      hyper_param_.auxiliary_size = 3;
+    }
+    model_->Initialize(hyper_param_.score_func,
+                     hyper_param_.loss_func,
+                     hyper_param_.num_feature,
+                     hyper_param_.num_field,
+                     hyper_param_.num_K,
+                     hyper_param_.auxiliary_size,
+                     hyper_param_.model_scale);
+    index_t num_param = model_->GetNumParameter();
+    hyper_param_.num_param = num_param;
+    LOG(INFO) << "Number parameters: " << num_param;
+    print_info(
+      StringPrintf("Model size: %s", 
+           PrintSize(num_param*sizeof(real_t)).c_str())
+    );
+    print_info(
+      StringPrintf("Time cost for model initial: %.2f (sec)",
+           timer.toc())
+    );
+  } else {
+    print_action("Load model for online learning...");
+    // load parameters
+    CHECK_NE(hyper_param_.pre_model_file.empty(), true);
+    print_info(
+      StringPrintf("Load model from %s",
+            hyper_param_.pre_model_file.c_str())
+    );
+    model_ = new Model(hyper_param_.pre_model_file);
+    model_->SetScaleParameter(hyper_param_.model_scale);
+    CHECK_EQ(hyper_param_.score_func, model_->GetScoreFunction());
+    CHECK_EQ(hyper_param_.loss_func, model_->GetLossFunction());
+    CHECK_EQ(hyper_param_.num_feature, model_->GetNumFeature());
+    if (hyper_param_.score_func.compare("fm") == 0 ||
+         hyper_param_.score_func.compare("ffm") == 0) {
+      CHECK_EQ(hyper_param_.num_K, model_->GetNumK());
+    }
+    if (hyper_param_.score_func.compare("ffm") == 0) {
+      CHECK_EQ(hyper_param_.num_field, model_->GetNumField());
+    }
+    print_info(
+      StringPrintf("Time cost for loading model: %.2f (sec)",
+          timer.toc())
+    );
   }
-  model_->Initialize(hyper_param_.score_func,
-                   hyper_param_.loss_func,
-                   hyper_param_.num_feature,
-                   hyper_param_.num_field,
-                   hyper_param_.num_K,
-                   hyper_param_.auxiliary_size,
-                   hyper_param_.model_scale);
-  index_t num_param = model_->GetNumParameter();
-  hyper_param_.num_param = num_param;
-  LOG(INFO) << "Number parameters: " << num_param;
-  print_info(
-    StringPrintf("Model size: %s", 
-         PrintSize(num_param*sizeof(real_t)).c_str())
-  );
-  print_info(
-    StringPrintf("Time cost for model initial: %.2f (sec)",
-         timer.toc())
-  );
   /*********************************************************
    *  Initialize score function                            *
    *********************************************************/

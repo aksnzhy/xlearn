@@ -164,6 +164,11 @@ class Model {
     return param_num_w_ + param_num_v_ + 2;
   }
 
+  // Set the scale of model parameters.
+  inline void SetScaleParameter(real_t model_scale_) {
+    scale_ = model_scale_;
+  }
+
  protected:
   /* Score function
   For now it can be 'linear', 'fm', or 'ffm' */
