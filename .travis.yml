@@ -3,10 +3,12 @@ compiler: gcc
 sudo: required
 before_install:
   - sudo pip install setuptools
+  - sudo pip3 install setuptools
 install:
-  - ./build.sh
+  - sudo ./build.sh
 script:
   - cd build/test/
   - ./run_all_test.sh
   - cd ../python_package/test/test/
   - python test_python.py test_data_conversion.py
+  - python3 test_python.py test_data_conversion.py
