@@ -1,9 +1,9 @@
 language: cpp
 compiler: gcc
 sudo: required
-install:
-  - sudo ./build.sh
+install: true
 script:
+  - sudo ./build.sh
   - cd build/test/
   - ./run_all_test.sh
   - cd ../python_package/test/test/
