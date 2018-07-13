@@ -1,9 +1,6 @@
 language: cpp
 compiler: gcc
 sudo: required
-before_install:
-  - sudo pip install setuptools
-  - sudo python3 pip install setuptools
 install:
   - sudo ./build.sh
 script:
@@ -11,4 +8,3 @@ script:
   - ./run_all_test.sh
   - cd ../python_package/test/test/
   - python test_python.py test_data_conversion.py
-  - python3 test_python.py test_data_conversion.py
