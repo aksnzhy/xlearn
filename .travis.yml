@@ -1,6 +1,12 @@
 language: cpp
 compiler: gcc
-install: true
-script:
+sudo: required
+before_install:
+  - sudo pip install setuptools
+install:
   - ./build.sh
-  - ./build/test/run_all_test.sh
+script:
+  - cd build/test/
+  - ./run_all_test.sh
+  - cd ../python_package/test/test/
+  - python test_python.py test_data_conversion.py
