@@ -3,7 +3,7 @@ compiler: gcc
 sudo: required
 before_install:
   - sudo pip install setuptools
-  - sudo pip3 install setuptools
+  - sudo python3 pip install setuptools
 install:
   - sudo ./build.sh
 script:
