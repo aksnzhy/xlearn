@@ -1,0 +1,6 @@
+language: cpp
+compiler: gcc
+install: true
+script:
+  - ./build.sh
+  - ./build/test/run_all_test.sh
