@@ -9,5 +9,5 @@ make
 
 cd python-package
 if command -v python2; then
-    python2 setup.py install
+    sudo python2 setup.py install
 fi

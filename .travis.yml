@@ -3,7 +3,7 @@ compiler: gcc
 sudo: required
 install: true
 script:
-  - sudo ./build.sh
+  - ./build.sh
   - cd build/test/
   - ./run_all_test.sh
   - cd ../python_package/test/test/
