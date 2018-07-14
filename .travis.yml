@@ -3,7 +3,7 @@ compiler: gcc
 sudo: required
 install: true
 script:
-  - ./build.sh
+  - ./build-travis.sh
   - cd build/test/
   - ./run_all_test.sh
   - cd ../python-package/test/

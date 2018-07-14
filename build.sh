@@ -9,5 +9,9 @@ make
 
 cd python-package
 if command -v python2; then
-    sudo python2 setup.py install
+    python2 setup.py install
+fi
+
+if command -v python3; then
+    python3 setup.py install
 fi
