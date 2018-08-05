@@ -55,7 +55,7 @@ class KVStore {
    // | value:  | 0.2 | 1.0 | 0.5 | 1.0 | 0.33 |  0.7 |  0.8 |
    //  ------------------------------------------------------
    virtual void Push(const std::vector<index_t>& key, 
-   	                 const std::vector<real_t>& value);
+   	               const std::vector<real_t>& value);
 
    // Push a list of (key, value_list) into store.
    // For example:
@@ -69,8 +69,8 @@ class KVStore {
    //  ------------------------------------------------------
    // This method is useful for the FM and FFM task.
    virtual void Push(const std::vector<index_t>& key, 
-   	                 const std::vector<real_t>& value_list, 
-   	                 const size_t length);
+   	               const std::vector<real_t>& value_list, 
+   	               const size_t length);
 
    // Pull the values for a list of keys from store.
    // For example:
@@ -79,7 +79,7 @@ class KVStore {
    // | value:  | 0.2 | 1.0 | 0.5 | 1.0 | 0.33 |  0.7 |  0.8 |
    //  ------------------------------------------------------
    virtual void Pull(const std::vector<index_t>& key, 
-   	                 std::vector<real_t>* value);
+   	               std::vector<real_t>* value);
 
    // Pull the value list for a list of keys from store.
    // For example:
@@ -93,8 +93,8 @@ class KVStore {
    //  ------------------------------------------------------
    // This method is useful for the FM and FFM task.
    virtual void Pull(const std::vector<index_t>& key, 
-   	                 std::vector<real_t>* value_list, 
-   	                 const size_t length);
+   	               std::vector<real_t>* value_list, 
+   	               const size_t length);
 
    //---------------------------------------------------------------------------
    // In xLearn, we use a simple range strategy for model partiton
