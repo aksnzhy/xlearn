@@ -15,9 +15,7 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
-
-This file tests the file_splitor.h
+This file tests the file_splitor.h file.
 */
 
 #include "gtest/gtest.h"

@@ -15,9 +15,7 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
-
-This file tests parser.h
+This file tests parser.h file.
 */
 
 #include "gtest/gtest.h"

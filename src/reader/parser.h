@@ -15,8 +15,6 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
-
 This file defines the Parser class, which parses datasets
 to the DMatrix.
 */

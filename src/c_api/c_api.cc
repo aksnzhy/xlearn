@@ -15,9 +15,7 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
-
-This file is the implementation of C API for xLearn.
+This file is the implementation of C API.
 */
 
 #include <string>

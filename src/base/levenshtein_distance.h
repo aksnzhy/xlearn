@@ -15,10 +15,8 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
-
-This file defines the StrSimilar class, which can be
-used to find similar strings.
+This file defines the StrSimilar class, which can 
+beused to find similar strings.
 */
 
 #ifndef XLEARN_BASE_LEVEN_SHTEIN_DISTANCE_H_

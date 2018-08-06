@@ -15,9 +15,7 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
-
-This file tests data_structure.h
+This file tests data_structure.h file.
 */
 
 #include "gtest/gtest.h"

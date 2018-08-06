@@ -15,7 +15,6 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
 This file defines the Score class, including linear score,
 FM score, FFM score, and etc.
 */

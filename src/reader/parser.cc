@@ -15,9 +15,7 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
-
-This file is the implementation of Parser.
+This file is the implementation of Parser class.
 */
 
 #include "src/reader/parser.h"

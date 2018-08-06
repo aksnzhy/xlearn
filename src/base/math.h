@@ -15,8 +15,6 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
-
 This file provides a set of fast ( but approximate )
 mathmatic methods.
 */

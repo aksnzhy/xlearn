@@ -15,9 +15,7 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
-
-This file tests levenshtein_distance.h
+This file tests levenshtein_distance.h file.
 */
 
 #include "gtest/gtest.h"

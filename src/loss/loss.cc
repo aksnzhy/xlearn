@@ -15,8 +15,7 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
-This file is the implementation of the base Loss class.
+This file is the implementation of the basic Loss class.
 */
 
 #include "src/loss/loss.h"

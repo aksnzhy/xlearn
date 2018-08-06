@@ -15,9 +15,7 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
-
-This file tests c_api.h
+This file tests c_api.h file.
 */
 
 #include "gtest/gtest.h"

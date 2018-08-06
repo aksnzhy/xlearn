@@ -15,10 +15,8 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
-
-This file provides a simple implementation of the thread
-pool that used by xLearn.
+This file provides a simple implementation of the 
+thread pool that used by xLearn.
 */
 
 #ifndef XLEARN_BASE_THREAD_POOL_H_

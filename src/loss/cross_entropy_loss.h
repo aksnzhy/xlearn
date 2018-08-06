@@ -15,7 +15,6 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
 This file defines the CrossEntropyLoss class.
 */
 

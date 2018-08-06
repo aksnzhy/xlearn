@@ -15,10 +15,8 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
-
-This file defines the KVStore class, which allows workers to get
-and set the model parameters.
+This file defines the KVStore class, which allows workers 
+to get and set the model parameters.
 */
 
 #ifndef XLEARN_DISTRIBUTED_KVSTORE_H_

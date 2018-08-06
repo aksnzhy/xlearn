@@ -15,9 +15,7 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
-
-This file tests file_util.h
+This file tests file_util.h file.
 */
 
 #include "gtest/gtest.h"

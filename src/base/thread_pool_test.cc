@@ -15,9 +15,7 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
-
-This file tests thread_pool.h
+This file tests thread_pool.h file.
 */
 
 #include "gtest/gtest.h"

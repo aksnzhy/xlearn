@@ -15,10 +15,8 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
-
-This file provides logging facilities treating log messages by
-their severities.
+This file provides logging facilities treating log 
+messages by their severities.
 */
 
 #ifndef XLEARN_BASE_LOGGING_H_

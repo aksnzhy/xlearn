@@ -15,9 +15,7 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
-
-This file is the implementation of Reader.
+This file is the implementation of Reader class.
 */
 
 #include "src/reader/reader.h"

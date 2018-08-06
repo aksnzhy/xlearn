@@ -15,8 +15,6 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com) and Yuze Liao
-
 This file defines the FileSpliter which splits raw data file into K
 subfiles so that K-folds validation can be easily applied under
 our framework.

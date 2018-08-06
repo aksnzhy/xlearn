@@ -31,8 +31,6 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
-
 This file provides the scoped_ptr and scoped_array.
 */
 

@@ -15,9 +15,7 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
-
-This file defines the facilities for format printing.
+This file defines facilities for format printing.
 */
 
 #ifndef XLEARN_BASE_FORMAT_PRINT_H_

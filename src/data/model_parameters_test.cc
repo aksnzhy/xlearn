@@ -15,9 +15,7 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
-
-This file tests model_parameters.h
+This file tests model_parameters.h file.
 */
 
 #include "gtest/gtest.h"

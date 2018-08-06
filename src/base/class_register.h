@@ -15,10 +15,8 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com) and Tian. T
-
-Defines several helper macros for registering class by a string name and
-creating them later per the registered name.
+This file defines several helper macros for registering class by a 
+string name and creating them later per the registered name.
 */
 
 //------------------------------------------------------------------------------

@@ -15,9 +15,7 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
-
-This file tests the KVStore class.
+This file tests the KVStore class file
 */
 
 #include "gtest/gtest.h"

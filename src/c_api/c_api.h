@@ -15,10 +15,8 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
-
-This file define the C API of xLearn, used for interfacing 
-to other languages.
+This file define the C API of xLearn, which is used 
+for interfacing to other languages.
 */
 
 #ifndef XLEARN_C_API_C_API_H_

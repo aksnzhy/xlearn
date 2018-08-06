@@ -15,8 +15,6 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com) and Yuze Liao
-
 This file is the implementation of the fileSpliter class.
 */
 

@@ -15,9 +15,7 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
-
-This file defines the basic data structures used by xLearn.
+This file defines the basic data structures.
 */
 
 #ifndef XLEARN_DATA_DATA_STRUCTURE_H_

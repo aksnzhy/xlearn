@@ -15,10 +15,8 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
-
-This file provides the following basic facilities to make
-programming convenient.
+This file provides the following basic facilities to 
+make programming convenient.
 */
 
 #ifndef XLEARN_BASE_COMMON_H_

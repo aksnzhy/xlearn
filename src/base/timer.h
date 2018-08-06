@@ -15,9 +15,7 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
-
-This file define the Timer class.
+This file defines the Timer class.
 */
 
 #ifndef XLEARN_BASE_TIMER_H_

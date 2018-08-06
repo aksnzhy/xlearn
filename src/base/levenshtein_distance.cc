@@ -15,9 +15,7 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
-
-This file if the implementation of StrSimilar class.
+This file is the implementation of StrSimilar class.
 */
 
 #include <algorithm>

@@ -15,9 +15,7 @@
 //------------------------------------------------------------------------------
 
 /*
-Author: Chao Ma (mctt90@gmail.com)
-
-This file is the implementation of the logging facilities.
+This file is the implementation of logging facilities.
 */
 
 #include "src/base/logging.h"
