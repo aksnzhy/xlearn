@@ -1,0 +1,10 @@
+language: cpp
+compiler: gcc
+sudo: required
+install: true
+script:
+  - ./build-travis.sh
+  - cd build/test/
+  - ./run_all_test.sh
+  - cd ../python-package/test/
+  - python test_python.py test_data_conversion.py
