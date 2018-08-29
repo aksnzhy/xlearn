@@ -43,6 +43,6 @@ build/*
 .model
 
 # R-package
-.Rhistory
+*.Rhistory
 *.tar.gz
 xlearn/*
