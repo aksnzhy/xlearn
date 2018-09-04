@@ -22,7 +22,7 @@ This file is the implementation of StrSimilar class.
 
 #include "src/base/levenshtein_distance.h"
 
-#define  min(a,b) ((a<b)?a:b)
+#define min(a,b) ((a<b)?a:b)
 
 // Find str in string list.
 // Return true if we can find str in target string list.
