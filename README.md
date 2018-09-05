@@ -5,7 +5,7 @@
 [![Travis](https://img.shields.io/travis/rust-lang/rust.svg)]()
 
 [Installation](http://xlearn-doc.readthedocs.io/en/latest/install.html) |
-[Documents](http://xlearn-doc.readthedocs.io/en/latest/start.html) |
+[Documents](http://xlearn-doc.readthedocs.io/en/latest/index.html) |
 [RoadMap](doc/roadmap.md) |
 [News](doc/news.md)
 
@@ -17,7 +17,7 @@ learning problems on large-scale sparse data, which is very common in Internet s
 and recommender systems in recent years.  If you are the user  of liblinear, libfm, or libffm, now xLearn is your 
 another better choice.
 
-[Get Started!](http://xlearn-doc.readthedocs.io/en/latest/start.html)
+[Get Started!](http://xlearn-doc.readthedocs.io/en/latest/index.html)
 
 ### Performance
 
