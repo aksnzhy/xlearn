@@ -4,10 +4,6 @@
 ![Project Status](https://img.shields.io/badge/version-0.3.1-green.svg)
 [![Travis](https://img.shields.io/travis/rust-lang/rust.svg)]()
 
-[Installation](http://xlearn-doc.readthedocs.io/en/latest/install.html) |
-[Documents](http://xlearn-doc.readthedocs.io/en/latest/index.html) |
-[RoadMap](doc/roadmap.md) |
-[News](doc/news.md)
 
 ## What is xLearn?
 
@@ -36,3 +32,22 @@ xLearn does not rely on any troublesome third-party library, and hence users can
 <img src="https://github.com/aksnzhy/xLearn/raw/master/img/scalability.png" width = "650"/>
 
 xLearn can be used for solving large-scale machine learning problems. First, xLearn supports out-of-core training, which can handle very large data (TB) by just leveraging the disk of a PC. In addition, xLearn supports distributed training, which scales beyond billions of example across many machines by using the parameter server framework.
+
+
+## News
+
+ - 08/03/2018 xLearn 0.3.0 version release. Main update:
+
+    * Fix bugs in previous version
+    * Solved the memory leak problem for on-disk learning
+    * Support TXT model checkpoint
+    * Support Scikit-Learn API
+
+ - 18/12/2017 xLearn 0.2.0 version release. Main update:
+
+    * Fix bugs in previous version
+    * Support *pip* installation
+    * New Documents
+    * Faster *FTRL* algorithm
+
+ - 11/24/2017 The first version (0.1.0) of xLearn release !
