@@ -15,7 +15,7 @@ another better choice.
 
 [Get Started! (English)](http://xlearn-doc.readthedocs.io/en/latest/index.html)
 
-[Get Started! (Chinese)](http://xlearn-doc-cn.readthedocs.io/en/latest/index.html)
+[Get Started! (中文)](http://xlearn-doc-cn.readthedocs.io/en/latest/index.html)
 
 ### Performance
 
