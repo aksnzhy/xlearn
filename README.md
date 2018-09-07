@@ -38,6 +38,8 @@ xLearn can be used for solving large-scale machine learning problems. First, xLe
 
 ## News
 
+ - 07/09/2018 The [Chinese document](http://xlearn-doc-cn.readthedocs.io/en/latest/index.html) is available now!
+
  - 08/03/2018 xLearn 0.3.0 version release. Main update:
 
     * Fix bugs in previous version
