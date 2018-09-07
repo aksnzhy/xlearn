@@ -13,7 +13,9 @@ learning problems on large-scale sparse data, which is very common in Internet s
 and recommender systems in recent years.  If you are the user  of liblinear, libfm, or libffm, now xLearn is your 
 another better choice.
 
-[Get Started!](http://xlearn-doc.readthedocs.io/en/latest/index.html)
+[Get Started! (English)](http://xlearn-doc.readthedocs.io/en/latest/index.html)
+
+[Get Started! (Chinese)](http://xlearn-doc-cn.readthedocs.io/en/latest/index.html)
 
 ### Performance
 
