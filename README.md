@@ -33,7 +33,7 @@ xLearn does not rely on any troublesome third-party library, and hence users can
 
 <img src="https://github.com/aksnzhy/xLearn/raw/master/img/scalability.png" width = "650"/>
 
-xLearn can be used for solving large-scale machine learning problems. First, xLearn supports out-of-core training, which can handle very large data (TB) by just leveraging the disk of a PC. In addition, xLearn supports distributed training, which scales beyond billions of example across many machines by using the parameter server framework.
+xLearn can be used for solving large-scale machine learning problems. First, xLearn supports out-of-core training, which can handle very large data (TB) by just leveraging the disk of a PC. In addition, xLearn supports distributed training, which scales beyond billions of example across many machines by using the Parameter Server framework.
 
 
 ## News
