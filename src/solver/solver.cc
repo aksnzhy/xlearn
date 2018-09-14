@@ -504,6 +504,7 @@ void Solver::start_train_work() {
  * Original training without cross-validation                                 *
  ******************************************************************************/
   else {
+    // The training process
     trainer.Train();
     // Save binary model
     if (save_model) {
@@ -512,12 +513,10 @@ void Solver::start_train_work() {
       print_action("Start to save model ...");
       trainer.SaveModel(hyper_param_.model_file);
       print_info(
-        StringPrintf("Model file: %s", 
-          hyper_param_.model_file.c_str())
+        StringPrintf("Model file: %s", hyper_param_.model_file.c_str())
       );
       print_info(
-        StringPrintf("Time cost for saving model: %.2f (sec)",
-             timer.toc())
+        StringPrintf("Time cost for saving model: %.2f (sec)", timer.toc())
       );
     }
     // Save TXT model 
@@ -527,12 +526,10 @@ void Solver::start_train_work() {
       print_action("Start to save txt model ...");
       trainer.SaveTxtModel(hyper_param_.txt_model_file);
       print_info(
-        StringPrintf("TXT Model file: %s", 
-          hyper_param_.txt_model_file.c_str())
+        StringPrintf("TXT Model file: %s", hyper_param_.txt_model_file.c_str())
       );
       print_info(
-        StringPrintf("Time cost for saving txt model: %.2f (sec)",
-             timer.toc())
+        StringPrintf("Time cost for saving txt model: %.2f (sec)", timer.toc())
       );
     }
     print_action("Finish training");

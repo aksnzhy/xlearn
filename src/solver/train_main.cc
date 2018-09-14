@@ -39,7 +39,9 @@ int main(int argc, char* argv[]) {
 
   print_info(
     StringPrintf("Total time cost: %.2f (sec)", 
-    timer.toc()), false);
+    timer.toc()), 
+    NOT_IMPORTANT_MSG
+  );
 
   return 0;
 }

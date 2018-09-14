@@ -219,7 +219,7 @@ void Model::Serialize(const std::string& filename) {
 }
 
 // Serialize current model to a txt file.
-void Model::SerializeToTxt(const std::string& filename) {
+void Model::SerializeToTXT(const std::string& filename) {
   CHECK_NE(filename.empty(), true);
   std::ofstream o_file(filename);
   // For now, only LR model can dump to txt file.

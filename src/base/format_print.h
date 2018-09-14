@@ -29,6 +29,9 @@ This file defines facilities for format printing.
 
 namespace Color {
 
+#define IMPORTANT_MSG true
+#define NOT_IMPORTANT_MSG false
+
 // Color table
 enum Code {
 /*********************************************************
@@ -112,11 +115,11 @@ inline void print_action(const std::string& out) {
             << out << reset << std::endl;
 }
 
-inline void print_info(const std::string& out, bool imp = false) {
+inline void print_info(const std::string& out, bool important = false) {
   Color::Modifier green(Color::FG_GREEN);
   Color::Modifier bold(Color::BOLD);
   Color::Modifier reset(Color::RESET);
-  if (!imp) {
+  if (!important) {
     std::cout << green << "[------------] " << reset
             << out << std::endl;
   } else {

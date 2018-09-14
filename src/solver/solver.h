@@ -15,8 +15,7 @@
 //------------------------------------------------------------------------------
 
 /*
-This file defines the Solver class, which is the entry
-of the xLearn.
+This file defines the Solver class, which is the entry of the xLearn.
 */
 
 #ifndef XLEARN_SOLVER_SOLVER_H_

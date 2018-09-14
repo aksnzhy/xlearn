@@ -197,7 +197,7 @@ TEST(MODEL_TEST, Save_and_Load) {
   RemoveFile(hyper_param.model_file.c_str());
 }
 
-TEST(MODEL_TEST, SerializeToTxt) {
+TEST(MODEL_TEST, SerializeToTXT) {
   HyperParam hyper_param = Init();
   hyper_param.score_func = "linear";
   Model model_lr;
@@ -209,7 +209,7 @@ TEST(MODEL_TEST, SerializeToTxt) {
                     hyper_param.auxiliary_size, 
                     0.5);
   // Serialize model to txt file
-  model_lr.SerializeToTxt(hyper_param.model_file);
+  model_lr.SerializeToTXT(hyper_param.model_file);
   std::ifstream i_file(hyper_param.model_file);
   for (index_t i = 0; i < hyper_param.num_feature+1; ++i) {
     real_t tmp = -1.0;

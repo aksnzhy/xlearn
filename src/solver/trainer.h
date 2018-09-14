@@ -85,7 +85,7 @@ class Trainer {
   void SaveTxtModel(const std::string& filename) {
     CHECK_NE(filename.empty(), true);
     CHECK_NE(filename.compare("none"), 0);
-    model_->SerializeToTxt(filename);
+    model_->SerializeToTXT(filename);
   }
 
  protected:
