@@ -1,4 +1,4 @@
-//------------------------------------------------------------------------------
+ //------------------------------------------------------------------------------
 // Copyright (c) 2018 by contributors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -163,8 +163,8 @@ void Trainer::train(std::vector<Reader*>& train_reader,
                     std::vector<Reader*>& test_reader) {
   int best_epoch = 0;
   int stop_window = 0;
-  real_t best_loss = kFloatMax;
-  real_t prev_loss = kFloatMax;
+  real_t best_result = metric_ == nullptr ? kFloatMax : kFloatMin;
+  real_t prev_result = metric_ == nullptr ? kFloatMin : kFloatMax;
   MetricInfo te_info;
   // Show header info
   if (!quiet_) { 
@@ -189,26 +189,33 @@ void Trainer::train(std::vector<Reader*>& train_reader,
                       n);
       // Early-stopping
       if (early_stop_) {
-        if (te_info.loss_val < best_loss) {
-          best_loss = te_info.loss_val;
+        if ((metric_ == nullptr && te_info.loss_val < best_result) ||
+            (metric_ != nullptr && te_info.metric_val > best_result))  {
+          best_result = metric_ == nullptr ? 
+            te_info.loss_val : te_info.metric_val;
           best_epoch = n;
           model_->SetBestModel();
         }
-        if (te_info.loss_val >= prev_loss) {
-          stop_window++;
+        if ((metric_ == nullptr && te_info.loss_val >= prev_result) ||
+            (metric_ != nullptr && te_info.metric_val <= prev_result)) {
           // If the validation loss goes up conntinuously
           // in stop_window epoch, we stop training
           if (stop_window == stop_window_) { break; }
+          stop_window++;
         } else {
           stop_window = 0;
         }
-        prev_loss = te_info.loss_val;
+        prev_result = metric_ == nullptr ? 
+          te_info.loss_val : te_info.metric_val;
       }
     }
   }
   if (early_stop_ && best_epoch != epoch_) {  // not for cv
+    std::string metric_name = metric_ == nullptr ? 
+      "loss" : metric_->metric_type();
     print_action(
-      StringPrintf("Early-stopping at epoch %d", best_epoch)
+      StringPrintf("Early-stopping at epoch %d, best %s: %f", 
+        best_epoch, metric_name.c_str(), best_result)
     );
     model_->Shrink();
   } else {  // for cv
