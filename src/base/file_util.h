@@ -342,25 +342,25 @@ inline uint64_t HashFile(const std::string& filename, bool one_block=false) {
   CHECK_EQ(static_cast<int>(f.tellg()), 0);
 
   uint64_t magic = 90359;
-  for(long pos = 0; pos < end; ) {
+  for (long pos = 0; pos < end; ) {
     long next_pos = std::min(pos + kChunkSize, end);
     long size = next_pos - pos;
     std::vector<char> buffer(kChunkSize);
     f.read(buffer.data(), size);
 
     int i = 0;
-    while(i < size - 8) {
+    while (i < size - 8) {
       uint64_t x = *reinterpret_cast<uint64_t*>(buffer.data() + i);
       magic = ( (magic + x) * (magic + x + 1) >> 1) + x;
       i += 8;
     }
-    for(; i < size; i++) {
+    for (; i < size; i++) {
       char x = buffer[i];
       magic = ( (magic + x) * (magic + x + 1) >> 1) + x;
     }
 
     pos = next_pos;
-    if(one_block) { break; }
+    if (one_block) { break; }
   }
 
   return magic;
