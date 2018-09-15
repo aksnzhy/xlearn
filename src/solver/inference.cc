@@ -53,7 +53,7 @@ void Predictor::Predict() {
     }
   }
   if (reader_->has_label()) {
-    print_info(
+    Color::print_info(
       StringPrintf("The test loss is: %.6f", 
         loss_->GetLoss())
     );

@@ -71,7 +71,7 @@ std::string Reader::check_file_format() {
   } else if (count == 0){
     return "csv";
   }
-  print_error("Unknow file format");
+  Color::print_error("Unknow file format");
   exit(0);
 }
 
@@ -86,13 +86,13 @@ std::string Reader::check_file_format() {
 void InmemReader::Initialize(const std::string& filename) {
   CHECK_NE(filename.empty(), true)
   filename_ = filename;
-  print_info("First check if the text file has been already "
-             "converted to binary format.");
+  Color::print_info("First check if the text file has been already "
+                    "converted to binary format.");
   // HashBinary() will read the first two hash value
   // and then check it whether equal to the hash value generated
   // by HashFile() function from current txt file.
   if (hash_binary(filename_)) {
-    print_info(
+    Color::print_info(
       StringPrintf("Binary file (%s.bin) found. "
                    "Skip converting text to binary.",
                    filename_.c_str())
@@ -100,7 +100,7 @@ void InmemReader::Initialize(const std::string& filename) {
     filename_ += ".bin";
     init_from_binary();
   } else {
-    print_info(
+    Color::print_info(
       StringPrintf("Binary file (%s.bin) NOT found. Convert text "
                    "file to binary file.",
                    filename_.c_str())

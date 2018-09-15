@@ -155,7 +155,7 @@ void Solver::checker(int argc, char* argv[]) {
   try {
     checker_.Initialize(hyper_param_.is_train, argc, argv);
     if (!checker_.check_cmd(hyper_param_)) {
-      print_error("Arguments error");
+      Color::print_error("Arguments error");
       exit(0);
     }
   } catch (std::invalid_argument &e) {
@@ -167,7 +167,7 @@ void Solver::checker(int argc, char* argv[]) {
 // Check the given hyper-parameters
 void Solver::checker(HyperParam& hyper_param) {
   if (!checker_.check_param(hyper_param)) {
-    print_error("Arguments error");
+    Color::print_error("Arguments error");
     exit(0);
   }
 }
@@ -200,7 +200,7 @@ void Solver::init_train() {
    *********************************************************/
   Timer timer;
   timer.tic();
-  print_action("Read Problem ...");
+  Color::print_action("Read Problem ...");
   LOG(INFO) << "Start to init Reader";
   // Split file
   if (hyper_param_.cross_validation) {
@@ -240,7 +240,7 @@ void Solver::init_train() {
       reader_[i]->SetShuffle(true);
     }
     if (reader_[i] == nullptr) {
-      print_error(
+      Color::print_error(
         StringPrintf("Cannot open the file %s",
              file_list[i].c_str())
       );
@@ -272,23 +272,23 @@ void Solver::init_train() {
   // Check overflow:
   // INT_MAX +  = 0
   if (hyper_param_.num_feature == 0) {
-    print_error("Feature index is too large (overflow).");
+    Color::print_error("Feature index is too large (overflow).");
     LOG(FATAL) << "Feature index is too large (overflow).";
   }
   LOG(INFO) << "Number of feature: " << hyper_param_.num_feature;
-  print_info(
+  Color::print_info(
     StringPrintf("Number of Feature: %d", 
                  hyper_param_.num_feature)
   );
   if (hyper_param_.score_func.compare("ffm") == 0) {
     hyper_param_.num_field = max_field + 1;
     LOG(INFO) << "Number of field: " << hyper_param_.num_field;
-    print_info(
+    Color::print_info(
       StringPrintf("Number of Field: %d", 
         hyper_param_.num_field)
     );
   }
-  print_info(
+  Color::print_info(
     StringPrintf("Time cost for reading problem: %.2f (sec)",
          timer.toc())
   );
@@ -297,7 +297,7 @@ void Solver::init_train() {
    *********************************************************/
   timer.reset();
   timer.tic();
-  print_action("Initialize model ...");
+  Color::print_action("Initialize model ...");
   // Initialize parameters
   model_ = new Model();
   if (hyper_param_.opt_type.compare("sgd") == 0) {
@@ -317,11 +317,11 @@ void Solver::init_train() {
   index_t num_param = model_->GetNumParameter();
   hyper_param_.num_param = num_param;
   LOG(INFO) << "Number parameters: " << num_param;
-  print_info(
+  Color::print_info(
     StringPrintf("Model size: %s", 
          PrintSize(num_param*sizeof(real_t)).c_str())
   );
-  print_info(
+  Color::print_info(
     StringPrintf("Time cost for model initial: %.2f (sec)",
          timer.toc())
   );
@@ -365,9 +365,9 @@ void Solver::init_predict() {
   /*********************************************************
    *  Read model file                                      *
    *********************************************************/
-  print_action("Load model ...");
+  Color::print_action("Load model ...");
   CHECK_NE(hyper_param_.model_file.empty(), true);
-  print_info(
+  Color::print_info(
     StringPrintf("Load model from %s",
           hyper_param_.model_file.c_str())
   );
@@ -384,32 +384,32 @@ void Solver::init_predict() {
   if (hyper_param_.score_func.compare("ffm") == 0) {
     hyper_param_.num_field = model_->GetNumField();
   }
-  print_info(
+  Color::print_info(
     StringPrintf("Loss function: %s", 
       hyper_param_.loss_func.c_str())
   );
-  print_info(
+  Color::print_info(
     StringPrintf("Score function: %s", 
       hyper_param_.score_func.c_str())
   );
-  print_info(
+  Color::print_info(
     StringPrintf("Number of Feature: %d", 
                  hyper_param_.num_feature)
   );
   if (hyper_param_.score_func.compare("fm") == 0 ||
       hyper_param_.score_func.compare("ffm") == 0) {
-    print_info(
+    Color::print_info(
       StringPrintf("Number of K: %d", 
                    hyper_param_.num_K)
     );
     if (hyper_param_.score_func.compare("ffm") == 0) {
-      print_info(
+      Color::print_info(
         StringPrintf("Number of field: %d", 
                     hyper_param_.num_field)
       );
     }
   }
-  print_info(
+  Color::print_info(
     StringPrintf("Time cost for loading model: %.2f (sec)",
         timer.toc())
   );
@@ -417,7 +417,7 @@ void Solver::init_predict() {
   /*********************************************************
    *  Initialize Reader and read problem                   *
    *********************************************************/
-  print_action("Read Problem ...");
+  Color::print_action("Read Problem ...");
   timer.reset();
   timer.tic();
   // Create Reader
@@ -426,13 +426,13 @@ void Solver::init_predict() {
   reader_[0]->Initialize(hyper_param_.test_set_file);
   reader_[0]->SetShuffle(false);
   if (reader_[0] == nullptr) {
-   print_info(
+   Color::print_info(
     StringPrintf("Cannot open the file %s",
                  hyper_param_.test_set_file.c_str())
    );
    exit(0);
   }
-  print_info(
+  Color::print_info(
     StringPrintf("Time cost for reading problem: %.2f (sec)",
                   timer.toc())
   );
@@ -492,13 +492,13 @@ void Solver::start_train_work() {
                      early_stop,
                      stop_window,
                      quiet);
-  print_action("Start to train ...");
+  Color::print_action("Start to train ...");
 /******************************************************************************
  * Training under cross-validation                                            *
  ******************************************************************************/
   if (hyper_param_.cross_validation) {
     trainer.CVTrain();
-    print_action("Finish Cross-Validation");
+    Color::print_action("Finish Cross-Validation");
   } 
 /******************************************************************************
  * Original training without cross-validation                                 *
@@ -510,12 +510,12 @@ void Solver::start_train_work() {
     if (save_model) {
       Timer timer;
       timer.tic();
-      print_action("Start to save model ...");
+      Color::print_action("Start to save model ...");
       trainer.SaveModel(hyper_param_.model_file);
-      print_info(
+      Color::print_info(
         StringPrintf("Model file: %s", hyper_param_.model_file.c_str())
       );
-      print_info(
+      Color::print_info(
         StringPrintf("Time cost for saving model: %.2f (sec)", timer.toc())
       );
     }
@@ -523,22 +523,22 @@ void Solver::start_train_work() {
     if (save_txt_model) {
       Timer timer;
       timer.tic();
-      print_action("Start to save txt model ...");
+      Color::print_action("Start to save txt model ...");
       trainer.SaveTxtModel(hyper_param_.txt_model_file);
-      print_info(
+      Color::print_info(
         StringPrintf("TXT Model file: %s", hyper_param_.txt_model_file.c_str())
       );
-      print_info(
+      Color::print_info(
         StringPrintf("Time cost for saving txt model: %.2f (sec)", timer.toc())
       );
     }
-    print_action("Finish training");
+    Color::print_action("Finish training");
   }
 }
 
 // Inference
 void Solver::start_prediction_work() {
-  print_action("Start to predict ...");
+  Color::print_action("Start to predict ...");
   Predictor pdc;
   pdc.Initialize(reader_[0],
                  model_,
@@ -557,7 +557,7 @@ void Solver::start_prediction_work() {
 // Finalize xLearn
 void Solver::Clear() {
   LOG(INFO) << "Clear the xLearn environment ...";
-  print_action("Clear the xLearn environment ...");
+  Color::print_action("Clear the xLearn environment ...");
   // Clear model
   delete this->model_;
   // Clear Reader

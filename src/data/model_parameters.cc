@@ -189,7 +189,7 @@ void Model::free_model() {
 Model::Model(const std::string& filename) {
   CHECK_NE(filename.empty(), true);
   if (this->Deserialize(filename) == false) {
-    print_error(
+    Color::print_error(
       StringPrintf("Cannot Load model from the file: %s",
            filename.c_str())
     );
@@ -218,16 +218,17 @@ void Model::Serialize(const std::string& filename) {
   Close(file);
 }
 
-// Serialize current model to a txt file.
+// Serialize current model to a TXT file.
 void Model::SerializeToTXT(const std::string& filename) {
   CHECK_NE(filename.empty(), true);
   std::ofstream o_file(filename);
-  // For now, only LR model can dump to txt file.
   /* bias */
   o_file << (*param_b_) << "\n";
   /* linear term */ 
+  index_t idx = 0;
   for (index_t n = 0; n < param_num_w_; n+=aux_size_) {
     o_file << *(param_w_+n) << "\n";
+    idx++;
   }
   /* letent factor */
   index_t k_aligned = get_aligned_k();
@@ -266,8 +267,9 @@ void Model::SerializeToTXT(const std::string& filename) {
           }
           w += (aux_size_-1) * kAlign;
         }
+        o_file << "\n";
       }
-      o_file << "\n";
+      //o_file << "\n";
     }
   }
 }

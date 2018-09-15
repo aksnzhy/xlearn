@@ -51,7 +51,7 @@ void Trainer::show_head_info(bool validate) {
   Color::Modifier green(Color::FG_GREEN);
   Color::Modifier reset(Color::RESET);
   std::cout << green << "[------------]" << reset;
-  print_row(str_list, width_list);
+  Color::print_row(str_list, width_list);
 }
 
 /*********************************************************
@@ -85,7 +85,7 @@ void Trainer::show_train_info(real_t tr_loss,
   std::cout.width(4); 
   std::cout << static_cast<int>(epoch*1.0/epoch_*100) 
             << "%" << green << "      ]"  << reset;
-  print_row(str_list, width_list);
+  Color::print_row(str_list, width_list);
 }
 
 /*********************************************************
@@ -108,7 +108,7 @@ void Trainer::Train() {
 void Trainer::CVTrain() {
   // Use the i-th reader as validation Reader
   for (int i = 0; i < reader_list_.size(); ++i) {
-    print_action(
+    Color::print_action(
       StringPrintf("Cross-validation: %d/%lu:", 
         i+1, reader_list_.size())
     );
@@ -142,13 +142,13 @@ void Trainer::show_average_metric() {
       metric += metric_info_[i].metric_val;
     }
   }
-  print_info(
+  Color::print_info(
     StringPrintf("Average %s: %.6f", 
     loss_->loss_type().c_str(), 
     loss / metric_info_.size())
   );
   if (metric_ != nullptr) {
-    print_info(
+    Color::print_info(
       StringPrintf("Average %s: %.6f", 
       metric_->metric_type().c_str(),
        metric / metric_info_.size())
@@ -213,7 +213,7 @@ void Trainer::train(std::vector<Reader*>& train_reader,
   if (early_stop_ && best_epoch != epoch_) {  // not for cv
     std::string metric_name = metric_ == nullptr ? 
       "loss" : metric_->metric_type();
-    print_action(
+    Color::print_action(
       StringPrintf("Early-stopping at epoch %d, best %s: %f", 
         best_epoch, metric_name.c_str(), best_result)
     );

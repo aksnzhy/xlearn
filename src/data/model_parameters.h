@@ -103,7 +103,7 @@ class Model {
   // Serialize model to a checkpoint file.
   void Serialize(const std::string& filename);
 
-  // Serialize model to a txt file.
+  // Serialize model to a TXT file.
   void SerializeToTXT(const std::string& filename);
 
   // Deserialize model from a checkpoint file.

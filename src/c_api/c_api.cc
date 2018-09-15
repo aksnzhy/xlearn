@@ -150,7 +150,7 @@ XL_DLL int XLearnFit(XL *out, const char *model_path) {
   xl->GetSolver().Initialize(xl->GetHyperParam());
   xl->GetSolver().StartWork();
   xl->GetSolver().Clear();
-  print_info(
+  Color::print_info(
     StringPrintf("Total time cost: %.2f (sec)", 
     timer.toc()), true);
   API_END();
@@ -168,7 +168,7 @@ XL_DLL int XLearnCV(XL *out) {
   xl->GetSolver().StartWork();
   xl->GetSolver().Clear();
   xl->GetHyperParam().cross_validation = false;
-  print_info(
+  Color::print_info(
     StringPrintf("Total time cost: %.2f (sec)", 
     timer.toc()), true);
   API_END();
@@ -187,7 +187,7 @@ XL_DLL int XLearnPredict(XL *out, const char *model_path, const char *out_path) 
   xl->GetSolver().SetPredict();
   xl->GetSolver().StartWork();
   xl->GetSolver().Clear();
-  print_info(
+  Color::print_info(
     StringPrintf("Total time cost: %.2f (sec)", 
     timer.toc()), true);
   API_END();

@@ -227,7 +227,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
   if (FileExist(args_[1].c_str())) {
     hyper_param.train_set_file = std::string(args_[1]);
   } else {
-    print_error(
+    Color::print_error(
       StringPrintf("Training data file: %s does not exist.", 
                     args_[1].c_str())
     );
@@ -242,7 +242,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     if (list[i].compare("-s") == 0) {  // task type
       int value = atoi(list[i+1].c_str());
       if (value < 0 || value > 5) {
-        print_error(
+        Color::print_error(
             "-s can only be [0 - 5] : \n"
             "  for classification task: \n"
             "    0 -- linear model (GLM) \n"
@@ -294,7 +294,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
           list[i+1].compare("rmsd") != 0 &&
           list[i+1].compare("rmse") != 0 &&
           list[i+1].compare("none") != 0) {
-        print_error(
+        Color::print_error(
           StringPrintf("Unknow metric: %s \n"
                " -x can only be: \n"
                "   acc \n"
@@ -318,7 +318,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       if (list[i+1].compare("adagrad") != 0 &&
           list[i+1].compare("ftrl") != 0 &&
           list[i+1].compare("sgd") != 0) {
-        print_error(
+        Color::print_error(
           StringPrintf("Unknow optimization method: %s \n"
                " -o can only be: adagrad and ftrl. \n",
                list[i+1].c_str())
@@ -332,7 +332,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       if (FileExist(list[i+1].c_str())) {
         hyper_param.validate_set_file = list[i+1];
       } else {
-        print_error(
+        Color::print_error(
           StringPrintf("Validation set file: %s dose not exists.",
                        list[i+1].c_str())
         );
@@ -351,7 +351,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-k") == 0) {  // latent factor
       int value = atoi(list[i+1].c_str());
       if (value <= 0) {
-        print_error(
+        Color::print_error(
           StringPrintf("Illegal -k '%i'. -k must be geater than zero.",
                value)
         );
@@ -363,7 +363,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-r") == 0) {  // learning rate
       real_t value = atof(list[i+1].c_str());
       if (value <= 0) {
-        print_error(
+        Color::print_error(
           StringPrintf("Illegal -r : '%f'. -r must be greater than zero.",
                value)
         );
@@ -375,7 +375,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-b") == 0) {  // regular lambda
       real_t value = atof(list[i+1].c_str());
       if (value < 0) {
-        print_error(
+        Color::print_error(
           StringPrintf("Illegal -b : '%f' "
                "-b must be greater than or equal to zero.",
                value)
@@ -388,7 +388,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-u") == 0) {  // model scale
       real_t value = atof(list[i+1].c_str());
       if (value <= 0) {
-        print_error(
+        Color::print_error(
           StringPrintf("Illegal -u : '%f'. -u must be greater than zero.",
                value)
         );
@@ -400,7 +400,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-e") == 0) {  // number of epoch
       int value = atoi(list[i+1].c_str());
       if (value < 0) {
-        print_error(
+        Color::print_error(
           StringPrintf("Illegal -e : '%i'. -e must be greater than zero.",
                value)
         );
@@ -412,7 +412,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-f") == 0) {  // number of folds
       int value = atoi(list[i+1].c_str());
       if (value < 0) {
-        print_error(
+        Color::print_error(
           StringPrintf("Illegal -f : '%i'. -f must be greater than zero.",
                value)
         );
@@ -427,7 +427,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-nthread") == 0) {  // number of thread
       int value = atoi(list[i+1].c_str());
       if (value <= 0) {
-        print_error(
+        Color::print_error(
           StringPrintf("Illegal -nthread : '%i'. -nthread must be greater than zero.",
                value)
         );
@@ -439,7 +439,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-block") == 0) {  // block size for on-disk training
       int value = atoi(list[i+1].c_str());
       if (value <= 0) {
-        print_error(
+        Color::print_error(
           StringPrintf("Illegal -block : '%i'. -block must be greater than zero.",
                value)
         );
@@ -451,7 +451,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-sw") == 0) {  // window size for early stopping
       int value = atoi(list[i+1].c_str());
       if (value < 1) {
-        print_error(
+        Color::print_error(
           StringPrintf("Illegal -sw : '%i'. -sw must be greater than or equal to 1.",
                value)
         );
@@ -481,7 +481,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-alpha") == 0) {  // alpha
       real_t value = atof(list[i+1].c_str());
       if (value <= 0) {
-        print_error(
+        Color::print_error(
           StringPrintf("Illegal -alpha : '%f'. "
                        "-alpha must be greater than zero.",
                value)
@@ -494,7 +494,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-beta") == 0) {  // beta
       real_t value = atof(list[i+1].c_str());
       if (value < 0) {
-        print_error(
+        Color::print_error(
           StringPrintf("Illegal -beta : '%f'. "
                        "-beta cannot be less than zero.",
                value)
@@ -507,7 +507,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-lambda_1") == 0) {  // lambda_1
       real_t value = atof(list[i+1].c_str());
       if (value < 0) {
-        print_error(
+        Color::print_error(
           StringPrintf("Illegal -lambda_1 : '%f'. "
                        "-lambda_1 cannot be less than zero.",
                value)
@@ -520,7 +520,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-lambda_2") == 0) { // lambda_2
       real_t value = atof(list[i+1].c_str());
       if (value < 0) {
-        print_error(
+        Color::print_error(
           StringPrintf("Illegal -lambda_2 : '%f'. "
                        "-lambda_2 cannot be less than zero.",
                value)
@@ -533,7 +533,7 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
     } else {  // no match
       std::string similar_str;
       ss.FindSimilar(list[i], menu_, similar_str);
-      print_error(
+      Color::print_error(
         StringPrintf("Unknow argument '%s'. Do you mean '%s' ?",
              list[i].c_str(),
              similar_str.c_str())
@@ -567,7 +567,7 @@ bool Checker::check_train_param(HyperParam& hyper_param) {
    *  Check file path                                      *
    *********************************************************/
   if (!FileExist(hyper_param.train_set_file.c_str())) {
-    print_error(
+    Color::print_error(
       StringPrintf("Training data file: %s does not exist.", 
                     hyper_param.train_set_file.c_str())
     );
@@ -575,7 +575,7 @@ bool Checker::check_train_param(HyperParam& hyper_param) {
   }
   if (!hyper_param.validate_set_file.empty() &&
       !FileExist(hyper_param.validate_set_file.c_str())) {
-    print_error(
+    Color::print_error(
       StringPrintf("Validation data file: %s does not exist.", 
                     hyper_param.validate_set_file.c_str())
     );
@@ -585,14 +585,14 @@ bool Checker::check_train_param(HyperParam& hyper_param) {
    *  Check invalid value                                  *
    *********************************************************/
   if (hyper_param.thread_number < 0) {
-    print_error(
+    Color::print_error(
       StringPrintf("The thread number must be greater than zero: %d.",
         hyper_param.thread_number)
     );
     bo = false;
   }
   if (hyper_param.loss_func.compare("unknow") == 0) {
-    print_error(
+    Color::print_error(
       StringPrintf("The task can only be 'binary' or 'reg'.")
     );
     bo = false;
@@ -607,7 +607,7 @@ bool Checker::check_train_param(HyperParam& hyper_param) {
       hyper_param.metric.compare("rmsd") != 0 &&
       hyper_param.metric.compare("rmse") != 0 &&
       hyper_param.metric.compare("none") != 0) {
-    print_error(
+    Color::print_error(
       StringPrintf("Unknow evaluation metric: %s.",
         hyper_param.metric.c_str())
     );
@@ -616,14 +616,14 @@ bool Checker::check_train_param(HyperParam& hyper_param) {
   if (hyper_param.opt_type.compare("sgd") != 0 &&
       hyper_param.opt_type.compare("ftrl") != 0 &&
       hyper_param.opt_type.compare("adagrad") != 0) {
-    print_error(
+    Color::print_error(
       StringPrintf("Unknow optimization method: %s.",
         hyper_param.opt_type.c_str())
     );
     bo = false;
   }
   if (hyper_param.num_K > 999999) {
-    print_error(
+    Color::print_error(
       StringPrintf("Invalid size of K: %d. "
                    "Size of K must be greater than zero.", 
         hyper_param.num_K)
@@ -631,7 +631,7 @@ bool Checker::check_train_param(HyperParam& hyper_param) {
     bo = false;
   }
   if (hyper_param.num_folds <= 0) {
-    print_error(
+    Color::print_error(
       StringPrintf("Invalid size of folds: %d. "
                    "Size of folds must be greater than zero.", 
         hyper_param.num_folds)
@@ -639,7 +639,7 @@ bool Checker::check_train_param(HyperParam& hyper_param) {
     bo = false;
   }
   if (hyper_param.num_epoch <= 0) {
-    print_error(
+    Color::print_error(
       StringPrintf("Invalid number of epoch: %d. "
                    "Number of epoch must be greater than zero.", 
         hyper_param.num_epoch)
@@ -667,17 +667,17 @@ bool Checker::check_train_param(HyperParam& hyper_param) {
 // Check warning and fix conflict
 void Checker::check_conflict_train(HyperParam& hyper_param) {
   if (hyper_param.on_disk && hyper_param.cross_validation) {
-    print_warning("On-disk training doesn't support cross-validation. "
-                  "xLearn has already disable the -cv option.");
+    Color::print_warning("On-disk training doesn't support cross-validation. "
+                         "xLearn has already disable the -cv option.");
     hyper_param.cross_validation = false;
   }
   if (hyper_param.cross_validation && hyper_param.early_stop) {
-    print_warning("Cross-validation doesn't support early-stopping. "
-                  "xLearn has already close early-stopping.");
+    Color::print_warning("Cross-validation doesn't support early-stopping. "
+                         "xLearn has already close early-stopping.");
     hyper_param.early_stop = false;
   }
   if (hyper_param.cross_validation && !hyper_param.test_set_file.empty()) {
-    print_warning(
+    Color::print_warning(
       StringPrintf("The --cv (cross-validation) has been set, and "
                    "xLearn will ignore the validation file: %s",
                    hyper_param.test_set_file.c_str())
@@ -685,24 +685,24 @@ void Checker::check_conflict_train(HyperParam& hyper_param) {
     hyper_param.validate_set_file.clear();
   }
   if (hyper_param.cross_validation && hyper_param.quiet) {
-    print_warning("The --cv (cross-validation) has been set, and "
-                  "xLearn will ignore the --quiet option.");
+    Color::print_warning("The --cv (cross-validation) has been set, and "
+                         "xLearn will ignore the --quiet option.");
     hyper_param.quiet = false;
   }
   if (hyper_param.cross_validation && !hyper_param.model_file.empty()) {
-    print_warning("The --cv (cross-validation) has been set, and "
-                  "xLearn will not dump model checkpoint to disk.");
+    Color::print_warning("The --cv (cross-validation) has been set, and "
+                         "xLearn will not dump model checkpoint to disk.");
     hyper_param.model_file.clear();
   }
   if (hyper_param.validate_set_file.empty() && hyper_param.early_stop) {
-    print_warning("Validation file not found, xLearn has already "
-                  "disable early-stopping.");
+    Color::print_warning("Validation file not found, xLearn has already "
+                         "disable early-stopping.");
     hyper_param.early_stop = false;
   }
   if (hyper_param.metric.compare("none") != 0 &&
       hyper_param.validate_set_file.empty() &&
       !hyper_param.cross_validation) {
-    print_warning(
+    Color::print_warning(
       StringPrintf("Validation file not found, xLearn has already "
                    "disable (-x %s) option.", 
                    hyper_param.metric.c_str())
@@ -714,7 +714,7 @@ void Checker::check_conflict_train(HyperParam& hyper_param) {
         hyper_param.metric.compare("prec") == 0 ||
         hyper_param.metric.compare("recall") == 0 ||
         hyper_param.metric.compare("f1") == 0) {
-      print_warning(
+      Color::print_warning(
         StringPrintf("The -x: %s metric can only be used "
                      "in classification tasks. xLearn will "
                      "ignore this option.",
@@ -727,7 +727,7 @@ void Checker::check_conflict_train(HyperParam& hyper_param) {
         hyper_param.metric.compare("mape") == 0 ||
         hyper_param.metric.compare("rmsd") == 0 ||
         hyper_param.metric.compare("rmse") == 0) {
-      print_warning(
+      Color::print_warning(
         StringPrintf("The -x: %s metric can only be used "
                      "in regression tasks. xLearn will ignore "
                      "this option.",
@@ -745,7 +745,7 @@ bool Checker::check_prediction_options(HyperParam& hyper_param) {
    *  Check size                                           *
    *********************************************************/
   if (args_.size() < 3) {
-    print_error("The test file and model file must be set.");
+    Color::print_error("The test file and model file must be set.");
     return false;
   }
   /*********************************************************
@@ -754,7 +754,7 @@ bool Checker::check_prediction_options(HyperParam& hyper_param) {
   if (FileExist(args_[1].c_str())) {
     hyper_param.test_set_file = std::string(args_[1]);
   } else {
-    print_error(
+    Color::print_error(
       StringPrintf("Test set file: %s does not exist.",
            args_[1].c_str())
     );
@@ -766,7 +766,7 @@ bool Checker::check_prediction_options(HyperParam& hyper_param) {
   if (FileExist(args_[2].c_str())) {
     hyper_param.model_file = std::string(args_[2]);
   } else {
-    print_error(
+    Color::print_error(
       StringPrintf("Model file: %s does not exist.",
            args_[2].c_str())
     );
@@ -787,7 +787,7 @@ bool Checker::check_prediction_options(HyperParam& hyper_param) {
     } else if (list[i].compare("-nthread") == 0) {  // number of thread
       int value = atoi(list[i+1].c_str());
       if (value <= 0) {
-         print_error(
+        Color::print_error(
           StringPrintf("Illegal -nthread : '%i'. -nthread must be greater than zero.",
                value)
         );
@@ -805,7 +805,7 @@ bool Checker::check_prediction_options(HyperParam& hyper_param) {
     } else {  // no match
       std::string similar_str;
       ss.FindSimilar(list[i], menu_, similar_str);
-      print_error(
+      Color::print_error(
         StringPrintf("Unknow argument '%s'. Do you mean '%s' ?",
              list[i].c_str(),
              similar_str.c_str())
@@ -836,7 +836,7 @@ bool Checker::check_prediction_param(HyperParam& hyper_param) {
   *  Check the path of test set file                      *
   *********************************************************/
  if (!FileExist(hyper_param.test_set_file.c_str())) {
-    print_error(
+    Color::print_error(
       StringPrintf("Test set file: %s does not exist.",
            hyper_param.test_set_file.c_str())
     );
@@ -846,7 +846,7 @@ bool Checker::check_prediction_param(HyperParam& hyper_param) {
   *  Check the path of model file                         *
   *********************************************************/
  if (!FileExist(hyper_param.model_file.c_str())) {
-   print_error(
+    Color::print_error(
       StringPrintf("Test set file: %s does not exist.",
            hyper_param.model_file.c_str())
     );
@@ -856,7 +856,7 @@ bool Checker::check_prediction_param(HyperParam& hyper_param) {
   *  Check invalid value                                  *
   *********************************************************/
  if (hyper_param.thread_number < 0) {
-    print_error(
+    Color::print_error(
       StringPrintf("The thread number must be greater than zero: %d.",
         hyper_param.thread_number)
     );
@@ -880,8 +880,8 @@ bool Checker::check_prediction_param(HyperParam& hyper_param) {
 // Check warning and fix conflict
 void Checker::check_conflict_predict(HyperParam& hyper_param) {
   if (hyper_param.sign && hyper_param.sigmoid) {
-    print_warning("Both of --sign and --sigmoid have been set. "
-                  "xLearn has already disable --sign and --sigmoid.");
+    Color::print_warning("Both of --sign and --sigmoid have been set. "
+                         "xLearn has already disable --sign and --sigmoid.");
     hyper_param.sign = false;
     hyper_param.sigmoid = false;
   }
