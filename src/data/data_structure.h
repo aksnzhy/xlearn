@@ -33,7 +33,7 @@ This file defines the basic data structures.
 namespace xLearn {
 
 //------------------------------------------------------------------------------
-// We use 32-bits float to store the real number 
+// We use 32-bits float to store the real number during computation, 
 // such as the model parameter and the gradient.
 //------------------------------------------------------------------------------
 typedef float real_t;
@@ -50,7 +50,7 @@ typedef uint32 index_t;
 typedef std::unordered_map<index_t, index_t> feature_map;
 
 //------------------------------------------------------------------------------
-// We use SSE to accelerate our training, so some 
+// We use SSE to accelerate our training, and hence some 
 // parameters will be aligned.
 //------------------------------------------------------------------------------
 const int kAlign = 4;
@@ -149,7 +149,7 @@ struct DMatrix {
   // Reset data for the DMatrix.
   // This function will first release the original
   // memory allocated for the DMatrix, and then re-allocate 
-  // memory for this matrix. For some dataset, it will not
+  // memory for this new matrix. For some dataset, it does not
   // contains the label y, and hence we need to set the 
   // has_label variable to false. On deafult, this value will
   // be set to true.
@@ -161,7 +161,7 @@ struct DMatrix {
     row_length = length;
     row.resize(length, nullptr);
     Y.resize(length, 0);
-    // we set norm to 1.0 by default, which means
+    // Here we set norm to 1.0 by default, which means
     // that we don't use instance-wise nomarlization
     norm.resize(length, 1.0);
     // Indicate that if current dataset has the label y
@@ -403,16 +403,16 @@ struct DMatrix {
   }
 
   /* The DMatrix has a hash value that is geneerated 
-  from the txt file. These two values are used to check 
+  from the TXT file. These two values are used to check 
   whether we can use binary file to speedup data reading */
   uint64 hash_value_1;
   uint64 hash_value_2;
   /* Row length of current matrix */
   index_t row_length;
-  /* Using pointer for zero-copy */
+  /* Store many SparseRow. Using pointer for zero-copy */
   std::vector<SparseRow*> row;
-  /* 0 or -1 for negative and +1 for positive
-  example, and others for regression */
+  /* (0 or -1) for negative and (+1) for positive
+  examples, and others value for regression */
   std::vector<real_t> Y;
   /* Used for instance-wise normalization */
   std::vector<real_t> norm;
