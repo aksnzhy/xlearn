@@ -111,9 +111,9 @@ const size_t KB = 1024.0;
 const size_t MB = 1024.0 * 1024.0;
 const size_t GB = 1024.0 * 1024.0 * 1024.0;
 
-/* 500 KB for one line of txt data */
+// Max size of one line TXT data
 static const uint32 kMaxLineSize = 500 * 1024;  // 500 KB
-/* Chunk size for hash block */
+// Max chunk size of hash block 
 static const uint32 kChunkSize = 1000 * 1024; // 1000 KB
 
 // Check whether the file exists.
@@ -121,13 +121,15 @@ inline bool FileExist(const char* filename) {
   if (access(filename, F_OK) != -1) {
     return true;
   }
-  LOG(WARNING) << "File: " << filename << "doesn't exists.";
+  LOG(WARNING) << "File: " << filename << " doesn't exist.";
   return false;
 }
 
 // Open file using fopen() and return the file pointer.
-// mode : "w" for write and "r" for read
+// Args_mode : "w" for write and "r" for read
 inline FILE* OpenFileOrDie(const char* filename, const char* mode) {
+  CHECK_NOTNULL(filename);
+  CHECK_NOTNULL(mode);
   FILE* input_stream = fopen(filename, mode);
   if (input_stream == nullptr) {
     LOG(FATAL) << "Cannot open file: " << filename
@@ -136,18 +138,21 @@ inline FILE* OpenFileOrDie(const char* filename, const char* mode) {
   return input_stream;
 }
 
-// Close file using fclose().
+// Close file using fclose() by given the file pointer.
 inline void Close(FILE *file) {
+  CHECK_NOTNULL(file);
   if (fclose(file) == -1) {
-    LOG(FATAL) << "Error invoke fclose().";
+    LOG(FATAL) << "Error: invoke fclose().";
   }
 }
 
 // Return the size (byte) of a target file.
 inline uint64 GetFileSize(FILE* file) {
+  CHECK_NOTNULL(file);
   if (fseek(file, 0L, SEEK_END) != 0) {
     LOG(FATAL) << "Error: invoke fseek().";
   }
+  // Note that we use uin64 here for big file
   uint64 total_size = ftell(file);
   if (total_size == -1) {
     LOG(FATAL) << "Error: invoke ftell().";
@@ -157,15 +162,15 @@ inline uint64 GetFileSize(FILE* file) {
   return total_size;
 }
 
-// Get one line of data from the file.
+// Get one line of data from file by given a file pointer.
 inline void GetLine(FILE* file, std::string& str_line) {
   CHECK_NOTNULL(file);
-  //static char* line = new char[kMaxLineSize];
   scoped_array<char> line(new char[kMaxLineSize]);
   CHECK_NOTNULL(fgets(line.get(), kMaxLineSize, file));
   int read_len = strlen(line.get());
   if (line[read_len - 1] != '\n') {
-    LOG(FATAL) << "Encountered a too-long line.     \
+    LOG(FATAL) << "Encountered a too-long line: \
+                   Cannot find the '\n' char.   \
                    Please check the data.";
   } else {
     line[read_len - 1] = '\0';
@@ -177,12 +182,12 @@ inline void GetLine(FILE* file, std::string& str_line) {
   str_line.assign(line.get());
 }
 
-// Write data from a buffer to disk file.
-// Return the size (byte) of data we write.
+// Write a block of data from a buffer to disk file.
+// Return the size (byte) of data that we write to this file.
 inline size_t WriteDataToDisk(FILE* file, const char* buf, size_t len) {
   CHECK_NOTNULL(file);
   CHECK_NOTNULL(buf);
-  CHECK_GE(len, 0);
+  CHECK_GT(len, 0);
   size_t write_len = fwrite(buf, 1, len, file);
   if (write_len != len) {
     LOG(FATAL) << "Error: invoke fwrite().";
@@ -190,14 +195,14 @@ inline size_t WriteDataToDisk(FILE* file, const char* buf, size_t len) {
   return write_len;
 }
 
-// Read data from disk file to a buffer.
-// Return the data size (byte) we have read.
+// Read a block data from disk file to a buffer.
+// Return the data size (byte) we read from the file.
 // If we reach the end of the file, return 0.
 inline size_t ReadDataFromDisk(FILE* file, char* buf, size_t len) {
   CHECK_NOTNULL(file);
   CHECK_NOTNULL(buf);
   CHECK_GE(len, 0);
-  /* Reach the end of the file */
+  // Reach the end of the file
   if (feof(file)) {
     return 0;
   }
@@ -216,7 +221,7 @@ inline void RemoveFile(const char* filename) {
   }
 }
 
-// Print file size.
+// Format the file size by GB, MB, and KB
 inline std::string PrintSize(uint64 file_size) {
   std::string res;
   if (file_size > GB) {
@@ -232,6 +237,23 @@ inline std::string PrintSize(uint64 file_size) {
   return res;
 }
 
+// Read the whole file to a memory buffer.
+// Return size (byte) of current file.
+inline uint64 ReadFileToMemory(const std::string& filename, char **buf) {
+  CHECK(!filename.empty());
+  FILE* file = OpenFileOrDie(filename.c_str(), "r");
+  uint64 len = GetFileSize(file);
+  try {
+    *buf = new char[len];
+  } catch (std::bad_alloc&) {
+    LOG(FATAL) << "Cannot allocate enough memory for Reader.";
+  }
+  uint64 read_size = fread(*buf, 1, len, file);
+  CHECK_EQ(read_size, len);
+  Close(file);
+  return len;
+}
+
 //------------------------------------------------------------------------------
 // Serialize or Deserialize for std::vector and std::string
 //------------------------------------------------------------------------------
@@ -240,12 +262,14 @@ inline std::string PrintSize(uint64 file_size) {
 template <typename T>
 void WriteVectorToFile(FILE* file_ptr, const std::vector<T>& vec) {
   CHECK_NOTNULL(file_ptr);
-  // We do not allow to Serialize an empty vector
+  // We do not want to serialize an empty vector
   CHECK(!vec.empty());
   size_t len = vec.size();
+  // First, write the length of this vector
   WriteDataToDisk(file_ptr, 
     reinterpret_cast<char*>(&len), 
     sizeof(len));
+  // Then, write the data of this vector
   WriteDataToDisk(file_ptr, 
     (char*)(vec.data()), 
     sizeof(T)*len);
@@ -255,12 +279,13 @@ void WriteVectorToFile(FILE* file_ptr, const std::vector<T>& vec) {
 template <typename T>
 void ReadVectorFromFile(FILE* file_ptr, std::vector<T>& vec) {
   CHECK_NOTNULL(file_ptr);
-  // First, read the size of vector
+  // First, read the length of vector
   size_t len = 0;
   ReadDataFromDisk(file_ptr, 
     reinterpret_cast<char*>(&len), 
     sizeof(len));
   CHECK_GT(len, 0);
+  // Clear the original vector
   std::vector<T>().swap(vec);
   vec.resize(len);
   ReadDataFromDisk(file_ptr, 
@@ -271,12 +296,14 @@ void ReadVectorFromFile(FILE* file_ptr, std::vector<T>& vec) {
 // Write a std::string to disk file.
 inline void WriteStringToFile(FILE* file_ptr, const std::string& str) {
   CHECK_NOTNULL(file_ptr);
-  // We do not allow Serialize an empty string
+  // We do not want to serialize an empty string
   CHECK(!str.empty());
   size_t len = str.size();
+  // First, write the length of string
   WriteDataToDisk(file_ptr, 
     reinterpret_cast<char*>(&len), 
     sizeof(len));
+  // Then, write the data of string
   WriteDataToDisk(file_ptr, 
     const_cast<char*>(str.data()), 
     len);
@@ -285,12 +312,13 @@ inline void WriteStringToFile(FILE* file_ptr, const std::string& str) {
 // Read a std::string from disk file.
 inline void ReadStringFromFile(FILE* file_ptr, std::string& str) {
   CHECK_NOTNULL(file_ptr);
-  // First, read the size of vector
+  // First, read the length of vector
   size_t len = 0;
   ReadDataFromDisk(file_ptr, 
     reinterpret_cast<char*>(&len), 
     sizeof(len));
   CHECK_GT(len, 0);
+  // Clear the original string
   std::string().swap(str);
   str.resize(len);
   ReadDataFromDisk(file_ptr, 
@@ -299,7 +327,7 @@ inline void ReadStringFromFile(FILE* file_ptr, std::string& str) {
 }
 
 //------------------------------------------------------------------------------
-// Some tool functions used by Reader
+// Tool function used by Reader class of xLearn
 //------------------------------------------------------------------------------
 
 // Calculate the hash value of current txt file.
@@ -336,23 +364,6 @@ inline uint64_t HashFile(const std::string& filename, bool one_block=false) {
   }
 
   return magic;
-}
-
-// Read the whole file to a memory buffer and 
-// Return size (byte) of current file.
-inline uint64 ReadFileToMemory(const std::string& filename, char **buf) {
-  CHECK(!filename.empty());
-  FILE* file = OpenFileOrDie(filename.c_str(), "r");
-  uint64 len = GetFileSize(file);
-  try {
-    *buf = new char[len];
-  } catch (std::bad_alloc&) {
-    LOG(FATAL) << "Cannot allocate enough memory for Reader.";
-  }
-  uint64 read_size = fread(*buf, 1, len, file);
-  CHECK_EQ(read_size, len);
-  Close(file);
-  return len;
 }
 
 #endif  // XLEARN_BASE_FILE_UTIL_H_
