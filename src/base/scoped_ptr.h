@@ -1,4 +1,20 @@
 //------------------------------------------------------------------------------
+// Copyright (c) 2018 by contributors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
 // https://developers.google.com/protocol-buffers/
@@ -31,7 +47,7 @@
 //------------------------------------------------------------------------------
 
 /*
-This file provides the scoped_ptr and scoped_array.
+This file provides the scoped_ptr and scoped_array classes.
 */
 
 #ifndef XLEARN_BASE_SCOPED_PTR_H_
@@ -68,7 +84,7 @@ class scoped_ptr {
   // Constructor.  Defaults to intializing with NULL.
   // There is no way to create an uninitialized scoped_ptr.
   // The input parameter must be allocated with new.
-  explicit scoped_ptr(C* p = NULL) : ptr_(p) { }
+  explicit scoped_ptr(C* p = nullptr) : ptr_(p) { }
 
   // Destructor.  If there is a C object, delete it.
   // We don't need to test ptr_ == NULL because C++ does that for us.
@@ -80,7 +96,7 @@ class scoped_ptr {
   // Reset.  Deletes the current owned object, if any.
   // Then takes ownership of a new object, if given.
   // this->reset(this->get()) works.
-  void reset(C* p = NULL) {
+  void reset(C* p = nullptr) {
     if (p != ptr_) {
       enum { type_must_be_complete = sizeof(C) };
       delete ptr_;
@@ -91,11 +107,11 @@ class scoped_ptr {
   // Accessors to get the owned object.
   // operator* and operator-> will assert() if there is no current object.
   C& operator*() const {
-    assert(ptr_ != NULL);
+    assert(ptr_ != nullptr);
     return *ptr_;
   }
   C* operator->() const  {
-    assert(ptr_ != NULL);
+    assert(ptr_ != nullptr);
     return ptr_;
   }
   C* get() const { return ptr_; }
@@ -120,7 +136,7 @@ class scoped_ptr {
   // and will not own the object any more.
   C* release() {
     C* retVal = ptr_;
-    ptr_ = NULL;
+    ptr_ = nullptr;
     return retVal;
   }
 
@@ -157,7 +173,7 @@ class scoped_array {
   // Constructor.  Defaults to intializing with NULL.
   // There is no way to create an uninitialized scoped_array.
   // The input parameter must be allocated with new [].
-  explicit scoped_array(C* p = NULL) : array_(p) { }
+  explicit scoped_array(C* p = nullptr) : array_(p) { }
 
   // Destructor.  If there is a C object, delete it.
   // We don't need to test ptr_ == NULL because C++ does that for us.
@@ -169,7 +185,7 @@ class scoped_array {
   // Reset.  Deletes the current owned object, if any.
   // Then takes ownership of a new object, if given.
   // this->reset(this->get()) works.
-  void reset(C* p = NULL) {
+  void reset(C* p = nullptr) {
     if (p != array_) {
       enum { type_must_be_complete = sizeof(C) };
       delete[] array_;
@@ -181,7 +197,7 @@ class scoped_array {
   // Will assert() if there is no current object, or index i is negative.
   C& operator[](std::ptrdiff_t i) const {
     assert(i >= 0);
-    assert(array_ != NULL);
+    assert(array_ != nullptr);
     return array_[i];
   }
 
@@ -211,7 +227,7 @@ class scoped_array {
   // and will not own the object any more.
   C* release() {
     C* retVal = array_;
-    array_ = NULL;
+    array_ = nullptr;
     return retVal;
   }
 
