@@ -70,6 +70,8 @@ Options: ::
   -nthread <thread_number> :  Number of thread for multiple thread lock-free learning (Hogwild!).
 
   -block <block_size>  :  Block size for on-disk training.
+
+  -sw <stop_window>    :  Size of stop window for early-stopping. Using 2 by default. 
                                                                                      
   --disk               :  Open on-disk training for large-scale machine learning problems.
                                                                    
@@ -91,7 +93,7 @@ Options: ::
 
 For Prediction: ::
 
-    xlearn_predict <test_file> <model_file> [OPTIONS]
+    xlearn_predict <test_file_path> <model_file_path> [OPTIONS]
 
 Options: ::
 
@@ -154,7 +156,7 @@ Parameter List: ::
                 'reg'}     # Regression
 
     metric   : {'acc', 'prec', 'recall', 'f1', 'auc',   # for classification
-                'mae', 'mape', 'rmse', 'rmsd'}          # for regression
+                'mae', 'mape', 'rmse', 'rmsd'}  # for regression
 
     lr       : float value  # learning rate
 
@@ -172,11 +174,15 @@ Parameter List: ::
 
     lambda_2 : float value  # hyper parameter for ftrl
 
+    nthread  : int value    # the number of CPU cores
+
     epoch    : int vlaue    # number of epoch
 
     fold     : int value    # number of fold for cross-validation
 
     opt      : {'sgd', 'agagrad', 'ftrl'}  # optimization method
+
+    stop_window : Size of stop window for early-stopping.
 
     block_size : int value  # block size for on-disk training
 
