@@ -28,6 +28,8 @@ This file is the implementation of StrSimilar class.
 // Return true if we can find str in target string list.
 bool StrSimilar::Find(const std::string& str,
                       const std::vector<std::string>& list) {
+  CHECK(!str.empty());
+  CHECK(!list.empty());
   std::vector<std::string>::const_iterator it;
   it = std::find(list.begin(), list.end(), str);
   if (it != list.end()) {
@@ -41,6 +43,8 @@ bool StrSimilar::Find(const std::string& str,
 int StrSimilar::FindSimilar(const std::string& str,
                             const std::vector<std::string>& list,
                             std::string& result) {
+  CHECK(!str.empty());
+  CHECK(!list.empty());
   int min_dis = kInt32Max;
   for (int i = 0; i < list.size(); ++i) {
     int dis = ldistance(str, list[i]);
@@ -56,6 +60,8 @@ int StrSimilar::FindSimilar(const std::string& str,
 // dynamic programing (DP).
 int StrSimilar::ldistance(const std::string& source,
                           const std::string& target) {
+  CHECK(!source.empty());
+  CHECK(!target.empty());
   //step 1
   int n = source.length();
   int m = target.length();
@@ -85,6 +91,6 @@ int StrSimilar::ldistance(const std::string& source,
       matrix[i][j] = min(above, min(left, diag));
      }
   }
-  //step7
+  //step 7
   return matrix[n][m];
 }

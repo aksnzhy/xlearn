@@ -59,6 +59,7 @@ class Logger {
   ~Logger();
 
   static std::ostream& GetStream(LogSeverity severity);
+  
   static std::ostream& Start(LogSeverity severity,
                              const std::string& file,
                              int line,
