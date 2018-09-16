@@ -86,7 +86,51 @@ After that, we can get a new file called ``model.txt``, which stores the trained
   0
   0
 
-For the linear and bias term, we store each parameter in each line. For FM and FFM, we store each vector of the latent factor in each line.
+For the linear and bias term, we store each parameter in each line. For FM and FFM, we store each vector of the latent factor in each line. For example:
+
+Linear: ::
+
+  bias: 0
+  i_0: 0
+  i_1: 0
+  i_2: 0
+  i_3: 0
+
+FM: ::
+
+  bias: 0
+  i_0: 0
+  i_1: 0
+  i_2: 0
+  i_3: 0
+  v_0: 5.61937e-06 0.0212581 0.150338 0.222903
+  v_1: 0.241989 0.0474224 0.128744 0.0995021
+  v_2: 0.0657265 0.185878 0.0223869 0.140097
+  v_3: 0.145557 0.202392 0.14798 0.127928
+
+FFM: ::
+
+  bias: 0
+  i_0: 0
+  i_1: 0
+  i_2: 0
+  i_3: 0
+  v_0_0: 5.61937e-06 0.0212581 0.150338 0.222903
+  v_0_1: 0.241989 0.0474224 0.128744 0.0995021
+  v_0_2: 0.0657265 0.185878 0.0223869 0.140097
+  v_0_3: 0.145557 0.202392 0.14798 0.127928
+  v_1_0: 0.219158 0.248771 0.181553 0.241653
+  v_1_1: 0.0742756 0.106513 0.224874 0.16325
+  v_1_2: 0.225384 0.240383 0.0411782 0.214497
+  v_1_3: 0.226711 0.0735065 0.234061 0.103661
+  v_2_0: 0.0771142 0.128723 0.0988574 0.197446
+  v_2_1: 0.172285 0.136068 0.148102 0.0234075
+  v_2_2: 0.152371 0.108065 0.149887 0.211232
+  v_2_3: 0.123096 0.193212 0.0179155 0.0479647
+  v_3_0: 0.055902 0.195092 0.0209918 0.0453358
+  v_3_1: 0.154174 0.144785 0.184828 0.0785329
+  v_3_2: 0.109711 0.102996 0.227222 0.248076
+  v_3_3: 0.144264 0.0409806 0.17463 0.083712
 
 Users can also set ``-o`` option to specify the output file. For example: ::
 
@@ -195,12 +239,12 @@ can use the ``--cv`` option to use this technique. For example: ::
 
     ./xlearn_train ./small_train.txt --cv
 
-On default, xLearn uses 5-folds cross validation, and users can set the number of fold by using 
+On default, xLearn uses 3-folds cross validation, and users can set the number of fold by using 
 ``-f`` option: ::
     
-    ./xlearn_train ./small_train.txt -f 3 --cv
+    ./xlearn_train ./small_train.txt -f 5 --cv
 
-Here we set the number of folds to ``3``. The xLearn will calculate the average validation loss at 
+Here we set the number of folds to ``5``. The xLearn will calculate the average validation loss at 
 the end of its output message: ::
 
      ...
