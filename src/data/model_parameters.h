@@ -158,6 +158,7 @@ class Model {
   }
 
   // Get the total size of model parameters.
+  // 2 = bias + bias_gradient
   inline index_t GetNumParameter() {
     return param_num_w_ + param_num_v_ + 2;
   }
@@ -170,12 +171,12 @@ class Model {
   For now it can be 'squared' and 'cross-entropy' */
   std::string  loss_func_;
   /* Size of the linear term
-  Note that we store both of the model parameter
+  Note that we store both of the model parameters
   and the gradient cache in param_w_, so
-  param_num_w_ equals num_feat_ * 2  */
+  param_num_w_ = num_feat_ * 2  */
   index_t param_num_w_;
   /* Size of the latent factor. 
-  We store both the model parameter and the gradient 
+  We store both the model parameters and the gradient 
   cache for adagrad in param_v_. 
   For linear function, param_num_v = 0
   For fm function, param_num_v_ = num_feat * num_K * 2
@@ -204,11 +205,10 @@ class Model {
   real_t* param_best_w_ = nullptr;
   real_t* param_best_v_ = nullptr;
   real_t* param_best_b_ = nullptr;
-  /* Used for init model parameters */
+  /* Used to init model parameters */
   real_t scale_;
 
-  // Initialize the value of model parameters.
-  // and gradient cache
+  // Initialize the value of model parameters and gradient cache.
   void initial(bool set_value = false);
 
   // Reset the value of current model parameters.

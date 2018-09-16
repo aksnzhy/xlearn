@@ -61,6 +61,7 @@ void Model::Initialize(const std::string& score_func,
   scale_ = scale;
   // Calculate the number of model parameters
   param_num_w_ = num_feature * aux_size_;
+  // latent vector
   if (score_func == "linear") {
     param_num_v_ = 0;
   } else if (score_func == "fm") {
