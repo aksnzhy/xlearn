@@ -78,7 +78,7 @@ void Model::Initialize(const std::string& score_func,
 
 // To get the best performance for SSE, we need to
 // allocate memory for the model parameters in aligned way.
-// For SSE, the align number should be 16 byte.
+// For SSE, the align number should be 16 byte (kAlignByte).
 void Model::initial(bool set_val) {
   try {
     // Conventional malloc for linear term and bias
@@ -122,14 +122,14 @@ void Model::set_value() {
    *  Initialize linear and bias term                      *
    *********************************************************/
   for (index_t i = 0; i < param_num_w_; i += aux_size_) {
-    param_w_[i] = 0;        /* model */
+    param_w_[i] = 0.0;        /* model */
     for (index_t j = 1; j < aux_size_; ++j) {
-      param_w_[i+j] = 1.0;  /* gradient cache */
+      param_w_[i+j] = 1.0;    /* gradient cache */
     }
   }
-  param_b_[0] = 0;      /* model */
+  param_b_[0] = 0.0;      /* model */
   for (index_t j = 1; j < aux_size_; ++j) {
-    param_b_[j] = 1.0;  /* gradient cache */
+    param_b_[j] = 1.0;    /* gradient cache */
   }
   /*********************************************************
    *  Initialize latent factor for fm                      *
@@ -139,12 +139,15 @@ void Model::set_value() {
     real_t coef = 1.0f / sqrt(num_K_) * scale_;
     real_t* w = param_v_;
     for (index_t j = 0; j < num_feat_; ++j) {
-      for(index_t d = 0; d < num_K_; d++, w++)
-        *w = coef * dis(generator);
-      for(index_t d = num_K_; d < k_aligned; d++, w++)
-        *w = 0;
-      for(index_t d = k_aligned; d < aux_size_*k_aligned; d++, w++)
-        *w = 1.0;
+      for(index_t d = 0; d < num_K_; d++, w++) {
+        *w = coef * dis(generator);  /* model */
+      }
+      for(index_t d = num_K_; d < k_aligned; d++, w++) {
+        *w = 0;  /* Beyond aligned number */
+      }
+      for(index_t d = k_aligned; d < aux_size_*k_aligned; d++, w++) {
+        *w = 1.0;  /* gradient cache */
+      }
     }
   }
   /*********************************************************
@@ -158,9 +161,9 @@ void Model::set_value() {
       for (index_t f = 0; f < num_field_; ++f) {
         for (index_t d = 0; d < k_aligned; ) {
           for (index_t s = 0; s < kAlign; s++, w++, d++) {
-            w[0] = (d < num_K_) ? coef * dis(generator) : 0.0;
+            w[0] = (d < num_K_) ? coef * dis(generator) : 0.0; /* model */
             for (index_t j = 1; j < aux_size_; ++j) {
-              w[kAlign * j] = 1.0;
+              w[kAlign * j] = 1.0; /* gradient cache */
             }
           }
           w += (aux_size_-1) * kAlign;
@@ -223,15 +226,74 @@ void Model::Serialize(const std::string& filename) {
 void Model::SerializeToTXT(const std::string& filename) {
   CHECK_NE(filename.empty(), true);
   std::ofstream o_file(filename);
-  /* bias */
+  /*********************************************************
+   *  Initialize linear and bias term                      *
+   *********************************************************/
+  // bias term
+  o_file << "bias: " << param_b_[0] << "\n";
+  // linear term
+  index_t idx = 0;
+  for (index_t i = 0; i < param_num_w_; i += aux_size_) {
+    o_file << "i_" << idx << ": " << param_w_[i] << "\n";
+    idx++;
+  }
+  /*********************************************************
+   *  Initialize latent factor for fm                      *
+   *********************************************************/
+  if (score_func_.compare("fm") == 0) {
+    index_t k_aligned = get_aligned_k();
+    real_t* w = param_v_;
+    for (index_t j = 0; j < num_feat_; ++j) {
+      o_file << "v_" << j << ": ";
+      for(index_t d = 0; d < num_K_; d++, w++) {
+        o_file << *w;
+        if (d != num_K_-1) {
+          o_file << " ";
+        }
+      }
+      o_file << "\n";
+      // skip the rest parameters
+      index_t skip = aux_size_*k_aligned-num_K_;
+      w += skip;
+    }
+  }
+  /*********************************************************
+   *  Initialize latent factor for ffm                     *
+   *********************************************************/
+  if (score_func_.compare("ffm") == 0) {
+    index_t k_aligned = get_aligned_k();
+    real_t* w = param_v_;
+    for (index_t j = 0; j < num_feat_; ++j) {
+      for (index_t f = 0; f < num_field_; ++f) {
+        o_file << "v_" << j << "_" << f << ": ";
+        for (index_t d = 0; d < k_aligned; ) {
+          for (index_t s = 0; s < kAlign; s++, w++, d++) {
+            if (d < num_K_) {
+              o_file << w[0];
+              if (d != num_K_-1) {
+                o_file << " ";
+              }
+            }
+          }
+          w += (aux_size_-1) * kAlign;
+        }
+        o_file << "\n";
+      }
+    }
+  }
+}
+
+/*
+// Serialize current model to a TXT file.
+void Model::SerializeToTXT(const std::string& filename) {
+  CHECK_NE(filename.empty(), true);
+  std::ofstream o_file(filename);
   o_file << (*param_b_) << "\n";
-  /* linear term */ 
   index_t idx = 0;
   for (index_t n = 0; n < param_num_w_; n+=aux_size_) {
     o_file << *(param_w_+n) << "\n";
     idx++;
   }
-  /* letent factor */
   index_t k_aligned = get_aligned_k();
   if (score_func_.compare("fm") == 0) {
     real_t* w = param_v_;
@@ -273,7 +335,7 @@ void Model::SerializeToTXT(const std::string& filename) {
       //o_file << "\n";
     }
   }
-}
+}*/
 
 // Deserialize model from a checkpoint file
 bool Model::Deserialize(const std::string& filename) {

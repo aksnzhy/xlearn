@@ -33,10 +33,10 @@ HyperParam Init() {
   HyperParam hyper_param;
   hyper_param.score_func = "ffm";
   hyper_param.loss_func = "squared";
-  hyper_param.num_feature = 10;
-  hyper_param.num_K = 8;
+  hyper_param.num_feature = 4;
+  hyper_param.num_K = 4;
   hyper_param.auxiliary_size = 2;
-  hyper_param.num_field = 10;
+  hyper_param.num_field = 4;
   hyper_param.model_file = "./test_model.bin";
   return hyper_param;
 }
@@ -199,6 +199,7 @@ TEST(MODEL_TEST, Save_and_Load) {
 
 TEST(MODEL_TEST, SerializeToTXT) {
   HyperParam hyper_param = Init();
+  // linear
   hyper_param.score_func = "linear";
   Model model_lr;
   model_lr.Initialize(hyper_param.score_func,
@@ -208,15 +209,29 @@ TEST(MODEL_TEST, SerializeToTXT) {
                     hyper_param.num_K,
                     hyper_param.auxiliary_size, 
                     0.5);
-  // Serialize model to txt file
-  model_lr.SerializeToTXT(hyper_param.model_file);
-  std::ifstream i_file(hyper_param.model_file);
-  for (index_t i = 0; i < hyper_param.num_feature+1; ++i) {
-    real_t tmp = -1.0;
-    i_file >> tmp;
-    EXPECT_FLOAT_EQ(tmp, 0.0);
-  }
-  RemoveFile(hyper_param.model_file.c_str());
+  model_lr.SerializeToTXT("test_txt.linear");
+  // fm
+  hyper_param.score_func = "fm";
+  Model model_fm;
+  model_fm.Initialize(hyper_param.score_func,
+                    hyper_param.loss_func,
+                    hyper_param.num_feature,
+                    hyper_param.num_field,
+                    hyper_param.num_K,
+                    hyper_param.auxiliary_size, 
+                    0.5);
+  model_fm.SerializeToTXT("test_txt.fm");
+  // ffm
+  hyper_param.score_func = "ffm";
+  Model model_ffm;
+  model_ffm.Initialize(hyper_param.score_func,
+                    hyper_param.loss_func,
+                    hyper_param.num_feature,
+                    hyper_param.num_field,
+                    hyper_param.num_K,
+                    hyper_param.auxiliary_size, 
+                    0.5);
+  model_ffm.SerializeToTXT("test_txt.ffm");
 }
 
 TEST(MODEL_TEST, BestModel) {
