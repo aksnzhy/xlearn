@@ -27,7 +27,7 @@ xLearn is developed with high-performance C++ code with careful design and optim
 
 <img src="https://github.com/aksnzhy/xLearn/raw/master/img/code.png" width = "600"/>
 
-xLearn does not rely on any troublesome third-party library, and hence users can just clone the code and compile it by using cmake. Also, xLearn supports very simple Python and R API for data scientists, and it also offers many useful features that have been widely used in machine learning and data mining competitions, such as cross-validation, early-stop, etc.
+xLearn does not rely on any troublesome third-party library, and hence users can just clone the code and compile it by using cmake. Also, xLearn supports very simple Python and CLI interface for data scientists, and it also offers many useful features that have been widely used in machine learning and data mining competitions, such as cross-validation, early-stop, etc.
 
 ### Scalability
 
