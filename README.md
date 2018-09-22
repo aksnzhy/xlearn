@@ -17,7 +17,7 @@ xLearn is a ***high performance***, ***easy-to-use***, and ***scalable*** machin
 
 <img src="https://github.com/aksnzhy/xLearn/raw/master/img/speed.png" width = "800"/>
 
-xLearn is developed with high-performance C++ code with careful design and optimizations. Our system is designed to maximize CPU and memory utilization, provide cache-aware computation, and support lock-free learning. By combining these insights, xLearn is 5x-13x faster compared to similar systems.
+xLearn is developed by high-performance C++ code with careful design and optimizations. Our system is designed to maximize CPU and memory utilization, provide cache-aware computation, and support lock-free learning. By combining these insights, xLearn is 5x-13x faster compared to similar systems.
 
 ### Ease-of-use
 
