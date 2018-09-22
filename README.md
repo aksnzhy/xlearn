@@ -34,6 +34,11 @@ xLearn can be used for solving large-scale machine learning problems. First, xLe
 
 ## News
 
+ - 09/21/2018 xLearn 0.3.2 version release. Main update:
+
+    * Fix bugs in previous version
+    * New TXT format for model output
+
  - 08/09/2018 xLearn uses the new logo:
 
  <img src="https://github.com/aksnzhy/xLearn/raw/master/img/xlearn_logo.png" width = "200"/>
