@@ -4,7 +4,6 @@
 ![Project Status](https://img.shields.io/badge/version-0.3.2-green.svg)
 [![Travis](https://img.shields.io/travis/rust-lang/rust.svg)]()
 
-
 ## What is xLearn?
 
 xLearn is a ***high performance***, ***easy-to-use***, and ***scalable*** machine learning package, including linear model (LR), factorization machines (FM), and field-aware factorization machines (FFM), which can be used to solve large-scale machine learning problems. xLearn is especially useful for solving machine learning problems on large-scale sparse data, which is very common in Internet services such as online advertisement and recommender systems in recent years. If you are the user  of liblinear, libfm, or libffm, now xLearn is your another better choice.
@@ -30,7 +29,6 @@ xLearn does not rely on any troublesome third-party library, and hence users can
 <img src="https://github.com/aksnzhy/xLearn/raw/master/img/scalability.png" width = "650"/>
 
 xLearn can be used for solving large-scale machine learning problems. First, xLearn supports out-of-core training, which can handle very large data (TB) by just leveraging the disk of a PC. In addition, xLearn supports distributed training, which scales beyond billions of example across many machines by using the Parameter Server framework.
-
 
 ## News
 
