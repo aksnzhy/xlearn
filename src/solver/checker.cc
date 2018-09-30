@@ -146,6 +146,9 @@ OPTIONS:
   --sign                   :  Converting output to 0 and 1. 
                                                                
   --sigmoid                :  Converting output to 0~1 (problebility). 
+  
+  --no-norm                :  Disable instance-wise normalization. By default, xLearn will use 
+                              instance-wise normalization for both training and prediction. 
 ----------------------------------------------------------------------------------------------)"
     );
   }
@@ -187,6 +190,7 @@ void Checker::Initialize(bool is_train, int argc, char* argv[]) {
     menu_.push_back(std::string("-nthread"));
     menu_.push_back(std::string("--sign"));
     menu_.push_back(std::string("--sigmoid"));
+    menu_.push_back(std::string("--no-norm"));
   }
   // Get the user's input
   for (int i = 0; i < argc; ++i) {
@@ -801,6 +805,9 @@ bool Checker::check_prediction_options(HyperParam& hyper_param) {
       i += 1;
     } else if (list[i].compare("--sigmoid") == 0) {  // using sigmoid
       hyper_param.sigmoid = true;
+      i += 1;
+    } else if (list[i].compare("--no-norm") == 0) {  // normalization
+      hyper_param.norm = false;
       i += 1;
     } else {  // no match
       std::string similar_str;
