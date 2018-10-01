@@ -15,8 +15,8 @@
 //------------------------------------------------------------------------------
 
 /*
-This file defines the Parser class, which parses datasets
-to the DMatrix.
+This file defines the Parser class, which parses 
+datasets to the DMatrix.
 */
 
 #ifndef XLEARN_READER_PARSER_H_

@@ -24,6 +24,7 @@ This file is the implementation of LinearScore class.
 namespace xLearn {
 
 // y = wTx (incluing bias term)
+// TODO(aksnzhy): solve unseen feature
 real_t LinearScore::CalcScore(const SparseRow* row,
                               Model& model,
                               real_t norm) {
@@ -60,6 +61,7 @@ void LinearScore::CalcGrad(const SparseRow* row,
 }
 
 // Calculate gradient and update current model using sgd
+// TODO(aksnzhy): solve unseen feature
 void LinearScore::calc_grad_sgd(const SparseRow* row,
                                 Model& model,
                                 real_t pg,
@@ -81,6 +83,7 @@ void LinearScore::calc_grad_sgd(const SparseRow* row,
 }
 
 // Calculate gradient and update current model using adagrad
+// TODO(aksnzhy): solve unseen feature
 void LinearScore::calc_grad_adagrad(const SparseRow* row,
                                     Model& model,
                                     real_t pg,
@@ -107,6 +110,7 @@ void LinearScore::calc_grad_adagrad(const SparseRow* row,
 }
 
 // Calculate gradient and update current model using ftrl
+// TODO(aksnzhy): solve unseen feature
 void LinearScore::calc_grad_ftrl(const SparseRow* row,
                                  Model& model,
                                  real_t pg,

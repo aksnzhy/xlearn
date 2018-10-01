@@ -27,6 +27,7 @@ namespace xLearn {
 
 // y = sum( (V_i*V_j)(x_i * x_j) )
 // Using SSE to accelerate vector operation.
+// TODO(aksnzhy): solve unseen feature
 real_t FMScore::CalcScore(const SparseRow* row,
                           Model& model,
                           real_t norm) {
@@ -92,6 +93,7 @@ real_t FMScore::CalcScore(const SparseRow* row,
 
 // Calculate gradient and update current model parameters.
 // Using SSE to accelerate vector operation.
+// TODO(aksnzhy): solve unseen feature
 void FMScore::CalcGrad(const SparseRow* row,
                        Model& model,
                        real_t pg,
@@ -175,6 +177,7 @@ void FMScore::calc_grad_sgd(const SparseRow* row,
 }
 
 // Calculate gradient and update current model using adagrad
+// TODO(aksnzhy): solve unseen feature
 void FMScore::calc_grad_adagrad(const SparseRow* row,
                                 Model& model,
                                 real_t pg,
@@ -248,6 +251,7 @@ void FMScore::calc_grad_adagrad(const SparseRow* row,
 }
 
 // Calculate gradient and update current model using ftrl
+// TODO(aksnzhy): solve unseen feature
 void FMScore::calc_grad_ftrl(const SparseRow* row,
                              Model& model,
                              real_t pg,
