@@ -227,7 +227,7 @@ void Model::SerializeToTXT(const std::string& filename) {
   CHECK_NE(filename.empty(), true);
   std::ofstream o_file(filename);
   /*********************************************************
-   *  Initialize linear and bias term                      *
+   *  Write linear and bias term                      *
    *********************************************************/
   // bias term
   o_file << "bias: " << param_b_[0] << "\n";
@@ -238,7 +238,7 @@ void Model::SerializeToTXT(const std::string& filename) {
     idx++;
   }
   /*********************************************************
-   *  Initialize latent factor for fm                      *
+   *  Write latent factor for fm                      *
    *********************************************************/
   if (score_func_.compare("fm") == 0) {
     index_t k_aligned = get_aligned_k();
@@ -258,7 +258,7 @@ void Model::SerializeToTXT(const std::string& filename) {
     }
   }
   /*********************************************************
-   *  Initialize latent factor for ffm                     *
+   *  Write latent factor for ffm                     *
    *********************************************************/
   if (score_func_.compare("ffm") == 0) {
     index_t k_aligned = get_aligned_k();
