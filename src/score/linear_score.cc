@@ -24,16 +24,20 @@ This file is the implementation of LinearScore class.
 namespace xLearn {
 
 // y = wTx (incluing bias term)
-// TODO(aksnzhy): solve unseen feature
 real_t LinearScore::CalcScore(const SparseRow* row,
                               Model& model,
                               real_t norm) {
   real_t* w = model.GetParameter_w();
+  index_t num_feat = model.GetNumFeature();
   real_t score = 0.0;
   index_t auxiliary_size = model.GetAuxiliarySize();
+  // linear term
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
-    index_t idx = iter->feat_id * auxiliary_size;
+    // To avoid unseen feature in Prediction
+    index_t feat_id = iter->feat_id;
+    if (feat_id >= num_feat) continue;
+    index_t idx = feat_id * auxiliary_size;
     score += w[idx] * iter->feat_val;
   }
   // bias

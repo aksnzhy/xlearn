@@ -37,12 +37,15 @@ real_t FFMScore::CalcScore(const SparseRow* row,
   real_t sum_w = 0;
   real_t sqrt_norm = sqrt(norm);
   real_t *w = model.GetParameter_w();
+  index_t num_feat = model.GetNumFeature();
+  index_t num_field = model.GetNumField();
   index_t aux_size = model.GetAuxiliarySize();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
-    sum_w += (iter->feat_val * 
-              w[iter->feat_id*aux_size] * 
-              sqrt_norm);
+    // To avoid unseen feature in Prediction
+    index_t feat_id = iter->feat_id;
+    if (feat_id >= num_feat) continue;
+    sum_w += (iter->feat_val * w[feat_id*aux_size] * sqrt_norm);
   }
   // bias
   w = model.GetParameter_b();
@@ -51,19 +54,23 @@ real_t FFMScore::CalcScore(const SparseRow* row,
    *  latent factor                                        *
    *********************************************************/
   index_t align0 = aux_size * model.get_aligned_k();
-  index_t align1 = model.GetNumField() * align0;
+  index_t align1 = num_field * align0;
   int align = kAlign * aux_size;
   w = model.GetParameter_v();
   __m128 XMMt = _mm_setzero_ps();
   for (SparseRow::const_iterator iter_i = row->begin();
        iter_i != row->end(); ++iter_i) {
+    // To avoid unseen feature in Prediction
     index_t j1 = iter_i->feat_id;
     index_t f1 = iter_i->field_id;
+    if (j1 >= num_feat || f1 >= num_field) continue;
     real_t v1 = iter_i->feat_val;
     for (SparseRow::const_iterator iter_j = iter_i+1;
          iter_j != row->end(); ++iter_j) {
+      // To avoid unseen feature in Prediction
       index_t j2 = iter_j->feat_id;
       index_t f2 = iter_j->field_id;
+      if (j2 >= num_feat || f2 >= num_field) continue;
       real_t v2 = iter_j->feat_val;
       real_t* w1_base = w + j1*align1 + f2*align0;
       real_t* w2_base = w + j2*align1 + f1*align0;
