@@ -41,8 +41,8 @@ real_t FMScore::CalcScore(const SparseRow* row,
   index_t aux_size = model.GetAuxiliarySize();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
-    // To avoid unseen feature in Prediction
     index_t feat_id = iter->feat_id;
+    // To avoid unseen feature in Prediction
     if (feat_id >= num_feat) continue;
     t += (iter->feat_val * w[feat_id*aux_size] * sqrt_norm);
   }
@@ -58,8 +58,8 @@ real_t FMScore::CalcScore(const SparseRow* row,
   real_t* s = sv.data();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
-    // To avoid unseen feature in Prediction
     index_t j1 = iter->feat_id;
+    // To avoid unseen feature in Prediction
     if (j1 >= num_feat) continue;
     real_t v1 = iter->feat_val;
     real_t *w = model.GetParameter_v() + j1 * align0;
@@ -74,8 +74,8 @@ real_t FMScore::CalcScore(const SparseRow* row,
   __m128 XMMt = _mm_set1_ps(0.0f);
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
-    // To avoid unseen feature in Prediction
     index_t j1 = iter->feat_id;
+    // To avoid unseen feature in Prediction
     if (j1 >= num_feat) continue;
     real_t v1 = iter->feat_val;
     real_t *w = model.GetParameter_v() + j1 * align0;

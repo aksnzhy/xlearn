@@ -34,8 +34,8 @@ real_t LinearScore::CalcScore(const SparseRow* row,
   // linear term
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
-    // To avoid unseen feature in Prediction
     index_t feat_id = iter->feat_id;
+    // To avoid unseen feature in Prediction
     if (feat_id >= num_feat) continue;
     index_t idx = feat_id * auxiliary_size;
     score += w[idx] * iter->feat_val;
