@@ -62,6 +62,9 @@ void LinearScore::CalcGrad(const SparseRow* row,
   else if (opt_type_.compare("ftrl") == 0) {
     this->calc_grad_ftrl(row, model, pg, norm);
   }
+  else {
+    LOG(FATAL) << "Unknow optimization method: " << opt_type_;
+  }
 }
 
 // Calculate gradient and update current model using sgd

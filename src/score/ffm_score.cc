@@ -109,6 +109,9 @@ void FFMScore::CalcGrad(const SparseRow* row,
   // Using ftrl 
   else if (opt_type_.compare("ftrl") == 0) {
     this->calc_grad_ftrl(row, model, pg, norm);
+  } 
+  else {
+    LOG(FATAL) << "Unknow optimization method: " << opt_type_;
   }
 }
 
