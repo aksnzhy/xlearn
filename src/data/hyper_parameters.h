@@ -130,7 +130,7 @@ struct HyperParam {
   False for not */
   bool early_stop = true;
   /* Early stop window size */
-  int stop_window = 1;
+  int stop_window = 2;
   /* Convert predition output to 0 and 1 */
   bool sign = false;
   /* Convert predition output using sigmoid */

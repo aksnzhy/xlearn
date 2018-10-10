@@ -189,15 +189,15 @@ void Trainer::train(std::vector<Reader*>& train_reader,
                       n);
       // Early-stopping
       if (early_stop_) {
-        if ((metric_ == nullptr && te_info.loss_val < best_result) ||
-            (metric_ != nullptr && te_info.metric_val > best_result))  {
+        if ((metric_ == nullptr && te_info.loss_val <= best_result) ||
+            (metric_ != nullptr && te_info.metric_val >= best_result))  {
           best_result = metric_ == nullptr ? 
             te_info.loss_val : te_info.metric_val;
           best_epoch = n;
           model_->SetBestModel();
         }
-        if ((metric_ == nullptr && te_info.loss_val >= prev_result) ||
-            (metric_ != nullptr && te_info.metric_val <= prev_result)) {
+        if ((metric_ == nullptr && te_info.loss_val > prev_result) ||
+            (metric_ != nullptr && te_info.metric_val < prev_result)) {
           // If the validation loss goes up conntinuously
           // in stop_window epoch, we stop training
           if (stop_window == stop_window_) { break; }
