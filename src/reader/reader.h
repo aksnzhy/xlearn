@@ -291,6 +291,7 @@ class OndiskReader : public Reader {
   DISALLOW_COPY_AND_ASSIGN(OndiskReader);
 };
 
+// TODO(aksnzhy)
 //------------------------------------------------------------------------------
 // Copy DMatrix from some other data source, e.g., Python Pandas.
 // When we use the Python interface of xLearn, users often need to 
