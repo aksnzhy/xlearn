@@ -432,6 +432,9 @@ void Solver::init_predict() {
    );
    exit(0);
   }
+  if (reader_[0]->Type().compare("on-disk") == 0) {
+    reader_[0]->SetBlockSize(hyper_param_.block_size);
+  }
   Color::print_info(
     StringPrintf("Time cost for reading problem: %.2f (sec)",
                   timer.toc())
