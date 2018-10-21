@@ -107,6 +107,11 @@ Options: ::
 
   --sigmoid                :  Converting output result to 0 ~ 1 (problebility).
 
+  --disk                   :  On-disk prediction.
+
+  --no-norm                :  Disable instance-wise normalization. By default, xLearn will use instance-wise 
+                              normalization in both training and prediction processes.
+
 xLearn Python API
 ------------------------------
 

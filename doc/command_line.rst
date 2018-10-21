@@ -387,7 +387,7 @@ useful. But sometimes it hurts model performance. Users can disable instance-wis
 
   ./xlearn_train ./small_train.txt -s 1 -v ./small_test.txt --no-norm
 
-Note that we usually use ``--no-norm`` in regression tasks.
+Note that if you use Instance-wise Normalization in training process, you also need to use the meachnism in prediction process.
 
 Quiet Training
 ----------------------------------------
