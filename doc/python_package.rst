@@ -214,6 +214,20 @@ be the ``libffm`` format: ::
 
     label field_1:index_1:value_1 field_2:index_2:value_2 ...
 
+xLearn can also use ``,`` as the splitor in file. For example: ::
+
+  libsvm format:
+
+     label,index_1:value_1,index_2:value_2 ... index_n:value_n
+
+  CSV format:
+
+     label,value_1,value_2 .. value_n
+
+  libffm format:
+
+     label,field_1:index_1:value_1,field_2:index_2:value_2 ...
+
 Note that, if the csv file doesn’t contain the label ``y``, user should add a ``placeholder`` to the dataset 
 by themselves (Also in test data). Otherwise, xLearn will treat the first element as the label ``y``.
 
@@ -477,7 +491,7 @@ normalization by using ``disableNorm()`` API: ::
             
    ffm_model.fit(param, "./model.out") 
 
-Note that we usually use ``disableNorm()`` in regression tasks.
+Note that if you use Instance-wise Normalization in training process, you also need to use the meachnism in prediction process.
 
 Quiet Training
 ----------------------------------------
