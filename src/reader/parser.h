@@ -63,6 +63,11 @@ class Parser {
     has_label_ = label;
   }
 
+  // Set Splitor
+  inline void setSplitor(const std::string& splitor) {
+    splitor_ = splitor;
+  }
+
   // The real parse function invoked by users.
   virtual void Parse(char* buf, uint64 size, DMatrix& matrix) = 0;
 
@@ -79,6 +84,8 @@ class Parser {
    /* True for training task and
    False for prediction task */
    bool has_label_;
+   /* Split string for data items */
+   std::string splitor_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Parser);

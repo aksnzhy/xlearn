@@ -88,7 +88,7 @@ void LibsvmParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
     pos += get_line_from_buffer(line_buf, buf, pos, size);
     // Add Y
     if (has_label_) {  // for training task
-      char *y_char = strtok(line_buf, " \t");
+      char *y_char = strtok(line_buf, splitor_.c_str());
       matrix.Y[i] = atof(y_char);
     } else {  // for predict task
       matrix.Y[i] = -2;
@@ -98,7 +98,7 @@ void LibsvmParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
     // The first element
     if (!has_label_) {
       char *idx_char = strtok(line_buf, ":");
-      char *value_char = strtok(nullptr, " \t");
+      char *value_char = strtok(nullptr, splitor_.c_str());
       if (idx_char != nullptr && *idx_char != '\n') {
         index_t idx = atoi(idx_char);
         real_t value = atof(value_char);
@@ -109,7 +109,7 @@ void LibsvmParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
     // The remain elements
     for (;;) {
       char *idx_char = strtok(nullptr, ":");
-      char *value_char = strtok(nullptr, " \t");
+      char *value_char = strtok(nullptr, splitor_.c_str());
       if (idx_char == nullptr || *idx_char == '\n') {
         break;
       }
@@ -142,7 +142,7 @@ void FFMParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
     pos += get_line_from_buffer(line_buf, buf, pos, size);
     // Add Y
     if (has_label_) {  // for training task
-      char *y_char = strtok(line_buf, " \t");
+      char *y_char = strtok(line_buf, splitor_.c_str());
       matrix.Y[i] = atof(y_char);
     } else {  // for predict task
       matrix.Y[i] = -2;
@@ -153,7 +153,7 @@ void FFMParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
     if (!has_label_) {
       char *field_char = strtok(line_buf, ":");
       char *idx_char = strtok(nullptr, ":");
-      char *value_char = strtok(nullptr, " \t");
+      char *value_char = strtok(nullptr, splitor_.c_str());
       if (idx_char != nullptr && *idx_char != '\n') {
         index_t idx = atoi(idx_char);
         real_t value = atof(value_char);
@@ -166,7 +166,7 @@ void FFMParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
     for (;;) {
       char *field_char = strtok(nullptr, ":");
       char *idx_char = strtok(nullptr, ":");
-      char *value_char = strtok(nullptr, " \t");
+      char *value_char = strtok(nullptr, splitor_.c_str());
       if (field_char == nullptr || *field_char == '\n') {
         break;
       }
@@ -203,7 +203,7 @@ void CSVParser::Parse(char* buf, uint64 size, DMatrix& matrix) {
   for (index_t i = 0; i < line_num; ++i) {
     pos += get_line_from_buffer(line_buf, buf, pos, size);
     str_vec.clear();
-    SplitStringUsing(line_buf, " \t", &str_vec);
+    SplitStringUsing(line_buf, splitor_.c_str(), &str_vec);
     int size = str_vec.size();
     // Add Y
     matrix.Y[i] = atof(str_vec[0].c_str());

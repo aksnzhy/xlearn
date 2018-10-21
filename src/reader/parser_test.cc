@@ -29,10 +29,15 @@ This file tests parser.h file.
 namespace xLearn {
 
 const std::string kStr = "1 0:0.12 1:0.12 2:0.12 3:0.12 4:0.12\n";
+const std::string kStr_comma = "1,0:0.12,1:0.12,2:0.12,3:0.12,4:0.12\n";
 const std::string kStrFFM = "1 0:0:0.12 1:1:0.12 2:2:0.12 3:3:0.12 4:4:0.12\n";
+const std::string kStrFFM_comma = "1,0:0:0.12,1:1:0.12,2:2:0.12,3:3:0.12,4:4:0.12\n";
 const std::string kStrCSV = "1 0.12 0.12 0.12 0.12 0.12\n";
+const std::string kStrCSV_comma = "1,0.12,0.12,0.12,0.12,0.12\n";
 const std::string kStrNoy = "0:0.12 1:0.12 2:0.12 3:0.12 4:0.12\n";
+const std::string kStrNoy_comma = "0:0.12,1:0.12,2:0.12,3:0.12,4:0.12\n";
 const std::string kStrFFMNoy = "0:0:0.12 1:1:0.12 2:2:0.12 3:3:0.12 4:4:0.12\n";
+const std::string kStrFFMNoy_comma = "0:0:0.12,1:1:0.12,2:2:0.12,3:3:0.12,4:4:0.12\n";
 const std::string Kfilename = "./test_file.txt";
 const index_t kNum_lines = 100000;
 
@@ -82,6 +87,20 @@ TEST(PARSER_TEST, Parse_libsvm) {
   DMatrix matrix;
   LibsvmParser parser;
   parser.setLabel(true);
+  parser.setSplitor(" ");
+  parser.Parse(buffer, size, matrix);
+  check(matrix, true, false);
+  RemoveFile(Kfilename.c_str());
+}
+
+TEST(PARSER_TEST, Parse_libsvm_comma) {
+  write_data(Kfilename, kStr_comma);
+  char* buffer = nullptr;
+  uint64 size = ReadFileToMemory(Kfilename, &buffer);
+  DMatrix matrix;
+  LibsvmParser parser;
+  parser.setLabel(true);
+  parser.setSplitor(",");
   parser.Parse(buffer, size, matrix);
   check(matrix, true, false);
   RemoveFile(Kfilename.c_str());
@@ -94,6 +113,20 @@ TEST(PARSER_TEST, Parse_libsvm_no_y) {
   DMatrix matrix;
   LibsvmParser parser;
   parser.setLabel(false);
+  parser.setSplitor(" ");
+  parser.Parse(buffer, size, matrix);
+  check(matrix, false, false);
+  RemoveFile(Kfilename.c_str());
+}
+
+TEST(PARSER_TEST, Parse_libsvm_no_y_comma) {
+  write_data(Kfilename, kStrNoy_comma);
+  char* buffer = nullptr;
+  uint64 size = ReadFileToMemory(Kfilename, &buffer);
+  DMatrix matrix;
+  LibsvmParser parser;
+  parser.setLabel(false);
+  parser.setSplitor(",");
   parser.Parse(buffer, size, matrix);
   check(matrix, false, false);
   RemoveFile(Kfilename.c_str());
@@ -106,6 +139,20 @@ TEST(PARSER_TEST, Parse_libffm) {
   DMatrix matrix;
   FFMParser parser;
   parser.setLabel(true);
+  parser.setSplitor(" ");
+  parser.Parse(buffer, size, matrix);
+  check(matrix, true, true);
+  RemoveFile(Kfilename.c_str());
+}
+
+TEST(PARSER_TEST, Parse_libffm_comma) {
+  write_data(Kfilename, kStrFFM_comma);
+  char* buffer = nullptr;
+  uint64 size = ReadFileToMemory(Kfilename, &buffer);
+  DMatrix matrix;
+  FFMParser parser;
+  parser.setLabel(true);
+  parser.setSplitor(",");
   parser.Parse(buffer, size, matrix);
   check(matrix, true, true);
   RemoveFile(Kfilename.c_str());
@@ -118,6 +165,20 @@ TEST(PARSER_TEST, Parse_libffm_no_y) {
   DMatrix matrix;
   FFMParser parser;
   parser.setLabel(false);
+  parser.setSplitor(" ");
+  parser.Parse(buffer, size, matrix);
+  check(matrix, false, true);
+  RemoveFile(Kfilename.c_str());
+}
+
+TEST(PARSER_TEST, Parse_libffm_no_y_comma) {
+  write_data(Kfilename, kStrFFMNoy_comma);
+  char* buffer = nullptr;
+  uint64 size = ReadFileToMemory(Kfilename, &buffer);
+  DMatrix matrix;
+  FFMParser parser;
+  parser.setLabel(false);
+  parser.setSplitor(",");
   parser.Parse(buffer, size, matrix);
   check(matrix, false, true);
   RemoveFile(Kfilename.c_str());
@@ -130,6 +191,20 @@ TEST(PARSER_TEST, Parse_csv) {
   DMatrix matrix;
   CSVParser parser;
   parser.setLabel(true);
+  parser.setSplitor(" ");
+  parser.Parse(buffer, size, matrix);
+  check(matrix, true, false);
+  RemoveFile(Kfilename.c_str());
+}
+
+TEST(PARSER_TEST, Parse_csv_comma) {
+  write_data(Kfilename, kStrCSV_comma);
+  char* buffer = nullptr;
+  uint64 size = ReadFileToMemory(Kfilename, &buffer);
+  DMatrix matrix;
+  CSVParser parser;
+  parser.setLabel(true);
+  parser.setSplitor(",");
   parser.Parse(buffer, size, matrix);
   check(matrix, true, false);
   RemoveFile(Kfilename.c_str());

@@ -127,6 +127,8 @@ class Reader {
   bool has_label_;
   /* If shuffle data ? */
   bool shuffle_;
+  /* Split string for data items */
+  std::string splitor_;
 
   // Check current file format and return
   // "libsvm", "ffm", or "csv".

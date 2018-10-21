@@ -47,9 +47,34 @@ std::string Reader::check_file_format() {
   std::string data_line;
   GetLine(file, data_line);
   Close(file);
+  // Find the split string
+  int space_count = 0;
+  int table_count = 0;
+  int comma_count = 0;
+  for (size_t i = 0; i < data_line.size(); ++i) {
+    if (data_line[i] == ' ') {
+      space_count++;
+    } else if (data_line[i] == '\t') {
+      table_count++;
+    } else if (data_line[i] == ',') {
+      comma_count++;
+    }
+  }
+  if (space_count > table_count && 
+      space_count > comma_count) {
+    splitor_ = " ";
+  } else if (table_count > space_count &&
+             table_count > comma_count) {
+    splitor_ = "\t";
+  } else if (comma_count > space_count &&
+             comma_count > table_count) {
+    splitor_ = ",";
+  } else {
+    LOG(FATAL) << "File format error!";
+  }
   // Split the first line of data
   std::vector<std::string> str_list;
-  SplitStringUsing(data_line, " \t", &str_list);
+  SplitStringUsing(data_line, splitor_.c_str(), &str_list);
   // has y?
   size_t found = str_list[0].find(":");
   if (found != std::string::npos) {  // find ":", no label
@@ -156,6 +181,8 @@ void InmemReader::init_from_txt() {
   parser_ = CreateParser(check_file_format().c_str());
   if (has_label_) parser_->setLabel(true);
   else parser_->setLabel(false);
+  // Set splitor
+  parser_->setSplitor(this->splitor_);
   // Init data_buf_
   char* buffer = nullptr;
   uint64 file_size = ReadFileToMemory(filename_, &buffer);
@@ -209,13 +236,15 @@ void InmemReader::Reset() { pos_ = 0; }
 //------------------------------------------------------------------------------
 
 // Create parser and open file
-void OndiskReader::Initialize(const std::string& filename) { 
+void OndiskReader::Initialize(const std::string& filename) {
   CHECK_NE(filename.empty(), true);
   this->filename_ = filename;
   // Init parser_                                 
   parser_ = CreateParser(check_file_format().c_str());
   if (has_label_) parser_->setLabel(true);
   else parser_->setLabel(false);
+  // Set splitor
+  parser_->setSplitor(this->splitor_);
   // Allocate memory for block
   try {
     this->block_ = (char*)malloc(block_size_*1024*1024);
