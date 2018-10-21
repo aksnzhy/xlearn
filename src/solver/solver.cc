@@ -235,6 +235,9 @@ void Solver::init_train() {
   // Create Reader
   for (int i = 0; i < num_reader; ++i) {
     reader_[i] = create_reader();
+    if (reader_[i]->Type().compare("on-disk") == 0) {
+      reader_[i]->SetBlockSize(hyper_param_.block_size);
+    }
     reader_[i]->Initialize(file_list[i]);
     if (!hyper_param_.on_disk) {
       reader_[i]->SetShuffle(true);
@@ -245,9 +248,6 @@ void Solver::init_train() {
              file_list[i].c_str())
       );
       exit(0);
-    }
-    if (reader_[i]->Type().compare("on-disk") == 0) {
-      reader_[i]->SetBlockSize(hyper_param_.block_size);
     }
     LOG(INFO) << "Init Reader: " << file_list[i];
   }
@@ -423,6 +423,9 @@ void Solver::init_predict() {
   // Create Reader
   reader_.resize(1, create_reader());
   CHECK_NE(hyper_param_.test_set_file.empty(), true);
+  if (reader_[0]->Type().compare("on-disk") == 0) {
+    reader_[0]->SetBlockSize(hyper_param_.block_size);
+  }
   reader_[0]->Initialize(hyper_param_.test_set_file);
   reader_[0]->SetShuffle(false);
   if (reader_[0] == nullptr) {
@@ -431,9 +434,6 @@ void Solver::init_predict() {
                  hyper_param_.test_set_file.c_str())
    );
    exit(0);
-  }
-  if (reader_[0]->Type().compare("on-disk") == 0) {
-    reader_[0]->SetBlockSize(hyper_param_.block_size);
   }
   Color::print_info(
     StringPrintf("Time cost for reading problem: %.2f (sec)",
