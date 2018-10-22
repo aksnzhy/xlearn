@@ -142,6 +142,8 @@ OPTIONS:
   -nthread <thread number> :  Number of thread for multi-thread learning. 
                                                                              
   -l <log_file_path>       :  Path of the log file. Using '/tmp/xlearn_log' by default. 
+
+  -block <block_size>      :  Block size fot on-disk prediction. 
                                                             
   --sign                   :  Converting output to 0 and 1. 
                                                                
@@ -190,6 +192,7 @@ void Checker::Initialize(bool is_train, int argc, char* argv[]) {
     menu_.push_back(std::string("-o"));
     menu_.push_back(std::string("-l"));
     menu_.push_back(std::string("-nthread"));
+    menu_.push_back(std::string("-block"));
     menu_.push_back(std::string("--sign"));
     menu_.push_back(std::string("--sigmoid"));
     menu_.push_back(std::string("--disk"));
@@ -801,6 +804,18 @@ bool Checker::check_prediction_options(HyperParam& hyper_param) {
         bo = false;
       } else {
         hyper_param.thread_number = value;
+      }
+      i += 2;
+    } else if (list[i].compare("-block") == 0) {  // block size for on-disk training
+      int value = atoi(list[i+1].c_str());
+      if (value <= 0) {
+        Color::print_error(
+          StringPrintf("Illegal -block : '%i'. -block must be greater than zero.",
+               value)
+        );
+        bo = false;
+      } else {
+        hyper_param.block_size = value;
       }
       i += 2;
     } else if (list[i].compare("--sign") == 0) {  // convert output to 0 and 1

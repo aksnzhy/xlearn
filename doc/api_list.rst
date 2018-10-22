@@ -103,6 +103,8 @@ Options: ::
 
   -nthread <thread number> :  Number of thread for multiple thread lock-free learning (Hogwild!).
 
+  -block <block_size>      :  Block size fot on-disk prediction. 
+
   --sign                   :  Converting output result to 0 and 1.
 
   --sigmoid                :  Converting output result to 0 ~ 1 (problebility).
