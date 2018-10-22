@@ -27,7 +27,6 @@ namespace xLearn {
 
 // y = sum( (V_i_fj*V_j_fi)(x_i * x_j) )
 // Using SSE to accelerate vector operation.
-// TODO(aksnzhy): solve unseen feature
 real_t FFMScore::CalcScore(const SparseRow* row,
                            Model& model,
                            real_t norm) {

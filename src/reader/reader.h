@@ -228,7 +228,7 @@ class OndiskReader : public Reader {
  public:
   // Constructor and Destructor
   OndiskReader() 
-    : block_size_(500) {  }  // 500 MB by default
+    : block_size_(kDefautBlockSize) { }
   ~OndiskReader() { 
     Clear();
     Close(file_ptr_); 
