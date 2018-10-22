@@ -32,7 +32,7 @@ xLearn can be used for solving large-scale machine learning problems. First, xLe
 
 ## What's New
 
- - 2018-10-21 xLearn 0.3.4 version release. Main updaye:
+ - 2018-10-21 xLearn 0.3.4 version release. Main update:
 
     * Fix bugs in on-disk training.
     * Support new file format.
