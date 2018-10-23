@@ -195,6 +195,10 @@ void Solver::init_train() {
     threadNumber = hyper_param_.thread_number;
   }
   pool_ = new ThreadPool(threadNumber);
+  Color::print_info(
+    StringPrintf("xLearn uses %i threads for training task.",
+             threadNumber)
+  );
   /*********************************************************
    *  Initialize Reader                                    *
    *********************************************************/
@@ -362,6 +366,10 @@ void Solver::init_predict() {
    *********************************************************/
   size_t threadNumber = std::thread::hardware_concurrency();
   pool_ = new ThreadPool(threadNumber);
+  Color::print_info(
+    StringPrintf("xLearn uses %i threads for training task.",
+             threadNumber)
+  );
   /*********************************************************
    *  Read model file                                      *
    *********************************************************/
