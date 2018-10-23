@@ -6,7 +6,7 @@
 
 ## What is xLearn?
 
-xLearn is a ***high performance***, ***easy-to-use***, and ***scalable*** machine learning package, including linear model (LR), factorization machines (FM), and field-aware factorization machines (FFM), which can be used to solve large-scale machine learning problems. xLearn is especially useful for solving machine learning problems on large-scale sparse data, which is very common in Internet services such as online advertisement and recommender systems in recent years. If you are the user of liblinear, libfm, and libffm, now xLearn is your another better choice.
+xLearn is a ***high performance***, ***easy-to-use***, and ***scalable*** machine learning package, including linear model (LR), factorization machines (FM), and field-aware factorization machines (FFM), which can be used to solve large-scale machine learning problems. xLearn is especially useful for solving machine learning problems on large-scale sparse data. Many real world datasets deal with high dimensional sparse feature vectors like a recommendation system where the number of categories and users is on the order of millions. If you are the user of liblinear, libfm, and libffm, now xLearn is your another better choice.
 
 [Get Started! (English)](http://xlearn-doc.readthedocs.io/en/latest/index.html)
 
