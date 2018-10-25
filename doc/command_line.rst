@@ -379,7 +379,10 @@ Users can set the number of thread for xLearn by using ``-nthread`` option: ::
 
    ./xlearn_train ./small_train.txt -nthread 2
 
-If you don't set this option, xLearn uses all of the CPU cores by default.
+If you don't set this option, xLearn uses all of the CPU cores by default. xLearn will show the number of threads: ::
+
+    [------------] xLearn uses 2 threads for training task.
+    [ ACTION     ] Read Problem ...
 
 Users can disable lock-free training by using ``--dis-lock-free``: ::
 

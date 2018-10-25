@@ -456,6 +456,11 @@ Users can set the number of thread for xLearn by using ``nthread`` parameter: ::
             
    ffm_model.fit(param, "./model.out") 
 
+xLearn will show the number of threads: ::
+
+    [------------] xLearn uses 4 threads for training task.
+    [ ACTION     ] Read Problem ...
+
 Users can also disable lock-free training by using ``disableLockFree()`` API: ::
 
    import xlearn as xl
