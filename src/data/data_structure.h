@@ -131,6 +131,7 @@ typedef std::vector<Node> SparseRow;
 //    index_t max_feat = matrix.MaxFeat();
 //    index_t max_field = matrix.MaxField();
 //------------------------------------------------------------------------------
+// TODO(aksnzhy): Implement incremental adding
 struct DMatrix {
   // Constructor
   DMatrix()
