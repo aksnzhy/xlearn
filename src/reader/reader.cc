@@ -232,6 +232,7 @@ void InmemReader::init_from_txt() {
   // Deserialize in-memory buffer to disk file.
   std::string bin_file = filename_ + ".bin";
   data_buf_.Serialize(bin_file);
+  delete [] block_;
   Close(file);
 }
 
