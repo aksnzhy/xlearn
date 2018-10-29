@@ -35,7 +35,6 @@ namespace xLearn {
 CLASS_REGISTER_IMPLEMENT_REGISTRY(xLearn_reader_registry, Reader);
 REGISTER_READER("memory", InmemReader);
 REGISTER_READER("disk", OndiskReader);
-REGISTER_READER("copy", CopyReader);
 
 // Check current file format and
 // return 'libsvm', 'libffm', or 'csv'.
@@ -100,6 +99,17 @@ std::string Reader::check_file_format() {
   exit(0);
 }
 
+// Find the last '\n' in block, and shrink back file pointer
+void Reader::shrink_block(char* block, size_t* ret, FILE* file) {
+  // Find the last '\n'
+  size_t index = *ret-1;
+  while (block[index] != '\n') { index--; }
+  // Shrink back file pointer
+  fseek(file, index-*ret+1, SEEK_CUR);
+  // The real size of block
+  *ret = index + 1;
+}
+
 //------------------------------------------------------------------------------
 // Implementation of InmemReader
 //------------------------------------------------------------------------------
@@ -130,6 +140,15 @@ void InmemReader::Initialize(const std::string& filename) {
                    "file to binary file.",
                    filename_.c_str())
     );
+    // Allocate memory for block
+    try {
+      this->block_ = (char*)malloc(block_size_*1024*1024);
+    } catch (std::bad_alloc&) {
+      LOG(FATAL) << "Cannot allocate enough memory for data  \
+                     block. Block size: " 
+                 << block_size_ << "MB. "
+                 << "You set change the block size via configuration.";
+    }
     init_from_txt();
   }
 }
@@ -167,7 +186,7 @@ void InmemReader::init_from_binary() {
   has_label_ = data_buf_.has_label;
   // Init data_samples_
   num_samples_ = data_buf_.row_length;
-  data_samples_.ResetMatrix(num_samples_);
+  data_samples_.ReAlloc(num_samples_);
   // for shuffle
   order_.resize(num_samples_);
   for (int i = 0; i < order_.size(); ++i) {
@@ -183,16 +202,28 @@ void InmemReader::init_from_txt() {
   else parser_->setLabel(false);
   // Set splitor
   parser_->setSplitor(this->splitor_);
-  // Init data_buf_
-  char* buffer = nullptr;
-  uint64 file_size = ReadFileToMemory(filename_, &buffer);
-  parser_->Parse(buffer, file_size, data_buf_);
+  // Convert MB to Byte
+  uint64 read_byte = block_size_ * 1024 * 1024;
+  // Open file
+  FILE* file = OpenFileOrDie(filename_.c_str(), "r");
+  // Read until the end of file
+  for (;;) {
+    // Read a block of data from disk file
+    size_t ret = ReadDataFromDisk(file, block_, read_byte);
+    if (ret == 0) {
+      break;
+    } else if (ret == read_byte) {
+      // Find the last '\n', and shrink back file pointer
+      this->shrink_block(block_, &ret, file);
+    } // else ret < read_byte: we don't need shrink_block()
+    parser_->Parse(block_, ret, data_buf_, false);
+  }
   data_buf_.SetHash(HashFile(filename_, true),
                     HashFile(filename_, false));
   data_buf_.has_label = has_label_;
   // Init data_samples_ 
   num_samples_ = data_buf_.row_length;
-  data_samples_.ResetMatrix(num_samples_, has_label_);
+  data_samples_.ReAlloc(num_samples_, has_label_);
   // for shuffle
   order_.resize(num_samples_);
   for (int i = 0; i < order_.size(); ++i) {
@@ -201,7 +232,7 @@ void InmemReader::init_from_txt() {
   // Deserialize in-memory buffer to disk file.
   std::string bin_file = filename_ + ".bin";
   data_buf_.Serialize(bin_file);
-  delete [] buffer;
+  Close(file);
 }
 
 // Smaple data from memory buffer.
@@ -266,17 +297,6 @@ void OndiskReader::Reset() {
   }
 }
 
-// Find the last '\n' in block, and shrink back file pointer
-void OndiskReader::shrink_block(char* block, size_t* ret, FILE* file) {
-  // Find the last '\n'
-  size_t index = *ret-1;
-  while (block[index] != '\n') { index--; }
-  // Shrink back file pointer
-  fseek(file, index-*ret+1, SEEK_CUR);
-  // The real size of block
-  *ret = index + 1;
-}
-
 // Sample data from disk file.
 index_t OndiskReader::Samples(DMatrix* &matrix) {
   // Convert MB to Byte
@@ -291,61 +311,9 @@ index_t OndiskReader::Samples(DMatrix* &matrix) {
     shrink_block(block_, &ret, file_ptr_);
   } // else ret < read_byte: we don't need shrink_block()
   // Parse block to data_sample_
-  parser_->Parse(block_, ret, data_samples_);
+  parser_->Parse(block_, ret, data_samples_, true);
   matrix = &data_samples_;
   return data_samples_.row_length;
 }
-
-//------------------------------------------------------------------------------
-// Implementation of CopyReader
-//------------------------------------------------------------------------------
-
-// Copy DMatrix from some other data source
-void CopyReader::Initialize(const std::string& filename) {
-  // We do nothing in this function
-  return;
-}
-
-// Copy DMatrix from the other data source
-void CopyReader::CopyDMatrix(DMatrix* matrix) {
-  CHECK_NOTNULL(matrix);
-  // Copy matrix to data_buf_
-  this->data_buf_.CopyFrom(matrix);
-  // Init data_samples_ 
-  num_samples_ = data_buf_.row_length;
-  data_samples_.ResetMatrix(num_samples_, has_label_);
-  // for shuffle
-  order_.resize(num_samples_);
-  for (int i = 0; i < order_.size(); ++i) {
-    order_[i] = i;
-  }
-}
-
-// Smaple data from memory buffer.
-index_t CopyReader::Samples(DMatrix* &matrix) {
-  for (int i = 0; i < num_samples_; ++i) {
-    if (pos_ >= data_buf_.row_length) {
-      // End of the data buffer
-      if (i == 0) {
-        if (shuffle_) {
-          random_shuffle(order_.begin(), order_.end());
-        }
-        matrix = nullptr;
-        return 0;
-      }
-      break;
-    }
-    // Copy data between different DMatrix.
-    data_samples_.row[i] = data_buf_.row[order_[pos_]];
-    data_samples_.Y[i] = data_buf_.Y[order_[pos_]];
-    data_samples_.norm[i] = data_buf_.norm[order_[pos_]];
-    pos_++;
-  }
-  matrix = &data_samples_;
-  return num_samples_;
-}
-
-// Return to the begining of the data buffer.
-void CopyReader::Reset() { pos_ = 0; }
 
 }  // namespace xLearn

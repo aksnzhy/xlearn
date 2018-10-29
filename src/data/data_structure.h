@@ -101,11 +101,10 @@ typedef std::vector<Node> SparseRow;
 // We can use the DMatrix like this:
 //
 //    DMatrix matrix;
-//    /* Initialize 10 rows */
-//    matrix.ResetMatrix(10);   
 //    for (int i = 0; i < 10; ++i) {
-//      matrix.Y[i] = ...
-//      /* We set feild_id to 0 by default */
+//      matrix.AddRow();
+//      matrix.Y[i] = 0;
+//      matrix.norm[i] = 1.0;
 //      matrix.AddNode(i, feat_id, feat_val, field_id);
 //    }
 //
@@ -147,50 +146,56 @@ struct DMatrix {
   // Destructor
   ~DMatrix() { }
 
-  // Reset data for the DMatrix.
+  // ReAlloc memoryfor the DMatrix.
   // This function will first release the original
   // memory allocated for the DMatrix, and then re-allocate 
   // memory for this new matrix. For some dataset, it does not
   // contains the label y, and hence we need to set the 
   // has_label variable to false. On deafult, this value will
   // be set to true.
-  void ResetMatrix(size_t length, bool label = true) {
+  void ReAlloc(size_t length, bool label = true) {
     CHECK_GE(length, 0);
-    this->Release();
-    hash_value_1 = 0;
-    hash_value_2 = 0;
-    row_length = length;
-    row.resize(length, nullptr);
-    Y.resize(length, 0);
+    this->Reset();
+    this->hash_value_1 = 0;
+    this->hash_value_2 = 0;
+    this->row_length = length;
+    this->row.resize(length, nullptr);
+    this->Y.resize(length, 0);
     // Here we set norm to 1.0 by default, which means
     // that we don't use instance-wise nomarlization
-    norm.resize(length, 1.0);
+    this->norm.resize(length, 1.0);
     // Indicate that if current dataset has the label y
-    has_label = label;
-    pos = 0;
+    this->has_label = label;
+    this->pos = 0;
   }
 
-  // Release memory for DMatrix.
-  // Note that a typical alternative that forces a
-  // reallocation is to use swap(), instead of using clear().
-  void Release() {
-    hash_value_1 = 0;
-    hash_value_2 = 0;
+  // Reset memory for DMatrix.
+  void Reset() {
+    this->has_label = true;
+    this->hash_value_1 = 0;
+    this->hash_value_2 = 0;
     // Delete Y
-    std::vector<real_t>().swap(Y);
+    std::vector<real_t>().swap(this->Y);
     // Delete Node
-    for (int i = 0; i < row_length; ++i) {
-      if (row[i] != nullptr) {
-        STLDeleteElementsAndClear(&row);
+    for (int i = 0; i < this->row_length; ++i) {
+      if ((this->row)[i] != nullptr) {
+        STLDeleteElementsAndClear(&(this->row));
       }
     }
     // Delete SparseRow
-    std::vector<SparseRow*>().swap(row);
+    std::vector<SparseRow*>().swap(this->row);
     // Delete norm
-    std::vector<real_t>().swap(norm);
-    has_label = false;
-    row_length = 0;
-    pos = 0;
+    std::vector<real_t>().swap(this->norm);
+    this->row_length = 0;
+    this->pos = 0;
+  }
+
+  // Dynamically adding new row for current DMatrix.
+  void AddRow() {
+    this->Y.push_back(0);
+    this->norm.push_back(1.0);
+    this->row.push_back(nullptr);
+    row_length++;
   }
 
   // Add node to current data matrix.
@@ -224,7 +229,7 @@ struct DMatrix {
   // allocate memory if current matrix is empty.
   void CopyFrom(const DMatrix* matrix) {
     CHECK_NOTNULL(matrix);
-    this->Release();
+    this->Reset();
     // Copy hash value
     this->hash_value_1 = matrix->hash_value_1;
     this->hash_value_2 = matrix->hash_value_2;
@@ -310,12 +315,12 @@ struct DMatrix {
   // This method will be used for distributed computation. 
   // Return the count of sample for each function call.
   index_t GetMiniBatch(index_t batch_size, DMatrix& mini_batch) {
-    CHECK_EQ(batch_size, mini_batch.row_length);
     // Copy mini-batch
     for (index_t i = 0; i < batch_size; ++i) {
       if (this->pos >= this->row_length) {
         return i;
       }
+      mini_batch.AddRow();
       mini_batch.row[i] = this->row[pos];
       mini_batch.Y[i] = this->Y[pos];
       mini_batch.norm[i] = this->norm[pos];
@@ -354,7 +359,7 @@ struct DMatrix {
   // Deserialize the DMatrix from disk file.
   void Deserialize(const std::string& filename) {
     CHECK(!filename.empty());
-    this->Release();
+    this->Reset();
     FILE* file = OpenFileOrDie(filename.c_str(), "r");
     // Read hash_value
     ReadDataFromDisk(file, (char*)&hash_value_1, sizeof(hash_value_1));

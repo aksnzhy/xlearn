@@ -210,17 +210,11 @@ void CheckCSV(const DMatrix* matrix, bool disk) {
   }
 }
 
-void read_from_memory(const std::string& filename, int task_id, bool copy = false) {
+void read_from_memory(const std::string& filename, int task_id) {
   InmemReader in_mem_reader;
-  CopyReader copy_reader;
   Reader* reader = nullptr;
   in_mem_reader.Initialize(filename);
-  if (copy) {
-    copy_reader.CopyDMatrix(in_mem_reader.GetMatrix());
-    reader = &copy_reader;
-  } else {
-    reader = &in_mem_reader;
-  }
+  reader = &in_mem_reader;
   DMatrix* matrix = nullptr;
   for (int i = 0; i < iteration_num; ++i) {
     int record_num = reader->Samples(matrix);
@@ -333,32 +327,6 @@ TEST(ReaderTest, ReadFromBinary) {
   read_from_memory(csv_file_comma, 2);
   read_from_memory(lr_no_file_comma, 3);
   read_from_memory(ffm_no_file_comma, 4);  
-}
-
-TEST(ReaderTest, CopyReader) {
-  // has label
-  string lr_file = kTestfilename + "_LR.txt";
-  string ffm_file = kTestfilename + "_ffm.txt";
-  string csv_file = kTestfilename + "_csv.txt";
-  string lr_file_comma = kTestfilename + "_LR_comma.txt";
-  string ffm_file_comma = kTestfilename + "_ffm_comma.txt";
-  string csv_file_comma = kTestfilename + "_csv_comma.txt";
-  // has no label
-  string lr_no_file = kTestfilename + "_LR_no_comma.txt";
-  string ffm_no_file = kTestfilename + "_ffm_no_comma.txt";
-  string lr_no_file_comma = kTestfilename + "_LR_no_comma.txt";
-  string ffm_no_file_comma = kTestfilename + "_ffm_no_comma.txt";
-  // check
-  read_from_memory(lr_file, 0, true);
-  read_from_memory(ffm_file, 1, true);
-  read_from_memory(csv_file, 2, true);
-  read_from_memory(lr_no_file, 3, true);
-  read_from_memory(ffm_no_file, 4, true);
-  read_from_memory(lr_file_comma, 0, true);
-  read_from_memory(ffm_file_comma, 1, true);
-  read_from_memory(csv_file_comma, 2, true);
-  read_from_memory(lr_no_file_comma, 3, true);
-  read_from_memory(ffm_no_file_comma, 4, true); 
 }
 
 TEST(ReaderTest, SampleFromDisk) { 

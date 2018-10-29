@@ -24,56 +24,88 @@ This file tests data_structure.h file.
 
 namespace xLearn {
 
-TEST(DMATRIX_TEST, Resize_and_Release) {
+const size_t kLength = 10;
+
+TEST(DMATRIX_TEST, ReAlloc) {
   DMatrix matrix;
-  matrix.ResetMatrix(10);
+  matrix.ReAlloc(kLength, false);
   EXPECT_EQ(matrix.hash_value_1, 0);
   EXPECT_EQ(matrix.hash_value_2, 0);
-  EXPECT_EQ(matrix.row_length, 10);
-  for (size_t i = 0; i < 10; ++i) {
-    EXPECT_EQ(matrix.row[i], nullptr);
-    EXPECT_FLOAT_EQ(matrix.Y[i], 0);
-    EXPECT_FLOAT_EQ(matrix.norm[i], 1.0);
-    EXPECT_EQ(matrix.has_label, true);
-  }
-  matrix.Release();
-  EXPECT_EQ(matrix.row_length, 0);
-  EXPECT_EQ(matrix.hash_value_1, 0);
-  EXPECT_EQ(matrix.hash_value_2, 0);
+  EXPECT_EQ(matrix.row_length, kLength);
+  EXPECT_EQ(matrix.row.size(), kLength);
+  EXPECT_EQ(matrix.Y.size(), kLength);
+  EXPECT_EQ(matrix.norm.size(), kLength);
   EXPECT_EQ(matrix.has_label, false);
-  EXPECT_EQ(matrix.row.empty(), true);
+  EXPECT_EQ(matrix.pos, 0);
+}
+
+TEST(DMATRIX_TEST, Reset) {
+  DMatrix matrix;
+  matrix.Reset();
+  EXPECT_EQ(matrix.has_label, true);
+  EXPECT_EQ(matrix.hash_value_1, 0);
+  EXPECT_EQ(matrix.hash_value_2, 0);
+  EXPECT_EQ(matrix.row_length, 0);
+  EXPECT_EQ(matrix.pos, 0);
   EXPECT_EQ(matrix.Y.empty(), true);
   EXPECT_EQ(matrix.norm.empty(), true);
+  EXPECT_EQ(matrix.row.empty(),true);
+}
+
+TEST(DMATRIX_TEST, AddData) {
+  DMatrix matrix;
+  matrix.Reset();
+  for (size_t i = 0; i < kLength; ++i) {
+    matrix.AddRow();
+    matrix.Y[i] = 1.0;
+    matrix.norm[i] = 1.0;
+    matrix.AddNode(i, i, 66.66, i);
+  }
+  matrix.SetHash(1234, 5678);
+  for (size_t i = 0; i < kLength; ++i) {
+    EXPECT_EQ(matrix.row_length, kLength);
+    EXPECT_FLOAT_EQ(matrix.Y[i], 1.0);
+    EXPECT_FLOAT_EQ(matrix.norm[i], 1.0);
+    SparseRow* row = matrix.row[i];
+    for (SparseRow::iterator iter = row->begin();
+         iter != row->end(); ++iter) {
+      EXPECT_EQ(iter->feat_id, i);
+      EXPECT_EQ(iter->field_id, i);
+      EXPECT_FLOAT_EQ(iter->feat_val, 66.66);
+    }
+  }
+  EXPECT_EQ(matrix.hash_value_1, 1234);
+  EXPECT_EQ(matrix.hash_value_2, 5678);
 }
 
 TEST(DMATRIX_TEST, Serialize_and_Deserialize) {
   DMatrix matrix;
-  // Init
-  matrix.ResetMatrix(10);
-  for (size_t i = 0; i < 10; ++i) {
+  matrix.Reset();
+  for (size_t i = 0; i < kLength; ++i) {
+    matrix.AddRow();
     matrix.AddNode(i, i, 2.5, i);
     matrix.Y[i] = i;
     matrix.norm[i] = 0.25;
-    matrix.has_label = false;
   }
   matrix.SetHash(1234, 5678);
   // Serialize
   matrix.Serialize("/tmp/test.bin");
-  matrix.Release();
-  EXPECT_EQ(matrix.row_length, 0);
+  matrix.Reset();
+  EXPECT_EQ(matrix.has_label, true);
   EXPECT_EQ(matrix.hash_value_1, 0);
   EXPECT_EQ(matrix.hash_value_2, 0);
-  EXPECT_EQ(matrix.has_label, false);
-  EXPECT_EQ(matrix.row.empty(), true);
+  EXPECT_EQ(matrix.row_length, 0);
+  EXPECT_EQ(matrix.pos, 0);
   EXPECT_EQ(matrix.Y.empty(), true);
   EXPECT_EQ(matrix.norm.empty(), true);
+  EXPECT_EQ(matrix.row.empty(),true);
   // Deserialize
   matrix.Deserialize("/tmp/test.bin");
-  EXPECT_EQ(matrix.row_length, 10);
+  EXPECT_EQ(matrix.row_length, kLength);
   EXPECT_EQ(matrix.hash_value_1, 1234);
   EXPECT_EQ(matrix.hash_value_2, 5678);
-  EXPECT_EQ(matrix.has_label, false);
-  for (int i = 0; i < 10; ++i) {
+  EXPECT_EQ(matrix.has_label, true);
+  for (size_t i = 0; i < kLength; ++i) {
     EXPECT_EQ(matrix.Y[i], i);
     EXPECT_EQ(matrix.norm[i], 0.25);
     SparseRow *row = matrix.row[i];
@@ -87,14 +119,14 @@ TEST(DMATRIX_TEST, Serialize_and_Deserialize) {
   RemoveFile("/tmp/test.bin");
 }
 
-TEST(DMATRIX_TEST, Find_max_feat_and_field) {
+TEST(DMATRIX_TEST, Find_Max_Feat_and_Field) {
   DMatrix matrix;
-  matrix.ResetMatrix(10);
-  for (size_t i = 0; i < 10; ++i) {
+  matrix.Reset();
+  for (size_t i = 0; i < kLength; ++i) {
+    matrix.AddRow();
     matrix.AddNode(i, i, 2.5, i);
     matrix.Y[i] = i;
     matrix.norm[i] = 0.25;
-    matrix.has_label = false;
   }
   matrix.SetHash(1234, 5678);
   EXPECT_EQ(matrix.MaxFeat(), 9);
@@ -102,26 +134,25 @@ TEST(DMATRIX_TEST, Find_max_feat_and_field) {
 }
 
 TEST(DMATRIX_TEST, CopyFrom) {
-  // Init matrix
   DMatrix matrix;
-  matrix.ResetMatrix(10);
-  for (size_t i = 0; i < 10; ++i) {
+  matrix.Reset();
+  for (size_t i = 0; i < kLength; ++i) {
+    matrix.AddRow();
     matrix.AddNode(i, i, 2.5, i);
     matrix.Y[i] = i;
     matrix.norm[i] = 0.25;
   }
-  matrix.has_label = false;
   matrix.SetHash(1234, 5678);
   // Copy matrix
   DMatrix new_matrix;
   new_matrix.CopyFrom(&matrix);
-  matrix.Release();
+  matrix.Reset();
   // Check
-  EXPECT_EQ(new_matrix.row_length, 10);
+  EXPECT_EQ(new_matrix.row_length, kLength);
   EXPECT_EQ(new_matrix.hash_value_1, 1234);
   EXPECT_EQ(new_matrix.hash_value_2, 5678);
-  EXPECT_EQ(new_matrix.has_label, false);
-  for (int i = 0; i < 10; ++i) {
+  EXPECT_EQ(new_matrix.has_label, true);
+  for (size_t i = 0; i < kLength; ++i) {
     EXPECT_EQ(new_matrix.Y[i], i);
     EXPECT_EQ(new_matrix.norm[i], 0.25);
     SparseRow *row =new_matrix.row[i];
@@ -137,21 +168,25 @@ TEST(DMATRIX_TEST, CopyFrom) {
 TEST(DMATRIX_TEST, Compress) {
   // Init matrix
   DMatrix matrix;
-  matrix.ResetMatrix(4);
+  matrix.Reset();
   // row_0
+  matrix.AddRow();
   matrix.AddNode(0, 1, 0.1);
   matrix.AddNode(0, 5, 0.1);
   matrix.AddNode(0, 8, 0.1);
   matrix.AddNode(0, 10, 0.1);
   // row_1
+  matrix.AddRow();
   matrix.AddNode(1, 3, 0.1);
   matrix.AddNode(1, 12, 0.1);
   matrix.AddNode(1, 20, 0.1);
   // row_2
+  matrix.AddRow();
   matrix.AddNode(2, 5, 0.1);
   matrix.AddNode(2, 8, 0.1);
   matrix.AddNode(2, 11, 0.1);
   // row_3
+  matrix.AddRow();
   matrix.AddNode(3, 2, 0.1);
   matrix.AddNode(3, 4, 0.1);
   matrix.AddNode(3, 7, 0.1);
@@ -196,19 +231,20 @@ TEST(DMATRIX_TEST, Compress) {
 TEST(DMATRIX_TEST, GetMiniBatch) {
   // Init matrix
   DMatrix matrix;
-  matrix.ResetMatrix(10);
-  for (size_t i = 0; i < 10; ++i) {
+  matrix.Reset();
+  for (size_t i = 0; i < kLength; ++i) {
+    matrix.AddRow();
     matrix.AddNode(i, i, 2.5, i);
     matrix.Y[i] = i;
     matrix.norm[i] = 0.25;
   }
   DMatrix mini_batch;
-  mini_batch.ResetMatrix(4);
+  mini_batch.Reset();
   index_t res = 0;
   // Get mini-batch (4 samples)
   res = matrix.GetMiniBatch(4, mini_batch);
   EXPECT_EQ(res, 4);
-  for (int i = 0; i < 4; ++i) {
+  for (size_t i = 0; i < 4; ++i) {
     EXPECT_EQ(mini_batch.Y[i], i);
     EXPECT_EQ(mini_batch.norm[i], 0.25);
     SparseRow *row =mini_batch.row[i];

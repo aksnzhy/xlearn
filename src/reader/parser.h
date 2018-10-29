@@ -69,17 +69,18 @@ class Parser {
   }
 
   // The real parse function invoked by users.
-  virtual void Parse(char* buf, uint64 size, DMatrix& matrix) = 0;
+  // If reset == true, Parser will invoke matrix.Reset();
+  virtual void Parse(char* buf, 
+                     uint64 size, 
+                     DMatrix& matrix,
+                     bool reset = false) = 0;
 
  protected:
-   // Get how many lines in current memory buffer.
-   index_t get_line_number(char* buf, uint64 size);
-
    // Get one line from memory buffer.
    uint64 get_line_from_buffer(char* line,
-                         char* buf,
-                         uint64 pos,
-                         uint64 size);
+                               char* buf,
+                               uint64 pos,
+                               uint64 size);
 
    /* True for training task and
    False for prediction task */
@@ -102,7 +103,10 @@ class LibsvmParser : public Parser {
   ~LibsvmParser() {  }
 
   // Parse the libsvm file
-  void Parse(char* buf, uint64 size, DMatrix& matrix);
+  void Parse(char* buf, 
+             uint64 size, 
+             DMatrix& matrix,
+             bool reset = false);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(LibsvmParser);
@@ -119,7 +123,10 @@ class FFMParser : public Parser {
   ~FFMParser() {  }
 
   // Parse the libffm file
-  void Parse(char* buf, uint64 size, DMatrix& matrix);
+  void Parse(char* buf, 
+             uint64 size, 
+             DMatrix& matrix,
+             bool reset = false);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(FFMParser);
@@ -140,7 +147,10 @@ class CSVParser : public Parser {
   ~CSVParser() { }
 
   // Parse the csv file
-  void Parse(char* buf, uint64 size, DMatrix& matrix);
+  void Parse(char* buf, 
+             uint64 size, 
+             DMatrix& matrix,
+             bool reset = false);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(CSVParser);

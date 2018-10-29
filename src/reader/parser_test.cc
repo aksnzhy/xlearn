@@ -80,6 +80,36 @@ void check(const DMatrix& matrix, bool has_label, bool has_field) {
   }
 }
 
+// Check the parser's result when push data twice
+void check_double(const DMatrix& matrix, bool has_label, bool has_field) {
+  EXPECT_EQ(matrix.row_length, 2*kNum_lines);
+  // First check
+  for (index_t i = 0; i < matrix.row_length; ++i) {
+    if (has_label) {
+      EXPECT_EQ(matrix.Y[i], 1);
+    } else {
+      EXPECT_EQ(matrix.Y[i], -2);
+    }
+    EXPECT_FLOAT_EQ(matrix.norm[i], 13.888889);
+    int col_len = matrix.row[i]->size();
+    EXPECT_EQ(col_len, 5);
+    SparseRow *row = matrix.row[i];
+    int n = 0;
+    for (SparseRow::iterator iter = row->begin();
+         iter != row->end(); ++iter) {
+      if (has_field) {
+        EXPECT_EQ(iter->field_id, n);
+      } else {
+        EXPECT_EQ(iter->field_id, 0);
+      }
+      EXPECT_EQ(iter->feat_id, n);
+      EXPECT_FLOAT_EQ(iter->feat_val, 0.12);
+      n++;
+    }
+    EXPECT_EQ(n, 5);
+  }
+}
+
 TEST(PARSER_TEST, Parse_libsvm) {
   write_data(Kfilename, kStr);
   char* buffer = nullptr;
@@ -88,7 +118,11 @@ TEST(PARSER_TEST, Parse_libsvm) {
   LibsvmParser parser;
   parser.setLabel(true);
   parser.setSplitor(" ");
-  parser.Parse(buffer, size, matrix);
+  parser.Parse(buffer, size, matrix, true);
+  check(matrix, true, false);
+  parser.Parse(buffer, size, matrix, false);
+  check_double(matrix, true, false);
+  parser.Parse(buffer, size, matrix, true);
   check(matrix, true, false);
   RemoveFile(Kfilename.c_str());
 }
@@ -101,7 +135,11 @@ TEST(PARSER_TEST, Parse_libsvm_comma) {
   LibsvmParser parser;
   parser.setLabel(true);
   parser.setSplitor(",");
-  parser.Parse(buffer, size, matrix);
+  parser.Parse(buffer, size, matrix, true);
+  check(matrix, true, false);
+  parser.Parse(buffer, size, matrix, false);
+  check_double(matrix, true, false);
+  parser.Parse(buffer, size, matrix, true);
   check(matrix, true, false);
   RemoveFile(Kfilename.c_str());
 }
@@ -114,7 +152,11 @@ TEST(PARSER_TEST, Parse_libsvm_no_y) {
   LibsvmParser parser;
   parser.setLabel(false);
   parser.setSplitor(" ");
-  parser.Parse(buffer, size, matrix);
+  parser.Parse(buffer, size, matrix, true);
+  check(matrix, false, false);
+  parser.Parse(buffer, size, matrix, false);
+  check_double(matrix, false, false);
+  parser.Parse(buffer, size, matrix, true);
   check(matrix, false, false);
   RemoveFile(Kfilename.c_str());
 }
@@ -127,7 +169,11 @@ TEST(PARSER_TEST, Parse_libsvm_no_y_comma) {
   LibsvmParser parser;
   parser.setLabel(false);
   parser.setSplitor(",");
-  parser.Parse(buffer, size, matrix);
+  parser.Parse(buffer, size, matrix, true);
+  check(matrix, false, false);
+  parser.Parse(buffer, size, matrix, false);
+  check_double(matrix, false, false);
+  parser.Parse(buffer, size, matrix, true);
   check(matrix, false, false);
   RemoveFile(Kfilename.c_str());
 }
@@ -140,7 +186,11 @@ TEST(PARSER_TEST, Parse_libffm) {
   FFMParser parser;
   parser.setLabel(true);
   parser.setSplitor(" ");
-  parser.Parse(buffer, size, matrix);
+  parser.Parse(buffer, size, matrix, true);
+  check(matrix, true, true);
+  parser.Parse(buffer, size, matrix, false);
+  check_double(matrix, true, true);
+  parser.Parse(buffer, size, matrix, true);
   check(matrix, true, true);
   RemoveFile(Kfilename.c_str());
 }
@@ -153,7 +203,11 @@ TEST(PARSER_TEST, Parse_libffm_comma) {
   FFMParser parser;
   parser.setLabel(true);
   parser.setSplitor(",");
-  parser.Parse(buffer, size, matrix);
+  parser.Parse(buffer, size, matrix, true);
+  check(matrix, true, true);
+  parser.Parse(buffer, size, matrix, false);
+  check_double(matrix, true, true);
+  parser.Parse(buffer, size, matrix, true);
   check(matrix, true, true);
   RemoveFile(Kfilename.c_str());
 }
@@ -166,7 +220,11 @@ TEST(PARSER_TEST, Parse_libffm_no_y) {
   FFMParser parser;
   parser.setLabel(false);
   parser.setSplitor(" ");
-  parser.Parse(buffer, size, matrix);
+  parser.Parse(buffer, size, matrix, true);
+  check(matrix, false, true);
+  parser.Parse(buffer, size, matrix, false);
+  check_double(matrix, false, true);
+  parser.Parse(buffer, size, matrix, true);
   check(matrix, false, true);
   RemoveFile(Kfilename.c_str());
 }
@@ -179,7 +237,11 @@ TEST(PARSER_TEST, Parse_libffm_no_y_comma) {
   FFMParser parser;
   parser.setLabel(false);
   parser.setSplitor(",");
-  parser.Parse(buffer, size, matrix);
+  parser.Parse(buffer, size, matrix, true);
+  check(matrix, false, true);
+  parser.Parse(buffer, size, matrix, false);
+  check_double(matrix, false, true);
+  parser.Parse(buffer, size, matrix, true);
   check(matrix, false, true);
   RemoveFile(Kfilename.c_str());
 }
@@ -192,7 +254,11 @@ TEST(PARSER_TEST, Parse_csv) {
   CSVParser parser;
   parser.setLabel(true);
   parser.setSplitor(" ");
-  parser.Parse(buffer, size, matrix);
+  parser.Parse(buffer, size, matrix, true);
+  check(matrix, true, false);
+  parser.Parse(buffer, size, matrix, false);
+  check_double(matrix, true, false);
+  parser.Parse(buffer, size, matrix, true);
   check(matrix, true, false);
   RemoveFile(Kfilename.c_str());
 }
@@ -205,7 +271,11 @@ TEST(PARSER_TEST, Parse_csv_comma) {
   CSVParser parser;
   parser.setLabel(true);
   parser.setSplitor(",");
-  parser.Parse(buffer, size, matrix);
+  parser.Parse(buffer, size, matrix, true);
+  check(matrix, true, false);
+  parser.Parse(buffer, size, matrix, false);
+  check_double(matrix, true, false);
+  parser.Parse(buffer, size, matrix, true);
   check(matrix, true, false);
   RemoveFile(Kfilename.c_str());
 }
