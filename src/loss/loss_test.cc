@@ -87,7 +87,7 @@ TEST_F(LossTest, Predict_Linear) {
   }
   // Create Data matrix
   DMatrix matrix;
-  matrix.ResetMatrix(kLine);
+  matrix.ReAlloc(kLine);
   for (int i = 0; i < kLine; ++i) {
     matrix.Y[i] = 0;
     matrix.row[i] = new SparseRow;
@@ -131,7 +131,7 @@ TEST_F(LossTest, Predict_FM) {
   }
   // Create Data matrix
   DMatrix matrix;
-  matrix.ResetMatrix(kLine);
+  matrix.ReAlloc(kLine);
   for (int i = 0; i < kLine; ++i) {
     matrix.Y[i] = 0;
     matrix.row[i] = new SparseRow;
@@ -176,7 +176,7 @@ TEST_F(LossTest, Predict_FFM) {
   }
   // Create Data matrix
   DMatrix matrix;
-  matrix.ResetMatrix(kLine);
+  matrix.ReAlloc(kLine);
   for (int i = 0; i < kLine; ++i) {
     matrix.Y[i] = 0;
     matrix.row[i] = new SparseRow;

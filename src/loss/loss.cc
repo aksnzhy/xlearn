@@ -82,7 +82,7 @@ void Loss::CalcGradDist(DMatrix* matrix,
   for(;;) {
     // Get a mini-batch from current data matrix
     DMatrix mini_batch;
-    mini_batch.ResetMatrix(batch_size_);
+    mini_batch.ReAlloc(batch_size_);
     index_t len = matrix->GetMiniBatch(batch_size_, mini_batch);
     if (len == 0) {
       break;
