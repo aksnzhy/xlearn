@@ -232,6 +232,7 @@ class InmemReader : public Reader {
 // OndiskReader is used to train very big data, which cannot be
 // loaded into main memory of current single machine.
 //------------------------------------------------------------------------------
+// TODO(chao): binary-cache
 class OndiskReader : public Reader {
  public:
   // Constructor and Destructor
