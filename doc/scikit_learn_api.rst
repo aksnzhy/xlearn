@@ -1,6 +1,8 @@
 Scikit-learn api Guide
 ^^^^^^^^^^^^^^^^^^^^^^^
 
+(Note that, the Scikit-Learn API will not be maintainned anymore.)
+
 xLearn can support scikit-learn-like api for users. Here is an example: ::
 
   import numpy as np
