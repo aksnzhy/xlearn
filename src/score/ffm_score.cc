@@ -262,7 +262,6 @@ void FFMScore::calc_grad_adagrad(const SparseRow* row,
 }
 
 // Calculate gradient and update current model using ftrl
-// TODO(aksnzhy): solve unseen feature
 void FFMScore::calc_grad_ftrl(const SparseRow* row,
                               Model& model,
                               real_t pg,
