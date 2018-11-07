@@ -132,7 +132,10 @@ FFM: ::
   v_3_2: 0.109711 0.102996 0.227222 0.248076
   v_3_3: 0.144264 0.0409806 0.17463 0.083712
 
-Users can also set ``-o`` option to specify the output file. For example: ::
+Prediction Output
+----------------------------------------
+
+Users can also set ``-o`` option to specify the prediction output file. For example: ::
 
   ./xlearn_predict ./small_test.txt ./small_train.txt.model -o output.txt  
   head -n 5 ./output.txt
