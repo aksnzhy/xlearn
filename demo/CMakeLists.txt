@@ -18,6 +18,16 @@ DESTINATION ${PROJECT_BINARY_DIR}/demo/criteo_ctr)
 FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/classification/criteo_ctr/run_demo_ctr.py" 
 DESTINATION ${PROJECT_BINARY_DIR}/)
 
+# Higgs
+FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/classification/higgs/higgs-test.csv" 
+DESTINATION ${PROJECT_BINARY_DIR}/demo/higgs)
+FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/classification/higgs/higgs-train.csv" 
+DESTINATION ${PROJECT_BINARY_DIR}/demo/higgs)
+FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/classification/higgs/run_higgs.sh" 
+DESTINATION ${PROJECT_BINARY_DIR}/demo/higgs)
+FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/classification/higgs/run_higgs.py" 
+DESTINATION ${PROJECT_BINARY_DIR}/demo/higgs)
+
 # Mushroom
 FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/classification/mushroom/agaricus_test.txt" 
 DESTINATION ${PROJECT_BINARY_DIR}/demo/mushroom)
