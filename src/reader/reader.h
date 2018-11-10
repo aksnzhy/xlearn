@@ -160,7 +160,6 @@ class Reader {
 // For in-memory smaplling, the Reader will automatically convert
 // txt data to binary data, and uses this binary data in the next time.
 //------------------------------------------------------------------------------
-// TODO(aksnzhy): implement incremental reader
 class InmemReader : public Reader {
  public:
   // Constructor and Destructor
