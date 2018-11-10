@@ -78,6 +78,9 @@ class Metric {
   // Return the metric type.
   virtual std::string metric_type() = 0;
 
+  // Compare two metric value, which is used in early-stop.
+  virtual bool cmp(const real_t a, const real_t b) = 0;
+
  protected:
   /* Pointer of thread pool */
   ThreadPool* pool_;
@@ -161,6 +164,11 @@ class AccMetric : public Metric {
   // Metric type
   std::string metric_type() { 
     return "Accuarcy"; 
+  }
+
+  // Compare two metric value
+  bool cmp(const real_t a, const real_t b) {
+    return a >= b ? true : false;
   }
 
  protected:
@@ -251,6 +259,11 @@ class PrecMetric : public Metric {
     return "Precision"; 
   }
 
+  // Compare two metric value
+  bool cmp(const real_t a, const real_t b) {
+    return a >= b ? true : false;
+  }
+
  protected:
   index_t true_positive_;
   index_t false_positive_;
@@ -337,6 +350,11 @@ class RecallMetric : public Metric {
   // Metric type
   std::string metric_type() { 
     return "Recall"; 
+  }
+
+  // Compare two metric value
+  bool cmp(const real_t a, const real_t b) {
+    return a >= b ? true : false;
   }
 
  protected:
@@ -429,6 +447,11 @@ class F1Metric : public Metric {
   // Metric type
   std::string metric_type() { 
     return "F1"; 
+  }
+
+  // Compare two metric value
+  bool cmp(const real_t a, const real_t b) {
+    return a >= b ? true : false;
   }
 
  protected:
@@ -534,6 +557,11 @@ class AUCMetric : public Metric {
     return "AUC";
   }
 
+  // Compare two metric value
+  bool cmp(const real_t a, const real_t b) {
+    return a >= b ? true : false;
+  }
+
  protected:
   std::vector<index_t> all_positive_number_;
   std::vector<index_t> all_negative_number_;
@@ -635,6 +663,11 @@ class MAEMetric : public Metric {
     return "MAE"; 
   }
 
+  // Compare two metric value
+  bool cmp(const real_t a, const real_t b) {
+    return a <= b ? true : false;
+  }
+
  protected:
   real_t error_;
   index_t total_example_;
@@ -707,6 +740,11 @@ class MAPEMetric : public Metric {
   // Metric type
   std::string metric_type() { 
     return "MAPE"; 
+  }
+
+  // Compare two metric value
+  bool cmp(const real_t a, const real_t b) {
+    return a <= b ? true : false;
   }
 
  protected:
@@ -783,6 +821,11 @@ class RMSDMetric : public Metric {
   // Metric type
   std::string metric_type() { 
     return "RMSD"; 
+  }
+
+  // Compare two metric value
+  bool cmp(const real_t a, const real_t b) {
+    return a <= b ? true : false;
   }
 
  protected:

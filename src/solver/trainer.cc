@@ -163,8 +163,28 @@ void Trainer::train(std::vector<Reader*>& train_reader,
                     std::vector<Reader*>& test_reader) {
   int best_epoch = 0;
   int stop_window = 0;
-  real_t best_result = metric_ == nullptr ? kFloatMax : kFloatMin;
-  real_t prev_result = metric_ == nullptr ? kFloatMin : kFloatMax;
+  real_t best_result = 0;
+  real_t prev_result = 0;
+  if (metric_ == nullptr) {
+    best_result = kFloatMax;
+    prev_result = kFloatMin;
+  } else {
+    std::string metric_type = metric_->metric_type();
+    // Classification
+    if (metric_type.compare("Accuarcy") == 0 ||
+        metric_type.compare("Precision") == 0 ||
+        metric_type.compare("Recall") == 0 ||
+        metric_type.compare("F1") == 0 ||
+        metric_type.compare("AUC") == 0) {
+      best_result = kFloatMin;
+      prev_result = kFloatMax;
+    } else if (metric_type.compare("MAE") == 0 ||
+               metric_type.compare("MAPE") == 0 ||
+               metric_type.compare("RMSD") == 0) {  // regression
+      best_result = kFloatMax;
+      prev_result = kFloatMin;
+    }
+  }
   MetricInfo te_info;
   // Show header info
   if (!quiet_) { 
@@ -190,14 +210,16 @@ void Trainer::train(std::vector<Reader*>& train_reader,
       // Early-stopping
       if (early_stop_) {
         if ((metric_ == nullptr && te_info.loss_val <= best_result) ||
-            (metric_ != nullptr && te_info.metric_val >= best_result))  {
+            (metric_ != nullptr && metric_->cmp(te_info.metric_val, 
+                                                best_result))) {
           best_result = metric_ == nullptr ? 
             te_info.loss_val : te_info.metric_val;
           best_epoch = n;
           model_->SetBestModel();
         }
         if ((metric_ == nullptr && te_info.loss_val > prev_result) ||
-            (metric_ != nullptr && te_info.metric_val < prev_result)) {
+            (metric_ != nullptr && !metric_->cmp(te_info.metric_val, 
+                                                 prev_result))) {
           // If the validation loss goes up conntinuously
           // in stop_window epoch, we stop training
           if (stop_window == stop_window_) { break; }

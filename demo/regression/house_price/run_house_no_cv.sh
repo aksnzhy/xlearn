@@ -14,9 +14,9 @@
 
 # Training task:
 #  -s : 4    (use fm model for regression)
-#  -x : mae  (use MAE metric)
+#  -x : rmsd  (use RMSD metric)
 # The model will be stored in house_price_train.txt.model
-../../xlearn_train ./house_price_train.txt -s 4 -v ./house_price_test.txt -x mae
+../../xlearn_train ./house_price_train.txt -s 4 -v ./house_price_test.txt -x rmsd
 # Prediction task:
 # The output result will be stored in house_price_test.txt.out
 ../../xlearn_predict ./house_price_test.txt ./house_price_train.txt.model
