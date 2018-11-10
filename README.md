@@ -1,7 +1,7 @@
 <img src="https://github.com/aksnzhy/xLearn/raw/master/img/xlearn_logo.png" width = "400"/>
 
 [![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](./LICENCE)
-[![Project Status](https://img.shields.io/badge/version-0.3.7-green.svg)]()
+[![Project Status](https://img.shields.io/badge/version-0.3.8-green.svg)]()
 [![Travis](https://img.shields.io/travis/rust-lang/rust.svg)]()
 
 ## What is xLearn?
