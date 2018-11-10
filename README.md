@@ -34,8 +34,8 @@ xLearn can be used for solving large-scale machine learning problems. First, xLe
 
  - 2018-11-10 xLearn 0.3.8 version release. Main update:
 
-   * Fix bugs in previous version.
-   * Update early-stop mechanism.
+    * Fix bugs in previous version.
+    * Update early-stop mechanism.
 
  - 2018-11-08. xLearn gets 2000 star! Congs!
 
