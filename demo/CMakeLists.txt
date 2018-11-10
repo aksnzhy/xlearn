@@ -65,3 +65,7 @@ FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/regression/house_price/run_demo_house_pri
 DESTINATION ${PROJECT_BINARY_DIR}/demo/house_price)
 FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/regression/house_price/run_demo_house_price.py" 
 DESTINATION ${PROJECT_BINARY_DIR}/demo/house_price)
+FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/regression/house_price/run_house_no_cv.sh" 
+DESTINATION ${PROJECT_BINARY_DIR}/demo/house_price)
+FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/regression/house_price/run_house_no_cv.py" 
+DESTINATION ${PROJECT_BINARY_DIR}/demo/house_price)

@@ -15,26 +15,26 @@
 import xlearn as xl
 
 # Training task
-linear_model = xl.create_linear() # Use linear model
-linear_model.setTrain("./higgs-train.csv")    # Training data
-linear_model.setValidate("./higgs-test.csv")  # Validation data
+fm_model = xl.create_fm() # Use factorization machine
+fm_model.setTrain("./house_price_train.txt")    # Training data
+fm_model.setValidate("./house_price_test.txt")  # Validation data
 
 # param:
-#  0. binary classification
+#  0. regression task
 #  1. learning rate: 0.2
 #  2. regular lambda: 0.002
 #  3. evaluation metric: accuracy
-param = {'task':'binary', 'lr':0.2, 
-         'lambda':0.002, 'metric':'acc'}
+param = {'task':'reg', 'lr':0.2, 
+         'lambda':0.002, 'metric':'mae'}
 
 # Start to train
 # The trained model will be stored in model.out
-linear_model.fit(param, './model.out')
+fm_model.fit(param, './model.out')
 
 # Prediction task
-linear_model.setTest("./higgs-test.csv")  # Test data
-linear_model.setSigmoid()  # Convert output to 0-1
+fm_model.setTest("./house_price_test.txt")  # Test data
+fm_model.setSigmoid()  # Convert output to 0-1
 
 # Start to predict
 # The output result will be stored in output.txt
-linear_model.predict("./model.out", "./output.txt")
+fm_model.predict("./model.out", "./output.txt")

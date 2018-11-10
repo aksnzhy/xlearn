@@ -13,10 +13,10 @@
 # limitations under the License.
 
 # Training task:
-#  -s : 0    (use LR for classification)
-#  -x : acc  (use accuracy metric)
-# The model will be stored in higgs-train.csv.model
-../../xlearn_train ./higgs-train.csv -s 0 -v ./higgs-test.csv -x acc
+#  -s : 4    (use fm model for regression)
+#  -x : mae  (use MAE metric)
+# The model will be stored in house_price_train.txt.model
+../../xlearn_train ./house_price_train.txt -s 4 -v ./house_price_test.txt -x mae
 # Prediction task:
-# The output result will be stored in higgs-test.csv.out
-../../xlearn_predict ./higgs-test.csv ./higgs-train.csv.model
+# The output result will be stored in house_price_test.txt.out
+../../xlearn_predict ./house_price_test.txt ./house_price_train.txt.model
