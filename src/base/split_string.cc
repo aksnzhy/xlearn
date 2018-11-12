@@ -22,7 +22,7 @@ This file is the implementation of StringSplit utilities.
 
 #include "src/base/common.h"
 
-// In most cases, delim contains only one character.  In this case, we
+// In most cases, delim contains only one character. In this case, we
 // use CalculateReserveForVector to count the number of elements should
 // be reserved in result vector, and thus optimize SplitStringUsing.
 static int CalculateReserveForVector(const std::string& full, const char* delim) {
