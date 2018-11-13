@@ -1,4 +1,4 @@
-# Copyright (c) 2016 by contributors.
+# Copyright (c) 2018 by contributors.
 # Authour: Chao Ma (mctt90@gmail.com)
 #
 # This is the root CMakeLists.txt file of the xLearn project, which
