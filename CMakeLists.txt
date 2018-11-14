@@ -36,7 +36,7 @@ add_definitions("-Wall -Wno-sign-compare -O3 -std=c++11
 #-------------------------------------------------------------------------------
 # Declare where our project will be installed.
 #-------------------------------------------------------------------------------
-set(CMAKE_INSTALL_PREFIX "xForest")
+set(CMAKE_INSTALL_PREFIX "xLearn")
 
 #-------------------------------------------------------------------------------
 # For Mac OSX
