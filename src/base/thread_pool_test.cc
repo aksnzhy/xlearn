@@ -33,7 +33,9 @@ TEST(ThreadPoolTest, Print_test) {
     pool.enqueue(std::bind(func, 2));
     pool.enqueue(std::bind(func, 3));
     pool.enqueue(std::bind(func, 4));
-    pool.Sync(4);
+    pool.enqueue(std::bind(func, 5));
+    pool.enqueue(std::bind(func, 6));
+    pool.Sync(6);
     printf("Hello master\n");
   }
   printf("final\n");
