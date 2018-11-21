@@ -88,7 +88,7 @@ else:
 		Examples
 		--------
 		>>> x = c_str("Hello, world!")
-		>>> print x.value
+		>>> print(x.value)
 		Hello, world!
 		"""
 		return ctypes.c_char_p(string.encode('utf-8'))
