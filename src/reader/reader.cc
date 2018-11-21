@@ -196,7 +196,7 @@ void InmemReader::init_from_binary() {
 
 // Pre-load all the data to memory buffer from txt file.
 void InmemReader::init_from_txt() {
-  // Init parser_                                 
+  // Init parser_                       
   parser_ = CreateParser(check_file_format().c_str());
   if (has_label_) parser_->setLabel(true);
   else parser_->setLabel(false);
