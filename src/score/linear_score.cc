@@ -74,12 +74,15 @@ void LinearScore::calc_grad_sgd(const SparseRow* row,
                                 real_t norm) {
   // linear term
   real_t* w = model.GetParameter_w();
+  index_t num_feat = model.GetNumFeature();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
     real_t gradient = pg * iter->feat_val;
-    index_t idx_g = iter->feat_id;
-    gradient += regu_lambda_ * w[idx_g];
-    w[idx_g] -= (learning_rate_ * gradient);
+    index_t feat_id = iter->feat_id;
+    // To avoid unseen feature
+    if (feat_id >= num_feat) continue;
+    gradient += regu_lambda_ * w[feat_id];
+    w[feat_id] -= (learning_rate_ * gradient);
   }
   // bias
   w = model.GetParameter_b();
@@ -95,10 +98,14 @@ void LinearScore::calc_grad_adagrad(const SparseRow* row,
                                     real_t norm) {
   // linear term
   real_t* w = model.GetParameter_w();
+  index_t num_feat = model.GetNumFeature();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
+    index_t feat_id = iter->feat_id;
+    // To avoid unseen feature
+    if (feat_id >= num_feat) continue;
     real_t gradient = pg * iter->feat_val;
-    index_t idx_g = iter->feat_id * 2;
+    index_t idx_g = feat_id * 2;
     index_t idx_c = idx_g + 1;
     gradient += regu_lambda_ * w[idx_g];
     w[idx_c] += (gradient * gradient);
@@ -122,11 +129,15 @@ void LinearScore::calc_grad_ftrl(const SparseRow* row,
   // linear term
   real_t sqrt_norm = sqrt(norm);
   real_t *w = model.GetParameter_w();
+  index_t num_feat = model.GetNumFeature();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
-    real_t &wl = w[iter->feat_id*3];
-    real_t &wlg = w[iter->feat_id*3+1];
-    real_t &wlz = w[iter->feat_id*3+2];
+    index_t feat_id = iter->feat_id;
+    // To avoid unseen feature
+    if (feat_id >= num_feat) continue;
+    real_t &wl = w[feat_id*3];
+    real_t &wlg = w[feat_id*3+1];
+    real_t &wlz = w[feat_id*3+2];
     real_t g = lambda_2_*wl+pg*iter->feat_val*sqrt_norm; 
     real_t old_wlg = wlg;
     wlg += g*g;

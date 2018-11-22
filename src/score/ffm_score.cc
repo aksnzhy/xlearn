@@ -42,7 +42,7 @@ real_t FFMScore::CalcScore(const SparseRow* row,
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
     index_t feat_id = iter->feat_id;
-    // To avoid unseen feature in Prediction
+    // To avoid unseen feature
     if (feat_id >= num_feat) continue;
     sum_w += (iter->feat_val * w[feat_id*aux_size] * sqrt_norm);
   }
@@ -125,9 +125,14 @@ void FFMScore::calc_grad_sgd(const SparseRow* row,
    *********************************************************/
   real_t sqrt_norm = sqrt(norm);
   real_t *w = model.GetParameter_w();
+  index_t num_feat = model.GetNumFeature();
+  index_t num_field = model.GetNumField();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
-    real_t &wl = w[iter->feat_id];
+    index_t feat_id = iter->feat_id;
+    // To avoid unseen feature
+    if (feat_id >= num_feat) continue;
+    real_t &wl = w[feat_id];
     real_t g = regu_lambda_*wl+pg*iter->feat_val*sqrt_norm;
     wl -= (learning_rate_ * g);
   }
@@ -150,11 +155,15 @@ void FFMScore::calc_grad_sgd(const SparseRow* row,
        iter_i != row->end(); ++iter_i) {
     index_t j1 = iter_i->feat_id;
     index_t f1 = iter_i->field_id;
+    // To avoid unseen feature
+    if (j1 >= num_feat || f1 >= num_field) continue;
     real_t v1 = iter_i->feat_val;
     for (SparseRow::const_iterator iter_j = iter_i+1;
          iter_j != row->end(); ++iter_j) {
       index_t j2 = iter_j->feat_id;
       index_t f2 = iter_j->field_id;
+      // To avoid unseen feature
+      if (j2 >= num_feat || f2 >= num_field) continue;
       real_t v2 = iter_j->feat_val;
       real_t* w1_base = w + j1*align1 + f2*align0;
       real_t* w2_base = w + j2*align1 + f1*align0;
@@ -192,10 +201,15 @@ void FFMScore::calc_grad_adagrad(const SparseRow* row,
    *********************************************************/
   real_t sqrt_norm = sqrt(norm);
   real_t *w = model.GetParameter_w();
+  index_t num_feat = model.GetNumFeature();
+  index_t num_field = model.GetNumField();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
-    real_t &wl = w[iter->feat_id*2];
-    real_t &wlg = w[iter->feat_id*2+1];
+    index_t feat_id = iter->feat_id;
+    // To avoid unseen feature
+    if (feat_id >= num_feat) continue;
+    real_t &wl = w[feat_id*2];
+    real_t &wlg = w[feat_id*2+1];
     real_t g = regu_lambda_*wl+pg*iter->feat_val*sqrt_norm;
     wlg += g*g;
     wl -= learning_rate_ * g * InvSqrt(wlg);
@@ -221,11 +235,15 @@ void FFMScore::calc_grad_adagrad(const SparseRow* row,
        iter_i != row->end(); ++iter_i) {
     index_t j1 = iter_i->feat_id;
     index_t f1 = iter_i->field_id;
+    // To avoid unseen feature
+    if (j1 >= num_feat || f1 >= num_field) continue;
     real_t v1 = iter_i->feat_val;
     for (SparseRow::const_iterator iter_j = iter_i+1;
          iter_j != row->end(); ++iter_j) {
       index_t j2 = iter_j->feat_id;
       index_t f2 = iter_j->field_id;
+      // To avoid unseen feature
+      if (j2 >= num_feat || f2 >= num_field) continue;
       real_t v2 = iter_j->feat_val;
       real_t* w1_base = w + j1*align1 + f2*align0;
       real_t* w2_base = w + j2*align1 + f1*align0;
@@ -271,11 +289,16 @@ void FFMScore::calc_grad_ftrl(const SparseRow* row,
    *********************************************************/  
   real_t sqrt_norm = sqrt(norm);
   real_t *w = model.GetParameter_w();
+  index_t num_feat = model.GetNumFeature();
+  index_t num_field = model.GetNumField();
   for (SparseRow::const_iterator iter = row->begin();
        iter != row->end(); ++iter) {
-    real_t &wl = w[iter->feat_id*3];
-    real_t &wlg = w[iter->feat_id*3+1];
-    real_t &wlz = w[iter->feat_id*3+2];
+    index_t feat_id = iter->feat_id;
+    // To avoid unseen feature
+    if (feat_id >= num_feat) continue;
+    real_t &wl = w[feat_id*3];
+    real_t &wlg = w[feat_id*3+1];
+    real_t &wlz = w[feat_id*3+2];
     real_t g = lambda_2_*wl+pg*iter->feat_val*sqrt_norm; 
     real_t old_wlg = wlg;
     wlg += g*g;
@@ -322,11 +345,15 @@ void FFMScore::calc_grad_ftrl(const SparseRow* row,
        iter_i != row->end(); ++iter_i) {
     index_t j1 = iter_i->feat_id;
     index_t f1 = iter_i->field_id;
+    // To avoid unseen feature
+    if (j1 >= num_feat || f1 >= num_field) continue;
     real_t v1 = iter_i->feat_val;
     for (SparseRow::const_iterator iter_j = iter_i+1;
          iter_j != row->end(); ++iter_j) {
       index_t j2 = iter_j->feat_id;
       index_t f2 = iter_j->field_id;
+      // To avoid unseen feature
+      if (j2 >= num_feat || f2 >= num_field) continue;
       real_t v2 = iter_j->feat_val;
       real_t* w1_base = w + j1*align1 + f2*align0;
       real_t* w2_base = w + j2*align1 + f1*align0;
