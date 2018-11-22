@@ -70,6 +70,12 @@ XL_DLL int XLearnSetTest(XL *out, const char *test_path);
 // Get file path of the test data
 XL_DLL int XLearnGetTest(XL *out, std::string& test_path);
 
+// Set file path of pre-trained model
+XL_DLL int XLearnSetPreModel(XL *out, const char *pre_model_path);
+
+// Get file path of pre-trained model
+XL_DLL int XLearnGetPreModel(XL *out, std::string& pre_model_path);
+
 // Set file path of the validation data
 XL_DLL int XLearnSetValidate(XL *out, const char *val_path);
 

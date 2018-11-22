@@ -299,22 +299,26 @@ void Solver::init_train() {
   timer.reset();
   timer.tic();
   Color::print_action("Initialize model ...");
-  // Initialize parameters
-  model_ = new Model();
-  if (hyper_param_.opt_type.compare("sgd") == 0) {
-    hyper_param_.auxiliary_size = 1;
-  } else if (hyper_param_.opt_type.compare("adagrad") == 0) {
-    hyper_param_.auxiliary_size = 2;
-  } else if (hyper_param_.opt_type.compare("ftrl") == 0) {
-    hyper_param_.auxiliary_size = 3;
+  // Initialize parameters from reader
+  if (hyper_param_.pre_model_file.empty()) {
+    model_ = new Model();
+    if (hyper_param_.opt_type.compare("sgd") == 0) {
+      hyper_param_.auxiliary_size = 1;
+    } else if (hyper_param_.opt_type.compare("adagrad") == 0) {
+      hyper_param_.auxiliary_size = 2;
+    } else if (hyper_param_.opt_type.compare("ftrl") == 0) {
+      hyper_param_.auxiliary_size = 3;
+    }
+    model_->Initialize(hyper_param_.score_func,
+                     hyper_param_.loss_func,
+                     hyper_param_.num_feature,
+                     hyper_param_.num_field,
+                     hyper_param_.num_K,
+                     hyper_param_.auxiliary_size,
+                     hyper_param_.model_scale);
+  } else { // Initialize parameter from pre-trained model
+    model_ = new Model(hyper_param_.pre_model_file);
   }
-  model_->Initialize(hyper_param_.score_func,
-                   hyper_param_.loss_func,
-                   hyper_param_.num_feature,
-                   hyper_param_.num_field,
-                   hyper_param_.num_K,
-                   hyper_param_.auxiliary_size,
-                   hyper_param_.model_scale);
   index_t num_param = model_->GetNumParameter();
   hyper_param_.num_param = num_param;
   LOG(INFO) << "Number parameters: " << num_param;

@@ -125,6 +125,15 @@ class XLearn(object):
         """
         _check_call(_LIB.XLearnSetTest(ctypes.byref(self.handle), c_str(test_path)))
 
+    def setPreModel(self, pre_model_path):
+        """ Set file path of pre-trained model.
+
+        Parameters
+        ----------
+        pre_model_path : str
+           the path of pre-trained model.
+        """
+        _check_call(_LIB.XLearnSetPreModel(ctypes.byref(self.handle), c_str(pre_model_path)))
 
     def setValidate(self, val_path):
         """Set file path of validation data.

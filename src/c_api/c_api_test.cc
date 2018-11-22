@@ -29,6 +29,7 @@ TEST(C_API_TEST, Initialize) {
   EXPECT_EQ(XLearnCreate("fm", &xlearn), 0);
   EXPECT_EQ(XLearnSetTrain(&xlearn, "./data_train.txt"), 0);
   EXPECT_EQ(XLearnSetTest(&xlearn, "./data_test.txt"), 0);
+  EXPECT_EQ(XLearnSetPreModel(&xlearn, "./pre_model.model"), 0);
   EXPECT_EQ(XLearnSetValidate(&xlearn, "./data_validate.txt"), 0);
   EXPECT_EQ(XLearnSetTXTModel(&xlearn, "./txt_model"), 0);
   EXPECT_EQ(XLearnSetStr(&xlearn, "loss", "squared"), 0);
@@ -60,6 +61,7 @@ TEST(C_API_TEST, Initialize) {
   EXPECT_EQ(xl->GetHyperParam().score_func, "fm");
   EXPECT_EQ(xl->GetHyperParam().train_set_file, "./data_train.txt");
   EXPECT_EQ(xl->GetHyperParam().test_set_file, "./data_test.txt");
+  EXPECT_EQ(xl->GetHyperParam().pre_model_file, "./pre_model.model");
   EXPECT_EQ(xl->GetHyperParam().validate_set_file, "./data_validate.txt");
   EXPECT_EQ(xl->GetHyperParam().txt_model_file, "./txt_model");
   EXPECT_EQ(xl->GetHyperParam().loss_func, "squared");

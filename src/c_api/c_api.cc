@@ -108,6 +108,22 @@ XL_DLL int XLearnGetTest(XL *out, std::string& test_path) {
   API_END();
 }
 
+// Set file path of the pre-trained model
+XL_DLL int XLearnSetPreModel(XL *out, const char *pre_model_path) {
+  API_BEGIN();
+  XLearn* xl = reinterpret_cast<XLearn*>(*out);
+  xl->GetHyperParam().pre_model_file = std::string(pre_model_path);
+  API_END();
+}
+
+// Get file path of the pre-trained model
+XL_DLL int XLearnGetPreModel(XL* out, std::string& pre_model_path) {
+  API_BEGIN();
+  XLearn* xl = reinterpret_cast<XLearn*>(*out);
+  pre_model_path = xl->GetHyperParam().pre_model_file;
+  API_END();
+}
+
 // Set file path of the validation data
 XL_DLL int XLearnSetValidate(XL *out, const char *val_path) {
   API_BEGIN();
