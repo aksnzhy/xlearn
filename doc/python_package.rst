@@ -18,7 +18,7 @@ If you install xLearn Python package successfully, you will see: ::
       >  <| |___|  __/ (_| | |  | | | |
      /_/\_\_____/\___|\__,_|_|  |_| |_|
 
-        xLearn   -- 0.38 Version --
+        xLearn   -- 0.40 Version --
   -------------------------------------------------------------------------
 
 Quick Start
@@ -185,6 +185,22 @@ FFM: ::
   v_3_1: 0.154174 0.144785 0.184828 0.0785329
   v_3_2: 0.109711 0.102996 0.227222 0.248076
   v_3_3: 0.144264 0.0409806 0.17463 0.083712
+
+Online Learning
+----------------------------------------
+xLearn can supoort online learning, which can train new data based on the pre-trained model. User can use the ``setPreModel`` API to specify the file path of pre-trained model. For example: ::
+
+   import xlearn as xl
+
+   ffm_model = xl.create_ffm()
+   ffm_model.setTrain("./small_train.txt")
+   ffm_model.setValidate("./small_test.txt")  
+   ffm_model.setPreModel("./pre_model")
+   param = {'task':'binary', 'lr':0.2, 'lambda':0.002} 
+            
+   ffm_model.fit(param, "./model.out") 
+
+Note that, xLearn can only uses the binary model, not the TXT model.
 
 Choose Machine Learning Algorithm
 ----------------------------------------

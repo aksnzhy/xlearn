@@ -132,6 +132,14 @@ FFM: ::
   v_3_2: 0.109711 0.102996 0.227222 0.248076
   v_3_3: 0.144264 0.0409806 0.17463 0.083712
 
+Online Learning
+----------------------------------------
+xLearn can supoort online learning, which can train new data based on the pre-trained model. User can use the ``-pre`` option to specify the file path of pre-trained model. For example: ::
+
+  ./xlearn_train ./small_train.txt -s 0 -pre ./pre_model
+
+Note that, xLearn can only uses the binary model, not the TXT model.
+
 Prediction Output
 ----------------------------------------
 

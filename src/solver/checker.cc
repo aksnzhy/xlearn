@@ -67,7 +67,6 @@ OPTIONS:
                           not dump the model checkpoint after training. 
 
   -pre <pre-model>     :  Path of the pre-trained model. This can be used for online learning. 
-                          (Under developing)
 
   -t <txt_model_file>  :  Path of the txt model checkpoint file. On default, this option is empty 
                           and xLearn will not dump the txt model. 

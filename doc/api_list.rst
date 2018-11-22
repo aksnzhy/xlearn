@@ -35,6 +35,8 @@ Options: ::
   -m <model_file>      :  Path of the model dump file. On default, the model file name is 'train_file' + '.model'. 
                           If we set this value to 'none', the xLearn will not dump the model checkpoint.
 
+  -pre <pre-model>     :  Path of the pre-trained model. This can be used for online learning. 
+
   -t <txt_model_file>  :  Path of the TEXT model checkpoint file. On default, we do not set this option
                           and xLearn will not dump the TEXT model.
                                                                             

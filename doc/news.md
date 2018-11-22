@@ -1,9 +1,14 @@
 ## What's New
 
+ - 2018-11-22 xLearn 0.4.0 version release. Main update:
+
+    * Fix bugs in previous version
+    * Add online learning for xLearn
+
  - 2018-11-10 xLearn 0.3.8 version release. Main update:
 
-   * Fix bugs in previous version.
-   * Update early-stop mechanism.
+    * Fix bugs in previous version.
+    * Update early-stop mechanism.
 
  - 2018-11-08. xLearn gets 2000 star! Congs!
 
