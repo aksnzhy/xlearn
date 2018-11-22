@@ -1,7 +1,7 @@
 <img src="https://github.com/aksnzhy/xLearn/raw/master/img/xlearn_logo.png" width = "400"/>
 
 [![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](./LICENCE)
-[![Project Status](https://img.shields.io/badge/version-0.3.8-green.svg)]()
+[![Project Status](https://img.shields.io/badge/version-0.4.0-green.svg)]()
 [![Travis](https://img.shields.io/travis/rust-lang/rust.svg)]()
 
 ## What is xLearn?
@@ -31,6 +31,11 @@ xLearn does not rely on any troublesome third-party library, and hence users can
 xLearn can be used for solving large-scale machine learning problems. First, xLearn supports out-of-core training, which can handle very large data (TB) by just leveraging the disk of a PC. In addition, xLearn supports distributed training, which scales beyond billions of example across many machines by using the Parameter Server framework.
 
 ## What's New
+
+ - 2018-11-22 xLearn 0.4.0 version release. Main update:
+
+    * Fix bugs in previous version
+    * Add online learning for xLearn
 
  - 2018-11-10 xLearn 0.3.8 version release. Main update:
 

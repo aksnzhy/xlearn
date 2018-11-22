@@ -1,6 +1,6 @@
 Package: xlearn
 Title: Large-Scale Machine Learning
-Version: 0.1
+Version: 0.4.0
 Date: 2017-12-04
 Author: Chao Ma <mctt90@gmail.com>, Tong He <hetong007@gmail.com>
 Maintainer: Tong He <hetong007@gmail.com>
