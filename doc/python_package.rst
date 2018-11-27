@@ -124,10 +124,8 @@ Model Output
 
 Also, users can save the model in ``TXT`` format by using ``setTXTModel()`` method. For example: ::
 
-    ffm_model.setSign()
     ffm_model.setTXTModel("./model.txt")
-    ffm_model.setTest("./small_test.txt")  
-    ffm_model.predict("./model.out", "./output.txt")
+    ffm_model.fit(param, "./model.out")
 
 After that, we get a new file called ``model.txt``, which stores the trained model in ``TXT`` format: ::
 
