@@ -88,26 +88,26 @@ inline ThreadPool::ThreadPool(size_t threads)
       [this]
       {
         for(;;) {
-            std::function<void()> task;
-            {
-              std::unique_lock<std::mutex> lock(this->queue_mutex);
-              this->condition.wait(lock,
-                [this]{ return this->stop || !this->tasks.empty(); });
-              if (this->stop && this->tasks.empty()) {
-                return;
-              }
-              task = std::move(this->tasks.front());
-              this->tasks.pop();
+          std::function<void()> task;
+          {
+            std::unique_lock<std::mutex> lock(this->queue_mutex);
+            this->condition.wait(lock,
+              [this]{ return this->stop || !this->tasks.empty(); });
+            if (this->stop && this->tasks.empty()) {
+              return;
             }
-         task();
-         sync++;
-         {
-           std::unique_lock<std::mutex> lock(this->sync_mutex);
-           sync_condition.notify_one();
-         }
-      }
-    }
-  );
+            task = std::move(this->tasks.front());
+            this->tasks.pop();
+          }
+          task();
+          {
+            std::unique_lock<std::mutex> lock(this->sync_mutex);
+            sync++;
+            sync_condition.notify_one();
+          }
+       }
+     }
+   );
 }
 
 // Add new work item to the pool
