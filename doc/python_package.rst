@@ -569,7 +569,7 @@ xLearn can support scikit-learn-like api for users. Here is an example: ::
   y_pred = linear_model.predict(X_val)
 
 In this example, we use linear model to train a binary classifier. We can also 
-create FM and FFM by using ``xl.FMModel()`` and ``xl.FMModel()`` . Please see 
+create FM and FFM by using ``xl.FMModel()`` and ``xl.FFMModel()`` . Please see 
 the details of these examples in (`Link`__)
 
 .. __: https://github.com/aksnzhy/xlearn/tree/master/demo/classification/scikit_learn_demo
