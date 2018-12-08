@@ -189,7 +189,7 @@ Parameter List: ::
 
     fold     : int value    # number of fold for cross-validation
 
-    opt      : {'sgd', 'agagrad', 'ftrl'}  # optimization method
+    opt      : {'sgd', 'adagrad', 'ftrl'}  # optimization method
 
     stop_window : Size of stop window for early-stopping.
 
