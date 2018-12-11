@@ -32,6 +32,14 @@ xLearn can be used for solving large-scale machine learning problems. First, xLe
 
 ## How to Contribute
 
+xLearn has been developed and used by many active community members. Your help is very valuable to make it better for everyone.
+
+ * Please contribute if you find any bug in xLearn
+ * Contribute to the tests to make it more reliable.
+ * Contribute to the documents to make it clearer for everyone.
+ * Contribute to the examples to share your experience with other users.
+ * Open issue if you met problems during development.
+
 ## What's New
 
  - 2018-11-22 xLearn 0.4.0 version release. Main update:
