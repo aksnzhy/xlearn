@@ -45,7 +45,7 @@ def _check_call(ret):
         return value from API calls
 	"""
 	if ret != 0:
-		raise XLearnError(_LIB.XLearGetLastError())
+		raise XLearnError(_LIB.XLearnGetLastError())
 
 # type definitions
 XLearnHandle = ctypes.c_void_p
