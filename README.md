@@ -40,6 +40,8 @@ xLearn has been developed and used by many active community members. Your help i
  * Contribute to the examples to share your experience with other users.
  * Open issue if you met problems during development.
 
+### Contributor
+
 ## What's New
 
  - 2018-11-22 xLearn 0.4.0 version release. Main update:
