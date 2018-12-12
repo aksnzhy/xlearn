@@ -42,7 +42,7 @@ xLearn has been developed and used by many active community members. Your help i
 
 ### Contributor
 
-<img src="https://github.com/aksnzhy/xLearn/raw/master/img/10520307.jpeg" width = "50"/>
+<img src="https://github.com/aksnzhy/xLearn/raw/master/img/10520307.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/11278017.jpeg" width = "40"/>
 
 ## What's New
 
