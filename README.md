@@ -40,9 +40,9 @@ xLearn has been developed and used by many active community members. Your help i
  * Contribute to the examples to share your experience with other users.
  * Open issue if you met problems during development.
 
-### Contributor
+### Contributors (rank randomly)
 
-<img src="https://github.com/aksnzhy/xLearn/raw/master/img/10520307.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/11278017.jpeg" width = "40"/>
+<img src="https://github.com/aksnzhy/xLearn/raw/master/img/10520307.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/11278017.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/1289856.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/13925796.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/15322665.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/1842965.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/21072881.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/22660103.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/2387719.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/25626965.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/3086744.png" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/3928409.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/4606937.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/6054101.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/6161143.png" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/7145046.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/7608904.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/9783213.png" width = "40"/>
 
 ## What's New
 
