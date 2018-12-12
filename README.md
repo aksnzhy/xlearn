@@ -42,6 +42,8 @@ xLearn has been developed and used by many active community members. Your help i
 
 ### Contributor
 
+<img src="https://github.com/aksnzhy/xLearn/raw/master/img/10520307.jpeg" width = "50"/>
+
 ## What's New
 
  - 2018-11-22 xLearn 0.4.0 version release. Main update:
