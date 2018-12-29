@@ -40,7 +40,7 @@ xLearn has been developed and used by many active community members. Your help i
  * Contribute to the examples to share your experience with other users.
  * Open issue if you met problems during development.
 
- Note that, please post iusse and contribution in *English* so that everyone can get help from it.
+ Note that, please post iusse and contribution in *English* so that everyone can get help from them.
 
 ### Contributors (rank randomly)
 
