@@ -119,7 +119,7 @@ void Reader::shrink_block(char* block, size_t* ret, FILE* file) {
 // can use the existing binary file. If not, reader will 
 // generate one automatically.
 void InmemReader::Initialize(const std::string& filename) {
-  CHECK_NE(filename.empty(), true)
+  CHECK_NE(filename.empty(), true);
   filename_ = filename;
   Color::print_info("First check if the text file has been already "
                     "converted to binary format.");
