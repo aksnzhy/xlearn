@@ -22,6 +22,7 @@ This file is the implementation of logging facilities.
 
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 //------------------------------------------------------------------------------
 // Logger
