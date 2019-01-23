@@ -22,6 +22,7 @@ This file is the implementation of logging facilities.
 
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 //------------------------------------------------------------------------------
 // Logger
@@ -80,7 +81,11 @@ std::ostream& Logger::Start(LogSeverity severity,
   time_t tm;
   time(&tm);
   char time_string[128];
+#ifndef _MSC_VER
   ctime_r(&tm, time_string);
+#else
+  ctime_s(time_string, sizeof(time_string), &tm);
+#endif
   return GetStream(severity) << time_string
                              << " " << file << ":" << line
                              << " (" << function << ") " << std::flush;
