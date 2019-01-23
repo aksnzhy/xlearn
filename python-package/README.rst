@@ -211,9 +211,9 @@ For example: ::
 For regression problems, the metric can be ``mae``, ``mape``, and ``rmsd`` (rmse). 
 For example: ::
 
-   param = {'task':'binary', 'lr':0.2, 'lambda':0.002, 'metric': 'rmse'}
-   param = {'task':'binary', 'lr':0.2, 'lambda':0.002, 'metric': 'mae'}    
-   param = {'task':'binary', 'lr':0.2, 'lambda':0.002, 'metric': 'mape'}  
+   param = {'task':'reg', 'lr':0.2, 'lambda':0.002, 'metric': 'rmse'}
+   param = {'task':'reg', 'lr':0.2, 'lambda':0.002, 'metric': 'mae'}    
+   param = {'task':'reg', 'lr':0.2, 'lambda':0.002, 'metric': 'mape'}  
 
 Cross-Validation
 ----------------------------------------
