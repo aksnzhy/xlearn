@@ -340,19 +340,21 @@ XL_DLL int XLearnSetBool(XL *out, const char *key, const bool value) {
   API_BEGIN();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   if (strcmp(key, "on_disk") == 0) {
-  	xl->GetHyperParam().on_disk = value;
+    xl->GetHyperParam().on_disk = value;
   } else if (strcmp(key, "quiet") == 0) {
-  	xl->GetHyperParam().quiet = value;
+    xl->GetHyperParam().quiet = value;
   } else if (strcmp(key, "norm") == 0) {
-  	xl->GetHyperParam().norm = value;
+    xl->GetHyperParam().norm = value;
   } else if (strcmp(key, "lock_free") == 0) {
-  	xl->GetHyperParam().lock_free = value;
+    xl->GetHyperParam().lock_free = value;
   } else if (strcmp(key, "early_stop") == 0) {
-  	xl->GetHyperParam().early_stop = value;
+    xl->GetHyperParam().early_stop = value;
   } else if (strcmp(key, "sign") == 0) {
-  	xl->GetHyperParam().sign = value;
+    xl->GetHyperParam().sign = value;
   } else if (strcmp(key, "sigmoid") == 0) {
-  	xl->GetHyperParam().sigmoid = value;
+    xl->GetHyperParam().sigmoid = value;
+  } else if (strcmp(key, "bin_out") == 0) {
+    xl->GetHyperParam().bin_out = value;
   }
   API_END();
 }

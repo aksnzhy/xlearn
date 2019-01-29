@@ -78,6 +78,7 @@ class Reader {
   // Constructor and Desstructor
   Reader() : 
     shuffle_(false), 
+    bin_out_(true),
     block_size_(kDefautBlockSize) {  }
   virtual ~Reader() {  }
 
@@ -110,6 +111,11 @@ class Reader {
   // Wether current dataset has label y ?
   bool inline has_label() { return has_label_; }
 
+  // Do not generate bin file
+  void SetNoBin() {
+    bin_out_ = false;  
+  }
+
   // If shuffle data ?
   virtual void SetShuffle(bool shuffle) {
     shuffle_ = shuffle;
@@ -128,6 +134,8 @@ class Reader {
   bool has_label_;
   /* If shuffle data ? */
   bool shuffle_;
+  /* Generate bin file ? */
+  bool bin_out_;
   /* Split string for data items */
   std::string splitor_;
   /* A block of memory to store the data */
