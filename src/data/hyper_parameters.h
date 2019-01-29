@@ -118,6 +118,8 @@ struct HyperParam {
   std::string log_file = "/tmp/xlearn_log";
   /* Block size for on-disk training */
   int block_size = 500;  // 500 MB
+  /* If generate bin file */
+  bool bin_out = true;
 //------------------------------------------------------------------------------
 // Parameters for validation
 //------------------------------------------------------------------------------
