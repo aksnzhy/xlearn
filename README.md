@@ -48,6 +48,9 @@ xLearn has been developed and used by many active community members. Your help i
 
 ## What's New
 
+ - 2018-11-22 xLearn 0.4.1 version release. Main update:
+    * More flexible data reader
+
  - 2018-11-22 xLearn 0.4.0 version release. Main update:
 
     * Fix bugs in previous version
