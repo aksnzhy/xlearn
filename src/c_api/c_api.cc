@@ -71,8 +71,8 @@ XL_DLL int XLearnShow(XL *out) {
   API_BEGIN()
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   printf("Info: \n Model: %s\n Loss: %s\n", 
-  	xl->GetHyperParam().score_func.c_str(),
-  	xl->GetHyperParam().loss_func.c_str());
+    xl->GetHyperParam().score_func.c_str(),
+    xl->GetHyperParam().loss_func.c_str());
   API_END()
 }
 
@@ -214,19 +214,19 @@ XL_DLL int XLearnSetStr(XL *out, const char *key, const char *value) {
   API_BEGIN();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   if (strcmp(key, "task") == 0) {
-  	if (strcmp(value, "binary") == 0) {
-  	  xl->GetHyperParam().loss_func = std::string("cross-entropy");
-  	} else if (strcmp(value, "reg") == 0) {
-  	  xl->GetHyperParam().loss_func = std::string("squared");
-  	} else {
+    if (strcmp(value, "binary") == 0) {
+      xl->GetHyperParam().loss_func = std::string("cross-entropy");
+    } else if (strcmp(value, "reg") == 0) {
+      xl->GetHyperParam().loss_func = std::string("squared");
+    } else {
       xl->GetHyperParam().loss_func = std::string("unknow");
     }
   } else if (strcmp(key, "metric") == 0) {
-  	xl->GetHyperParam().metric = std::string(value);
+    xl->GetHyperParam().metric = std::string(value);
   } else if (strcmp(key, "log") == 0) {
-  	xl->GetHyperParam().log_file = std::string(value);
+    xl->GetHyperParam().log_file = std::string(value);
   } else if (strcmp(key, "loss") == 0) {
-  	xl->GetHyperParam().loss_func = std::string(value);
+    xl->GetHyperParam().loss_func = std::string(value);
   } else if (strcmp(key, "opt") == 0) {
     xl->GetHyperParam().opt_type = std::string(value);
   }
@@ -256,13 +256,13 @@ XL_DLL int XLearnSetInt(XL *out, const char *key, const int value) {
   API_BEGIN();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   if (strcmp(key, "k") == 0) {
-  	xl->GetHyperParam().num_K = value;
+    xl->GetHyperParam().num_K = value;
   } else if (strcmp(key, "epoch") == 0) {
-  	xl->GetHyperParam().num_epoch = value;
+    xl->GetHyperParam().num_epoch = value;
   } else if (strcmp(key, "fold") == 0) {
-  	xl->GetHyperParam().num_folds = value;
+    xl->GetHyperParam().num_folds = value;
   } else if (strcmp(key, "block_size") == 0) {
-  	xl->GetHyperParam().block_size = value;
+    xl->GetHyperParam().block_size = value;
   } else if (strcmp(key, "nthread") == 0) {
     xl->GetHyperParam().thread_number = value;
   } else if (strcmp(key, "stop_window") == 0) {
@@ -296,11 +296,11 @@ XL_DLL int XLearnSetFloat(XL *out, const char *key, const float value) {
   API_BEGIN();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   if (strcmp(key, "lr") == 0) {
-  	xl->GetHyperParam().learning_rate = value;
+    xl->GetHyperParam().learning_rate = value;
   } else if (strcmp(key, "lambda") == 0) {
-  	xl->GetHyperParam().regu_lambda = value;
+    xl->GetHyperParam().regu_lambda = value;
   } else if (strcmp(key, "init") == 0) {
-  	xl->GetHyperParam().model_scale = value;
+    xl->GetHyperParam().model_scale = value;
   } else if (strcmp(key, "alpha") == 0) {
     xl->GetHyperParam().alpha = value;
   } else if (strcmp(key, "beta") == 0) {
