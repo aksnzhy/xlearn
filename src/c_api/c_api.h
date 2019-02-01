@@ -130,11 +130,11 @@ class XLearn {
 
   // Get funtions
   inline xLearn::HyperParam& GetHyperParam() { 
-  	return hyper_param; 
+    return hyper_param; 
   }
   
   inline xLearn::Solver& GetSolver() { 
-  	return solver; 
+    return solver; 
   }
 
  protected:

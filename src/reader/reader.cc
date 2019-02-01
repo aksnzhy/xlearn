@@ -230,8 +230,10 @@ void InmemReader::init_from_txt() {
     order_[i] = i;
   }
   // Deserialize in-memory buffer to disk file.
-  std::string bin_file = filename_ + ".bin";
-  data_buf_.Serialize(bin_file);
+  if (bin_out_) {
+    std::string bin_file = filename_ + ".bin";
+    data_buf_.Serialize(bin_file);
+  }
   delete [] block_;
   Close(file);
 }

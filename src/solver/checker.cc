@@ -121,6 +121,8 @@ OPTIONS:
                                                                                           
   --no-norm            :  Disable instance-wise normalization. By default, xLearn will use 
                           instance-wise normalization for both training and prediction. 
+
+  --no-bin             :  Do not generate bin file for training and test data file.
                                                                   
   --quiet              :  Don't print any evaluation information during the training and 
                           just train the model quietly. 
@@ -182,6 +184,7 @@ void Checker::Initialize(bool is_train, int argc, char* argv[]) {
     menu_.push_back(std::string("--cv"));
     menu_.push_back(std::string("--dis-es"));
     menu_.push_back(std::string("--no-norm"));
+    menu_.push_back(std::string("--no-bin"));
     menu_.push_back(std::string("--quiet"));
     menu_.push_back(std::string("-alpha"));
     menu_.push_back(std::string("-beta"));
@@ -483,6 +486,9 @@ bool Checker::check_train_options(HyperParam& hyper_param) {
       i += 1;
     } else if (list[i].compare("--no-norm") == 0) {  // normalization
       hyper_param.norm = false;
+      i += 1;
+    } else if (list[i].compare("--no-bin") == 0) {  // do not generate bin file
+      hyper_param.bin_out = false;
       i += 1;
     } else if (list[i].compare("--quiet") == 0) {  // quiet
       hyper_param.quiet = true;

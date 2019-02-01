@@ -178,6 +178,12 @@ class XLearn(object):
         _check_call(_LIB.XLearnSetBool(ctypes.byref(self.handle),
                                        c_str(key), ctypes.c_bool(True)))
 
+    def setNoBin(self):
+        """Do not generate bin file"""
+        key = 'bin_out'
+        _check_call(_LIB.XLearnSetBool(ctypes.byref(self.handle),
+                                       c_str(key), ctypes.c_bool(False)))
+
     def disableNorm(self):
         """Disable instance-wise normalization"""
         key = 'norm'
