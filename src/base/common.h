@@ -24,7 +24,7 @@ make programming convenient.
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>  // Linux, MacOSX and Cygwin has this standard header.
+#include <stdint.h>  // Linux, MacOSX, Cygwin and after VS2010 has this standard header.
 
 #include <limits>
 
