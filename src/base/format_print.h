@@ -219,7 +219,7 @@ inline void print_info(const std::string &out, bool important = false) {
 //   Meat       0x104       30    10.13
 //------------------------------------------------------------------------------
 template <typename T>
-void print_now(const std::vector<T> &column, const std::vector<int> &width) {
+void print_row(const std::vector<T> &column, const std::vector<int> &width) {
     CHECK_EQ(column.size(), width.size());
     for (size_t i = 0; i < column.size(); ++i) {
         std::cout.width(width[i]);
