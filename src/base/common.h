@@ -24,11 +24,7 @@ make programming convenient.
 
 #include <stdio.h>
 #include <stdlib.h>
-#ifndef _MSC_VER
-#include <stdint.h>  // Linux, MacOSX and Cygwin has this standard header.
-#else
-#include "base/stdint_msvc.h"  // Visual C++ use this header.
-#endif
+#include <stdint.h>  // Linux, MacOSX, Cygwin and after VS2010 has this standard header.
 
 #include <limits>
 
