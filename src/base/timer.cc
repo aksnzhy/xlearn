@@ -21,29 +21,28 @@ This file is the implementation of the Timer class.
 #include "src/base/timer.h"
 
 Timer::Timer() {
-  reset();
+    reset();
 }
 
 // Reset code start
 void Timer::reset() {
-  begin = std::chrono::high_resolution_clock::now();
-  duration =
-     std::chrono::duration_cast<std::chrono::milliseconds>(begin-begin);
+    begin = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::milliseconds>(begin - begin);
 }
 
 // Code start
 void Timer::tic() {
-  begin = std::chrono::high_resolution_clock::now();
+    begin = std::chrono::high_resolution_clock::now();
 }
 
 // Code end
 float Timer::toc() {
-  duration += std::chrono::duration_cast<std::chrono::milliseconds>
-              (std::chrono::high_resolution_clock::now()-begin);
-  return get();
+    duration += std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - begin);
+    return get();
 }
 
 // Get the time duration (seconds)
 float Timer::get() {
-  return (float)duration.count() / 1000;
+    return (float)duration.count() / 1000;
 }
+

@@ -37,8 +37,8 @@ This file provides stringprintf utilities.
 //  StringAppendF(&str, "%d", 3);               /* str = "23" */
 //------------------------------------------------------------------------------
 
-std::string StringPrintf(const char* format, ...);
-void SStringPrintf(std::string* dst, const char* format, ...);
-void StringAppendF(std::string* dst, const char* format, ...);
+std::string StringPrintf(const char *format, ...);
+void SStringPrintf(std::string *dst, const char *format, ...);
+void StringAppendF(std::string *dst, const char *format, ...);
 
-#endif   // XLEARN_BASE_STRING_PRINTF_H_
+#endif // XLEARN_BASE_STRING_PRINTF_H_

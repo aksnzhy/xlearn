@@ -55,6 +55,8 @@ This file provides the scoped_ptr and scoped_array classes.
 
 #include <assert.h>
 
+#include "src/base/common.h"
+
 //------------------------------------------------------------------------------
 // from google3/base/scoped_ptr.h
 //
@@ -77,81 +79,80 @@ template <class C> class scoped_array;
 // -----------------------------------------------------------------------------
 template <class C>
 class scoped_ptr {
- public:
-  // The element type
-  typedef C element_type;
+public:
+    // The element type
+    typedef C element_type;
 
-  // Constructor.  Defaults to intializing with NULL.
-  // There is no way to create an uninitialized scoped_ptr.
-  // The input parameter must be allocated with new.
-  explicit scoped_ptr(C* p = nullptr) : ptr_(p) { }
+    // Constructor.  Defaults to intializing with NULL.
+    // There is no way to create an uninitialized scoped_ptr.
+    // The input parameter must be allocated with new.
+    explicit scoped_ptr(C *p = nullptr) : ptr_(p) { }
 
-  // Destructor.  If there is a C object, delete it.
-  // We don't need to test ptr_ == NULL because C++ does that for us.
-  ~scoped_ptr() {
-    enum { type_must_be_complete = sizeof(C) };
-    delete ptr_;
-  }
-
-  // Reset.  Deletes the current owned object, if any.
-  // Then takes ownership of a new object, if given.
-  // this->reset(this->get()) works.
-  void reset(C* p = nullptr) {
-    if (p != ptr_) {
-      enum { type_must_be_complete = sizeof(C) };
-      delete ptr_;
-      ptr_ = p;
+    // Destructor.  If there is a C object, delete it.
+    // We don't need to test ptr_ == NULL because C++ does that for us.
+    ~scoped_ptr() {
+        enum { type_must_be_complete = sizeof(C) };
+        delete ptr_;
     }
-  }
 
-  // Accessors to get the owned object.
-  // operator* and operator-> will assert() if there is no current object.
-  C& operator*() const {
-    assert(ptr_ != nullptr);
-    return *ptr_;
-  }
-  C* operator->() const  {
-    assert(ptr_ != nullptr);
-    return ptr_;
-  }
-  C* get() const { return ptr_; }
+    // Reset.  Deletes the current owned object, if any.
+    // Then takes ownership of a new object, if given.
+    // this->reset(this->get()) works.
+    void reset(C *p = nullptr) {
+        if (p != ptr_) {
+            enum { type_must_be_complete = sizeof(C) };
+            delete ptr_;
+            ptr_ = p;
+        }
+    }
 
-  // Comparison operators.
-  // These return whether two scoped_ptr refer to the same object, not just to
-  // two different but equal objects.
-  bool operator==(C* p) const { return ptr_ == p; }
-  bool operator!=(C* p) const { return ptr_ != p; }
+    // Accessors to get the owned object.
+    // operator* and operator-> will assert() if there is no current object.
+    C &operator*() const {
+        assert(ptr_ != nullptr);
+        return *ptr_;
+    }
+    C *operator->() const {
+        assert(ptr_ != nullptr);
+        return ptr_;
+    }
+    C *get() const { return ptr_; }
 
-  // Swap two scoped pointers.
-  void swap(scoped_ptr& p2) {
-    C* tmp = ptr_;
-    ptr_ = p2.ptr_;
-    p2.ptr_ = tmp;
-  }
+    // Comparison operators.
+    // These return whether two scoped_ptr refer to the same object, not just to
+    // two different but equal objects.
+    bool operator==(C *p) const { return ptr_ == p; }
+    bool operator!=(C *p) const { return ptr_ != p; }
 
-  // Release a pointer.
-  // The return value is the current pointer held by this object.
-  // If this object holds a NULL pointer, the return value is NULL.
-  // After this operation, this object will hold a NULL pointer,
-  // and will not own the object any more.
-  C* release() {
-    C* retVal = ptr_;
-    ptr_ = nullptr;
-    return retVal;
-  }
+    // Swap two scoped pointers.
+    void swap(scoped_ptr &p2) {
+        C *tmp = ptr_;
+        ptr_ = p2.ptr_;
+        p2.ptr_ = tmp;
+    }
 
- private:
-  C* ptr_;
+    // Release a pointer.
+    // The return value is the current pointer held by this object.
+    // If this object holds a NULL pointer, the return value is NULL.
+    // After this operation, this object will hold a NULL pointer,
+    // and will not own the object any more.
+    C *release() {
+        C *retVal = ptr_;
+        ptr_ = nullptr;
+        return retVal;
+    }
 
-  // Forbid comparison of scoped_ptr types.  If C2 != C, it totally doesn't
-  // make sense, and if C2 == C, it still doesn't make sense because you should
-  // never have the same object owned by two different scoped_ptrs.
-  template <class C2> bool operator==(scoped_ptr<C2> const& p2) const;
-  template <class C2> bool operator!=(scoped_ptr<C2> const& p2) const;
+private:
+    C *ptr_;
 
-  // Disallow evil constructors
-  scoped_ptr(const scoped_ptr&);
-  void operator=(const scoped_ptr&);
+    // Forbid comparison of scoped_ptr types.  If C2 != C, it totally doesn't
+    // make sense, and if C2 == C, it still doesn't make sense because you should
+    // never have the same object owned by two different scoped_ptrs.
+    template <class C2> bool operator==(scoped_ptr<C2> const &p2) const;
+    template <class C2> bool operator!=(scoped_ptr<C2> const &p2) const;
+
+    // Disallow evil constructors
+    DISALLOW_COPY_AND_ASSIGN(scoped_ptr);
 };
 
 //------------------------------------------------------------------------------
@@ -165,83 +166,80 @@ class scoped_ptr {
 //------------------------------------------------------------------------------
 template <class C>
 class scoped_array {
- public:
+public:
+    // The element type
+    typedef C element_type;
 
-  // The element type
-  typedef C element_type;
+    // Constructor.  Defaults to intializing with NULL.
+    // There is no way to create an uninitialized scoped_array.
+    // The input parameter must be allocated with new [].
+    explicit scoped_array(C *p = nullptr) : array_(p) { }
 
-  // Constructor.  Defaults to intializing with NULL.
-  // There is no way to create an uninitialized scoped_array.
-  // The input parameter must be allocated with new [].
-  explicit scoped_array(C* p = nullptr) : array_(p) { }
-
-  // Destructor.  If there is a C object, delete it.
-  // We don't need to test ptr_ == NULL because C++ does that for us.
-  ~scoped_array() {
-    enum { type_must_be_complete = sizeof(C) };
-    delete[] array_;
-  }
-
-  // Reset.  Deletes the current owned object, if any.
-  // Then takes ownership of a new object, if given.
-  // this->reset(this->get()) works.
-  void reset(C* p = nullptr) {
-    if (p != array_) {
-      enum { type_must_be_complete = sizeof(C) };
-      delete[] array_;
-      array_ = p;
+    // Destructor.  If there is a C object, delete it.
+    // We don't need to test ptr_ == NULL because C++ does that for us.
+    ~scoped_array() {
+        enum { type_must_be_complete = sizeof(C) };
+        delete[] array_;
     }
-  }
 
-  // Get one element of the current object.
-  // Will assert() if there is no current object, or index i is negative.
-  C& operator[](std::ptrdiff_t i) const {
-    assert(i >= 0);
-    assert(array_ != nullptr);
-    return array_[i];
-  }
+    // Reset.  Deletes the current owned object, if any.
+    // Then takes ownership of a new object, if given.
+    // this->reset(this->get()) works.
+    void reset(C *p = nullptr) {
+        if (p != array_) {
+            enum { type_must_be_complete = sizeof(C) };
+            delete[] array_;
+            array_ = p;
+        }
+    }
 
-  // Get a pointer to the zeroth element of the current object.
-  // If there is no current object, return NULL.
-  C* get() const {
-    return array_;
-  }
+    // Get one element of the current object.
+    // Will assert() if there is no current object, or index i is negative.
+    C &operator[](std::ptrdiff_t i) const {
+        assert(i >= 0);
+        assert(array_ != nullptr);
+        return array_[i];
+    }
 
-  // Comparison operators.
-  // These return whether two scoped_array refer to the same object, not just
-  // to two different but equal objects.
-  bool operator==(C* p) const { return array_ == p; }
-  bool operator!=(C* p) const { return array_ != p; }
+    // Get a pointer to the zeroth element of the current object.
+    // If there is no current object, return NULL.
+    C *get() const {
+        return array_;
+    }
 
-  // Swap two scoped arrays.
-  void swap(scoped_array& p2) {
-    C* tmp = array_;
-    array_ = p2.array_;
-    p2.array_ = tmp;
-  }
+    // Comparison operators.
+    // These return whether two scoped_array refer to the same object, not just
+    // to two different but equal objects.
+    bool operator==(C *p) const { return array_ == p; }
+    bool operator!=(C *p) const { return array_ != p; }
 
-  // Release an array.
-  // The return value is the current pointer held by this object.
-  // If this object holds a NULL pointer, the return value is NULL.
-  // After this operation, this object will hold a NULL pointer,
-  // and will not own the object any more.
-  C* release() {
-    C* retVal = array_;
-    array_ = nullptr;
-    return retVal;
-  }
+    // Swap two scoped arrays.
+    void swap(scoped_array &p2) {
+        C *tmp = array_;
+        array_ = p2.array_;
+        p2.array_ = tmp;
+    }
 
- private:
-  C* array_;
+    // Release an array.
+    // The return value is the current pointer held by this object.
+    // If this object holds a NULL pointer, the return value is NULL.
+    // After this operation, this object will hold a NULL pointer,
+    // and will not own the object any more.
+    C *release() {
+        C *retVal = array_;
+        array_ = nullptr;
+        return retVal;
+    }
 
-  // Forbid comparison of different scoped_array types.
-  template <class C2> bool operator==(scoped_array<C2> const& p2) const;
-  template <class C2> bool operator!=(scoped_array<C2> const& p2) const;
+private:
+    C *array_;
 
-  // Disallow evil constructors
-  scoped_array(const scoped_array&);
+    // Forbid comparison of different scoped_array types.
+    template <class C2> bool operator==(scoped_array<C2> const &p2) const;
+    template <class C2> bool operator!=(scoped_array<C2> const &p2) const;
 
-  void operator=(const scoped_array&);
+    // Disallow evil constructors
+    DISALLOW_COPY_AND_ASSIGN(scoped_array);
 };
 
-#endif  // XLEARN_BASE_SCOPED_PTR_H_
+#endif // XLEARN_BASE_SCOPED_PTR_H_

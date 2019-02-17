@@ -24,8 +24,7 @@ make programming convenient.
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>  // Linux, MacOSX, Cygwin and after VS2010 has this standard header.
-
+#include <stdint.h> // Linux, MacOSX, Cygwin and after VS2010 has this standard header.
 #include <limits>
 
 #include "src/base/logging.h"
@@ -46,87 +45,96 @@ make programming convenient.
 // The GDB command 'where' will show you the stack trace.
 //------------------------------------------------------------------------------
 
-#define CHECK(a) if (!(a)) {                            \
-    LOG(ERR) << "CHECK failed "                         \
-               << __FILE__ << ":" << __LINE__ << "\n"   \
-               << #a << " = " << (a) << "\n";           \
-    abort();                                            \
-  }                                                     \
+#define CHECK(a)                                            \
+    if (!(a)) {                                             \
+        LOG(ERR) << "CHECK failed "                         \
+                << __FILE__ << ":" << __LINE__ << "\n"      \
+                << #a << " = " << (a) << "\n";              \
+        abort();                                            \
+    }
 
-#define CHECK_NOTNULL(a) if ((a) == NULL) {             \
-    LOG(ERR) << "CHECK failed "                         \
-               << __FILE__ << ":" << __LINE__ << "\n"   \
-               << #a << " == NULL \n";                  \
-    abort();                                            \
-  }                                                     \
+#define CHECK_NOTNULL(a)                                    \
+    if ((a) == NULL) {                                      \
+        LOG(ERR) << "CHECK failed "                         \
+                << __FILE__ << ":" << __LINE__ << "\n"      \
+                << #a << " == NULL \n";                     \
+        abort();                                            \
+    }
 
-#define CHECK_NULL(a) if ((a) != NULL) {                \
-    LOG(ERR) << "CHECK failed "                         \
-               << __FILE__ << ":" << __LINE__ << "\n"   \
-               << #a << " = " << (a) << "\n";           \
-    abort();                                            \
-  }                                                     \
+#define CHECK_NULL(a)                                       \
+    if ((a) != NULL) {                                      \
+        LOG(ERR) << "CHECK failed "                         \
+                << __FILE__ << ":" << __LINE__ << "\n"      \
+                << #a << " = " << (a) << "\n";              \
+        abort();                                            \
+    }
 
-#define CHECK_EQ(a, b) if (!((a) == (b))) {             \
-    LOG(ERR) << "CHECK_EQ failed "                      \
-               << __FILE__ << ":" << __LINE__ << "\n"   \
-               << #a << " = " << (a) << "\n"            \
-               << #b << " = " << (b) << "\n";           \
-    abort();                                            \
-  }                                                     \
+#define CHECK_EQ(a, b)                                      \
+    if (!((a) == (b))) {                                    \
+        LOG(ERR) << "CHECK_EQ failed "                      \
+                << __FILE__ << ":" << __LINE__ << "\n"      \
+                << #a << " = " << (a) << "\n"               \
+                << #b << " = " << (b) << "\n";              \
+        abort();                                            \
+    }
 
-#define CHECK_NE(a, b) if (!((a) != (b))) {             \
-    LOG(ERR) << "CHECK_NE failed "                      \
-               << __FILE__ << ":" << __LINE__ << "\n"   \
-               << #a << " = " << (a) << "\n"            \
-               << #b << " = " << (b) << "\n";           \
-    abort();                                            \
-  }                                                     \
+#define CHECK_NE(a, b)                                      \
+    if (!((a) != (b))) {                                    \
+        LOG(ERR) << "CHECK_NE failed "                      \
+                << __FILE__ << ":" << __LINE__ << "\n"      \
+                << #a << " = " << (a) << "\n"               \
+                << #b << " = " << (b) << "\n";              \
+        abort();                                            \
+    }
 
-#define CHECK_GT(a, b) if (!((a) > (b))) {              \
-    LOG(ERR) << "CHECK_GT failed "                      \
-               << __FILE__ << ":" << __LINE__ << "\n"   \
-               << #a << " = " << (a) << "\n"            \
-               << #b << " = " << (b) << "\n";           \
-    abort();                                            \
-  }                                                     \
+#define CHECK_GT(a, b)                                      \
+    if (!((a) > (b))) {                                     \
+        LOG(ERR) << "CHECK_GT failed "                      \
+                << __FILE__ << ":" << __LINE__ << "\n"      \
+                << #a << " = " << (a) << "\n"               \
+                << #b << " = " << (b) << "\n";              \
+        abort();                                            \
+    }
 
-#define CHECK_LT(a, b) if (!((a) < (b))) {              \
-    LOG(ERR) << "CHECK_LT failed "                      \
-               << __FILE__ << ":" << __LINE__ << "\n"   \
-               << #a << " = " << (a) << "\n"            \
-               << #b << " = " << (b) << "\n";           \
-    abort();                                            \
-  }                                                     \
+#define CHECK_LT(a, b)                                      \
+    if (!((a) < (b))) {                                     \
+        LOG(ERR) << "CHECK_LT failed "                      \
+                << __FILE__ << ":" << __LINE__ << "\n"      \
+                << #a << " = " << (a) << "\n"               \
+                << #b << " = " << (b) << "\n";              \
+        abort();                                            \
+    }
 
-#define CHECK_GE(a, b) if (!((a) >= (b))) {             \
-    LOG(ERR) << "CHECK_GE failed "                      \
-               << __FILE__ << ":" << __LINE__ << "\n"   \
-               << #a << " = " << (a) << "\n"            \
-               << #b << " = " << (b) << "\n";           \
-    abort();                                            \
-  }                                                     \
+#define CHECK_GE(a, b)                                      \
+    if (!((a) >= (b))) {                                    \
+        LOG(ERR) << "CHECK_GE failed "                      \
+                << __FILE__ << ":" << __LINE__ << "\n"      \
+                << #a << " = " << (a) << "\n"               \
+                << #b << " = " << (b) << "\n";              \
+        abort();                                            \
+    }
 
-#define CHECK_LE(a, b) if (!((a) <= (b))) {             \
-    LOG(ERR) << "CHECK_LE failed "                      \
-               << __FILE__ << ":" << __LINE__ << "\n"   \
-               << #a << " = " << (a) << "\n"            \
-               << #b << " = " << (b) << "\n";           \
-    abort();                                            \
-  }                                                     \
-                                                        \
+#define CHECK_LE(a, b)                                      \
+    if (!((a) <= (b))) {                                    \
+        LOG(ERR) << "CHECK_LE failed "                      \
+                << __FILE__ << ":" << __LINE__ << "\n"      \
+                << #a << " = " << (a) << "\n"               \
+                << #b << " = " << (b) << "\n";              \
+        abort();                                            \
+    }
+
 // Copied from glog.h
-#define CHECK_DOUBLE_EQ(a, b)                           \
-  do {                                                  \
-    CHECK_LE((a), (b)+0.000000000000001L);              \
-    CHECK_GE((a), (b)-0.000000000000001L);              \
-  } while (0)
+#define CHECK_DOUBLE_EQ(a, b)                               \
+    do {                                                    \
+        CHECK_LE((a), (b)+0.000000000000001L);              \
+        CHECK_GE((a), (b)-0.000000000000001L);              \
+    } while (0)
 
-#define CHECK_NEAR(a, b, margin)                        \
-  do {                                                  \
-    CHECK_LE((a), (b)+(margin));                        \
-    CHECK_GE((a), (b)-(margin));                        \
-  } while (0)
+#define CHECK_NEAR(a, b, margin)                            \
+    do {                                                    \
+        CHECK_LE((a), (b)+(margin));                        \
+        CHECK_GE((a), (b)-(margin));                        \
+    } while (0)
 
 //------------------------------------------------------------------------------
 // This marcro is used to disallow copy constructor and assign operator in
@@ -146,9 +154,9 @@ make programming convenient.
 // };
 //------------------------------------------------------------------------------
 
-#define DISALLOW_COPY_AND_ASSIGN(TypeName)              \
-  TypeName(const TypeName&);                            \
-  void operator=(const TypeName&)
+#define DISALLOW_COPY_AND_ASSIGN(TypeName)                  \
+    TypeName(const TypeName &);                             \
+    void operator=(const TypeName&)
 
 //------------------------------------------------------------------------------
 // Basis POD types.
@@ -181,7 +189,7 @@ typedef uint64_t uint64;
 static const int32 kInt32Max = 0x7FFFFFFF;
 static const int32 kInt32Min = -kInt32Max - 1;
 static const int64 kInt64Max = 0x7FFFFFFFFFFFFFFFll;
-static const int64 kInt64Min = -kInt64Max - 1;
+static const int64 KInt64Min = -kInt64Max - 1;
 static const uint32 kUInt32Max = 0xFFFFFFFFu;
 static const uint64 kUInt64Max = 0xFFFFFFFFFFFFFFFFull;
 
@@ -192,4 +200,4 @@ static const float kFloatMin = std::numeric_limits<float>::min();
 static const float kVerySmallNumber = 1e-15;
 static const double kVerySmallNumberDouble = 1e-15;
 
-#endif  // XLEARN_BASE_COMMON_H_
+#endif // XLEARN_BASE_COMMON_H_

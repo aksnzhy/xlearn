@@ -24,7 +24,6 @@ mathmatic methods.
 
 #include <stdlib.h>
 #include <stdint.h>
-
 #include <cmath>
 #include <random>
 
@@ -78,32 +77,32 @@ typedef uint32 index_t;
 //------------------------------------------------------------------------------
 
 static inline real_t fastlog2(real_t x) {
-  union { real_t f; uint32 i; } vx = { x };
-  union { uint32 i; real_t f; } mx = { (vx.i & 0x007FFFFF) | 0x3f000000 };
-  real_t y = vx.i;
-  y *= 1.1920928955078125e-7f;
+    union { real_t f; uint32 i; } vx = { x };
+    union { uint32 i; real_t f; } mx = { (vx.i & 0x007FFFFF) | 0x3f000000 };
+    real_t y = vx.i;
+    y *= 1.1920928955078125e-7f;
 
-  return y - 124.22551499f
-           - 1.498030302f * mx.f
-           - 1.72587999f / (0.3520887068f + mx.f);
+    return y - 124.22551499f - 1.498030302f * mx.f - 1.72587999f / (0.3520887068f + mx.f);
 }
 
 static inline real_t fastlog(real_t x) {
-  return 0.69314718f * fastlog2 (x);
+    return 0.69314718f * fastlog2(x);
 }
 
 static inline real_t fasterlog2(real_t x) {
-  union { real_t f; uint32 i; } vx = { x };
-  real_t y = vx.i;
-  y *= 1.1920928955078125e-7f;
-  return y - 126.94269504f;
+    union { real_t f; uint32 i; } vx = { x };
+    real_t y = vx.i;
+    y *= 1.1920928955078125e-7f;
+
+    return y - 126.94269504f;
 }
 
 static inline real_t fasterlog(real_t x){
-  union { real_t f; uint32 i; } vx = { x };
-  real_t y = vx.i;
-  y *= 8.2629582881927490e-8f;
-  return y - 87.989971088f;
+    union { real_t f; uint32 i; } vx = { x };
+    real_t y = vx.i;
+    y *= 8.2629582881927490e-8f;
+
+    return y - 87.989971088f;
 }
 
 //------------------------------------------------------------------------------
@@ -111,32 +110,28 @@ static inline real_t fasterlog(real_t x){
 //------------------------------------------------------------------------------
 
 static inline real_t fastpow2(real_t p) {
-  real_t offset = (p < 0) ? 1.0f : 0.0f;
-  real_t clipp = (p < -126) ? -126.0f : p;
-  int w = clipp;
-  real_t z = clipp - w + offset;
-  union { uint32 i; real_t f; } v = {(uint32)
-    ((1<<23)*(clipp+121.2740575f+27.7280233f/(4.84252568f-z)-1.49012907f*z))
-  };
+    real_t offset = (p < 0) ? 1.0f : 0.0f;
+    real_t clipp = (p < -126) ? -126.0f : p;
+    int w = clipp;
+    real_t z = clipp - w + offset;
+    union { uint32 i; real_t f; } v = {(uint32)((1 << 23) * (clipp + 121.2740575f + 27.7280233f / (4.84252568f - z) - 1.49012907f * z))};
 
-  return v.f;
+    return v.f;
 }
 
 static inline real_t fastexp(real_t p) {
-  return fastpow2(1.442695040f * p);
+    return fastpow2(1.442695040f * p);
 }
 
 static inline real_t fasterpow2(real_t p) {
-  real_t clipp = (p < -126) ? -126.0f : p;
-  union { uint32 i; real_t f; } v = {(uint32)
-    ((1<<23)*(clipp+126.94269504f))
-  };
+    real_t clipp = (p < -126) ? -126.0f : p;
+    union { uint32 i; real_t f; } v = {(uint32)((1 << 23) * (clipp + 126.94269504f))};
 
-  return v.f;
+    return v.f;
 }
 
 static inline real_t fasterexp(real_t p) {
-  return fasterpow2(1.442695040f * p);
+    return fasterpow2(1.442695040f * p);
 }
 
 //------------------------------------------------------------------------------
@@ -144,11 +139,11 @@ static inline real_t fasterexp(real_t p) {
 //------------------------------------------------------------------------------
 
 static inline real_t fastpow(real_t x, real_t p) {
-  return fastpow2(p * fastlog2(x));
+    return fastpow2(p * fastlog2(x));
 }
 
 static inline real_t fasterpow(real_t x, real_t p) {
-  return fasterpow2(p * fasterlog2(x));
+    return fasterpow2(p * fasterlog2(x));
 }
 
 //------------------------------------------------------------------------------
@@ -156,23 +151,24 @@ static inline real_t fasterpow(real_t x, real_t p) {
 //------------------------------------------------------------------------------
 
 static inline real_t fastsigmoid(real_t x) {
-  return 1.0f / (1.0f + fastexp (-x));
+    return 1.0f / (1.0f + fastexp (-x));
 }
 
 static inline real_t fastersigmoid(real_t x) {
-  return 1.0f / (1.0f + fasterexp (-x));
+    return 1.0f / (1.0f + fasterexp (-x));
 }
 
 //------------------------------------------------------------------------------
 // 1 / sqrt() Magic function !!
 //------------------------------------------------------------------------------
 static inline real_t InvSqrt(real_t x) {
-  real_t xhalf = 0.5f*x;
-  int i = *reinterpret_cast<int*>(&x);  // get bits for floating VALUE
-  i = 0x5f375a86-(i>>1);  // gives initial guess y0
-  x = *reinterpret_cast<real_t*>(&i);  // convert bits BACK to float
-  x = x*(1.5f-xhalf*x*x);  // Newton step, repeating increases accuracy
-  return x;
+    real_t xhalf = 0.5f * x;
+    int i = *reinterpret_cast<int *>(&x);  // get bits for floating VALUE
+    i = 0x5f375a86 - (i >> 1);  // gives initial guess y0
+    x = *reinterpret_cast<real_t *>(&i);  // convert bits BACK to float
+    x = x * (1.5f - xhalf * x * x);  // Newton step, repeating increases accuracy
+    
+    return x;
 }
 
-#endif   // XLEARN_BASE_MATH_H_
+#endif // XLEARN_BASE_MATH_H_

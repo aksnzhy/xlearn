@@ -37,8 +37,9 @@ This file defines the Timer class.
 //
 // This class can be used to evaluate multi-thread code.
 //------------------------------------------------------------------------------
+
 class Timer {
- public:
+public:
     Timer();
     // Reset start time
     void reset();
@@ -49,12 +50,12 @@ class Timer {
     // Get the time duration
     float get();
 
- protected:
+protected:
     std::chrono::high_resolution_clock::time_point begin;
     std::chrono::milliseconds duration;
 
- private:
-  DISALLOW_COPY_AND_ASSIGN(Timer);
+private:
+    DISALLOW_COPY_AND_ASSIGN(Timer);
 };
 
-#endif  // XLEARN_BASE_TIMER_H_
+#endif // XLEARN_BASE_TIMER_H_
