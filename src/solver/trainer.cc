@@ -50,7 +50,13 @@ void Trainer::show_head_info(bool validate) {
   width_list.push_back(20);
   Color::Modifier green(Color::FG_GREEN);
   Color::Modifier reset(Color::RESET);
+#ifndef _MSC_VER
   std::cout << green << "[------------]" << reset;
+#else
+	SetConsoleTextAttribute(Color::hConsole, green.GetCode());
+	std::cout << "[------------] ";
+	SetConsoleTextAttribute(Color::hConsole, reset.GetCode());
+#endif
   Color::print_row(str_list, width_list);
 }
 
@@ -81,10 +87,22 @@ void Trainer::show_train_info(real_t tr_loss,
   width_list.push_back(20);
   Color::Modifier green(Color::FG_GREEN);
   Color::Modifier reset(Color::RESET);
+#ifndef _MSC_VER
   std::cout << green << "[ " << reset;
   std::cout.width(4); 
   std::cout << static_cast<int>(epoch*1.0/epoch_*100) 
             << "%" << green << "      ]"  << reset;
+#else
+  SetConsoleTextAttribute(Color::hConsole, green.GetCode());
+  std::cout << "[ ";
+  SetConsoleTextAttribute(Color::hConsole, reset.GetCode());
+  std::cout.width(4);
+  std::cout << static_cast<int>(epoch*1.0/epoch_*100) 
+            << "%";
+  SetConsoleTextAttribute(Color::hConsole, green.GetCode());
+  std::cout << "      ]";
+  SetConsoleTextAttribute(Color::hConsole, reset.GetCode());
+#endif
   Color::print_row(str_list, width_list);
 }
 

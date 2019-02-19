@@ -60,7 +60,14 @@ void Solver::print_logo() const {
   Color::Modifier def(Color::FG_DEFAULT);
   Color::Modifier bold(Color::BOLD);
   Color::Modifier reset(Color::RESET);
+#ifndef _MSC_VER
   std::cout << green << bold << logo << def << reset;
+#else
+  SetConsoleTextAttribute(Color::hConsole, green.GetCode() | bold.GetCode());
+  std::cout << logo;
+  SetConsoleTextAttribute(Color::hConsole, def.GetCode());
+  SetConsoleTextAttribute(Color::hConsole, reset.GetCode());
+#endif
 }
 
 /******************************************************************************

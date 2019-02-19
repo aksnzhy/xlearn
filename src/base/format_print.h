@@ -26,6 +26,7 @@ This file defines facilities for format printing.
 #include <string>
 #ifdef _MSC_VER
 #define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
 
@@ -38,7 +39,7 @@ namespace Color {
 #define NOT_IMPORTANT_MSG false
 
 #ifdef _MSC_VER
-HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+static HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 #endif
 
 

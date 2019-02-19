@@ -26,6 +26,7 @@ This file is from GitHub: https://github.com/klauspost/mman-win32
 
 /* All the headers include this file. */
 #define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
 #include <sys/types.h>
 #include <windows.h>
 #include <errno.h>

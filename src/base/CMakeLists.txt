@@ -6,7 +6,11 @@ add_library(base STATIC logging.cc stringprintf.cc split_string.cc
 levenshtein_distance.cc timer.cc)
 
 # Build unittests.
+if(NOT WIN32)
 set(LIBS base pthread gtest)
+else(WIN32)
+set(LIBS base gtest)
+endif()
 
 add_executable(levenshtein_distance_test levenshtein_distance_test.cc)
 target_link_libraries(levenshtein_distance_test gtest_main ${LIBS})
