@@ -34,7 +34,7 @@ if(NOT WIN32)
 add_definitions("-Wall -Wno-sign-compare -O3 -std=c++11 
 -march=native -Wno-strict-aliasing -Wno-comment")
 else(WIN32)
-add_definitions("/WX- /MT /Od")
+add_definitions("/WX- /MT")
 endif()
 
 #-------------------------------------------------------------------------------

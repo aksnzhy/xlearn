@@ -1,6 +1,11 @@
 # Set output library.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/test/score)
 
+if(WIN32)
+# Disable optimization for sover
+add_definitions("/Od")
+endif()
+
 # Build static library
 set(STA_DEPS data base)
 add_library(score STATIC score_function.cc 
