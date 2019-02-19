@@ -1,7 +1,12 @@
 # Set output library.
+
+if(NOT WIN32)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/test/c_api)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+else(WIN32)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/test/c_api)
+endif()
 
 # Build static library
 set(STA_DEPS solver reader loss score data base)
@@ -25,7 +30,6 @@ target_link_libraries(xlearn_api_shared)
 else()
 target_link_libraries(xlearn_api_shared Ws2_32)
 endif()
-
 
 # Set properties
 set_target_properties(xlearn_api_shared PROPERTIES OUTPUT_NAME "xlearn_api")

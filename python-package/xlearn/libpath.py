@@ -38,13 +38,17 @@ def find_lib_path():
                 os.path.join(sys.prefix, 'xlearn')]
     if sys.platform == 'win32':
         if platform.architecture()[0] == '64bit':
-            dll_path.append(os.path.join(curr_path, '../../windows/x64/Release/'))
+            dll_path.append(os.path.join(curr_path, '../../lib/Release/'))
             # hack for pip installation when copy all parent source directory here
-            dll_path.append(os.path.join(curr_path, './windows/x64/Release/'))
+            dll_path.append(os.path.join(curr_path, './lib/Release/'))
+            # for windows install
+            dll_path.append(os.path.join(curr_path, '../../test/c_api/Release/'))
         else:
-            dll_path.append(os.path.join(curr_path, '../../windows/Release/'))
+            dll_path.append(os.path.join(curr_path, '../../lib/Release/'))
             # hack for pip installation when copy all parent source directory here
-            dll_path.append(os.path.join(curr_path, './windows/Release/'))
+            dll_path.append(os.path.join(curr_path, './lib/Release/'))
+            # for windows install
+            dll_path.append(os.path.join(curr_path, '../../test/c_api/Release/'))
         dll_path = [os.path.join(p, 'xlearn_api.dll') for p in dll_path]
     elif sys.platform.startswith('linux'):
         dll_path = [os.path.join(p, 'libxlearn_api.so') for p in dll_path]

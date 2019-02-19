@@ -37,7 +37,7 @@ for interfacing to other languages.
 #include <stdint.h>
 #endif
 
-#if defined(__MSC_VER) || defined(__WIN32)
+#if defined(_MSC_VER) || defined(_WIN32)
 #define XL_DLL XL_EXTERN_C __declspec(dllexport)
 #else
 #define XL_DLL XL_EXTERN_C
