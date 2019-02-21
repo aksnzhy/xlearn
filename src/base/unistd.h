@@ -13,12 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //------------------------------------------------------------------------------
-/**
- *  Copyright (c) 2015 by Contributors
- * @file   unistd.h
- * @brief  This file intended to serve as a drop-in replacement for
- * unistd.h on Windows Please add functionality as neeeded
+
+/* 
+ * This is intended as a drop-in replacement for unistd.h on Windows.
+ * Please add functionality as neeeded.
+ * Original file: https://stackoverflow.com/a/826027/1202830
  */
+
 #ifndef PS_WINDOWS_UNISTD_H_
 #define PS_WINDOWS_UNISTD_H_
 #include <stdlib.h>

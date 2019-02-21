@@ -13,13 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //------------------------------------------------------------------------------
-/*
-This file is from GitHub: https://github.com/klauspost/mman-win32 
+
+/* 
+* mman.h for Windows
+* This part is referenced from https://github.com/klauspost/mman-win32 
 */
-/*
- * sys/mman.h
- * mman-win32
- */
 
 #ifndef _SYS_MMAN_H_
 #define _SYS_MMAN_H_
