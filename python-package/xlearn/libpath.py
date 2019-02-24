@@ -43,6 +43,7 @@ def find_lib_path():
             dll_path.append(os.path.join(curr_path, './lib/Release/'))
             # for windows install
             dll_path.append(os.path.join(curr_path, '../../test/c_api/Release/'))
+            dll_path.append(os.path.join(curr_path, '../../test/c_api'))
         else:
             dll_path.append(os.path.join(curr_path, '../../lib/Release/'))
             # hack for pip installation when copy all parent source directory here
