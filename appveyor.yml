@@ -1,6 +1,6 @@
 image: Visual Studio 2017
 build_script:
-        ls c:
+        ls c:\\
 #         "C:\\Python36-x64\\python.exe" --version &&
 #         mkdir build_win &&
 #         cd build_win &&
