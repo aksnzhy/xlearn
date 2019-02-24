@@ -1,6 +1,6 @@
 environment:
         target: msvc
-        ver: 15
+        ver: 2015
         generator: "Visual Studio 14 2015 Win64"
         configuration: Release
 platform:
