@@ -9,7 +9,7 @@ build_script:
 #         python setup.py bdist_wheel
 test_script:
         cd test &&
-        ls base &&
+        ls base
 #         ./run_all_test.bat
 # artifacts:
 #         path: python-package\dist\*.whl
