@@ -12,4 +12,4 @@ build_script:
         cmake -G "Visual Studio 15 Win64" ../ &&
         MSBuild xLearn.sln &&
         cd test &&
-        ./run_all_test.bat
+        run_all_test.bat
