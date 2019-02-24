@@ -1,8 +1,10 @@
 environment:
-        target: msvc
-        ver: 15
+        - target: msvc
+        - ver: 15
+platform:
+        - x64
 build_script:
-        mkdir build_win &&
-        cd build_win &&
-        cmake -G "Visual Studio 15 Win64" ../ &&
-        MSBuild xLearn.sln
+        - mkdir build_win &&
+        - cd build_win &&
+        - cmake -G "Visual Studio 15 Win64" ../ &&
+        - MSBuild xLearn.sln
