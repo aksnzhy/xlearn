@@ -1,0 +1,5 @@
+build_script:
+        mkdir build_win &&
+        cd build_win &&
+        cmake -G "Visual Studio 15 Win64" ../ &&
+        MSBuild xLearn.sln
