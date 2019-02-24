@@ -2,7 +2,7 @@ image: Visual Studio 2017
 build_script:
         mkdir build_win &&
         cd build_win &&
-        cmake -G "Visual Studio 15 Win64" ../ &&
+        cmake -G "Visual Studio 15 Win64" ../
 #         MSBuild xLearn.sln /p:Configuration=Release &&
 #         cd python-package &&
 #         C:\\Python36-x64\\Scripts\\pip install wheel numpy scipy scikit-learn cython &&
