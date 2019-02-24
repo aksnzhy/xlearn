@@ -3,14 +3,12 @@ build_script:
         mkdir build_win &&
         cd build_win &&
         cmake -G "Visual Studio 15 Win64" ../ &&
-        MSBuild xLearn.sln
-#         ls python-package
-#         cd python-package &&
-#         python setup.py bdist_wheel
+        MSBuild xLearn.sln /p:Configuration=Release &&
+        cd python-package &&
+        python setup.py bdist_wheel
 test_script:
         cd test &&
-        ls base
-#         ./run_all_test.bat
-# artifacts:
-#         path: python-package\dist\*.whl
-#         name: Bits
+        ./run_all_test.bat
+artifacts:
+        path: python-package\dist\*.whl
+        name: Bits
