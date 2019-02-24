@@ -10,5 +10,5 @@ test_script:
         cd test &&
         run_all_test.bat
 artifacts:
-        path: **\*.whl
+        path: python-package\dist\*.whl
         name: Bits
