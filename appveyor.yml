@@ -1,3 +1,6 @@
+environment:
+        target: msvc
+        ver: 15
 build_script:
         mkdir build_win &&
         cd build_win &&
