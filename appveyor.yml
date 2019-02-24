@@ -4,7 +4,7 @@ build_script:
         cd build_win &&
         cmake -G "Visual Studio 15 Win64" ../ &&
         MSBuild xLearn.sln &&
-        cd python-package && ^
+        cd python-package &&
         python setup.py bdist_wheel
 test_script:
         cd test &&
