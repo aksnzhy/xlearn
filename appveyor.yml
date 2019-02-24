@@ -6,7 +6,10 @@ build_script:
         MSBuild xLearn.sln /p:Configuration=Release &&
         cd python-package &&
         C:\\Python36-x64\\Scripts\\pip install wheel numpy scipy scikit-learn cython &&
-        C:\\Python36-x64\\python.exe setup.py bdist_wheel
+        C:\\Python36-x64\\python.exe setup.py bdist_wheel -p win_amd64 --python-tag cp36 --py-limited-api cp36m
+test_script:
+        cd build_win\test &&
+        .\run_all_test.bat
 artifacts:
         path: build_win\python-package\dist\*.whl
         name: Bits
