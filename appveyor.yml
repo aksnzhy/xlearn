@@ -1,12 +1,12 @@
-environment:
-        target: msvc
-        ver: 2015
-        generator: "Visual Studio 14 2015 Win64"
-        configuration: Release
-platform:
-        x64
+# environment:
+#         target: msvc
+#         ver: 2015
+#         generator: "Visual Studio 14 2015 Win64"
+#         configuration: Release
+# platform:
+#         x64
 build_script:
         mkdir build_win &&
         cd build_win &&
-        cmake -G "Visual Studio 14 Win64" ../ &&
+        cmake -G "Visual Studio 15 Win64" ../ &&
         MSBuild xLearn.sln
