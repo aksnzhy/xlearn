@@ -1,8 +1,8 @@
 environment:
         - target: msvc
-        - ver: 15
-        - generator: "Visual Studio 15 2017 Win64"
-        - configuration: Release
+        ver: 15
+        generator: "Visual Studio 15 2017 Win64"
+        configuration: Release
 platform:
         - x64
 build_script:
