@@ -1,5 +1,6 @@
 image: Visual Studio 2017
 build_script:
+        python --version &&
         mkdir build_win &&
         cd build_win &&
         cmake -G "Visual Studio 15 Win64" ../ &&
