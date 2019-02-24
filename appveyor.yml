@@ -1,15 +1,14 @@
-# environment:
-#         target: msvc
-#         ver: 2015
-#         generator: "Visual Studio 14 2015 Win64"
-#         configuration: Release
-# platform:
-#         x64
 image: Visual Studio 2017
 build_script:
         mkdir build_win &&
         cd build_win &&
         cmake -G "Visual Studio 15 Win64" ../ &&
         MSBuild xLearn.sln &&
+        cd python-package && ^
+        python setup.py bdist_wheel
+test_script:
         cd test &&
         run_all_test.bat
+artifacts:
+        path: **\**\*.whl
+        name: Bits
