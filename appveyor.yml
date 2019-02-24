@@ -1,15 +1,14 @@
 image: Visual Studio 2017
 build_script:
-        C:\\Python36-x64\\python.exe --version
-#         mkdir build_win &&
-#         cd build_win &&
-#         cmake -G "Visual Studio 15 Win64" ../ &&
-#         MSBuild xLearn.sln /p:Configuration=Release &&
-#         cd python-package &&
-#         python setup.py bdist_wheel
-# test_script:
-#         cd test &&
-#         ./run_all_test.bat
-# artifacts:
-#         path: python-package\dist\*.whl
-#         name: Bits
+        mkdir build_win &&
+        cd build_win &&
+        cmake -G "Visual Studio 15 Win64" ../ &&
+        MSBuild xLearn.sln /p:Configuration=Release &&
+        cd python-package &&
+        C:\\Python36-x64\\python.exe setup.py bdist_wheel
+test_script:
+        cd test &&
+        ./run_all_test.bat
+artifacts:
+        path: python-package\dist\*.whl
+        name: Bits
