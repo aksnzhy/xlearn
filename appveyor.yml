@@ -5,6 +5,7 @@
 #         configuration: Release
 # platform:
 #         x64
+image: Visual Studio 2017
 build_script:
         mkdir build_win &&
         cd build_win &&
