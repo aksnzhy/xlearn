@@ -1,6 +1,6 @@
 <img src="https://github.com/aksnzhy/xLearn/raw/master/img/xlearn_logo.png" width = "400"/>
 
-[![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](/LICENCE)
+[![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](LICENCE)
 [![Project Status](https://img.shields.io/badge/version-0.4.1-green.svg)]()
 [![Build Status](https://travis-ci.org/etveritas/xlearn.svg?branch=etveritas-xlearn)](https://travis-ci.org/etveritas/xlearn)
 [![Build status](https://ci.appveyor.com/api/projects/status/kydqbf8l270tns0t/branch/etveritas-xlearn?svg=true)](https://ci.appveyor.com/project/etveritas/xlearn/branch/etveritas-xlearn)
