@@ -2,7 +2,7 @@
 
 [![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](./LICENCE)
 [![Project Status](https://img.shields.io/badge/version-0.4.1-green.svg)]()
-[![Travis](https://img.shields.io/travis/rust-lang/rust.svg)]()
+[![Travis](https://img.shields.io/appveyor/ci/:user/:repo.svg)]()
 
 ## What is xLearn?
 
