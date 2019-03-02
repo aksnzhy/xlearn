@@ -9,7 +9,7 @@ Install Visual Studio 2017
 
 *If you have already installed your C++ compiler before, you can skip this step.*
 
-Download Visual Studio ``setup.exe`` from https://visualstudio.microsoft.com/downloads/, then you can follow the VS2017 install guide
+Download Visual Studio ``vs_xxxx_xxxx.exe`` from https://visualstudio.microsoft.com/downloads/, then you can follow the VS2017 install guide
 https://docs.microsoft.com/en-us/visualstudio/install/install-visual-studio?view=vs-2017. Users should make sure that choose the c++
 development tools when install VS2017.
  
