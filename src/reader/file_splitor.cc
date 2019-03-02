@@ -42,9 +42,9 @@ void FileSpliter::split(const std::string& filename, int num_blocks) {
   CHECK_GE(num_blocks, 2); // At least we need two blocks for CV.
   // Input
 #ifndef _MSC_VER
-  FILE *file_ptr_read = OpenFileOrDie(filename.c_str(), "r");
+  FILE* file_ptr_read = OpenFileOrDie(filename.c_str(), "r");
 #else
-  FILE *file_ptr_read = OpenFileOrDie(filename.c_str(), "rb");
+  FILE* file_ptr_read = OpenFileOrDie(filename.c_str(), "rb");
 #endif
   int file_desc_read = fileno(file_ptr_read);
   uint64 file_size = GetFileSize(file_ptr_read);
@@ -96,7 +96,7 @@ void FileSpliter::split(const std::string& filename, int num_blocks) {
         average_block_size + (next_block_size - real_file_size);
     offset += real_file_size;
 #ifdef _MSC_VER
-    Close(file_ptr_write[i]);
+  Close(file_ptr_write[i]);
 #endif
   }
   munmap(map_ptr_read, file_size);

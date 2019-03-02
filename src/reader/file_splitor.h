@@ -33,16 +33,16 @@ namespace xLearn {
 // Split file using mmap() on Unix-like systems.
 //------------------------------------------------------------------------------
 class FileSpliter {
-public:
-    FileSpliter() { }
-    ~FileSpliter() { }
+ public:
+  FileSpliter() {  }
+  ~FileSpliter() {  }
 
-    void split(const std::string &filename, int num_blocks);
+  void split(const std::string& filename, int num_blocks);
 
-private:
-    DISALLOW_COPY_AND_ASSIGN(FileSpliter);
+ private:
+  DISALLOW_COPY_AND_ASSIGN(FileSpliter);
 };
 
-} // namespace xLearn
+}  // namespace xLearn
 
-#endif // XLEARN_READER_FILE_SPLITER_H_
+#endif  // XLEARN_READER_FILE_SPLIT_H_

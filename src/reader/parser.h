@@ -54,36 +54,42 @@ namespace xLearn {
 //   parser->Parse(buffer, size, matrix);
 //------------------------------------------------------------------------------
 class Parser {
-public:
-    Parser() { }
-    virtual ~Parser() { }
+ public:
+  Parser() { }
+  virtual ~Parser() {  }
 
-    // Wether this dataset contains label y ?
-    inline void setLabel(bool label) {
-        has_label_ = label;
-    }
+  // Wether this dataset contains label y ?
+  inline void setLabel(bool label) {
+    has_label_ = label;
+  }
 
-    // Set Splitor
-    inline void setSplitor(const std::string &splitor) {
-        splitor_ = splitor;
-    }
+  // Set Splitor
+  inline void setSplitor(const std::string& splitor) {
+    splitor_ = splitor;
+  }
 
-    // The real parse function invoked by users.
-    // If reset == true, Parser will invoke matrix.Reset();
-    virtual void Parse(char *buf, uint64 size, DMatrix &matrix, bool reset = false) = 0;
+  // The real parse function invoked by users.
+  // If reset == true, Parser will invoke matrix.Reset();
+  virtual void Parse(char* buf, 
+                     uint64 size, 
+                     DMatrix& matrix,
+                     bool reset = false) = 0;
 
-protected:
-    // Get one line from memory buffer.
-    uint64 get_line_from_buffer(char *line, char *buf, uint64 pos, uint64 size);
+ protected:
+   // Get one line from memory buffer.
+   uint64 get_line_from_buffer(char* line,
+                               char* buf,
+                               uint64 pos,
+                               uint64 size);
 
-    /* True for training task and
-    False for prediction task */
-    bool has_label_;
-    /* Split string for data items */
-    std::string splitor_;
+   /* True for training task and
+   False for prediction task */
+   bool has_label_;
+   /* Split string for data items */
+   std::string splitor_;
 
-private:
-    DISALLOW_COPY_AND_ASSIGN(Parser);
+ private:
+  DISALLOW_COPY_AND_ASSIGN(Parser);
 };
 
 //------------------------------------------------------------------------------
@@ -92,15 +98,18 @@ private:
 // [y2 idx:value idx:value ...]
 //------------------------------------------------------------------------------
 class LibsvmParser : public Parser {
-public:
-    LibsvmParser() { }
-    ~LibsvmParser() { }
+ public:
+  LibsvmParser() { }
+  ~LibsvmParser() {  }
 
-    // Parse the libsvm file
-    void Parse(char *buf, uint64 size, DMatrix &matrix, bool reset = false);
+  // Parse the libsvm file
+  void Parse(char* buf, 
+             uint64 size, 
+             DMatrix& matrix,
+             bool reset = false);
 
-private:
-    DISALLOW_COPY_AND_ASSIGN(LibsvmParser);
+ private:
+  DISALLOW_COPY_AND_ASSIGN(LibsvmParser);
 };
 
 //------------------------------------------------------------------------------
@@ -109,15 +118,18 @@ private:
 // [y2 field:idx:value field:idx:value ...]
 //------------------------------------------------------------------------------
 class FFMParser : public Parser {
-public:
-    FFMParser() { }
-    ~FFMParser() { }
+ public:
+  FFMParser() { }
+  ~FFMParser() {  }
 
-    // Parse the libffm file
-    void Parse(char *buf, uint64 size, DMatrix &matrix, bool reset = false);
+  // Parse the libffm file
+  void Parse(char* buf, 
+             uint64 size, 
+             DMatrix& matrix,
+             bool reset = false);
 
-private:
-    DISALLOW_COPY_AND_ASSIGN(FFMParser);
+ private:
+  DISALLOW_COPY_AND_ASSIGN(FFMParser);
 };
 
 //------------------------------------------------------------------------------
@@ -130,15 +142,18 @@ private:
 // element as the label y.
 //------------------------------------------------------------------------------
 class CSVParser : public Parser {
-public:
-    CSVParser() { }
-    ~CSVParser() { }
+ public:
+  CSVParser() { }
+  ~CSVParser() { }
 
-    // Parse the csv file
-    void Parse(char *buf, uint64 size, DMatrix &matrix, bool reset = false);
+  // Parse the csv file
+  void Parse(char* buf, 
+             uint64 size, 
+             DMatrix& matrix,
+             bool reset = false);
 
-private:
-    DISALLOW_COPY_AND_ASSIGN(CSVParser);
+ private:
+  DISALLOW_COPY_AND_ASSIGN(CSVParser);
 };
 
 //------------------------------------------------------------------------------
@@ -146,18 +161,18 @@ private:
 //------------------------------------------------------------------------------
 CLASS_REGISTER_DEFINE_REGISTRY(xLearn_parser_registry, Parser);
 
-#define REGISTER_PARSER(format_name, parser_name)                               \
-    CLASS_REGISTER_OBJECT_CREATOR(                                              \
-        xLearn_parser_registry,                                                 \
-        Parser,                                                                 \
-        format_name,                                                            \
-        parser_name)
+#define REGISTER_PARSER(format_name, parser_name)          \
+  CLASS_REGISTER_OBJECT_CREATOR(                           \
+      xLearn_parser_registry,                              \
+      Parser,                                              \
+      format_name,                                         \
+      parser_name)
 
-#define CREATE_PARSER(format_name)                                              \
-    CLASS_REGISTER_CREATE_OBJECT(                                               \
-        xLearn_parser_registry,                                                 \
-        format_name)
+#define CREATE_PARSER(format_name)                         \
+  CLASS_REGISTER_CREATE_OBJECT(                            \
+      xLearn_parser_registry,                              \
+      format_name)
 
-} // namespace xLearn
+}  // namespace xLearn
 
-#endif // XLEARN_READER_PARSER_H_
+#endif  // XLEARN_READER_PARSER_H_

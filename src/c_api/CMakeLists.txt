@@ -1,5 +1,4 @@
 # Set output library.
-
 if(NOT WIN32)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/test/c_api)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
@@ -25,9 +24,8 @@ add_library(xlearn_api_shared SHARED c_api.cc c_api_error.cc
 ../score/ffm_score.cc 
 ../solver/checker.cc ../solver/trainer.cc 
 ../solver/inference.cc ../solver/solver.cc)
-if(NOT WIN32)
-target_link_libraries(xlearn_api_shared)
-else()
+
+if(WIN32)
 target_link_libraries(xlearn_api_shared Ws2_32)
 endif()
 
