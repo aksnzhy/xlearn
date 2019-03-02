@@ -10,8 +10,3 @@ build_script:
 test_script:
         cd ..\test &&
         .\run_all_test.bat
-artifacts:
-        - path: build_win\Release\*.exe
-          name: Bits
-        - path: build_win\python-package\dist\*.whl
-          name: Bits
