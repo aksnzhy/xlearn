@@ -17,7 +17,6 @@ else(WIN32)
 set(LIBS solver reader loss score data base Ws2_32)
 endif()
 
-
 add_executable(xlearn_train train_main.cc)
 target_link_libraries(xlearn_train ${LIBS})
 

@@ -74,90 +74,93 @@ const size_t kDefautBlockSize = 500;  // 500 MB
 // the libsvm format, the libffm format, and the CSV format.
 //------------------------------------------------------------------------------
 class Reader {
-public:
-    // Constructor and Desstructor
-    Reader() : shuffle_(false), bin_out_(true), block_size_(kDefautBlockSize) {  }
-    virtual ~Reader() {  }
+ public:
+  // Constructor and Desstructor
+  Reader() : 
+    shuffle_(false), 
+    bin_out_(true),
+    block_size_(kDefautBlockSize) {  }
+  virtual ~Reader() {  }
 
-    // We need to invoke the Initialize() function before
-    // we start to sample data. We can shuffle data before 
-    // training, and this is good for SGD.
-    virtual void Initialize(const std::string& filename) = 0;
+  // We need to invoke the Initialize() function before
+  // we start to sample data. We can shuffle data before 
+  // training, and this is good for SGD.
+  virtual void Initialize(const std::string& filename) = 0;
 
-    // Sample data from disk or from memory buffer.
-    // Return the number of record in each samplling.
-    // Samples() will return 0 when reaching end of the data.
-    virtual index_t Samples(DMatrix* &matrix) = 0;
+  // Sample data from disk or from memory buffer.
+  // Return the number of record in each samplling.
+  // Samples() will return 0 when reaching end of the data.
+  virtual index_t Samples(DMatrix* &matrix) = 0;
 
-    // Return to the begining of the data.
-    virtual void Reset() = 0;
+  // Return to the begining of the data.
+  virtual void Reset() = 0;
 
-    // Free the memory of data matrix.
-    virtual void Clear() = 0;
+  // Free the memory of data matrix.
+  virtual void Clear() = 0;
 
-    // Return the Reader type, which can be 
-    // 'in-memory' or 'on-disk' so far.
-    virtual std::string Type() = 0;
+  // Return the Reader type, which can be 
+  // 'in-memory' or 'on-disk' so far.
+  virtual std::string Type() = 0;
 
-    // Set the size of the block buffer.
-    inline void SetBlockSize(size_t size) { 
-        CHECK_GT(size, 0);
-        block_size_ = size; 
-    }
+  // Set the size of the block buffer.
+  inline void SetBlockSize(size_t size) { 
+    CHECK_GT(size, 0);
+    block_size_ = size; 
+  }
 
-    // Wether current dataset has label y ?
-    bool inline has_label() { return has_label_; }
+  // Wether current dataset has label y ?
+  bool inline has_label() { return has_label_; }
 
-    // Do not generate bin file
-    void SetNoBin() {
-        bin_out_ = false;  
-    }
+  // Do not generate bin file
+  void SetNoBin() {
+    bin_out_ = false;  
+  }
 
-    // If shuffle data ?
-    virtual void SetShuffle(bool shuffle) {
-        shuffle_ = shuffle;
-    }
+  // If shuffle data ?
+  virtual void SetShuffle(bool shuffle) {
+    shuffle_ = shuffle;
+  }
 
-protected:
-    /* Input file name */
-    std::string filename_;
-    /* Sample() returns this data sample */
-    DMatrix data_samples_;
-    /* Parser for a block of memory buffer */
-    Parser* parser_;
-    /* If this data has label y ?
-    This value will be set automitically
-    in initialization */
-    bool has_label_;
-    /* If shuffle data ? */
-    bool shuffle_;
-    /* Generate bin file ? */
-    bool bin_out_;
-    /* Split string for data items */
-    std::string splitor_;
-    /* A block of memory to store the data */
-    char* block_;
-    /* Block size */
-    size_t block_size_;
+ protected:
+  /* Input file name */
+  std::string filename_;
+  /* Sample() returns this data sample */
+  DMatrix data_samples_;
+  /* Parser for a block of memory buffer */
+  Parser* parser_;
+  /* If this data has label y ?
+  This value will be set automitically
+  in initialization */
+  bool has_label_;
+  /* If shuffle data ? */
+  bool shuffle_;
+  /* Generate bin file ? */
+  bool bin_out_;
+  /* Split string for data items */
+  std::string splitor_;
+  /* A block of memory to store the data */
+  char* block_;
+  /* Block size */
+  size_t block_size_;
 
-    // Check current file format and return
-    // "libsvm", "ffm", or "csv".
-    // Program crashes for unknow format.
-    // This function will also check if current
-    // data has the label y.
-    std::string check_file_format();
+  // Check current file format and return
+  // "libsvm", "ffm", or "csv".
+  // Program crashes for unknow format.
+  // This function will also check if current
+  // data has the label y.
+  std::string check_file_format();
 
-    // Find the last '\n' in block and 
-    // shrink back file pointer.
-    void shrink_block(char* block, size_t* ret, FILE* file);
+  // Find the last '\n' in block and 
+  // shrink back file pointer.
+  void shrink_block(char* block, size_t* ret, FILE* file);
 
-    // Create parser for different file format
-    Parser* CreateParser(const char* format_name) {
-        return CREATE_PARSER(format_name);
-    }
+  // Create parser for different file format
+  Parser* CreateParser(const char* format_name) {
+    return CREATE_PARSER(format_name);
+  }
 
-private:
-    DISALLOW_COPY_AND_ASSIGN(Reader);
+ private:
+  DISALLOW_COPY_AND_ASSIGN(Reader);
 };
 
 //------------------------------------------------------------------------------
@@ -166,69 +169,69 @@ private:
 // txt data to binary data, and uses this binary data in the next time.
 //------------------------------------------------------------------------------
 class InmemReader : public Reader {
-public:
-    // Constructor and Destructor
-    InmemReader() : pos_(0) { }
-    ~InmemReader() { }
+ public:
+  // Constructor and Destructor
+  InmemReader() : pos_(0) { }
+  ~InmemReader() { }
 
-    // Pre-load all the data into memory buffer.
-    virtual void Initialize(const std::string& filename);
+  // Pre-load all the data into memory buffer.
+  virtual void Initialize(const std::string& filename);
 
-    // Sample data from the memory buffer.
-    virtual index_t Samples(DMatrix* &matrix);
+  // Sample data from the memory buffer.
+  virtual index_t Samples(DMatrix* &matrix);
 
-    // Return to the begining of the data.
-    virtual void Reset();
+  // Return to the begining of the data.
+  virtual void Reset();
 
-    // Free the memory of data matrix.
-    virtual void Clear() {
-        data_buf_.Reset();
-        data_samples_.Reset();
-        if (block_ != nullptr) {
-            delete [] block_;
-        }
+  // Free the memory of data matrix.
+  virtual void Clear() {
+    data_buf_.Reset();
+    data_samples_.Reset();
+    if (block_ != nullptr) {
+      delete [] block_;
     }
+  }
 
-    // Return the Reader type
-    virtual std::string Type() {
-        return "in-memory";
+  // Return the Reader type
+  virtual std::string Type() {
+    return "in-memory";
+  }
+
+  // If shuffle data ?
+  virtual inline void SetShuffle(bool shuffle) {
+    this->shuffle_ = shuffle;
+    if (shuffle_ && !order_.empty()) {
+      random_shuffle(order_.begin(), order_.end());
     }
+  }
 
-    // If shuffle data ?
-    virtual inline void SetShuffle(bool shuffle) {
-        shuffle_ = shuffle;
-        if (shuffle_ && !order_.empty()) {
-            random_shuffle(order_.begin(), order_.end());
-        }
-    }
+  // Get data buffer
+  virtual inline DMatrix* GetMatrix() {
+    return &data_buf_;
+  }
 
-    // Get data buffer
-    virtual inline DMatrix* GetMatrix() {
-        return &data_buf_;
-    }
+ protected:
+  /* Reader will load all the data 
+  into this buffer */
+  DMatrix data_buf_;
+  /* Number of record at each samplling */
+  index_t num_samples_;
+  /* Position for samplling */
+  index_t pos_;
+  /* For random shuffle */
+  std::vector<index_t> order_;
 
-protected:
-    /* Reader will load all the data 
-    into this buffer */
-    DMatrix data_buf_;
-    /* Number of record at each samplling */
-    index_t num_samples_;
-    /* Position for samplling */
-    index_t pos_;
-    /* For random shuffle */
-    std::vector<index_t> order_;
+  // Check wheter current path has a binary file.
+  bool hash_binary(const std::string& filename);
 
-    // Check wheter current path has a binary file.
-    bool hash_binary(const std::string& filename);
+  // Initialize Reader from existing binary file.
+  void init_from_binary();
 
-    // Initialize Reader from existing binary file.
-    void init_from_binary();
+  // Initialize Reader from a new txt file.
+  void init_from_txt();
 
-    // Initialize Reader from a new txt file.
-    void init_from_txt();
-
-private:
-    DISALLOW_COPY_AND_ASSIGN(InmemReader);
+ private:
+  DISALLOW_COPY_AND_ASSIGN(InmemReader);
 };
 
 //------------------------------------------------------------------------------
@@ -238,50 +241,50 @@ private:
 //------------------------------------------------------------------------------
 // TODO(chao): binary-cache
 class OndiskReader : public Reader {
-public:
-    // Constructor and Destructor
-    OndiskReader() { }
-    ~OndiskReader() { 
-        Clear();
-        Close(file_ptr_); 
+ public:
+  // Constructor and Destructor
+  OndiskReader() { }
+  ~OndiskReader() { 
+    Clear();
+    Close(file_ptr_); 
+  }
+
+  // Create parser and open file
+  virtual void Initialize(const std::string& filename);
+
+  // Sample data from disk file
+  virtual index_t Samples(DMatrix* &matrix);
+
+  // Return to the head of file
+  virtual void Reset();
+
+  // Free the memory of data matrix.
+  virtual void Clear() {
+    data_samples_.Reset();
+    if (block_ != nullptr) {
+      delete [] block_;
     }
+  }
 
-    // Create parser and open file
-    virtual void Initialize(const std::string& filename);
+  // Return the Reader type
+  virtual std::string Type() {
+    return "on-disk";
+  }
 
-    // Sample data from disk file
-    virtual index_t Samples(DMatrix* &matrix);
-
-    // Return to the head of file
-    virtual void Reset();
-
-    // Free the memory of data matrix.
-    virtual void Clear() {
-        data_samples_.Reset();
-        if (block_ != nullptr) {
-            delete [] block_;
-        }
+  // We cannot set shuffle for OndiskReader
+  void inline SetShuffle(bool shuffle) {
+    if (shuffle == true) {
+      LOG(ERR) << "Cannot set shuffle for OndiskReader.";
     }
+    this->shuffle_ = false;
+  }
 
-    // Return the Reader type
-    virtual std::string Type() {
-        return "on-disk";
-    }
-
-    // We cannot set shuffle for OndiskReader
-    void inline SetShuffle(bool shuffle) {
-        if (shuffle == true) {
-        LOG(ERR) << "Cannot set shuffle for OndiskReader.";
-        }
-        shuffle_ = false;
-    }
-
-protected:
-    /* Maintain the file pointer */
-    FILE* file_ptr_; 
+ protected:
+  /* Maintain the file pointer */
+  FILE* file_ptr_; 
  
-private:
-    DISALLOW_COPY_AND_ASSIGN(OndiskReader);
+ private:
+  DISALLOW_COPY_AND_ASSIGN(OndiskReader);
 };
 
 //------------------------------------------------------------------------------
@@ -289,16 +292,16 @@ private:
 //------------------------------------------------------------------------------
 CLASS_REGISTER_DEFINE_REGISTRY(xLearn_reader_registry, Reader);
 
-#define REGISTER_READER(format_name, reader_name)                               \
-  CLASS_REGISTER_OBJECT_CREATOR(                                                \
-      xLearn_reader_registry,                                                   \
-      Reader,                                                                   \
-      format_name,                                                              \
+#define REGISTER_READER(format_name, reader_name)           \
+  CLASS_REGISTER_OBJECT_CREATOR(                            \
+      xLearn_reader_registry,                               \
+      Reader,                                               \
+      format_name,                                          \
       reader_name)
 
-#define CREATE_READER(format_name)                                              \
-  CLASS_REGISTER_CREATE_OBJECT(                                                 \
-      xLearn_reader_registry,                                                   \
+#define CREATE_READER(format_name)                          \
+  CLASS_REGISTER_CREATE_OBJECT(                             \
+      xLearn_reader_registry,                               \
       format_name)
 
 } // namespace xLearn

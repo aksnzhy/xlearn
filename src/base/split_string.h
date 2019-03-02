@@ -42,81 +42,83 @@ This file provides StringSplit utilities.
 //   substrings[2] == "banana"
 //------------------------------------------------------------------------------
 
-void SplitStringUsing(const std::string &full, const char *delim,
-                      std::vector<std::string> *result);
+void SplitStringUsing(const std::string& full,
+                      const char* delim,
+                      std::vector<std::string>* result);
 
 // This function has the same semnatic as SplitStringUsing.  Results
 // are saved in an STL set container.
-void SplitStringToSetUsing(const std::string &full, const char *delim,
-                           std::set<std::string> *result);
+void SplitStringToSetUsing(const std::string& full,
+                           const char* delim,
+                           std::set<std::string>* result);
 
 template <typename T>
 struct simple_insert_iterator {
-    explicit simple_insert_iterator(T *t) : t_(t) { }
+  explicit simple_insert_iterator(T* t) : t_(t) { }
 
-    simple_insert_iterator<T> &operator=(const typename T::value_type &value) {
-        t_->insert(value);
+  simple_insert_iterator<T>& operator=(const typename T::value_type& value) {
+    t_->insert(value);
+    return *this;
+  }
 
-        return *this;
-    }
+  simple_insert_iterator<T>& operator*() { return *this; }
+  simple_insert_iterator<T>& operator++() { return *this; }
+  simple_insert_iterator<T>& operator++(int placeholder) { return *this; }
 
-    simple_insert_iterator<T> &operator*() { return *this; }
-    simple_insert_iterator<T> &operator++() { return *this; }
-    simple_insert_iterator<T> &operator++(int placeholder) { return *this; }
-
-    T *t_;
+  T* t_;
 };
 
 template <typename T>
 struct back_insert_iterator {
-    explicit back_insert_iterator(T &t) : t_(t) { }
+  explicit back_insert_iterator(T& t) : t_(t) {}
 
-    back_insert_iterator<T> &operator=(const typename T::value_type &value) {
-        t_.push_back(value);
-        
-        return *this;
-    }
+  back_insert_iterator<T>& operator=(const typename T::value_type& value) {
+    t_.push_back(value);
+    return *this;
+  }
 
-    back_insert_iterator<T> &operator*() { return *this; }
-    back_insert_iterator<T> &operator++() { return *this; }
-    back_insert_iterator<T> operator++(int placeholder) { return *this; }
+  back_insert_iterator<T>& operator*() { return *this; }
+  back_insert_iterator<T>& operator++() { return *this; }
+  back_insert_iterator<T> operator++(int placeholder) { return *this; }
 
-    T &t_;
+  T& t_;
 };
 
 template <typename StringType, typename ITR>
-static inline void SplitStringToIteratorUsing(const StringType &full, const char *delim,
-                                              ITR &result) {
-    // Optimize the common case where delim is a single character.
-    if (delim[0] != '\0' && delim[1] == '\0') {
-        char c = delim[0];
-        const char *p = full.data();
-        const char *end = p + full.size();
-        while (p != end) {
-            if (*p == c) {
-                ++p;
-            } else {
-                const char *start = p;
-                while (++p != end && *p != c) {
-                    // Skip to the next occurence of the delimiter.
-                }
-                *result++ = StringType(start, p-start);
-            }
+static inline
+void SplitStringToIteratorUsing(const StringType& full,
+                                const char* delim,
+                                ITR& result) {
+  // Optimize the common case where delim is a single character.
+  if (delim[0] != '\0' && delim[1] == '\0') {
+    char c = delim[0];
+    const char* p = full.data();
+    const char* end = p + full.size();
+    while (p != end) {
+      if (*p == c) {
+        ++p;
+      } else {
+        const char* start = p;
+        while (++p != end && *p != c) {
+          // Skip to the next occurence of the delimiter.
         }
-        return;
+        *result++ = StringType(start, p - start);
+      }
     }
+    return;
+  }
 
-    std::string::size_type begin_index, end_index;
-    begin_index = full.find_first_not_of(delim);
-    while (begin_index != std::string::npos) {
-        end_index = full.find_first_of(delim, begin_index);
-        if (end_index == std::string::npos) {
-            *result++ = full.substr(begin_index);
-            return;
-        }
-        *result++ = full.substr(begin_index, (end_index - begin_index));
-        begin_index = full.find_first_not_of(delim, end_index);
+  std::string::size_type begin_index, end_index;
+  begin_index = full.find_first_not_of(delim);
+  while (begin_index != std::string::npos) {
+    end_index = full.find_first_of(delim, begin_index);
+    if (end_index == std::string::npos) {
+      *result++ = full.substr(begin_index);
+      return;
     }
+    *result++ = full.substr(begin_index, (end_index - begin_index));
+    begin_index = full.find_first_not_of(delim, end_index);
+  }
 }
 
-#endif // XLEARN_BASE_SPLIT_STRING_H_
+#endif   // XLEARN_BASE_SPLIT_STRING_H_

@@ -26,7 +26,6 @@ messages by their severities.
 #include <iomanip>
 #include <iostream>
 #include <string>
-#include <string.h>
 
 //------------------------------------------------------------------------------
 // If function |InitializeLogger| was invoked and was able to open
@@ -45,29 +44,32 @@ messages by their severities.
 //   }
 //------------------------------------------------------------------------------
 
-void InitializeLogger(const std::string &info_log_filename,
-                      const std::string &warn_log_filename,
-                      const std::string &erro_log_filename);
+void InitializeLogger(const std::string& info_log_filename,
+                      const std::string& warn_log_filename,
+                      const std::string& erro_log_filename);
 
 enum LogSeverity { INFO, WARNING, ERR, FATAL };
 
 class Logger {
-    friend void InitializeLogger(const std::string &info_log_filename,
-                                 const std::string &warn_log_filename,
-                                 const std::string &erro_log_filename);
+  friend void InitializeLogger(const std::string& info_log_filename,
+                               const std::string& warn_log_filename,
+                               const std::string& erro_log_filename);
+ public:
+  Logger(LogSeverity s) : severity_(s) {}
+  ~Logger();
 
-public:
-    Logger(LogSeverity s) : severity_(s) { }
-    ~Logger();
+  static std::ostream& GetStream(LogSeverity severity);
+  
+  static std::ostream& Start(LogSeverity severity,
+                             const std::string& file,
+                             int line,
+                             const std::string& function);
 
-    static std::ostream &GetStream(LogSeverity severity);
-    static std::ostream &Start(LogSeverity severity, const std::string &file, int line, const std::string &function);
-
-private:
-    static std::ofstream info_log_file_;
-    static std::ofstream warn_log_file_;
-    static std::ofstream erro_log_file_;
-    LogSeverity severity_;
+ private:
+  static std::ofstream info_log_file_;
+  static std::ofstream warn_log_file_;
+  static std::ofstream erro_log_file_;
+  LogSeverity severity_;
 };
 
 //-----------------------------------------------------------------------------
@@ -93,6 +95,6 @@ private:
 // message head will be there.
 //-----------------------------------------------------------------------------
 #define LOG(severity)                                                       \
-    Logger(severity).Start(severity, __FILE__, __LINE__, __FUNCTION__)
+  Logger(severity).Start(severity, __FILE__, __LINE__, __FUNCTION__)
 
-#endif // XLEARN_BASE_LOGGING_H_
+#endif   // XLEARN_BASE_LOGGING_H_

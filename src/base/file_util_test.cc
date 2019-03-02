@@ -122,9 +122,9 @@ TEST(FileTest, Serialize_and_Deserialize_string) {
 
 TEST(FileTest, Serialize_and_Deserialize_vector) {
 #ifndef _MSC_VER
-  std::string filename = "/tmp/test.bin";
+   std::string filename = "/tmp/test.bin";
 #else
-  std::string filename = "../../test.bin";
+   std::string filename = "../../test.bin";
 #endif
    FILE* file = OpenFileOrDie(filename.c_str(), "w");
    // Serialize

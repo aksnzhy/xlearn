@@ -53,9 +53,9 @@ void Trainer::show_head_info(bool validate) {
 #ifndef _MSC_VER
   std::cout << green << "[------------]" << reset;
 #else
-	SetConsoleTextAttribute(Color::hConsole, green.GetCode());
-	std::cout << "[------------] ";
-	SetConsoleTextAttribute(Color::hConsole, reset.GetCode());
+  SetConsoleTextAttribute(Color::hConsole, green.GetCode());
+  std::cout << "[------------] ";
+  SetConsoleTextAttribute(Color::hConsole, reset.GetCode());
 #endif
   Color::print_row(str_list, width_list);
 }
