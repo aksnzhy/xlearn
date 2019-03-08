@@ -181,9 +181,6 @@ struct DMatrix {
       if ((this->row)[i] != nullptr) {
         STLDeleteElementsAndClear(&(this->row));
       }
-#ifndef _MSC_VER
-        break;
-#endif
     }
     // Delete SparseRow
     std::vector<SparseRow*>().swap(this->row);
