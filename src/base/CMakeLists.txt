@@ -3,7 +3,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/test/base)
 
 # Build static library
 add_library(base STATIC logging.cc stringprintf.cc split_string.cc 
-levenshtein_distance.cc timer.cc)
+levenshtein_distance.cc timer.cc format_print.cc)
 
 # Build unittests.
 if(NOT WIN32)

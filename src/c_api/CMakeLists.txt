@@ -15,7 +15,7 @@ target_link_libraries(xlearn_api ${STA_DEPS})
 # Build shared library
 add_library(xlearn_api_shared SHARED c_api.cc c_api_error.cc 
 ../base/logging.cc ../base/stringprintf.cc ../base/split_string.cc 
-../base/levenshtein_distance.cc ../base/timer.cc 
+../base/levenshtein_distance.cc ../base/timer.cc ../base/format_print.cc
 ../data/model_parameters.cc 
 ../loss/loss.cc ../loss/squared_loss.cc ../loss/cross_entropy_loss.cc 
 ../loss/metric.cc 
