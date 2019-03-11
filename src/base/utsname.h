@@ -94,7 +94,6 @@ int uname(struct utsname *name) {
 	default:
 		strcpy(name->machine, "unknown");
 	}
-
 	return 0;
 }
 
