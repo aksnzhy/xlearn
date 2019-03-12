@@ -1,5 +1,8 @@
 ## What's New
 
+  - 2019-3-12 xLearn 0.4.2 version release. Main update:
+    * Release Windows version of xLearn
+
  - 2019-1-30 xLearn 0.4.1 version release. Main update:
     * More flexible data reader.
 
