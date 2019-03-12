@@ -2,8 +2,6 @@
 
 [![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](./LICENCE)
 [![Project Status](https://img.shields.io/badge/version-0.4.2-green.svg)]()
-[![Build Status](https://travis-ci.org/etveritas/xlearn.svg?branch=etveritas-xlearn)](https://travis-ci.org/etveritas/xlearn)
-[![Build status](https://ci.appveyor.com/api/projects/status/kydqbf8l270tns0t/branch/etveritas-xlearn?svg=true)](https://ci.appveyor.com/project/etveritas/xlearn/branch/etveritas-xlearn)
 
 ## What is xLearn?
 
