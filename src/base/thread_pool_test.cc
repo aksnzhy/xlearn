@@ -39,7 +39,11 @@ TEST(ThreadPoolTest, Print_test) {
     printf("Hello master\n");
   }
   printf("final\n");
+#ifndef _MSC_VER
   usleep(100);
+#else
+  std::this_thread::sleep_for(std::chrono::microseconds(100));
+#endif
 }
 
 int a1 = 0;

@@ -87,8 +87,8 @@ void Model::initial(bool set_val) {
     if (score_func_.compare("fm") == 0 ||
         score_func_.compare("ffm") == 0) {
       // Aligned malloc for latent factor
-#ifdef _WIN32
-      param_v_ = _aligned_malloc(
+#ifdef _MSC_VER
+      param_v_ = (decltype(param_v_))_aligned_malloc(
                  param_num_v_ * sizeof(real_t),
                  kAlignByte);
 #else
@@ -176,13 +176,21 @@ void Model::set_value() {
 // Free the allocated memory
 void Model::free_model() {
   free(param_w_);
+#ifndef _MSC_VER
   free(param_v_);
+#else
+  _aligned_free(param_v_);
+#endif
   free(param_b_);
   if (param_best_w_ != nullptr) {
     free(param_best_w_);
   }
   if (param_best_v_ != nullptr) {
+#ifndef _MSC_VER
     free(param_best_v_);
+#else
+    _aligned_free(param_best_v_);
+#endif
   }
   if (param_best_b_ != nullptr) {
     free(param_best_b_);
@@ -204,7 +212,11 @@ Model::Model(const std::string& filename) {
 // Serialize current model to a disk file
 void Model::Serialize(const std::string& filename) {
   CHECK_NE(filename.empty(), true);
+#ifndef _MSC_VER
   FILE* file = OpenFileOrDie(filename.c_str(), "w");
+#else
+  FILE *file = OpenFileOrDie(filename.c_str(), "wb");
+#endif
   // Write score function
   WriteStringToFile(file, score_func_);
   // Write loss function
@@ -286,7 +298,11 @@ void Model::SerializeToTXT(const std::string& filename) {
 // Deserialize model from a checkpoint file
 bool Model::Deserialize(const std::string& filename) {
   CHECK_NE(filename.empty(), true);
+#ifndef _MSC_VER
   FILE* file = OpenFileOrDie(filename.c_str(), "r");
+#else
+  FILE* file = OpenFileOrDie(filename.c_str(), "rb");
+#endif
   if (file == NULL) { return false; }
   // Read score function
   ReadStringFromFile(file, score_func_);
@@ -315,8 +331,8 @@ void Model::SetBestModel() {
     }
     if (param_best_v_ == nullptr &&
         score_func_.compare("linear") != 0) {
-  #ifdef _WIN32
-        param_best_v_ = _aligned_malloc(
+  #ifdef _MSC_VER
+        param_best_v_ = (decltype(param_best_v_))_aligned_malloc(
         param_num_v_ * sizeof(real_t),
         kAlignByte);
   #else

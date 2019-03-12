@@ -7,7 +7,11 @@ add_library(reader STATIC parser.cc file_splitor.cc reader.cc)
 target_link_libraries(reader ${STA_DEPS})
 
 # Build uinttests.
+if(NOT WIN32)
 set(LIBS reader data base pthread gtest)
+else(WIN32)
+set(LIBS reader data base gtest)
+endif()
 
 add_executable(parser_test parser_test.cc)
 target_link_libraries(parser_test gtest_main ${LIBS})

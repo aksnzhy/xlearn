@@ -18,8 +18,13 @@
 This file is the implementation of the fileSpliter class.
 */
 
+#ifndef _MSC_VER
 #include <sys/mman.h>
 #include <unistd.h>
+#else
+#include "src/base/mman.h"
+#include "src/base/unistd.h"
+#endif
 #include <vector>
 
 #include "src/base/common.h"
@@ -36,7 +41,11 @@ void FileSpliter::split(const std::string& filename, int num_blocks) {
   CHECK_NE(filename.empty(), true);
   CHECK_GE(num_blocks, 2); // At least we need two blocks for CV.
   // Input
+#ifndef _MSC_VER
   FILE* file_ptr_read = OpenFileOrDie(filename.c_str(), "r");
+#else
+  FILE* file_ptr_read = OpenFileOrDie(filename.c_str(), "rb");
+#endif
   int file_desc_read = fileno(file_ptr_read);
   uint64 file_size = GetFileSize(file_ptr_read);
   uint64 average_block_size = file_size / num_blocks;
@@ -49,7 +58,11 @@ void FileSpliter::split(const std::string& filename, int num_blocks) {
 
   for (int i = 0; i < num_blocks; ++i) {
     std::string name = StringPrintf("%s_%d", filename.c_str(), i);
+#ifndef _MSC_VER
     file_ptr_write[i] = OpenFileOrDie(name.c_str(), "w+");
+#else
+    file_ptr_write[i] = OpenFileOrDie(name.c_str(), "wb+");
+#endif
     file_desc_write[i] = fileno(file_ptr_write[i]);
     int ret = ftruncate(file_desc_write[i], 
       next_block_size + kMaxLineSize);
@@ -82,8 +95,14 @@ void FileSpliter::split(const std::string& filename, int num_blocks) {
     next_block_size =
         average_block_size + (next_block_size - real_file_size);
     offset += real_file_size;
+#ifdef _MSC_VER
+  Close(file_ptr_write[i]);
+#endif
   }
   munmap(map_ptr_read, file_size);
+#ifdef _MSC_VER
+  Close(file_ptr_read);
+#endif
 }
 
 } // namespace xLearn

@@ -41,7 +41,11 @@ REGISTER_READER("disk", OndiskReader);
 // This function will also check if current
 // data has the label y.
 std::string Reader::check_file_format() {
+#ifndef _MSC_VER
   FILE* file = OpenFileOrDie(filename_.c_str(), "r");
+#else
+  FILE* file = OpenFileOrDie(filename_.c_str(), "rb");
+#endif
   // get the first line of data
   std::string data_line;
   GetLine(file, data_line);
@@ -160,7 +164,11 @@ bool InmemReader::hash_binary(const std::string& filename) {
   std::string bin_file = filename + ".bin";
   // If the ".bin" file does not exists, return false.
   if (!FileExist(bin_file.c_str())) { return false; }
+#ifndef _MSC_VER
   FILE* file = OpenFileOrDie(bin_file.c_str(), "r");
+#else
+  FILE* file = OpenFileOrDie(bin_file.c_str(), "rb");
+#endif
   // Check the first hash value
   uint64 hash_1 = 0;
   ReadDataFromDisk(file, (char*)&hash_1, sizeof(hash_1));
@@ -205,7 +213,11 @@ void InmemReader::init_from_txt() {
   // Convert MB to Byte
   uint64 read_byte = block_size_ * 1024 * 1024;
   // Open file
+#ifndef _MSC_VER
   FILE* file = OpenFileOrDie(filename_.c_str(), "r");
+#else
+  FILE* file = OpenFileOrDie(filename_.c_str(), "rb");
+#endif
   // Read until the end of file
   for (;;) {
     // Read a block of data from disk file
@@ -289,7 +301,11 @@ void OndiskReader::Initialize(const std::string& filename) {
                << "You set change the block size via configuration.";
   }
   // Open file
+#ifndef _MSC_VER
   file_ptr_ = OpenFileOrDie(filename_.c_str(), "r");
+#else
+  file_ptr_ = OpenFileOrDie(filename_.c_str(), "rb");
+#endif
 }
 
 // Return to the begining of the file

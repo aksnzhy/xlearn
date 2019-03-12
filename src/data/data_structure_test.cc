@@ -89,7 +89,11 @@ TEST(DMATRIX_TEST, Serialize_and_Deserialize) {
   }
   matrix.SetHash(1234, 5678);
   // Serialize
+#ifndef _MSC_VER
   matrix.Serialize("/tmp/test.bin");
+#else
+  matrix.Serialize("../../test.bin");
+#endif
   matrix.Reset();
   EXPECT_EQ(matrix.has_label, true);
   EXPECT_EQ(matrix.hash_value_1, 0);
@@ -100,7 +104,11 @@ TEST(DMATRIX_TEST, Serialize_and_Deserialize) {
   EXPECT_EQ(matrix.norm.empty(), true);
   EXPECT_EQ(matrix.row.empty(),true);
   // Deserialize
+#ifndef _MSC_VER
   matrix.Deserialize("/tmp/test.bin");
+#else
+  matrix.Deserialize("../../test.bin");
+#endif
   EXPECT_EQ(matrix.row_length, kLength);
   EXPECT_EQ(matrix.hash_value_1, 1234);
   EXPECT_EQ(matrix.hash_value_2, 5678);
@@ -116,7 +124,11 @@ TEST(DMATRIX_TEST, Serialize_and_Deserialize) {
       EXPECT_FLOAT_EQ(iter->feat_val, 2.5);
     }
   }
+#ifndef _MSC_VER
   RemoveFile("/tmp/test.bin");
+#else
+  RemoveFile("../../test.bin");
+#endif
 }
 
 TEST(DMATRIX_TEST, Find_Max_Feat_and_Field) {

@@ -69,7 +69,7 @@ class TestDataConversion(unittest.TestCase):
         Test if the conversion between libsvm and numpy array is correct
         """
 
-        file = tempfile.NamedTemporaryFile(delete=True)
+        file = tempfile.NamedTemporaryFile(delete=False)
 
         # write to temporary files
         write_data_to_xlearn_format(self.X, self.y, file.name)
@@ -86,7 +86,7 @@ class TestDataConversion(unittest.TestCase):
         Test if the conversion between libsvm and csr matrix is correct
         """
         X_spase = csr_matrix(self.X)
-        file = tempfile.NamedTemporaryFile(delete=True)
+        file = tempfile.NamedTemporaryFile(delete=False)
 
         # write to temporary files
         write_data_to_xlearn_format(X_spase, self.y, file.name)
@@ -102,7 +102,7 @@ class TestDataConversion(unittest.TestCase):
         """
         Test if the conversion between libffm and numpy array is correct
         """
-        file = tempfile.NamedTemporaryFile(delete=True)
+        file = tempfile.NamedTemporaryFile(delete=False)
 
         # write data to libffm format
         write_data_to_xlearn_format(self.X, self.y, file.name, fields=self.fields)
@@ -120,7 +120,7 @@ class TestDataConversion(unittest.TestCase):
         Test if the conversion between libffm and csr matrix is correct
         """
         X_sparse = csr_matrix(self.X)
-        file = tempfile.NamedTemporaryFile(delete=True)
+        file = tempfile.NamedTemporaryFile(delete=False)
 
         # write data to libffm format
         write_data_to_xlearn_format(X_sparse, self.y, file.name, fields=self.fields)

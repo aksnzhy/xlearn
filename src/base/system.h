@@ -21,8 +21,14 @@ This file defines several system functions.
 #ifndef XLEARN_BASE_SYSTEM_H_
 #define XLEARN_BASE_SYSTEM_H_
 
+#ifndef _MSC_VER
 #include <sys/utsname.h>
 #include <unistd.h>
+#else
+#define HAVE_STRUCT_TIMESPEC
+#include "src/base/utsname.h"
+#include "src/base/unistd.h"
+#endif
 
 #include <string>
 
@@ -48,7 +54,11 @@ std::string get_user_name() {
 std::string print_current_time() {
   time_t current_time = time(NULL);
   struct tm broken_down_time;
+#ifndef _MSC_VER
   CHECK(localtime_r(&current_time, &broken_down_time) == &broken_down_time);
+#else
+  CHECK(localtime_s(&broken_down_time, &current_time) == 0);
+#endif
   return StringPrintf("%04d%02d%02d-%02d%02d%02d",
                       1900 + broken_down_time.tm_year,
                       1 + broken_down_time.tm_mon,

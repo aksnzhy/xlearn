@@ -26,7 +26,11 @@ This file tests file_util.h file.
 #include "src/base/file_util.h"
 
 TEST(FileTest, File_Exist) {
+#ifndef _MSC_VER
   std::string filename = "/tmp/test";
+#else
+  std::string filename = "../../test";
+#endif
   FILE* file = OpenFileOrDie(filename.c_str(), "w");
   bool bo = FileExist(filename.c_str());
   EXPECT_EQ(bo, true);
@@ -37,7 +41,11 @@ TEST(FileTest, File_Exist) {
 }
 
 TEST(FileTest, Get_File_Size) {
+#ifndef _MSC_VER
   std::string filename = "/tmp/test";
+#else
+  std::string filename = "../../test";
+#endif
   FILE* file_w = OpenFileOrDie(filename.c_str(), "w");
   int number = 999;
   WriteDataToDisk(file_w, (char*)&number, sizeof(number));
@@ -48,7 +56,11 @@ TEST(FileTest, Get_File_Size) {
 }
 
 TEST(FileTest, Get_One_Line) {
+#ifndef _MSC_VER
   std::string filename = "/tmp/test";
+#else
+  std::string filename = "../../test";
+#endif
   FILE* file_w = OpenFileOrDie(filename.c_str(), "w");
   std::string w_str("apple\n");
   for (int i = 0; i < 3; ++i) {
@@ -66,7 +78,11 @@ TEST(FileTest, Get_One_Line) {
 }
 
 TEST(FileTest, Write_and_Read_Data) {
+#ifndef _MSC_VER
   std::string filename = "/tmp/test";
+#else
+  std::string filename = "../../test";
+#endif
   FILE* file_w = OpenFileOrDie(filename.c_str(), "w");
   int number = 999;
   WriteDataToDisk(file_w, (char*)&number, sizeof(number));
@@ -80,7 +96,11 @@ TEST(FileTest, Write_and_Read_Data) {
 }
 
 TEST(FileTest, Serialize_and_Deserialize_string) {
+#ifndef _MSC_VER
   std::string filename = "/tmp/test.bin";
+#else
+  std::string filename = "../../test.bin";
+#endif
   FILE* file = OpenFileOrDie(filename.c_str(), "w");
   // Serialize
   std::string str_1("apple");
@@ -101,7 +121,11 @@ TEST(FileTest, Serialize_and_Deserialize_string) {
 }
 
 TEST(FileTest, Serialize_and_Deserialize_vector) {
+#ifndef _MSC_VER
    std::string filename = "/tmp/test.bin";
+#else
+   std::string filename = "../../test.bin";
+#endif
    FILE* file = OpenFileOrDie(filename.c_str(), "w");
    // Serialize
    std::vector<int> array;

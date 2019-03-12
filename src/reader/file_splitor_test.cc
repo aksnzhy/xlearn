@@ -30,7 +30,11 @@ using std::string;
 
 namespace xLearn {
 
+#ifndef _MSC_VER
 const string kTestfilename = "/tmp/test_file";
+#else
+const string kTestfilename = "../../test_file";
+#endif
 const int kNumfolds = 5;
 const int kNumOfLines = 1000 + 1;
 const int kMaxLineSize = 100 * 1024; // 100 kb
@@ -55,6 +59,7 @@ class SpliterTest : public ::testing::Test {
       string filename = StringPrintf("%s_%d", kTestfilename.c_str(), i);
       RemoveFile(filename.c_str());
     }
+    RemoveFile(kTestfilename.c_str());
   }
 };
 

@@ -115,7 +115,11 @@ struct HyperParam {
   output_file = test_set_file + ".out" */
   std::string output_file;
   /* Filename of log file */
+#ifndef _MSC_VER
   std::string log_file = "/tmp/xlearn_log";
+#else
+  std::string log_file = "xlearn_log";
+#endif
   /* Block size for on-disk training */
   int block_size = 500;  // 500 MB
   /* If generate bin file */
