@@ -19,4 +19,5 @@
 namespace Color {
 
 bool Modifier::is_first_ = true;
+
 } // namespace Color
