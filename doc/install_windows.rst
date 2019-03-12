@@ -1,8 +1,7 @@
 Installation Guide for Windows
 ----------------------------------
 
-For now, xLearn can support both Linux, Mac OS X and Windows. This page gives instructions on how to build and install the xLearn
-from source code on Windows. Before starting,  make sure that your Windows has already installed  ``Visual Studio 2017`` and ``CMake``. 
+For now, xLearn can support Windows. This page gives instructions on how to build and install the xLearn from source code on Windows. Before starting,  make sure that your Windows has already installed  ``Visual Studio 2017`` and ``CMake``. 
 
 Install Visual Studio 2017
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -100,5 +99,5 @@ You will see the following message if the installation is successful: ::
       >  <| |___|  __/ (_| | |  | | | |
      /_/\_\_____/\___|\__,_|_|  |_| |_|
 
-        xLearn   -- 0.41 Version --
+        xLearn   -- 0.42 Version --
   -------------------------------------------------------------------------
