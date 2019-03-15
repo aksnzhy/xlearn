@@ -39,10 +39,10 @@ namespace xLearn {
 typedef float real_t;
 
 //------------------------------------------------------------------------------
-// We use 32-bits unsigned integer to store the index 
+// We use 64-bits unsigned integer to store the index 
 // of the feature and the model parameters.
 //------------------------------------------------------------------------------
-typedef uint32 index_t;
+typedef uint64 index_t;
 
 //------------------------------------------------------------------------------
 // Mapping sparse feature to dense feature. Used by distributed computation.
