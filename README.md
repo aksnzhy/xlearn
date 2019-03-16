@@ -47,7 +47,7 @@ xLearn has been developed and used by many active community members. Your help i
 
 ## For Enterprise Users and Call for Sponsors
 
-If you are enterprise users and find xLearn is useful, please let us know, and we are glad to add your company logo here. We also welcome you become a sponsor to make this project better.
+If you are enterprise users and find xLearn is useful in your work, please let us know, and we are glad to add your company logo here. We also welcome you become a sponsor to make this project better.
 
 <img src="https://github.com/aksnzhy/xLearn/raw/master/img/tencent.png" width = "200"/>
 <img src="https://github.com/aksnzhy/xLearn/raw/master/img/stategrid.jpg" width = "200"/>
