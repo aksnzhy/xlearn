@@ -134,8 +134,8 @@ class BaseXLearnModel(BaseEstimator):
 
         # initialize internal structure
         self._XLearnModel = None
-        self._temp_model_file = tempfile.NamedTemporaryFile(delete=True)
-        self._temp_weight_file = tempfile.NamedTemporaryFile(delete=True)
+        self._temp_model_file = tempfile.NamedTemporaryFile(delete=False)
+        self._temp_weight_file = tempfile.NamedTemporaryFile(delete=False)
         self.weights = None
         self.fields = None
 
@@ -209,7 +209,7 @@ class BaseXLearnModel(BaseEstimator):
             raise Exception('model_type must be fm, ffm or lr')
 
         # create temporary files for training data
-        temp_train_file = tempfile.NamedTemporaryFile(delete=True)
+        temp_train_file = tempfile.NamedTemporaryFile(delete=False)
 
         if y is None:
             assert isinstance(X, str), 'X must be a string specifying training file location' \
@@ -261,7 +261,7 @@ class BaseXLearnModel(BaseEstimator):
                     y_numeric=True, 
                     multi_output=False)
 
-                temp_val_file = tempfile.NamedTemporaryFile(delete=True)
+                temp_val_file = tempfile.NamedTemporaryFile(delete=False)
                 self._convert_data(X_val, y_val, temp_val_file.name, fields=self.fields)
                 self._XLearnModel.setValidate(temp_val_file.name)
 
@@ -276,6 +276,7 @@ class BaseXLearnModel(BaseEstimator):
 
         # remove temporary files for training
         self._remove_temp_file(temp_train_file)
+        self._remove_temp_file(temp_val_file)
 
     def predict(self, X):
         """ Generate prediction using feature matrix X
@@ -286,7 +287,7 @@ class BaseXLearnModel(BaseEstimator):
         """
 
         # convert data to libsvm or libffm format
-        temp_test_file = tempfile.NamedTemporaryFile(delete=True)
+        temp_test_file = tempfile.NamedTemporaryFile(delete=False)
 
         if isinstance(X, str):
             self._XLearnModel.setTest(X)
@@ -296,7 +297,7 @@ class BaseXLearnModel(BaseEstimator):
             self._XLearnModel.setTest(temp_test_file.name)
 
         # generate output
-        temp_output_file = tempfile.NamedTemporaryFile(delete=True)
+        temp_output_file = tempfile.NamedTemporaryFile(delete=False)
         self.get_model().predict(self._temp_model_file.name, temp_output_file.name)
 
         # read output into numpy
@@ -356,10 +357,17 @@ class BaseXLearnModel(BaseEstimator):
         if os.path.exists(temp_bin_file):
             os.remove(temp_bin_file)
         temp_file.close()
+        if os.path.exists(temp_file.name):
+            os.remove(temp_file.name)
+
+    def __del__(self):
+        self._remove_temp_file(self._temp_model_file)
+        self._remove_temp_file(self._temp_weight_file)
 
     def __delete__(self, instance):
-        self._temp_model_file.close()
-        self._temp_weight_file.close()
+        # self._temp_model_file.close()
+        # self._temp_weight_file.close()
+        del instance
 
 class FMModel(BaseXLearnModel):
     """ Factorization machine (FM) model
