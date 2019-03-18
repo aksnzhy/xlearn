@@ -45,6 +45,8 @@ for interfacing to other languages.
 
 /* Handle to xlearn */
 typedef void* XL;
+/* Handle to DMatrix */
+typedef void* DM;
 
 // Say hello to user
 XL_DLL int XLearnHello();
@@ -54,6 +56,12 @@ XL_DLL int XLearnCreate(const char *model_type, XL *out);
 
 // Free the xLearn handle
 XL_DLL int XLearnHandleFree(XL *out);
+
+// Transform Numpy or Pandas DataFrame to DMatrix
+XL_DLL int xLearnDMatrix(const float *data,
+                         const index_t *field_map,
+                         uint64 nrow, uint64 ncol,
+                         DM *out);
 
 // Show the model information
 XL_DLL int XLearnShow(XL *out);
@@ -137,8 +145,13 @@ class XLearn {
     return solver; 
   }
 
+  inline xLearn::DMatrix& GetDMatrix() {
+    return dmatrix;
+  }
+
  protected:
    xLearn::HyperParam hyper_param;
+   xLearn::DMatrix dmatrix;
    xLearn::Solver solver;
 
  private:

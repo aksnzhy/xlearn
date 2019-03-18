@@ -185,6 +185,7 @@ void Checker::Initialize(bool is_train, int argc, char* argv[]) {
     menu_.push_back(std::string("--dis-es"));
     menu_.push_back(std::string("--no-norm"));
     menu_.push_back(std::string("--no-bin"));
+    menu_.push_back(std::string("--from-file"));
     menu_.push_back(std::string("--quiet"));
     menu_.push_back(std::string("-alpha"));
     menu_.push_back(std::string("-beta"));
@@ -199,6 +200,7 @@ void Checker::Initialize(bool is_train, int argc, char* argv[]) {
     menu_.push_back(std::string("--sigmoid"));
     menu_.push_back(std::string("--disk"));
     menu_.push_back(std::string("--no-norm"));
+    menu_.push_back(std::string("--from-file"));
   }
   // Get the user's input
   for (int i = 0; i < argc; ++i) {
@@ -230,7 +232,7 @@ bool Checker::check_param(HyperParam& hyper_param) {
   }
 }
 
-// Check options for training tasks
+// Check options for training tasks, for CLI must from-file
 bool Checker::check_train_options(HyperParam& hyper_param) {
   bool bo = true;
   /*********************************************************
@@ -581,20 +583,23 @@ bool Checker::check_train_param(HyperParam& hyper_param) {
   /*********************************************************
    *  Check file path                                      *
    *********************************************************/
-  if (!FileExist(hyper_param.train_set_file.c_str())) {
-    Color::print_error(
-      StringPrintf("Training data file: %s does not exist.", 
-                    hyper_param.train_set_file.c_str())
-    );
-    bo = false;
-  }
-  if (!hyper_param.validate_set_file.empty() &&
-      !FileExist(hyper_param.validate_set_file.c_str())) {
-    Color::print_error(
-      StringPrintf("Validation data file: %s does not exist.", 
-                    hyper_param.validate_set_file.c_str())
-    );
-    bo = false;
+  if (hyper_param.from_file) {
+    if (!FileExist(hyper_param.train_set_file.c_str())) {
+      Color::print_error(
+        StringPrintf("Training data file: %s does not exist.", 
+                      hyper_param.train_set_file.c_str())
+      );
+      bo = false;
+    }
+
+      if (!hyper_param.validate_set_file.empty() &&
+        !FileExist(hyper_param.validate_set_file.c_str())) {
+      Color::print_error(
+        StringPrintf("Validation data file: %s does not exist.", 
+                      hyper_param.validate_set_file.c_str())
+      );
+      bo = false;
+    }
   }
   /*********************************************************
    *  Check invalid value                                  *
@@ -868,12 +873,14 @@ bool Checker::check_prediction_param(HyperParam& hyper_param) {
  /*********************************************************
   *  Check the path of test set file                      *
   *********************************************************/
- if (!FileExist(hyper_param.test_set_file.c_str())) {
-    Color::print_error(
-      StringPrintf("Test set file: %s does not exist.",
-           hyper_param.test_set_file.c_str())
-    );
-    bo =  false;
+ if (hyper_param.from_file){
+  if (!FileExist(hyper_param.test_set_file.c_str())) {
+      Color::print_error(
+        StringPrintf("Test set file: %s does not exist.",
+            hyper_param.test_set_file.c_str())
+      );
+      bo =  false;
+  }
  }
  /*********************************************************
   *  Check the path of model file                         *

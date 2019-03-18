@@ -184,6 +184,8 @@ void Solver::init_log() {
               StringPrintf("%s.ERROR", prefix.c_str()));
 }
 
+
+// TODO(etVERITAS)
 // Initialize training task
 void Solver::init_train() {
   /*********************************************************
