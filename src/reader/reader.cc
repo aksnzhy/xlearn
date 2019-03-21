@@ -257,6 +257,7 @@ index_t InmemReader::Samples(DMatrix* &matrix) {
       // End of the data buffer
       if (i == 0) {
         if (shuffle_) {
+          srand(this->seed_+1);
           random_shuffle(order_.begin(), order_.end());
         }
         matrix = nullptr;
