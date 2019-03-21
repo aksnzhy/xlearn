@@ -15,7 +15,7 @@
 import xlearn as xl
 
 # Training task
-fm_model = xl.create_fm() # Use factorization machine
+fm_model = xl.create_fm()  # Use factorization machine
 fm_model.setTrain("./house_price_train.txt")    # Training data
 fm_model.setValidate("./house_price_test.txt")  # Validation data
 
@@ -23,7 +23,7 @@ fm_model.setValidate("./house_price_test.txt")  # Validation data
 #  0. regression task
 #  1. learning rate: 0.2
 #  2. regular lambda: 0.002
-#  3. evaluation metric: accuracy
+#  3. evaluation metric: mae
 param = {'task':'reg', 'lr':0.2, 
          'lambda':0.002, 'metric':'mae'}
 
@@ -33,7 +33,6 @@ fm_model.fit(param, './model.out')
 
 # Prediction task
 fm_model.setTest("./house_price_test.txt")  # Test data
-fm_model.setSigmoid()  # Convert output to 0-1
 
 # Start to predict
 # The output result will be stored in output.txt
