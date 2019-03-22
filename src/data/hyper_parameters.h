@@ -124,8 +124,6 @@ struct HyperParam {
   int block_size = 500;  // 500 MB
   /* If generate bin file */
   bool bin_out = true;
-  /* From file(true) or DMatrix(false), main in Python API */
-  bool from_file = true;
 //------------------------------------------------------------------------------
 // Parameters for validation
 //------------------------------------------------------------------------------
