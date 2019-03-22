@@ -124,6 +124,8 @@ struct HyperParam {
   int block_size = 500;  // 500 MB
   /* If generate bin file */
   bool bin_out = true;
+  /* Random seed to shuffle data set */
+  int seed = 1;
 //------------------------------------------------------------------------------
 // Parameters for validation
 //------------------------------------------------------------------------------
