@@ -287,6 +287,8 @@ XL_DLL int XLearnSetInt(XL *out, const char *key, const int value) {
     xl->GetHyperParam().thread_number = value;
   } else if (strcmp(key, "stop_window") == 0) {
     xl->GetHyperParam().stop_window = value;
+  } else if (strcmp(key, "seed") == 0) {
+    xl->GetHyperParam().seed = value;
   }
   API_END();
 }

@@ -116,6 +116,11 @@ class Reader {
     bin_out_ = false;  
   }
 
+  // Set random see
+  void SetSeed(int seed) {
+    seed_ = seed;
+  }
+
   // If shuffle data ?
   virtual void SetShuffle(bool shuffle) {
     shuffle_ = shuffle;
@@ -142,6 +147,8 @@ class Reader {
   char* block_;
   /* Block size */
   size_t block_size_;
+  /* Random seed */
+  int seed_ = 1;
 
   // Check current file format and return
   // "libsvm", "ffm", or "csv".
@@ -201,6 +208,7 @@ class InmemReader : public Reader {
   virtual inline void SetShuffle(bool shuffle) {
     this->shuffle_ = shuffle;
     if (shuffle_ && !order_.empty()) {
+      srand(this->seed_);
       random_shuffle(order_.begin(), order_.end());
     }
   }

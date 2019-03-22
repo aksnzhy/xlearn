@@ -241,6 +241,7 @@ void Solver::init_train() {
   for (int i = 0; i < num_reader; ++i) {
     reader_[i] = create_reader();
     reader_[i]->SetBlockSize(hyper_param_.block_size);
+    reader_[i]->SetSeed(hyper_param_.seed);
     if (hyper_param_.bin_out == false) {
       reader_[i]->SetNoBin();
     }
