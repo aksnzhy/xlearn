@@ -20,7 +20,6 @@ This file is the implementation of C API.
 
 #include <string>
 #include <iostream>
-#include <memory>
 
 #include <string.h>
 
@@ -65,25 +64,6 @@ XL_DLL int XLearnHandleFree(XL *out) {
   API_BEGIN();
   // For now, we do nothing here
   API_END();
-}
-
-// Transform Numpy or Pandas DataFrame to DMatrix
-XL_DLL int xLearnDMatrix(const float *data,
-                         const index_t *field_map,
-                         uint64 nrow, uint64 ncol,
-                         DM *out) {
-  std::unique_ptr<xLearn::DMatrix> source(new xLearn::DMatrix());
-  for (int i = 0; i < nrow; ++i) {
-    source->AddRow();
-    for (int j = 0; j < ncol; ++j) {
-      if (field_map != nullptr){
-        source->AddNode(i, j, data[j+i*ncol], field_map[j]);
-      } else {
-        source->AddNode(i, j, data[j+i*ncol]);
-      }
-    }
-  }
-  *out = new std::shared_ptr<xLearn::DMatrix>(std::move(source));
 }
 
 // Show the mode information

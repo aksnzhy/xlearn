@@ -7,6 +7,9 @@
 *.o
 *.obj
 build/*
+build_win/*
+.vscode/*
+.vs/*
 
 # Precompiled Headers
 *.gch
