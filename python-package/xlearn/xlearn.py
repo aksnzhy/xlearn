@@ -18,6 +18,7 @@ import os
 import ctypes
 from numpy import ndarray
 from pandas import DataFrame 
+import numpy as np 
 from .base import _LIB, XLearnHandle
 from .base import _check_call, c_str
 from .data import DMatrix
@@ -285,8 +286,15 @@ class XLearn(object):
         model_path : str. path of model checkpoint.
         out_path : str. path of output result.
         """
+        length = ctypes.c_uint64()
+        preds = ctypes.POINTER(ctypes.c_float)()
         _check_call(_LIB.XLearnPredict(ctypes.byref(self.handle),
-                                       c_str(model_path), c_str(out_path)))
+                                       c_str(model_path), c_str(out_path), ctypes.byref(length), ctypes.byref(preds)))
+        
+        res = np.zeros(length.value, dtype=np.float32)
+        ctypes.memmove(res.ctypes.data, preds, length.value * res.strides[0])
+        
+        return res
 
 def create_linear():
     """

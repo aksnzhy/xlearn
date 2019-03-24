@@ -52,6 +52,7 @@ void Predictor::Predict() {
       o_file << out[i] << "\n";
     }
   }
+  this->out_ = out;
   if (reader_->has_label()) {
     Color::print_info(
       StringPrintf("The test loss is: %.6f", 

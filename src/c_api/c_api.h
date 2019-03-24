@@ -107,7 +107,9 @@ XL_DLL int XLearnFit(XL *out, const char *model_path);
 XL_DLL int XLearnCV(XL *out);
 
 // Start to predict
-XL_DLL int XLearnPredict(XL *out, const char *model_path, const char *out_path);
+XL_DLL int XLearnPredict(XL *out, const char *model_path, 
+                         const char *out_path, uint64 *length,
+                         const float **out_arr);
 
 // Set DMatrix
 XL_DLL int XLearnSetDMatrix(XL *out, const char *key, DataHandle *out_data);

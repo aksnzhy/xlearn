@@ -250,7 +250,9 @@ XL_DLL int XLearnCV(XL *out) {
 }
 
 // Start to predict
-XL_DLL int XLearnPredict(XL *out, const char *model_path, const char *out_path) {
+XL_DLL int XLearnPredict(XL *out, const char *model_path, 
+                         const char *out_path, uint64 *length,
+                         const float** out_arr) {
   API_BEGIN();
   Timer timer;
   timer.tic();
@@ -261,6 +263,10 @@ XL_DLL int XLearnPredict(XL *out, const char *model_path, const char *out_path) 
   xl->GetSolver().Initialize(xl->GetHyperParam());
   xl->GetSolver().SetPredict();
   xl->GetSolver().StartWork();
+  std::vector<real_t> &preds = xl->GetSolver().GetResult();
+  *out_arr = &preds[0];
+  *length = static_cast<uint64>(preds.size());
+  std::cout << *length << std::endl;
   xl->GetSolver().Clear();
   Color::print_info(
     StringPrintf("Total time cost: %.2f (sec)", 

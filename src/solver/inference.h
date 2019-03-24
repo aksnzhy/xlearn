@@ -63,11 +63,17 @@ class Predictor {
   // The core function
   void Predict();
 
+  // Get the results
+  inline std::vector<real_t> GetResult() {
+    return this->out_;
+  }
+
  protected:
   Reader* reader_;
   Model* model_;
   Loss* loss_;
   std::string out_file_;
+  std::vector<real_t> out_;
   bool sign_;
   bool sigmoid_;
 

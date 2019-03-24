@@ -608,6 +608,7 @@ void Solver::start_prediction_work() {
                  hyper_param_.sigmoid);
   // Predict and write output
   pdc.Predict();
+  this->out_ = pdc.GetResult();
 }
 
 /******************************************************************************
