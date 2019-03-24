@@ -266,7 +266,6 @@ XL_DLL int XLearnPredict(XL *out, const char *model_path,
   std::vector<real_t> &preds = xl->GetSolver().GetResult();
   *out_arr = &preds[0];
   *length = static_cast<uint64>(preds.size());
-  std::cout << *length << std::endl;
   xl->GetSolver().Clear();
   Color::print_info(
     StringPrintf("Total time cost: %.2f (sec)", 
