@@ -596,20 +596,29 @@ bool Checker::check_train_param(HyperParam& hyper_param) {
   /*********************************************************
    *  Check file path                                      *
    *********************************************************/
-  if (!FileExist(hyper_param.train_set_file.c_str())) {
-    Color::print_error(
-      StringPrintf("Training data file: %s does not exist.", 
-                    hyper_param.train_set_file.c_str())
-    );
-    bo = false;
-  }
-  if (!hyper_param.validate_set_file.empty() &&
-      !FileExist(hyper_param.validate_set_file.c_str())) {
-    Color::print_error(
-      StringPrintf("Validation data file: %s does not exist.", 
-                    hyper_param.validate_set_file.c_str())
-    );
-    bo = false;
+  if (hyper_param.from_file) {
+    if (!FileExist(hyper_param.train_set_file.c_str())) {
+      Color::print_error(
+        StringPrintf("Training data file: %s does not exist.", 
+                      hyper_param.train_set_file.c_str())
+      );
+      bo = false;
+    }
+    if (!hyper_param.validate_set_file.empty() &&
+        !FileExist(hyper_param.validate_set_file.c_str())) {
+      Color::print_error(
+        StringPrintf("Validation data file: %s does not exist.", 
+                      hyper_param.validate_set_file.c_str())
+      );
+      bo = false;
+    }  
+  } else {
+    if (hyper_param.train_dataset == nullptr) {
+      Color::print_error(
+        StringPrintf("Training dataset is None, please check!")
+      );
+      bo = false;
+    }
   }
   /*********************************************************
    *  Check invalid value                                  *
@@ -883,19 +892,28 @@ bool Checker::check_prediction_param(HyperParam& hyper_param) {
  /*********************************************************
   *  Check the path of test set file                      *
   *********************************************************/
- if (!FileExist(hyper_param.test_set_file.c_str())) {
-    Color::print_error(
-      StringPrintf("Test set file: %s does not exist.",
-           hyper_param.test_set_file.c_str())
-    );
-    bo =  false;
+ if (hyper_param.from_file) {
+  if (!FileExist(hyper_param.test_set_file.c_str())) {
+      Color::print_error(
+        StringPrintf("Test set file: %s does not exist.",
+            hyper_param.test_set_file.c_str())
+      );
+      bo =  false;
+  }
+ } else {
+   if (hyper_param.test_dataset == nullptr) {
+      Color::print_error(
+        StringPrintf("Test dataset is None, please check!")
+      );
+      bo =  false;
+   }
  }
  /*********************************************************
   *  Check the path of model file                         *
   *********************************************************/
  if (!FileExist(hyper_param.model_file.c_str())) {
     Color::print_error(
-      StringPrintf("Test set file: %s does not exist.",
+      StringPrintf("Model file: %s does not exist.",
            hyper_param.model_file.c_str())
     );
     bo = false;

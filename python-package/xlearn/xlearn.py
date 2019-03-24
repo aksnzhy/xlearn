@@ -16,8 +16,11 @@
 import sys
 import os
 import ctypes
+from numpy import ndarray
+from pandas import DataFrame 
 from .base import _LIB, XLearnHandle
 from .base import _check_call, c_str
+from .data import DMatrix
 
 class XLearn(object):
     """XLearn is the core interface used by python API."""
@@ -115,8 +118,19 @@ class XLearn(object):
         train_path : str
            the path of training data
         """
-        _check_call(_LIB.XLearnSetTrain(ctypes.byref(self.handle), c_str(train_path)))
-
+        if isinstance(train_path, str):
+            _check_call(_LIB.XLearnSetTrain(ctypes.byref(self.handle), c_str(train_path)))
+        elif isinstance(train_path, ndarray) | isinstance(train_path, DataFrame):
+            key = "train"
+            train_data = DMatrix(train_path)
+            _check_call(_LIB.XLearnSetDMatrix(ctypes.byref(self.handle), c_str(key), ctypes.byref(train_data.handle)))
+            _check_call(_LIB.XLearnSetBool(ctypes.byref(self.handle), c_str("from_file"), ctypes.c_bool(False)))
+        elif isinstance(train_path, DMatrix):
+            key = "train"
+            _check_call(_LIB.XLearnSetDMatrix(ctypes.byref(self.handle), c_str(key), ctypes.byref(train_path.handle)))
+            _check_call(_LIB.XLearnSetBool(ctypes.byref(self.handle), c_str("from_file"), ctypes.c_bool(False)))
+        else:
+            raise Exception("Invalid train.Can be test file path, numpy array, pandas DataFrame or xLearn DMatrix", type(train_path))
 
     def setTest(self, test_path):
         """Set file path of test data.
@@ -126,7 +140,19 @@ class XLearn(object):
         test_path : str
            the path of test data.
         """
-        _check_call(_LIB.XLearnSetTest(ctypes.byref(self.handle), c_str(test_path)))
+        if isinstance(test_path, str):
+            _check_call(_LIB.XLearnSetTest(ctypes.byref(self.handle), c_str(test_path)))
+        elif isinstance(test_path, ndarray) | isinstance(test_path, DataFrame):
+            key = "test"
+            test_data = DMatrix(test_path)
+            _check_call(_LIB.XLearnSetDMatrix(ctypes.byref(self.handle), c_str(key), ctypes.byref(test_data.handle)))
+            _check_call(_LIB.XLearnSetBool(ctypes.byref(self.handle), c_str("from_file"), ctypes.c_bool(False)))
+        elif isinstance(test_path, DMatrix):
+            key = "test"
+            _check_call(_LIB.XLearnSetDMatrix(ctypes.byref(self.handle), c_str(key), ctypes.byref(test_path.handle)))
+            _check_call(_LIB.XLearnSetBool(ctypes.byref(self.handle), c_str("from_file"), ctypes.c_bool(False)))
+        else:
+            raise Exception("Invalid test.Can be test file path, numpy array, pandas DataFrame or xLearn DMatrix", type(test_path))
 
     def setPreModel(self, pre_model_path):
         """ Set file path of pre-trained model.
@@ -146,18 +172,28 @@ class XLearn(object):
         val_path : str
            the path of validation data.
         """
-        _check_call(_LIB.XLearnSetValidate(ctypes.byref(self.handle), c_str(val_path)))
+        if isinstance(val_path, str):
+            _check_call(_LIB.XLearnSetValidate(ctypes.byref(self.handle), c_str(val_path)))
+        elif isinstance(val_path, ndarray) | isinstance(val_path, DataFrame):
+            key = "validate"
+            val_data = DMatrix(val_path)
+            _check_call(_LIB.XLearnSetDMatrix(ctypes.byref(self.handle), c_str(key), ctypes.byref(val_data.handle)))
+        elif isinstance(val_path, DMatrix):
+            key = "validate"
+            _check_call(_LIB.XLearnSetDMatrix(ctypes.byref(self.handle), c_str(key), ctypes.byref(val_path.handle)))
+        else:
+            raise Exception("Invalid validation.Can be test file path, numpy array, pandas DataFrame or xLearn DMatrix", type(val_path))
 
-    def setValidateDMatrix(self, val_data):
-        """Set the data matrix for validation set
+    # def setValidateDMatrix(self, val_data):
+    #     """Set the data matrix for validation set
 
-        Parameters
-        ----------
-        val_data : DMatrix
-            the validation matrix for validation set
-        """
-        _check_call(_LIB.XLearnSetValidateDMatrix(ctypes.byref(self.handle),
-                                                  ctypes.byref(val_data.handle)))
+    #     Parameters
+    #     ----------
+    #     val_data : DMatrix
+    #         the validation matrix for validation set
+    #     """
+    #     _check_call(_LIB.XLearnSetValidateDMatrix(ctypes.byref(self.handle),
+    #                                               ctypes.byref(val_data.handle)))
 
     def setTXTModel(self, model_path):
         """Set the path of TXT model file.

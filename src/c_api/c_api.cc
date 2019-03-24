@@ -59,6 +59,65 @@ XL_DLL int XLearnCreate(const char *model_type, XL *out) {
   API_END();
 }
 
+// Handle data matrix for xLearn
+XL_DLL int XlearnCreateDataFromMat(const real_t* data,
+                                   index_t nrow,
+                                   index_t ncol,
+                                   const real_t* label,
+                                   index_t* field_map,
+                                   DataHandle* out) {
+  API_BEGIN();
+  std::unique_ptr<xLearn::DMatrix> source(new xLearn::DMatrix());	
+  // if feature_map equal nullptr, we will not use field
+  if (label == nullptr) {
+    source->has_label = false;
+    if (field_map == nullptr) {
+      for (int i = 0; i < nrow; ++i) {	
+        source->AddRow();
+        for (int j = 0; j < ncol; ++j) {
+          source->AddNode(i, j, data[j+i*ncol]);
+        }
+      }
+    } else {
+      for (int i = 0; i < nrow; ++i) {	
+        source->AddRow();	
+        for (int j = 0; j < ncol; ++j) {
+          source->AddNode(i, j, data[j+i*ncol], field_map[j]);	
+        }
+      }
+    }
+  } else {
+    source->has_label = true;
+    if (field_map == nullptr) {
+      for (int i = 0; i < nrow; ++i) {	
+        source->AddRow();
+        source->Y[i] = label[i];
+        for (int j = 0; j < ncol; ++j) {
+          source->AddNode(i, j, data[j+i*ncol]);
+        }
+      }
+    } else {
+      for (int i = 0; i < nrow; ++i) {	
+        source->AddRow();
+        source->Y[i] = label[i];
+        for (int j = 0; j < ncol; ++j) {
+          source->AddNode(i, j, data[j+i*ncol], field_map[j]);	
+        }
+      }
+    }
+  }
+  *out = source.release();
+  API_END();
+}
+
+XL_DLL int XlearnDataFree(DataHandle* out) {
+  API_BEGIN();
+  CHECK_NOTNULL(out);
+  reinterpret_cast<xLearn::DMatrix*>(*out)->Reset();
+  delete reinterpret_cast<xLearn::DMatrix*>(*out);
+  API_END();
+}
+
 // Free the xLearn handle
 XL_DLL int XLearnHandleFree(XL *out) {
   API_BEGIN();
@@ -206,6 +265,19 @@ XL_DLL int XLearnPredict(XL *out, const char *model_path, const char *out_path) 
   Color::print_info(
     StringPrintf("Total time cost: %.2f (sec)", 
     timer.toc()), true);
+  API_END();
+}
+
+XL_DLL int XLearnSetDMatrix(XL *out, const char *key, DataHandle *out_data){
+  API_BEGIN()
+  XLearn* xl = reinterpret_cast<XLearn*>(*out);
+  if (strcmp(key, "train") == 0) {
+    xl->GetHyperParam().train_dataset = reinterpret_cast<xLearn::DMatrix*>(*out_data);
+  } else if (strcmp(key, "test") == 0) {
+    xl->GetHyperParam().test_dataset = reinterpret_cast<xLearn::DMatrix*>(*out_data);
+  } else if (strcmp(key, "validate") == 0) {
+    xl->GetHyperParam().valid_dataset = reinterpret_cast<xLearn::DMatrix*>(*out_data);
+  }
   API_END();
 }
 
@@ -357,6 +429,8 @@ XL_DLL int XLearnSetBool(XL *out, const char *key, const bool value) {
     xl->GetHyperParam().sigmoid = value;
   } else if (strcmp(key, "bin_out") == 0) {
     xl->GetHyperParam().bin_out = value;
+  } else if (strcmp(key, "from_file") == 0) {
+    xl->GetHyperParam().from_file = value;
   }
   API_END();
 }
