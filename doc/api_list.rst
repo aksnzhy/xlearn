@@ -74,6 +74,8 @@ Options: ::
   -block <block_size>  :  Block size for on-disk training.
 
   -sw <stop_window>    :  Size of stop window for early-stopping. Using 2 by default. 
+
+  -seed <random_seed>  :  Random Seed to shuffle data set.
                                                                                      
   --disk               :  Open on-disk training for large-scale machine learning problems.
                                                                    
