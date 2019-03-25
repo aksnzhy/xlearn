@@ -8,6 +8,7 @@
 *.obj
 build/*
 build_win/*
+build_unix/*
 .vscode/*
 .vs/*
 

@@ -263,7 +263,9 @@ XL_DLL int XLearnPredict(XL *out, const char *model_path,
   xl->GetSolver().Initialize(xl->GetHyperParam());
   xl->GetSolver().SetPredict();
   xl->GetSolver().StartWork();
-  std::vector<real_t> &preds = xl->GetSolver().GetResult();
+  static std::vector<real_t> tmp_preds;
+  tmp_preds = xl->GetSolver().GetResult();
+  std::vector<real_t> &preds = tmp_preds;
   *out_arr = &preds[0];
   *length = static_cast<uint64>(preds.size());
   xl->GetSolver().Clear();
