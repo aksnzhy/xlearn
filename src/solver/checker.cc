@@ -705,6 +705,11 @@ bool Checker::check_train_param(HyperParam& hyper_param) {
 
 // Check warning and fix conflict
 void Checker::check_conflict_train(HyperParam& hyper_param) {
+  if (!hyper_param.from_file && hyper_param.cross_validation) {
+    Color::print_warning("Transform DMatrix not from file doesn't support cross-validation. "
+                         "xLearn has already disable the -cv option.");
+    hyper_param.cross_validation = false;
+  }
   if (hyper_param.on_disk && hyper_param.cross_validation) {
     Color::print_warning("On-disk training doesn't support cross-validation. "
                          "xLearn has already disable the -cv option.");
@@ -733,13 +738,15 @@ void Checker::check_conflict_train(HyperParam& hyper_param) {
                          "xLearn will not dump model checkpoint to disk.");
     hyper_param.model_file.clear();
   }
-  if (hyper_param.validate_set_file.empty() && hyper_param.early_stop) {
-    Color::print_warning("Validation file not found, xLearn has already "
+  if ((hyper_param.validate_set_file.empty() && hyper_param.valid_dataset == nullptr) 
+      && hyper_param.early_stop) {
+    Color::print_warning("Validation file(dataset) not found, xLearn has already "
                          "disable early-stopping.");
     hyper_param.early_stop = false;
   }
   if (hyper_param.metric.compare("none") != 0 &&
-      hyper_param.validate_set_file.empty() &&
+      hyper_param.validate_set_file.empty() && 
+      hyper_param.valid_dataset == nullptr &&
       !hyper_param.cross_validation) {
     Color::print_warning(
       StringPrintf("Validation file not found, xLearn has already "

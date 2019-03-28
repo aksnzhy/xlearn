@@ -103,12 +103,12 @@ struct HyperParam {
   /* Filename for validation set
   This value can be empty. */
   std::string validate_set_file;
-  /* DMatrix */
-  xLearn::DMatrix* train_dataset;
-
-  xLearn::DMatrix* test_dataset;
-
-  xLearn::DMatrix* valid_dataset;
+  /* DMatrix pointer for train*/
+  xLearn::DMatrix* train_dataset = nullptr;
+  /* DMatrix pointer for test*/
+  xLearn::DMatrix* test_dataset = nullptr;
+  /* DMatrix pointer for validate*/
+  xLearn::DMatrix* valid_dataset = nullptr;
 
   /* Filename of model checkpoint
   On default, model_file = train_set_file + ".model" */
