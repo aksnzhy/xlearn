@@ -14,6 +14,6 @@ REM # See the License for the specific language governing permissions and
 REM # limitations under the License.
 
 REM # Training task
-".\Release\xlearn_train.exe" ./small_train.txt -s 1 -v ./small_test.txt -x acc -l ".\Release\xlearn_log"
+.\Release\xlearn_train.exe ./small_train.txt -s 1 -v ./small_test.txt -x acc -l .\Release\xlearn_log
 REM # Prediction task
-".\Release\xlearn_predict.exe" ./small_test.txt ./small_train.txt.model --sigmoid -l ".\Release\xlearn_log"
+.\Release\xlearn_predict.exe ./small_test.txt ./small_train.txt.model --sigmoid -l .\Release\xlearn_log

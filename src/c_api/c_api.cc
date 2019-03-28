@@ -249,16 +249,16 @@ XL_DLL int XLearnCV(XL *out) {
   API_END();
 }
 
-// Start to predict
-XL_DLL int XLearnPredict(XL *out, const char *model_path, 
-                         const char *out_path, uint64 *length,
-                         const float** out_arr) {
+// Start to predict, this function is for output numpy
+XL_DLL int XLearnPredictForMat(XL *out, const char *model_path, 
+                               uint64 *length,
+                               const float** out_arr) {
   API_BEGIN();
   Timer timer;
   timer.tic();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
   xl->GetHyperParam().model_file = std::string(model_path);
-  xl->GetHyperParam().output_file = std::string(out_path);
+  xl->GetHyperParam().res_out = false;
   xl->GetHyperParam().is_train = false;
   xl->GetSolver().Initialize(xl->GetHyperParam());
   xl->GetSolver().SetPredict();
@@ -268,6 +268,27 @@ XL_DLL int XLearnPredict(XL *out, const char *model_path,
   std::vector<real_t> &preds = tmp_preds;
   *out_arr = &preds[0];
   *length = static_cast<uint64>(preds.size());
+  xl->GetSolver().Clear();
+  Color::print_info(
+    StringPrintf("Total time cost: %.2f (sec)", 
+    timer.toc()), true);
+  API_END();
+}
+
+// Start to predict, this function is for output file
+XL_DLL int XLearnPredictForFile(XL *out, const char *model_path, 
+                         const char *out_path) {
+  API_BEGIN();
+  Timer timer;
+  timer.tic();
+  XLearn* xl = reinterpret_cast<XLearn*>(*out);
+  xl->GetHyperParam().model_file = std::string(model_path);
+  xl->GetHyperParam().output_file = std::string(out_path);
+  xl->GetHyperParam().res_out = true;
+  xl->GetHyperParam().is_train = false;
+  xl->GetSolver().Initialize(xl->GetHyperParam());
+  xl->GetSolver().SetPredict();
+  xl->GetSolver().StartWork();
   xl->GetSolver().Clear();
   Color::print_info(
     StringPrintf("Total time cost: %.2f (sec)", 

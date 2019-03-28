@@ -605,7 +605,8 @@ void Solver::start_prediction_work() {
                  loss_,
                  hyper_param_.output_file,
                  hyper_param_.sign,
-                 hyper_param_.sigmoid);
+                 hyper_param_.sigmoid,
+                 hyper_param_.res_out);
   // Predict and write output
   pdc.Predict();
   this->out_ = pdc.GetResult();

@@ -47,17 +47,20 @@ class Predictor {
                   Loss* loss,
                   const std::string& out,
                   bool sign = false,
-                  bool sigmoid = false) {
+                  bool sigmoid = false,
+                  bool res_out = true) {
     CHECK_NOTNULL(reader);
     CHECK_NOTNULL(model);
     CHECK_NOTNULL(loss);
-    CHECK_NE(out.empty(), true);
+    if (res_out)
+      CHECK_NE(out.empty(), true);
     reader_ = reader;
     model_ = model;
     loss_ = loss;
     out_file_ = out;
     sign_ = sign;
     sigmoid_ = sigmoid;
+    res_out_ = res_out;
   }
 
   // The core function
@@ -76,6 +79,7 @@ class Predictor {
   std::vector<real_t> out_;
   bool sign_;
   bool sigmoid_;
+  bool res_out_;
 
   // Convert output by using the sigmoid function.
   void sigmoid(std::vector<real_t>& in, 

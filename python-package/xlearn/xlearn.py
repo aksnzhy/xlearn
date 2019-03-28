@@ -171,17 +171,6 @@ class XLearn(object):
         else:
             raise Exception("Invalid validation.Can be test file path or xLearn DMatrix", type(val_path))
 
-    # def setValidateDMatrix(self, val_data):
-    #     """Set the data matrix for validation set
-
-    #     Parameters
-    #     ----------
-    #     val_data : DMatrix
-    #         the validation matrix for validation set
-    #     """
-    #     _check_call(_LIB.XLearnSetValidateDMatrix(ctypes.byref(self.handle),
-    #                                               ctypes.byref(val_data.handle)))
-
     def setTXTModel(self, model_path):
         """Set the path of TXT model file.
 
@@ -264,23 +253,29 @@ class XLearn(object):
         self._set_Param(param)
         _check_call(_LIB.XLearnCV(ctypes.byref(self.handle)))
 
-    def predict(self, model_path, out_path):
+    def predict(self, model_path, out_path=None):
         """Predict output
 
         Parameters
         ----------
         model_path : str. path of model checkpoint.
-        out_path : str. path of output result.
+        out_path : str, default None. if a path of output result is setted, then will save result to local file,
+        and will not return numpy res.
         """
-        length = ctypes.c_uint64()
-        preds = ctypes.POINTER(ctypes.c_float)()
-        _check_call(_LIB.XLearnPredict(ctypes.byref(self.handle),
-                                       c_str(model_path), c_str(out_path), ctypes.byref(length), ctypes.byref(preds)))
-        
-        res = np.zeros(length.value, dtype=np.float32)
-        ctypes.memmove(res.ctypes.data, preds, length.value * res.strides[0])
-        
-        return res
+        if out_path is None:
+            length = ctypes.c_uint64()
+            preds = ctypes.POINTER(ctypes.c_float)()
+            _check_call(_LIB.XLearnPredictForMat(ctypes.byref(self.handle),
+                                                 c_str(model_path),
+                                                 ctypes.byref(length),
+                                                 ctypes.byref(preds)))
+            res = np.zeros(length.value, dtype=np.float32)
+            ctypes.memmove(res.ctypes.data, preds, length.value * res.strides[0])
+            return res
+        else:
+            _check_call(_LIB.XLearnPredictForFile(ctypes.byref(self.handle),
+                                                 c_str(model_path),
+                                                 c_str(out_path)))
 
 def create_linear():
     """

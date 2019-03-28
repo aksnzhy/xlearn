@@ -936,8 +936,10 @@ bool Checker::check_prediction_param(HyperParam& hyper_param) {
  /*********************************************************
   *  Set default value                                    *
   *********************************************************/
- if (hyper_param.output_file.empty()) {
-   hyper_param.output_file = hyper_param.test_set_file + ".out";
+ if (hyper_param.res_out) {
+  if (hyper_param.output_file.empty()) {
+    hyper_param.output_file = hyper_param.test_set_file + ".out";
+  }
  }
 
  return true;

@@ -111,6 +111,14 @@ XL_DLL int XLearnPredict(XL *out, const char *model_path,
                          const char *out_path, uint64 *length,
                          const float **out_arr);
 
+// Start to predict, this function is for output numpy
+XL_DLL int XLearnPredictForMat(XL *out, const char *model_path, 
+                               uint64 *length, const float** out_arr);
+
+// Start to predict, this function is for output file
+XL_DLL int XLearnPredictForFile(XL *out, const char *model_path, 
+                                const char *out_path);
+
 // Set DMatrix
 XL_DLL int XLearnSetDMatrix(XL *out, const char *key, DataHandle *out_data);
 

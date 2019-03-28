@@ -135,6 +135,8 @@ struct HyperParam {
   int seed = 1;
   /* from file or not? */
   bool from_file = true;
+  /* If generate prediction file */
+  bool res_out = true;
 //------------------------------------------------------------------------------
 // Parameters for validation
 //------------------------------------------------------------------------------
