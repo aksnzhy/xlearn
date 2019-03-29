@@ -127,6 +127,12 @@ API List: ::
 
     xl.hello()               # Say hello to user
 
+    # This part is for data
+    # X is feautres data, can be pandas DataFrame or numpy.ndarray,
+    # y is label, default None, can be pandas DataFrame\Series, array or list,
+    # filed_map is field map of features, default None, can be andas DataFrame\Series, array or list
+    dmatrix = xl.DMatrix(X, y, field_map)  
+
     model = create_linear()  #  Create linear model.
 
     model = create_fm()      #  Create factorization machines.
@@ -138,14 +144,24 @@ API List: ::
     model.fit(param, "model_path")   #  Train model.
 
     model.cv(param)    # Perform cross-validation.
-
-    model.predict("model_path", "output_path")  # Perform prediction. 
-
-    model.setTrain("data_path")      #  Set training data for xLearn.
-
-    model.setValidate("data_path")   #  Set validation data for xLearn.
-
-    model.setTest("data_path")       #  Set test data for xLearn.
+    
+    # Users can choose one of this two
+    model.predict("model_path", "output_path")  # Perform prediction, output result to file, return None.
+    model.predict("model_path")                 # Perform prediction, return result by numpy.ndarray. 
+    
+    # Users can choose one of this two
+    model.setTrain("data_path")      #  Set training data from file for xLearn.
+    model.setTrain(dmatrix)          #  Set training data from DMatrix for xLearn.
+    
+    # Users can choose one of this two
+    # note: this type of validate must be same as train
+    # that is, set train from file, must set validate from file
+    model.setValidate("data_path")   #  Set validation data from file for xLearn.
+    model.setValidate(dmatrix)       #  Set validation data from DMatrix for xLearn.
+    
+    # Users can choose one of this two
+    model.setTest("data_path")       #  Set test data from file for xLearn.
+    model.setTest(dmatrix)           #  Set test data from DMatrix for xLearn.
 
     model.setQuiet()    #  Set xlearn to train model quietly.
 
@@ -162,6 +178,7 @@ API List: ::
     model.disableLockFree()   # Disable lock-free training.
 
     model.disableEarlyStop()  # Disable early-stopping.
+    
 
 Parameter List: ::
 
