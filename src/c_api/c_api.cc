@@ -302,8 +302,7 @@ XL_DLL int XLearnSetDMatrix(XL *out, const char *key, DataHandle *out_data){
   if (strcmp(key, "train") == 0) {
     xl->GetHyperParam().train_dataset = reinterpret_cast<xLearn::DMatrix*>(*out_data);
     if (!xl->GetHyperParam().train_dataset->has_label){
-      Color::print_error("Train set must have label!");
-      exit(1);
+      throw std::runtime_error("Train set must have label!");
     }
   } else if (strcmp(key, "test") == 0) {
     xl->GetHyperParam().test_dataset = reinterpret_cast<xLearn::DMatrix*>(*out_data);

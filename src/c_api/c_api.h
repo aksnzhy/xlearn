@@ -106,11 +106,6 @@ XL_DLL int XLearnFit(XL *out, const char *model_path);
 // Cross-validation
 XL_DLL int XLearnCV(XL *out);
 
-// Start to predict
-XL_DLL int XLearnPredict(XL *out, const char *model_path, 
-                         const char *out_path, uint64 *length,
-                         const float **out_arr);
-
 // Start to predict, this function is for output numpy
 XL_DLL int XLearnPredictForMat(XL *out, const char *model_path, 
                                uint64 *length, const float** out_arr);
