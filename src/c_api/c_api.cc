@@ -74,35 +74,55 @@ XL_DLL int XlearnCreateDataFromMat(const real_t* data,
     if (field_map == nullptr) {
       for (int i = 0; i < nrow; ++i) {	
         source->AddRow();
+        real_t norm = 0.0;
         for (int j = 0; j < ncol; ++j) {
-          source->AddNode(i, j, data[j+i*ncol]);
+          real_t value = data[j+i*ncol];
+          source->AddNode(i, j, value);
+          norm += value*value;
         }
+        norm = 1.0f / norm;
+        source->norm[i] = norm;
       }
     } else {
       for (int i = 0; i < nrow; ++i) {	
-        source->AddRow();	
+        source->AddRow();
+        real_t norm = 0.0;
         for (int j = 0; j < ncol; ++j) {
-          source->AddNode(i, j, data[j+i*ncol], field_map[j]);	
+          real_t value = data[j+i*ncol];
+          source->AddNode(i, j, value, field_map[j]);
+          norm += value*value;
         }
+        norm = 1.0f / norm;
+        source->norm[i] = norm;
       }
     }
   } else {
     source->has_label = true;
     if (field_map == nullptr) {
-      for (int i = 0; i < nrow; ++i) {	
+      for (int i = 0; i < nrow; ++i) {
         source->AddRow();
+        real_t norm = 0.0;
         source->Y[i] = label[i];
         for (int j = 0; j < ncol; ++j) {
-          source->AddNode(i, j, data[j+i*ncol]);
+          real_t value = data[j+i*ncol];
+          source->AddNode(i, j, value);
+          norm += value*value;
         }
+        norm = 1.0f / norm;
+        source->norm[i] = norm;
       }
     } else {
       for (int i = 0; i < nrow; ++i) {	
         source->AddRow();
+        real_t norm = 0.0;
         source->Y[i] = label[i];
         for (int j = 0; j < ncol; ++j) {
-          source->AddNode(i, j, data[j+i*ncol], field_map[j]);	
+          real_t value = data[j+i*ncol];
+          source->AddNode(i, j, value, field_map[j]);
+          norm += value*value;
         }
+        norm = 1.0f / norm;
+        source->norm[i] = norm;
       }
     }
   }

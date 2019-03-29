@@ -16,7 +16,7 @@
 
 import os, ctypes
 from numpy import ndarray
-from pandas import DataFrame
+from pandas import DataFrame, Series 
 import numpy as np 
 from .base import _LIB, XLearnHandle
 from .base import _check_call, c_str
@@ -28,15 +28,15 @@ class DMatrix(object):
         Initial function.
         Parameters:
         data: NumPy 2D or pandas DataFrame of features data.
-        label: one-dimentional numpy array, it presents samples label.
-        field_map: one-dimentional numpy array, it presents the feautres'field repsepctively.
+        label: one-dimentional array, it presents samples label.
+        field_map: one-dimentional array, it presents the feautres'field repsepctively.
         This field_map like, [1, 2, 1, 3] means, the first and third features belong to field one, and the second belongs to field two, and so on.
         this parameter only useful for ffm model.
         Note: we only do roughly check, and do detail check in true work function.
         """
 
         self.__handle = ctypes.c_void_p()
-        if (isinstance(data, ndarray) | isinstance(data, DataFrame)):
+        if (isinstance(data, ndarray) or isinstance(data, DataFrame)):
             self._init_from_npy2d(data, label, field_map)
         else:
             raise ValueError('Input data must be numpy.ndarray or pandas.DataFrame')
@@ -53,14 +53,26 @@ class DMatrix(object):
         if len(mat.shape) != 2:
             raise ValueError('Input numpy.ndarray must be 2 dimensional')
 
+        if isinstance(mat, DataFrame):
+            mat = mat.values
+
         data = np.array(mat.reshape(mat.size), copy=False, dtype=np.float32)
         data_ptr = data.ctypes.data_as(ctypes.POINTER(ctypes.c_float))
         label_ptr = None
         field_ptr = None
         if label is not None:
+            if isinstance(label, DataFrame):
+                label = label.values
+            if isinstance(label, Series):
+                label = label.values
+            if isinstance(label, list):
+                label = np.array(label)
             if isinstance(label, ndarray):
-                if (len(label.shape) != 1) & ((len(label.shape) == 2) & label.shape[0] != 1):
-                    raise ValueError('Input numpy.ndarray of label must be 1 dimensional or 2 dimensional with the first dimensional is 1')
+                if (len(label.shape) > 2):
+                    raise ValueError('Input numpy.ndarray of label must be 1 dimensional or 2 dimensional with one dimensional is 1')
+                if (len(label.shape) == 2) and (label.shape[0] != 1) and (label.shape[1] != 1):
+                    print(len(label.shape))
+                    raise ValueError('Input numpy.ndarray of label must be 1 dimensional or 2 dimensional with one dimensional is 1')
                 if (label.size != mat.shape[0]):
                     raise ValueError('Input label must has same elements as the data lines')
                 labels = np.array(label.reshape(label.size), copy=False, dtype=np.float32)
@@ -69,9 +81,17 @@ class DMatrix(object):
                 raise ValueError('Input label must be numpy.ndarray')
 
         if field_map is not None:
+            if isinstance(field_map, DataFrame):
+                field_map = field_map.values
+            if isinstance(field_map, Series):
+                field_map = field_map.values
+            if isinstance(field_map, list):
+                field_map = np.array(field_map)
             if isinstance(field_map, ndarray):
-                if (len(field_map.shape) != 1) & ((len(field_map.shape) == 2) & (field_map.shape[0] != 1)):
-                    raise ValueError('Input numpy.ndarray of field_map must be 1 dimensional or 2 dimensional with the first dimensional is 1')
+                if (len(field_map.shape) > 2):
+                    raise ValueError('Input numpy.ndarray of label must be 1 dimensional or 2 dimensional with one dimensional is 1')
+                if (len(field_map.shape) == 2) and (field_map.shape[0] != 1) and (label.shape[1] != 1):
+                    raise ValueError('Input numpy.ndarray of field_map must be 1 dimensional or 2 dimensional with the one dimensional is 1')
                 if (field_map.size != mat.shape[1]):
                     raise ValueError('Input field_map must has same elements as the data columns')
                 fields = np.array(field_map.reshape(field_map.size), copy=False, dtype=np.int32)

@@ -99,3 +99,11 @@ DESTINATION ${PROJECT_BINARY_DIR}/demo/house_price)
 endif()
 FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/regression/house_price/run_house_no_cv.py" 
 DESTINATION ${PROJECT_BINARY_DIR}/demo/house_price)
+
+# House price(for DMatrix)
+FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/dmatrix_demo/example_dmatrix.py" 
+DESTINATION ${PROJECT_BINARY_DIR}/demo/dmatrix_demo)
+FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/dmatrix_demo/house_price_train.txt" 
+DESTINATION ${PROJECT_BINARY_DIR}/demo/dmatrix_demo)
+FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/dmatrix_demo/house_price_test.txt" 
+DESTINATION ${PROJECT_BINARY_DIR}/demo/dmatrix_demo)
