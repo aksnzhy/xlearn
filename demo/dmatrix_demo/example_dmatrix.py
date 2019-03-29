@@ -24,8 +24,8 @@ import numpy as np
 import pandas as pd
 
 # read file from file
-house_price_train = pd.read_csv("house_price_train.txt", header=None, sep="\t")
-house_price_test = pd.read_csv("house_price_test.txt", header=None, sep="\t")
+house_price_train = pd.read_csv("../house_price/house_price_train.txt", header=None, sep="\t")
+house_price_test = pd.read_csv("../house_price/house_price_test.txt", header=None, sep="\t")
 
 # get train X, y
 X_train = house_price_train[house_price_train.columns[1:]]
