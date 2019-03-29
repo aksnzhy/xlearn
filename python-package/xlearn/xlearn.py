@@ -121,6 +121,7 @@ class XLearn(object):
         """
         if isinstance(train_path, str):
             _check_call(_LIB.XLearnSetTrain(ctypes.byref(self.handle), c_str(train_path)))
+            _check_call(_LIB.XLearnSetBool(ctypes.byref(self.handle), c_str("from_file"), ctypes.c_bool(True)))
         elif isinstance(train_path, DMatrix):
             key = "train"
             _check_call(_LIB.XLearnSetDMatrix(ctypes.byref(self.handle), c_str(key), ctypes.byref(train_path.handle)))
@@ -138,6 +139,7 @@ class XLearn(object):
         """
         if isinstance(test_path, str):
             _check_call(_LIB.XLearnSetTest(ctypes.byref(self.handle), c_str(test_path)))
+            _check_call(_LIB.XLearnSetBool(ctypes.byref(self.handle), c_str("from_file"), ctypes.c_bool(True)))
         elif isinstance(test_path, DMatrix):
             key = "test"
             _check_call(_LIB.XLearnSetDMatrix(ctypes.byref(self.handle), c_str(key), ctypes.byref(test_path.handle)))

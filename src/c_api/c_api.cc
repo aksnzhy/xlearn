@@ -187,6 +187,9 @@ XL_DLL int XLearnGetPreModel(XL* out, std::string& pre_model_path) {
 XL_DLL int XLearnSetValidate(XL *out, const char *val_path) {
   API_BEGIN();
   XLearn* xl = reinterpret_cast<XLearn*>(*out);
+  if (!xl->GetHyperParam().from_file){
+    throw std::runtime_error("Input for validation type Must equal to train's!");
+  }
   xl->GetHyperParam().validate_set_file = std::string(val_path);
   API_END();
 }
