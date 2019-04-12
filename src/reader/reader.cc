@@ -144,6 +144,7 @@ void InmemReader::Initialize(const std::string& filename) {
                    "file to binary file.",
                    filename_.c_str())
     );
+    std::cout << "aaaaaaaaaaa\n";
     // Allocate memory for block
     try {
       this->block_ = (char*)malloc(block_size_*1024*1024);
@@ -153,6 +154,7 @@ void InmemReader::Initialize(const std::string& filename) {
                  << block_size_ << "MB. "
                  << "You set change the block size via configuration.";
     }
+    std::cout << "bbbbbbbbbbbb\n";
     init_from_txt();
   }
 }
