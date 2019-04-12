@@ -118,7 +118,7 @@ const size_t MB = 1024.0 * 1024.0;
 const size_t GB = 1024.0 * 1024.0 * 1024.0;
 
 // Max size of one line TXT data
-static const uint32 kMaxLineSize = 500 * 1024; // 500 KB
+static const uint32 kMaxLineSize = 10 * 1024 * 1024;  // 10 MB
 // Max chunk size of hash block
 static const uint32 kChunkSize = 1000 * 1024; // 1000 KB
 
