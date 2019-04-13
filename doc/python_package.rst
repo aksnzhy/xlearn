@@ -531,7 +531,7 @@ In this way, xLearn can accelerate its training speed significantly.
 
 DMatrix Transition
 ----------------------------------------
-Here is a simple Python demo to show that how to use xLearn python API. You can checkout the 
+Here is a simple Python demo to show that how to use xLearn python DMatrix API. You can checkout the 
 demo data (``house_price_train.txt`` and ``house_price_test.txt``) from the path ``demo/regression/house_price``.
 
 .. code-block:: python
