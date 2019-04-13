@@ -178,7 +178,6 @@ API List: ::
     model.disableLockFree()   # Disable lock-free training.
 
     model.disableEarlyStop()  # Disable early-stopping.
-    
 
 Parameter List: ::
 
