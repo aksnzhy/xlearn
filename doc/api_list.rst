@@ -130,7 +130,7 @@ API List: ::
     # This part is for data
     # X is feautres data, can be pandas DataFrame or numpy.ndarray,
     # y is label, default None, can be pandas DataFrame\Series, array or list,
-    # filed_map is field map of features, default None, can be andas DataFrame\Series, array or list
+    # filed_map is field map of features, default None, can be pandas DataFrame\Series, array or list
     dmatrix = xl.DMatrix(X, y, field_map)  
 
     model = create_linear()  #  Create linear model.
