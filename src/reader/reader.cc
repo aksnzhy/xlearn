@@ -347,12 +347,6 @@ void FromDMReader::Initialize(xLearn::DMatrix* &dmatrix) {
   for (int i = 0; i < order_.size(); ++i) {
     order_[i] = i;
   }
-  // Do not use bin out for From DMatrix Reader
-  // // Deserialize in-memory buffer to disk file.
-  // if (bin_out_) {
-  //   std::string bin_file = filename_ + ".bin";
-  //   this->data_ptr_->Serialize(bin_file);
-  // }
 }
 
 // Smaple data from memory buffer.

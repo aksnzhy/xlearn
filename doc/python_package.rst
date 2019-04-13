@@ -541,8 +541,8 @@ demo data (``house_price_train.txt`` and ``house_price_test.txt``) from the path
     import pandas as pd
 
     # read file from file
-    house_price_train = pd.read_csv("../house_price/house_price_train.txt", header=None, sep="\t")
-    house_price_test = pd.read_csv("../house_price/house_price_test.txt", header=None, sep="\t")
+    house_price_train = pd.read_csv("house_price_train.txt", header=None, sep="\t")
+    house_price_test = pd.read_csv("house_price_test.txt", header=None, sep="\t")
     
     # get train X, y
     X_train = house_price_train[house_price_train.columns[1:]]
@@ -570,8 +570,6 @@ demo data (``house_price_train.txt`` and ``house_price_test.txt``) from the path
     #  3. evaluation metric: mae
     param = {'task':'reg', 'lr':0.2, 
              'lambda':0.002, 'metric':'mae'}
-
-    fm_model.disableLockFree()
 
     # Start to train
     # The trained model will be stored in model.out

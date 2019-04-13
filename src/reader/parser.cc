@@ -229,8 +229,6 @@ void CSVParser::Parse(char* buf,
     for (int j = 1; j < size; ++j) {
       index_t idx = j-1;
       real_t value = atof(str_vec[j].c_str());
-      // // skip zero
-      // if (value < kVerySmallNumber) { continue; }
       matrix.AddNode(i, idx, value);
       norm += value*value;
     }

@@ -15,8 +15,8 @@
 
 # This is a snippet to test DMatrix transition from pandas DataFrame
 # Note: this program modify by demo of house_price,
-# If users want to check DMatrix work well, set disable lock-free at
-# line 29 in run_house_no_cv.py, there maybe some difference of precision
+# If users want to check DMatrix work well, set disable lock-free in
+# both this file and run_house_no_cv.py, there maybe some difference of precision
 # with output result file
 
 import xlearn as xl
@@ -24,8 +24,8 @@ import numpy as np
 import pandas as pd
 
 # read file from file
-house_price_train = pd.read_csv("../house_price/house_price_train.txt", header=None, sep="\t")
-house_price_test = pd.read_csv("../house_price/house_price_test.txt", header=None, sep="\t")
+house_price_train = pd.read_csv("house_price_train.txt", header=None, sep="\t")
+house_price_test = pd.read_csv("house_price_test.txt", header=None, sep="\t")
 
 # get train X, y
 X_train = house_price_train[house_price_train.columns[1:]]
@@ -53,8 +53,6 @@ fm_model.setValidate(xdm_test)  # Validation data
 #  3. evaluation metric: mae
 param = {'task':'reg', 'lr':0.2, 
          'lambda':0.002, 'metric':'mae'}
-
-fm_model.disableLockFree()
 
 # Start to train
 # The trained model will be stored in model.out
