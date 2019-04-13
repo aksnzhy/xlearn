@@ -86,6 +86,7 @@ class Reader {
   // we start to sample data. We can shuffle data before 
   // training, and this is good for SGD.
   virtual void Initialize(const std::string& filename) = 0;
+  virtual void Initialize(xLearn::DMatrix* &dmatrix) = 0;
 
   // Sample data from disk or from memory buffer.
   // Return the number of record in each samplling.
@@ -183,6 +184,7 @@ class InmemReader : public Reader {
 
   // Pre-load all the data into memory buffer.
   virtual void Initialize(const std::string& filename);
+  virtual void Initialize(xLearn::DMatrix* &dmatrix) { }
 
   // Sample data from the memory buffer.
   virtual index_t Samples(DMatrix* &matrix);
@@ -259,6 +261,7 @@ class OndiskReader : public Reader {
 
   // Create parser and open file
   virtual void Initialize(const std::string& filename);
+  virtual void Initialize(xLearn::DMatrix* &dmatrix) { }
 
   // Sample data from disk file
   virtual index_t Samples(DMatrix* &matrix);
@@ -293,6 +296,56 @@ class OndiskReader : public Reader {
  
  private:
   DISALLOW_COPY_AND_ASSIGN(OndiskReader);
+};
+
+class FromDMReader : public Reader {
+ public:
+  // Constructor and Destructor
+  FromDMReader() : pos_(0) { }
+  ~FromDMReader() { }
+
+  virtual void Initialize(const std::string& filename) { };
+  virtual void Initialize(xLearn::DMatrix* &dmatrix);
+
+  virtual index_t Samples(DMatrix* &matrix);
+
+  // Return to the begining of the data.
+  virtual void Reset() { pos_ = 0; }
+
+  // Free the memory of data matrix.
+  virtual void Clear() {
+    data_samples_.Reset();
+    if (block_ != nullptr) {
+      delete [] block_;
+    }
+  }
+
+  // Return the Reader type
+  virtual std::string Type() {
+    return "from-dmatrix";
+  }
+
+  // If shuffle data ?
+  virtual inline void SetShuffle(bool shuffle) {
+    this->shuffle_ = shuffle;
+    if (shuffle_ && !order_.empty()) {
+      srand(this->seed_);
+      random_shuffle(order_.begin(), order_.end());
+    }
+  }
+
+ protected:
+  DMatrix* data_ptr_;
+  /* Number of record at each samplling */
+  index_t num_samples_;
+  /* Position for samplling */
+  index_t pos_;
+  /* For random shuffle */
+  std::vector<index_t> order_;
+
+
+ private:
+  DISALLOW_COPY_AND_ASSIGN(FromDMReader);
 };
 
 //------------------------------------------------------------------------------

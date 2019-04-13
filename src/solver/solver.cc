@@ -70,7 +70,7 @@ void Solver::print_logo() const {
 // Create Reader by a given string
 Reader* Solver::create_reader() {
   Reader* reader;
-  std::string str = hyper_param_.on_disk ? "disk" : "memory";
+  std::string str = hyper_param_.from_file ? hyper_param_.on_disk ? "disk" : "memory" : "dmatrix";
   reader = CREATE_READER(str.c_str());
   if (reader == nullptr) {
     LOG(FATAL) << "Cannot create reader: " << str;
@@ -206,55 +206,87 @@ void Solver::init_train() {
   Color::print_action("Read Problem ...");
   LOG(INFO) << "Start to init Reader";
   // Split file
-  if (hyper_param_.cross_validation) {
-    CHECK_GT(hyper_param_.num_folds, 0);
-    splitor_.split(hyper_param_.train_set_file,
-                   hyper_param_.num_folds);
-    LOG(INFO) << "Split file into "
-              << hyper_param_.num_folds
-              << " parts.";
+  if (hyper_param_.from_file) {
+    if (hyper_param_.cross_validation) {
+      CHECK_GT(hyper_param_.num_folds, 0);
+      splitor_.split(hyper_param_.train_set_file,
+                    hyper_param_.num_folds);
+      LOG(INFO) << "Split file into "
+                << hyper_param_.num_folds
+                << " parts.";
+    }
   }
   // Get the Reader list
   int num_reader = 0;
-  std::vector<std::string> file_list;
-  if (hyper_param_.cross_validation) {
-    num_reader += hyper_param_.num_folds;
-    for (int i = 0; i < hyper_param_.num_folds; ++i) {
-      std::string filename = StringPrintf("%s_%d",
-           hyper_param_.train_set_file.c_str(), i);
-      file_list.push_back(filename);
+  if (hyper_param_.from_file) {
+    std::vector<std::string> file_list;
+    if (hyper_param_.cross_validation) {
+      num_reader += hyper_param_.num_folds;
+      for (int i = 0; i < hyper_param_.num_folds; ++i) {
+        std::string filename = StringPrintf("%s_%d",
+            hyper_param_.train_set_file.c_str(), i);
+        file_list.push_back(filename);
+      }
+    } else {  // do not use cross-validation
+      num_reader += 1;  // training file
+      CHECK_NE(hyper_param_.train_set_file.empty(), true);
+      file_list.push_back(hyper_param_.train_set_file);
+      if (!hyper_param_.validate_set_file.empty()) {
+        num_reader += 1;  // validation file
+        file_list.push_back(hyper_param_.validate_set_file);
+      }
     }
-  } else {  // do not use cross-validation
-    num_reader += 1;  // training file
-    CHECK_NE(hyper_param_.train_set_file.empty(), true);
-    file_list.push_back(hyper_param_.train_set_file);
-    if (!hyper_param_.validate_set_file.empty()) {
-      num_reader += 1;  // validation file
-      file_list.push_back(hyper_param_.validate_set_file);
+    LOG(INFO) << "Number of Reader: " << num_reader;
+    reader_.resize(num_reader, nullptr);
+    // Create Reader
+    for (int i = 0; i < num_reader; ++i) {
+      reader_[i] = create_reader();
+      reader_[i]->SetBlockSize(hyper_param_.block_size);
+      reader_[i]->SetSeed(hyper_param_.seed);
+      if (hyper_param_.bin_out == false) {
+        reader_[i]->SetNoBin();
+      }
+      reader_[i]->Initialize(file_list[i]);
+      if (!hyper_param_.on_disk) {
+        reader_[i]->SetShuffle(true);
+      }
+      if (reader_[i] == nullptr) {
+        Color::print_error(
+          StringPrintf("Cannot open the file %s",
+              file_list[i].c_str())
+        );
+        exit(0);
+      }
+      LOG(INFO) << "Init Reader: " << file_list[i];
+    } 
+  } else {
+    num_reader += 1;  // training dataset
+    std::vector<xLearn::DMatrix*> data_list;
+    CHECK_NOTNULL(hyper_param_.train_dataset);
+    data_list.push_back(hyper_param_.train_dataset);
+    if (hyper_param_.valid_dataset != nullptr) {
+      num_reader += 1;  // validation dataset
+      data_list.push_back(hyper_param_.valid_dataset);
     }
-  }
-  LOG(INFO) << "Number of Reader: " << num_reader;
-  reader_.resize(num_reader, nullptr);
-  // Create Reader
-  for (int i = 0; i < num_reader; ++i) {
-    reader_[i] = create_reader();
-    reader_[i]->SetBlockSize(hyper_param_.block_size);
-    reader_[i]->SetSeed(hyper_param_.seed);
-    if (hyper_param_.bin_out == false) {
-      reader_[i]->SetNoBin();
+    // Create Reader
+    LOG(INFO) << "Number of Reader: " << num_reader;
+    reader_.resize(num_reader, nullptr);
+    for (int i = 0; i < num_reader; ++i) {
+      reader_[i] = create_reader();
+      reader_[i]->SetBlockSize(hyper_param_.block_size);
+      reader_[i]->SetSeed(hyper_param_.seed);
+      if (hyper_param_.bin_out == false) {
+        reader_[i]->SetNoBin();
+      }
+      reader_[i]->Initialize(data_list[i]);
+      if (!hyper_param_.on_disk) {
+        reader_[i]->SetShuffle(true);
+      }
+      if (reader_[i] == nullptr) {
+        Color::print_error(
+          StringPrintf("Cannot open initialze dataset %d", i));
+      }
     }
-    reader_[i]->Initialize(file_list[i]);
-    if (!hyper_param_.on_disk) {
-      reader_[i]->SetShuffle(true);
-    }
-    if (reader_[i] == nullptr) {
-      Color::print_error(
-        StringPrintf("Cannot open the file %s",
-             file_list[i].c_str())
-      );
-      exit(0);
-    }
-    LOG(INFO) << "Init Reader: " << file_list[i];
   }
   /*********************************************************
    *  Read problem                                         *
@@ -435,16 +467,30 @@ void Solver::init_predict() {
   timer.tic();
   // Create Reader
   reader_.resize(1, create_reader());
-  CHECK_NE(hyper_param_.test_set_file.empty(), true);
-  reader_[0]->SetBlockSize(hyper_param_.block_size);
-  reader_[0]->Initialize(hyper_param_.test_set_file);
-  reader_[0]->SetShuffle(false);
-  if (reader_[0] == nullptr) {
-   Color::print_info(
-    StringPrintf("Cannot open the file %s",
-                 hyper_param_.test_set_file.c_str())
-   );
-   exit(0);
+  if (hyper_param_.from_file) {
+    CHECK_NE(hyper_param_.test_set_file.empty(), true);
+    reader_[0]->SetBlockSize(hyper_param_.block_size);
+    reader_[0]->Initialize(hyper_param_.test_set_file);
+    reader_[0]->SetShuffle(false);
+    if (reader_[0] == nullptr) {
+    Color::print_info(
+      StringPrintf("Cannot open the file %s",
+                  hyper_param_.test_set_file.c_str())
+    );
+    exit(0);
+    }
+  } else {
+    CHECK_NOTNULL(hyper_param_.test_dataset)
+    reader_[0]->SetBlockSize(hyper_param_.block_size);
+    reader_[0]->Initialize(hyper_param_.test_dataset);
+    reader_[0]->SetShuffle(false);
+    if (reader_[0] == nullptr) {
+    Color::print_info(
+      StringPrintf("Cannot open the file %s",
+                  hyper_param_.test_set_file.c_str())
+    );
+    exit(0);
+    }
   }
   Color::print_info(
     StringPrintf("Time cost for reading problem: %.2f (sec)",
@@ -559,9 +605,11 @@ void Solver::start_prediction_work() {
                  loss_,
                  hyper_param_.output_file,
                  hyper_param_.sign,
-                 hyper_param_.sigmoid);
+                 hyper_param_.sigmoid,
+                 hyper_param_.res_out);
   // Predict and write output
   pdc.Predict();
+  this->out_ = pdc.GetResult();
 }
 
 /******************************************************************************

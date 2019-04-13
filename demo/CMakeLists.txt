@@ -37,6 +37,8 @@ DESTINATION ${PROJECT_BINARY_DIR}/demo/higgs)
 endif()
 FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/classification/higgs/run_higgs.py" 
 DESTINATION ${PROJECT_BINARY_DIR}/demo/higgs)
+FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/classification/higgs/run_higgs_pandas.py" 
+DESTINATION ${PROJECT_BINARY_DIR}/demo/higgs)
 
 # Mushroom
 FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/classification/mushroom/agaricus_test.txt" 
@@ -66,6 +68,10 @@ FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/classification/titanic/run_demo_titanic.s
 DESTINATION ${PROJECT_BINARY_DIR}/demo/titanic)
 endif()
 FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/classification/titanic/run_demo_titanic.py" 
+DESTINATION ${PROJECT_BINARY_DIR}/demo/titanic)
+FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/classification/titanic/run_titanic_no_cv.py" 
+DESTINATION ${PROJECT_BINARY_DIR}/demo/titanic)
+FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/classification/titanic/run_titanic_no_cv_pandas.py" 
 DESTINATION ${PROJECT_BINARY_DIR}/demo/titanic)
 
 # Scikit-Learn
@@ -98,4 +104,6 @@ FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/regression/house_price/run_house_no_cv.sh
 DESTINATION ${PROJECT_BINARY_DIR}/demo/house_price)
 endif()
 FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/regression/house_price/run_house_no_cv.py" 
+DESTINATION ${PROJECT_BINARY_DIR}/demo/house_price)
+FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/regression/house_price/run_house_no_cv_pandas.py" 
 DESTINATION ${PROJECT_BINARY_DIR}/demo/house_price)

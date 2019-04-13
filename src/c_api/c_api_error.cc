@@ -26,7 +26,7 @@ struct XLearnAPIErrorEntry {
 
 static XLearnAPIErrorEntry entry;
 
-const char* XLearnGetLastError() {
+XL_DLL const char* XLearnGetLastError() {
   return entry.last_error.c_str();
 }
 

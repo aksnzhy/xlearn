@@ -47,7 +47,7 @@ This file defines the error handling for C API.
 } return 0;
 
 // Get the last error message needed by C API
-const char* XLearnGetLastError();
+XL_DLL const char* XLearnGetLastError();
 
 // Set the last error message needed by C API
 void XLearnAPISetLastError(const char* msg);

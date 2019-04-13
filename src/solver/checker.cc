@@ -596,20 +596,29 @@ bool Checker::check_train_param(HyperParam& hyper_param) {
   /*********************************************************
    *  Check file path                                      *
    *********************************************************/
-  if (!FileExist(hyper_param.train_set_file.c_str())) {
-    Color::print_error(
-      StringPrintf("Training data file: %s does not exist.", 
-                    hyper_param.train_set_file.c_str())
-    );
-    bo = false;
-  }
-  if (!hyper_param.validate_set_file.empty() &&
-      !FileExist(hyper_param.validate_set_file.c_str())) {
-    Color::print_error(
-      StringPrintf("Validation data file: %s does not exist.", 
-                    hyper_param.validate_set_file.c_str())
-    );
-    bo = false;
+  if (hyper_param.from_file) {
+    if (!FileExist(hyper_param.train_set_file.c_str())) {
+      Color::print_error(
+        StringPrintf("Training data file: %s does not exist.", 
+                      hyper_param.train_set_file.c_str())
+      );
+      bo = false;
+    }
+    if (!hyper_param.validate_set_file.empty() &&
+        !FileExist(hyper_param.validate_set_file.c_str())) {
+      Color::print_error(
+        StringPrintf("Validation data file: %s does not exist.", 
+                      hyper_param.validate_set_file.c_str())
+      );
+      bo = false;
+    }  
+  } else {
+    if (hyper_param.train_dataset == nullptr) {
+      Color::print_error(
+        StringPrintf("Training dataset is None, please check!")
+      );
+      bo = false;
+    }
   }
   /*********************************************************
    *  Check invalid value                                  *
@@ -696,6 +705,11 @@ bool Checker::check_train_param(HyperParam& hyper_param) {
 
 // Check warning and fix conflict
 void Checker::check_conflict_train(HyperParam& hyper_param) {
+  if (!hyper_param.from_file && hyper_param.cross_validation) {
+    Color::print_warning("Transform DMatrix not from file doesn't support cross-validation. "
+                         "xLearn has already disable the -cv option.");
+    hyper_param.cross_validation = false;
+  }
   if (hyper_param.on_disk && hyper_param.cross_validation) {
     Color::print_warning("On-disk training doesn't support cross-validation. "
                          "xLearn has already disable the -cv option.");
@@ -724,13 +738,15 @@ void Checker::check_conflict_train(HyperParam& hyper_param) {
                          "xLearn will not dump model checkpoint to disk.");
     hyper_param.model_file.clear();
   }
-  if (hyper_param.validate_set_file.empty() && hyper_param.early_stop) {
-    Color::print_warning("Validation file not found, xLearn has already "
+  if ((hyper_param.validate_set_file.empty() && hyper_param.valid_dataset == nullptr) 
+      && hyper_param.early_stop) {
+    Color::print_warning("Validation file(dataset) not found, xLearn has already "
                          "disable early-stopping.");
     hyper_param.early_stop = false;
   }
   if (hyper_param.metric.compare("none") != 0 &&
-      hyper_param.validate_set_file.empty() &&
+      hyper_param.validate_set_file.empty() && 
+      hyper_param.valid_dataset == nullptr &&
       !hyper_param.cross_validation) {
     Color::print_warning(
       StringPrintf("Validation file not found, xLearn has already "
@@ -883,19 +899,28 @@ bool Checker::check_prediction_param(HyperParam& hyper_param) {
  /*********************************************************
   *  Check the path of test set file                      *
   *********************************************************/
- if (!FileExist(hyper_param.test_set_file.c_str())) {
-    Color::print_error(
-      StringPrintf("Test set file: %s does not exist.",
-           hyper_param.test_set_file.c_str())
-    );
-    bo =  false;
+ if (hyper_param.from_file) {
+  if (!FileExist(hyper_param.test_set_file.c_str())) {
+      Color::print_error(
+        StringPrintf("Test set file: %s does not exist.",
+            hyper_param.test_set_file.c_str())
+      );
+      bo =  false;
+  }
+ } else {
+   if (hyper_param.test_dataset == nullptr) {
+      Color::print_error(
+        StringPrintf("Test dataset is None, please check!")
+      );
+      bo =  false;
+   }
  }
  /*********************************************************
   *  Check the path of model file                         *
   *********************************************************/
  if (!FileExist(hyper_param.model_file.c_str())) {
     Color::print_error(
-      StringPrintf("Test set file: %s does not exist.",
+      StringPrintf("Model file: %s does not exist.",
            hyper_param.model_file.c_str())
     );
     bo = false;
@@ -918,8 +943,10 @@ bool Checker::check_prediction_param(HyperParam& hyper_param) {
  /*********************************************************
   *  Set default value                                    *
   *********************************************************/
- if (hyper_param.output_file.empty()) {
-   hyper_param.output_file = hyper_param.test_set_file + ".out";
+ if (hyper_param.res_out) {
+  if (hyper_param.output_file.empty()) {
+    hyper_param.output_file = hyper_param.test_set_file + ".out";
+  }
  }
 
  return true;

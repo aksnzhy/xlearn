@@ -103,6 +103,13 @@ struct HyperParam {
   /* Filename for validation set
   This value can be empty. */
   std::string validate_set_file;
+  /* DMatrix pointer for train*/
+  xLearn::DMatrix* train_dataset = nullptr;
+  /* DMatrix pointer for test*/
+  xLearn::DMatrix* test_dataset = nullptr;
+  /* DMatrix pointer for validate*/
+  xLearn::DMatrix* valid_dataset = nullptr;
+
   /* Filename of model checkpoint
   On default, model_file = train_set_file + ".model" */
   std::string model_file;
@@ -126,6 +133,10 @@ struct HyperParam {
   bool bin_out = true;
   /* Random seed to shuffle data set */
   int seed = 1;
+  /* from file or not? */
+  bool from_file = true;
+  /* If generate prediction file */
+  bool res_out = true;
 //------------------------------------------------------------------------------
 // Parameters for validation
 //------------------------------------------------------------------------------
