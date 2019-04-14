@@ -27,7 +27,7 @@ This file is the implementation of Parser class.
 namespace xLearn {
 
 // Max size of one line TXT data
-static const uint32 kMaxLineSize = 500 * 1024;  // 500 KB
+static const uint32 kMaxLineSize = 10 * 1024 * 1024;  // 10 MB
 
 static char line_buf[kMaxLineSize];
 
@@ -229,8 +229,6 @@ void CSVParser::Parse(char* buf,
     for (int j = 1; j < size; ++j) {
       index_t idx = j-1;
       real_t value = atof(str_vec[j].c_str());
-      // skip zero
-      if (value < kVerySmallNumber) { continue; }
       matrix.AddNode(i, idx, value);
       norm += value*value;
     }

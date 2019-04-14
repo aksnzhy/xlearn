@@ -54,6 +54,9 @@ If you are enterprise users and find xLearn is useful in your work, please let u
 
 ## What's New
 
+ - 2019-3-25 xLearn 0.4.3 version release. Main update:
+    * Fix bugs in previous version
+
  - 2019-3-12 xLearn 0.4.2 version release. Main update:
     * Release Windows version of xLearn
 

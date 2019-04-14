@@ -30,7 +30,8 @@ namespace xLearn {
 // Given a pre-trained model and test data, the predictor
 // will return the prediction output
 void Predictor::Predict() {
-  std::ofstream o_file(out_file_);
+  if (res_out_)
+    std::ofstream o_file(out_file_);
   static std::vector<real_t> out;
   DMatrix* matrix = nullptr;
   reader_->Reset();
@@ -48,8 +49,12 @@ void Predictor::Predict() {
     } else if (sign_) {
       this->sign(out, out);
     }
-    for (index_t i = 0; i < out.size(); ++i) {
-      o_file << out[i] << "\n";
+    this->out_.insert(this->out_.end(), out.begin(), out.end());
+    if (res_out_) {
+      std::ofstream o_file(out_file_, std::ofstream::app);
+      for (index_t i = 0; i < out.size(); ++i) {
+        o_file << out[i] << "\n";
+      }
     }
   }
   if (reader_->has_label()) {

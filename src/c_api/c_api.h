@@ -45,12 +45,24 @@ for interfacing to other languages.
 
 /* Handle to xlearn */
 typedef void* XL;
+typedef void* DataHandle;
 
 // Say hello to user
 XL_DLL int XLearnHello();
 
 // Create xlearn handle
 XL_DLL int XLearnCreate(const char *model_type, XL *out);
+
+// Handle data matrix for xLearn
+XL_DLL int XlearnCreateDataFromMat(const real_t* data,
+                                   index_t nrow,
+                                   index_t ncol,
+                                   const real_t* label,
+                                   index_t* field_map,
+                                   DataHandle* out);
+
+// Handle data matrix for xLearn
+XL_DLL int XlearnDataFree(DataHandle* out);
 
 // Free the xLearn handle
 XL_DLL int XLearnHandleFree(XL *out);
@@ -94,8 +106,16 @@ XL_DLL int XLearnFit(XL *out, const char *model_path);
 // Cross-validation
 XL_DLL int XLearnCV(XL *out);
 
-// Start to predict
-XL_DLL int XLearnPredict(XL *out, const char *model_path, const char *out_path);
+// Start to predict, this function is for output numpy
+XL_DLL int XLearnPredictForMat(XL *out, const char *model_path, 
+                               uint64 *length, const float** out_arr);
+
+// Start to predict, this function is for output file
+XL_DLL int XLearnPredictForFile(XL *out, const char *model_path, 
+                                const char *out_path);
+
+// Set DMatrix
+XL_DLL int XLearnSetDMatrix(XL *out, const char *key, DataHandle *out_data);
 
 // Set string param
 XL_DLL int XLearnSetStr(XL *out, const char *key, const char *value);

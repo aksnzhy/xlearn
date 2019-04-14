@@ -77,6 +77,9 @@ class Solver {
   // Start a training task or start an inference task.
   void StartWork();
 
+  // Get reaults, only for predict
+  inline std::vector<real_t> GetResult() { return this->out_; }
+
   // Clear the xLearn environment.
   void Clear();
 
@@ -99,6 +102,8 @@ class Solver {
   xLearn::Metric* metric_;
   /* ThreadPool for multi-thread training */
   ThreadPool* pool_;
+  /* predict results */
+  std::vector<real_t> out_;
 
   // Create object by name
   xLearn::Reader* create_reader();

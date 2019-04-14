@@ -20,6 +20,7 @@ import warnings
 import numpy as np
 
 from .xlearn import create_linear, create_fm, create_ffm
+from .data import DMatrix
 from sklearn.base import BaseEstimator
 from sklearn.utils import check_array, check_X_y
 
@@ -209,9 +210,6 @@ class BaseXLearnModel(BaseEstimator):
         else:
             raise Exception('model_type must be fm, ffm or lr')
 
-        # create temporary files for training data
-        temp_train_file = tempfile.NamedTemporaryFile(delete=False)
-
         if y is None:
             assert isinstance(X, str), 'X must be a string specifying training file location' \
                                        ' when only X specified'
@@ -225,9 +223,8 @@ class BaseXLearnModel(BaseEstimator):
                 self.fields = fields
 
             # convert data into libsvm/libffm format for training
-            # TODO: replace conversion with DMatrix
-            self._convert_data(X, y, temp_train_file.name, fields=self.fields)
-            self._XLearnModel.setTrain(temp_train_file.name)
+            train_set = DMatrix(X, y, self.fields)
+            self._XLearnModel.setTrain(train_set)
 
         # TODO: find out what task need to set sigmoid
         if self.task == 'binary':
@@ -262,9 +259,8 @@ class BaseXLearnModel(BaseEstimator):
                     y_numeric=True, 
                     multi_output=False)
 
-                temp_val_file = tempfile.NamedTemporaryFile(delete=False)
-                self._convert_data(X_val, y_val, temp_val_file.name, fields=self.fields)
-                self._XLearnModel.setValidate(temp_val_file.name)
+                validate_set = DMatrix(X_val, y_val, self.fields)
+                self._XLearnModel.setValidate(validate_set)
 
         # set up files for storing weights
         self._XLearnModel.setTXTModel(self._temp_weight_file.name)
@@ -275,10 +271,6 @@ class BaseXLearnModel(BaseEstimator):
         # acquire weights
         self._parse_weight(self._temp_weight_file.name)
 
-        # remove temporary files for training
-        self._remove_temp_file(temp_train_file)
-        self._remove_temp_file(temp_val_file)
-
     def predict(self, X):
         """ Generate prediction using feature matrix X
 
@@ -287,26 +279,15 @@ class BaseXLearnModel(BaseEstimator):
         :return: prediction
         """
 
-        # convert data to libsvm or libffm format
-        temp_test_file = tempfile.NamedTemporaryFile(delete=False)
-
         if isinstance(X, str):
             self._XLearnModel.setTest(X)
         else:
             X = check_array(X, accept_sparse=['csr'])
-            self._convert_data(X, None, temp_test_file.name, fields=self.fields)
-            self._XLearnModel.setTest(temp_test_file.name)
+            test_set = DMatrix(X, None, self.fields)
+            self._XLearnModel.setTest(test_set)
 
         # generate output
-        temp_output_file = tempfile.NamedTemporaryFile(delete=False)
-        self.get_model().predict(self._temp_model_file.name, temp_output_file.name)
-
-        # read output into numpy
-        pred = np.loadtxt(temp_output_file.name)
-
-        # remove temporary test data and output file
-        self._remove_temp_file(temp_test_file)
-        self._remove_temp_file(temp_output_file)
+        pred = self.get_model().predict(self._temp_model_file.name)
 
         return pred
 

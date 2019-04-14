@@ -7,6 +7,10 @@
 *.o
 *.obj
 build/*
+build_win/*
+build_unix/*
+.vscode/*
+.vs/*
 
 # Precompiled Headers
 *.gch

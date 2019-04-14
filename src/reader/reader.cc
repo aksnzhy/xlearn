@@ -35,6 +35,7 @@ namespace xLearn {
 CLASS_REGISTER_IMPLEMENT_REGISTRY(xLearn_reader_registry, Reader);
 REGISTER_READER("memory", InmemReader);
 REGISTER_READER("disk", OndiskReader);
+REGISTER_READER("dmatrix", FromDMReader);
 
 // Check current file format and
 // return 'libsvm', 'libffm', or 'csv'.
@@ -334,6 +335,43 @@ index_t OndiskReader::Samples(DMatrix* &matrix) {
   parser_->Parse(block_, ret, data_samples_, true);
   matrix = &data_samples_;
   return data_samples_.row_length;
+}
+
+void FromDMReader::Initialize(xLearn::DMatrix* &dmatrix) { 
+  this->data_ptr_ = dmatrix;
+  has_label_ = this->data_ptr_->has_label;
+  num_samples_ = this->data_ptr_->row_length;
+  data_samples_.ReAlloc(num_samples_, has_label_);
+  // for shuffle
+  order_.resize(num_samples_);
+  for (int i = 0; i < order_.size(); ++i) {
+    order_[i] = i;
+  }
+}
+
+// Smaple data from memory buffer.
+index_t FromDMReader::Samples(DMatrix* &matrix) {
+  for (int i = 0; i < num_samples_; ++i) {
+    if (pos_ >= this->data_ptr_->row_length) {
+      // End of the data buffer
+      if (i == 0) {
+        if (shuffle_) {
+          srand(this->seed_+1);
+          random_shuffle(order_.begin(), order_.end());
+        }
+        matrix = nullptr;
+        return 0;
+      }
+      break;
+    }
+    // Copy data between different DMatrix.
+    data_samples_.row[i] = this->data_ptr_->row[order_[pos_]];
+    data_samples_.Y[i] = this->data_ptr_->Y[order_[pos_]];
+    data_samples_.norm[i] = this->data_ptr_->norm[order_[pos_]];
+    pos_++;
+  }
+  matrix = &data_samples_;
+  return num_samples_;
 }
 
 }  // namespace xLearn
