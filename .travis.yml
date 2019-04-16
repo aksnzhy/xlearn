@@ -11,6 +11,6 @@ script:
   # - python3 test_python.py
   # - python3 test_data_conversion.py
 #   - pip --list
-  - sudo apt install python3-pip
+  - sudo apt install python3.6
   - pip3 list
   - python3 --version
