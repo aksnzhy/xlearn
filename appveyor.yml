@@ -13,11 +13,12 @@ test_script:
 #         cd ..\python-package &&
 #         dir dist\*.whl /B>whl_name &&
         dir ..\scripts &&
-        dir ..\scripts\*.txt /B>whl_name.txt &&
-        set /p wname=<whl_name.txt &&
-        cd ..\scripts &&
-        C:\Python36-x64\Scripts\pip install %wname% &&
-        del whl_name
+        dir ..\scripts\*.txt /B
+#         dir ..\scripts\*.txt /B>whl_name.txt &&
+#         set /p wname=<whl_name.txt &&
+#         cd ..\scripts &&
+#         C:\Python36-x64\Scripts\pip install %wname% &&
+#         del whl_name
         
 #         C:\Python36-x64\Scripts\pip install dist\%wname% &&
 #         C:\Python36-x64\python.exe test\test_data_conversion.py &&
