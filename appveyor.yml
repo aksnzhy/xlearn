@@ -21,10 +21,9 @@ test_script:
         C:\Python35-x64\python.exe test\test_python.py &&
         C:\Python36-x64\Scripts\pip install dist\xlearn-0.4.3-py3-none-win_amd64.whl &&
         C:\Python34-x64\python.exe test\test_data_conversion.py &&
-        C:\Python34-x64\python.exe test\test_python.py
-        
-# artifacts:
-#         - path: build_win\Release\*.exe
-#           name: Bits
-#         - path: build_win\python-package\dist\*.whl
-#           name: Bits
+        C:\Python34-x64\python.exe test\test_python.py        
+artifacts:
+        - path: build_win\Release\*.exe
+          name: Bits
+        - path: build_win\python-package\dist\*.whl
+          name: Bits
