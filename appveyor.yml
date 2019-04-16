@@ -5,11 +5,18 @@ build_script:
         cmake -G "Visual Studio 15 Win64" ../ &&
         MSBuild xLearn.sln /p:Configuration=Release &&
         cd python-package &&
-        C:\\Python36-x64\\Scripts\\pip install wheel numpy scipy scikit-learn cython &&
+        C:\\Python36-x64\\Scripts\\pip install wheel numpy scipy scikit-learn cython pandas &&
         C:\\Python36-x64\\python.exe setup.py bdist_wheel --python-tag py3
 test_script:
         cd ..\test &&
-        .\run_all_test.bat
+        .\run_all_test.bat &&
+        cd ..\python-package\test &&
+        C:\\Python36-x64\\python.exe test_data_conversion.py &&
+        C:\\Python36-x64\\python.exe test_python.py &&
+        C:\\Python35-x64\\python.exe test_data_conversion.py &&
+        C:\\Python35-x64\\python.exe test_python.py &&
+        C:\\Python34-x64\\python.exe test_data_conversion.py &&
+        C:\\Python34-x64\\python.exe test_python.py
 artifacts:
         - path: build_win\Release\*.exe
           name: Bits

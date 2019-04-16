@@ -120,6 +120,10 @@ if __name__ == "__main__":
           # this will use MANIFEST.in during install where we specify additional files,
           # this is the golden line
           include_package_data=True,
+          install_requires=[
+              "numpy", 
+              "scipy"
+          ],
           # move data to MANIFEST.in
           license='Apache-2.0',
           classifiers=['License :: OSI Approved :: Apache Software License'],

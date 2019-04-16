@@ -16,7 +16,7 @@
 
 import os, ctypes
 from numpy import ndarray
-from pandas import DataFrame, Series 
+from .base import DataFrame, Series  
 import numpy as np 
 from .base import _LIB, XLearnHandle
 from .base import _check_call, c_str

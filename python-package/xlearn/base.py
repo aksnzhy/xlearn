@@ -100,3 +100,17 @@ else:
         Hello, world!
         """
         return ctypes.c_char_p(string.encode('utf-8'))
+
+"""pandas"""
+try:
+    from pandas import Series, DataFrame 
+except ImportError:
+    class Series(object):
+        """Dummy class for pandas.Series."""
+
+        pass
+
+    class DataFrame(object):
+        """Dummy class for pandas.DataFrame."""
+
+        pass

@@ -39,6 +39,8 @@
 #ifndef UTSNAME_H_
 #define UTSNAME_H_
 
+#pragma warning(disable : 4996)
+
 #define WIN32_LEAN_AND_MEAN
 #include <WinSock2.h>
 #include <Windows.h>
