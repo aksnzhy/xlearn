@@ -10,5 +10,5 @@ script:
   # - pip3 install scikit-learn cython pandas
   # - python3 test_python.py
   # - python3 test_data_conversion.py
-  - pip --list
-  - python --version
+#   - pip --list
+  - python3 --version
