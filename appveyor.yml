@@ -11,7 +11,7 @@ test_script:
         cd ..\test &&
         .\run_all_test.bat &&
         cd ..\python-package &&
-        dir dist
+        dir dist\*.whl
 #         dir dist\*.whl /B>whl_name &&
 #         set /p wname=<whl_name &&
 #         del whl_name &&
