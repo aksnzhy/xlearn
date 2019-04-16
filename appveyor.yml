@@ -11,18 +11,19 @@ test_script:
         cd ..\test &&
         .\run_all_test.bat &&
         cd ..\python-package &&
-        dir dist\*.whl /B>whl_name &&
-        set /p wname=<whl_name &&
-        del whl_name &&
-        C:\Python36-x64\Scripts\pip install dist\%wname% &&
-        C:\Python36-x64\python.exe test\test_data_conversion.py &&
-        C:\Python36-x64\python.exe test\test_python.py &&
-        C:\Python36-x64\Scripts\pip install dist\%wname% &&
-        C:\Python35-x64\python.exe test\test_data_conversion.py &&
-        C:\Python35-x64\python.exe test\test_python.py &&
-        C:\Python36-x64\Scripts\pip install dist\%wname% &&
-        C:\Python34-x64\python.exe test\test_data_conversion.py &&
-        C:\Python34-x64\python.exe test\test_python.py
+        dir
+#         dir dist\*.whl /B>whl_name &&
+#         set /p wname=<whl_name &&
+#         del whl_name &&
+#         C:\Python36-x64\Scripts\pip install dist\%wname% &&
+#         C:\Python36-x64\python.exe test\test_data_conversion.py &&
+#         C:\Python36-x64\python.exe test\test_python.py &&
+#         C:\Python36-x64\Scripts\pip install dist\%wname% &&
+#         C:\Python35-x64\python.exe test\test_data_conversion.py &&
+#         C:\Python35-x64\python.exe test\test_python.py &&
+#         C:\Python36-x64\Scripts\pip install dist\%wname% &&
+#         C:\Python34-x64\python.exe test\test_data_conversion.py &&
+#         C:\Python34-x64\python.exe test\test_python.py
 artifacts:
         - path: build_win\Release\*.exe
           name: Bits
