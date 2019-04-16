@@ -10,4 +10,4 @@ script:
   # - pip3 install scikit-learn cython pandas
   # - python3 test_python.py
   # - python3 test_data_conversion.py
-  - pip3.6.3 --list
+  - pip3 --list
