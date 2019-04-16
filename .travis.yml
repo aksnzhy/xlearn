@@ -7,8 +7,8 @@ script:
   - cd build/test/
   - ./run_all_test.sh
   - cd ../python-package
-  - python setup.py install
+  - sudo python setup.py install
   - cd test/
-  - pip install scikit-learn cython pandas
+  - sudo pip install scikit-learn cython pandas
   - python test_python.py
   - python test_data_conversion.py
