@@ -2,21 +2,20 @@ image: Visual Studio 2017
 build_script:
         mkdir build_win &&
         cd build_win &&
-        cmake -G "Visual Studio 15 Win64" ../
-#         MSBuild xLearn.sln /p:Configuration=Release &&
-#         cd python-package &&
-#         C:\Python36-x64\Scripts\pip install wheel numpy scipy scikit-learn cython pandas &&
-#         C:\Python36-x64\python.exe setup.py bdist_wheel --python-tag py3 --plat-name win_amd64
+        cmake -G "Visual Studio 15 Win64" ../ &&
+        MSBuild xLearn.sln /p:Configuration=Release &&
+        cd python-package &&
+        C:\Python36-x64\Scripts\pip install wheel numpy scipy scikit-learn cython pandas &&
+        C:\Python36-x64\python.exe setup.py bdist_wheel --python-tag py3 --plat-name win_amd64
 test_script:
-#         cd ..\test &&
-#         .\run_all_test.bat &&
-#         cd ..\python-package &&
-#         dir dist\*.whl /B>whl_name &&
-        dir ..\scripts\*.txt /B>whl_name &&
+        cd ..\test &&
+        .\run_all_test.bat &&
+        cd ..\python-package &&
+        dir dist\*.whl /B>whl_name &&
         set /p wname=<whl_name &&
         type whl_name &&
         echo %wname% &&
-        del whl_name
+        
         
 #         C:\Python36-x64\Scripts\pip install dist\%wname% &&
 #         C:\Python36-x64\python.exe test\test_data_conversion.py &&
@@ -27,6 +26,7 @@ test_script:
 #         C:\Python36-x64\Scripts\pip install dist\%wname% &&
 #         C:\Python34-x64\python.exe test\test_data_conversion.py &&
 #         C:\Python34-x64\python.exe test\test_python.py
+        del whl_name
 # artifacts:
 #         - path: build_win\Release\*.exe
 #           name: Bits
