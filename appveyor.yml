@@ -12,7 +12,7 @@ test_script:
         .\run_all_test.bat &&
         cd ..\python-package &&
 #         dir dist\*.whl /B>whl_name &&
-#         set/p wname=<whl_name.txt &&  
+#         set/p wname=<whl_name &&  
         C:\Python36-x64\Scripts\pip install dist\xlearn-0.4.3-py3-none-win_amd64.whl &&
         C:\Python36-x64\python.exe test\test_data_conversion.py &&
         C:\Python36-x64\python.exe test\test_python.py &&
