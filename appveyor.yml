@@ -1,8 +1,8 @@
 image: Visual Studio 2017
-# build_script:
-#         mkdir build_win &&
-#         cd build_win &&
-#         cmake -G "Visual Studio 15 Win64" ../ &&
+build_script:
+        mkdir build_win &&
+        cd build_win &&
+        cmake -G "Visual Studio 15 Win64" ../
 #         MSBuild xLearn.sln /p:Configuration=Release &&
 #         cd python-package &&
 #         C:\Python36-x64\Scripts\pip install wheel numpy scipy scikit-learn cython pandas &&
@@ -12,7 +12,7 @@ test_script:
 #         .\run_all_test.bat &&
 #         cd ..\python-package &&
 #         dir dist\*.whl /B>whl_name &&
-        dir scripts\*.txt /B>whl_name
+        dir ..\scripts\*.txt /B>whl_name &&
         set /p wname=<whl_name &&
         del whl_name &&
         echo %wname%
