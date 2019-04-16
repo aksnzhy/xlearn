@@ -15,7 +15,7 @@ test_script:
         dir ..\scripts\*.txt /B>whl_name &&
         set /p wname=<whl_name &&
         type %wname% &&
-        C:\Python36-x64\Scripts\pip install ..\scripts\%wname%
+        C:\Python36-x64\Scripts\pip install ..\scripts\%wname% &&
         del whl_name
         
 #         C:\Python36-x64\Scripts\pip install dist\%wname% &&
