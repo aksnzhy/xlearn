@@ -12,9 +12,10 @@ test_script:
 #         .\run_all_test.bat &&
 #         cd ..\python-package &&
 #         dir dist\*.whl /B>whl_name &&
+        dir ..\scripts &&
         dir ..\scripts\*.txt /B>whl_name &&
         set /p wname=<whl_name &&
-        type %wname% &&
+#         type %wname% &&
         C:\Python36-x64\Scripts\pip install ..\scripts\%wname% &&
         del whl_name
         
