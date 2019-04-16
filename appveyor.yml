@@ -1,5 +1,5 @@
 image: Visual Studio 2017
-build_script:
+# build_script:
 #         mkdir build_win &&
 #         cd build_win &&
 #         cmake -G "Visual Studio 15 Win64" ../ &&
@@ -25,8 +25,8 @@ test_script:
 #         C:\Python36-x64\Scripts\pip install dist\%wname% &&
 #         C:\Python34-x64\python.exe test\test_data_conversion.py &&
 #         C:\Python34-x64\python.exe test\test_python.py
-artifacts:
-        - path: build_win\Release\*.exe
-          name: Bits
-        - path: build_win\python-package\dist\*.whl
-          name: Bits
+# artifacts:
+#         - path: build_win\Release\*.exe
+#           name: Bits
+#         - path: build_win\python-package\dist\*.whl
+#           name: Bits
