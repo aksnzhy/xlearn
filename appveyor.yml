@@ -16,7 +16,7 @@ test_script:
         set /p wname=<whl_name &&
         type whl_name &&
         echo %wname% &&
-        del whl_name &&
+        del whl_name
         
 #         C:\Python36-x64\Scripts\pip install dist\%wname% &&
 #         C:\Python36-x64\python.exe test\test_data_conversion.py &&
