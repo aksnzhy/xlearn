@@ -53,6 +53,13 @@ Users can test the installation by using the following command: ::
 
   run_example.bat
 
+Build from VS solution
+=======================
+We support an vs solution for users, it's in the directory ``windows`` which is in root of xLearn project. There are three vs project
+in this solution: ``xlearn_train``, ``xlearn_test``, ``xlearn_api``, respectively relation to build executable train,predict entry program and DLL(dynamic link library) API for windows. You should make sure that your vs platform toolset is greater than v141(It works well if you use vs2017).
+
+**Note:** Files(both executable file and DLL) compiling from this solution is different from cmake solution, because of different structure.
+
 Install Python Package
 =======================
 
@@ -81,9 +88,12 @@ You should make sure that you enter DOS as Administrator.
 Install xLearn from pip
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-We will update Python package for Windows soon later.
+We provide Python package on Windows, it supports these Python(x64) versions: ``2.7, 3.4, 3.5, 3.6, 3.7``.
 
-The installation process will take a while to complete. 
+Users can download this binary python package from tab release_, then use ``pip`` command install the ``.whl`` file which you download.
+
+.. _release: https://github.com/aksnzhy/xlearn/releases
+
 After that, you can type the following script in your python shell to check whether the xLearn has been installed successfully: ::
 
   >>> import xlearn as xl
@@ -99,5 +109,5 @@ You will see the following message if the installation is successful: ::
       >  <| |___|  __/ (_| | |  | | | |
      /_/\_\_____/\___|\__,_|_|  |_| |_|
 
-        xLearn   -- 0.42 Version --
+        xLearn   -- 0.43 Version --
   -------------------------------------------------------------------------
