@@ -1,35 +1,36 @@
 image: Visual Studio 2017
 build_script:
-        - ps: mkdir build_win
-        - ps: cd build_win
-        - ps: cmake -G "Visual Studio 15 Win64" ../
-        - ps: MSBuild xLearn.sln /p:Configuration=Release
-        - ps: cd python-package
-        - ps: C:\Python36-x64\Scripts\pip install wheel cython
-        - ps: C:\Python36-x64\python.exe setup.py bdist_wheel --universal --plat-name win_amd64
+        - cmd: mkdir build_win
+        - cmd: cd build_win
+        - cmd: cmake -G "Visual Studio 15 Win64" ../
+        - cmd: MSBuild xLearn.sln /p:Configuration=Release
+        - cmd: cd python-package
+        - cmd: C:\Python36-x64\Scripts\pip install wheel cython
+        - cmd: C:\Python36-x64\python.exe setup.py bdist_wheel --universal --plat-name win_amd64
 test_script:
-        - ps: cd ..\tes
-        - ps: .\run_all_test.bat
-        - ps: cd ..\python-package\test
-        - ps: $pkage=Get-ChildItem -name ..\dist\*.whl
-        - ps: $pkagepath="..\dist\"+$pkage
-        - ps: C:\Python27-x64\Scripts\pip install $pkagepath
-        - ps: C:\Python27-x64\Scripts\pip install wheel scikit-learn cython
-        - ps: C:\Python27-x64\python.exe test_data_conversion.py
-        - ps: C:\Python27-x64\python.exe test_python.py
-        - ps: C:\Python36-x64\Scripts\pip install $pkagepath
-        - ps: C:\Python36-x64\Scripts\pip install wheel scikit-learn cython
-        - ps: C:\Python36-x64\python.exe test_data_conversion.py
-        - ps: C:\Python36-x64\python.exe test_python.py
-        - ps: C:\Python35-x64\Scripts\pip install $pkagepath
-        - ps: C:\Python35-x64\Scripts\pip install wheel scikit-learn cython
-        - ps: C:\Python35-x64\python.exe test_data_conversion.py
-        - ps: C:\Python35-x64\python.exe test_python.py
-        - ps: C:\Python34-x64\Scripts\pip install $pkagepath
-        - ps: C:\Python34-x64\Scripts\pip install --upgrade setuptools
-        - ps: C:\Python34-x64\Scripts\pip install wheel scikit-learn cython
-        - ps: C:\Python34-x64\python.exe test_data_conversion.py
-        - ps: C:\Python34-x64\python.exe test_python.py        
+        - cmd: cd ..\tes
+        - cmd: .\run_all_test.bat
+        - cmd: cd ..\python-package\test
+        - cmd: dir /b ..\dist\*.whl>whlname
+        - cmd: set/p pkage=<whlname
+        - cmd: set pkagepath=..\dist\%pkage%
+        - cmd: C:\Python27-x64\Scripts\pip install %pkagepath%
+        - cmd: C:\Python27-x64\Scripts\pip install wheel scikit-learn cython
+        - cmd: C:\Python27-x64\python.exe test_data_conversion.py
+        - cmd: C:\Python27-x64\python.exe test_python.py
+        - cmd: C:\Python36-x64\Scripts\pip install %pkagepath%
+        - cmd: C:\Python36-x64\Scripts\pip install wheel scikit-learn cython
+        - cmd: C:\Python36-x64\python.exe test_data_conversion.py
+        - cmd: C:\Python36-x64\python.exe test_python.py
+        - cmd: C:\Python35-x64\Scripts\pip install %pkagepath%
+        - cmd: C:\Python35-x64\Scripts\pip install wheel scikit-learn cython
+        - cmd: C:\Python35-x64\python.exe test_data_conversion.py
+        - cmd: C:\Python35-x64\python.exe test_python.py
+        - cmd: C:\Python34-x64\Scripts\pip install %pkagepath%
+        - cmd: C:\Python34-x64\Scripts\pip install --upgrade setuptools
+        - cmd: C:\Python34-x64\Scripts\pip install wheel scikit-learn cython
+        - cmd: C:\Python34-x64\python.exe test_data_conversion.py
+        - cmd: C:\Python34-x64\python.exe test_python.py        
 artifacts:
         - path: build_win\Release\*.exe
           name: Bits
