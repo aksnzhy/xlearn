@@ -53,9 +53,11 @@ Users can test the installation by using the following command: ::
 
   run_example.bat
 
-Build from VS solution
+Build from Visual Studio solution
 =======================
-We support an vs solution for users, it's in the directory ``windows`` which is in root of xLearn project. There are three vs project
+This build method is optional for Build from Source Code, if you already use method above, you can skip this part.
+
+We support an Visual Studio(vs) solution for users, it's in the directory ``windows`` which is in root of xLearn project. There are three vs project
 in this solution: ``xlearn_train``, ``xlearn_test``, ``xlearn_api``, respectively relation to build executable train,predict entry program and DLL(dynamic link library) API for windows. You should make sure that your vs platform toolset is greater than v141(It works well if you use vs2017).
 
 **Note:** Files(both executable file and DLL) compiling from this solution is different from cmake solution, because of different structure.
