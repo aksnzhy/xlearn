@@ -1,7 +1,8 @@
 image: Visual Studio 2017
 build_script:
         mkdir build_win &&
-        ls *.txt
+        set a=`ls *.txt`
+        echo %a%
 #         cd build_win &&
 #         cmake -G "Visual Studio 15 Win64" ../ &&
 #         MSBuild xLearn.sln /p:Configuration=Release &&
