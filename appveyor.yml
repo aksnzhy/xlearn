@@ -4,8 +4,8 @@ build_script:
         - ps: $pkagepath="..\dist\"+$pkage
         - ps: $pkagepath
         mkdir build_win &&
-        -ps: C:\Python36-x64\Scripts\pip install $pkagepath
-        cd build_win &&
+        C:\Python36-x64\Scripts\pip install $pkagepath &&
+        cd build_win
 #         cmake -G "Visual Studio 15 Win64" ../ &&
 #         MSBuild xLearn.sln /p:Configuration=Release &&
 #         cd python-package &&
