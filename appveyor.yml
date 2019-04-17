@@ -2,7 +2,6 @@ image: Visual Studio 2017
 build_script:
         mkdir build_win &&
         a=`ls *.txt` &&
-        echo %a% &&
         C:\Python36-x64\Scripts\pip install ${a}
 #         cd build_win &&
 #         cmake -G "Visual Studio 15 Win64" ../ &&
