@@ -3,9 +3,9 @@ build_script:
         - ps: $pkage=Get-ChildItem -name *.txt
         - ps: $pkagepath="..\dist\"+$pkage
         - ps: $pkagepath
-#         mkdir build_win &&
-#         C:\Python36-x64\Scripts\pip install ${a}
-#         cd build_win &&
+        mkdir build_win &&
+        -ps: C:\Python36-x64\Scripts\pip install $pkagepath
+        cd build_win &&
 #         cmake -G "Visual Studio 15 Win64" ../ &&
 #         MSBuild xLearn.sln /p:Configuration=Release &&
 #         cd python-package &&
