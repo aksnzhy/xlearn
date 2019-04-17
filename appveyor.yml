@@ -1,8 +1,8 @@
 image: Visual Studio 2017
 build_script:
         - ps: $pkage=Get-ChildItem -name *.txt
-        -ps: $pkagepath="..\dist\"+$pkage
-        -ps: $pkagepath
+        - ps: $pkagepath="..\dist\"+$pkage
+        - ps: $pkagepath
         mkdir build_win
 #         C:\Python36-x64\Scripts\pip install $pkagepath &&
 #         cd build_win
