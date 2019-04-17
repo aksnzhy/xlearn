@@ -18,6 +18,10 @@ test_script:
         - cmd: C:\Python27-x64\Scripts\pip install wheel scikit-learn cython
         - cmd: C:\Python27-x64\python.exe test_data_conversion.py
         - cmd: C:\Python27-x64\python.exe test_python.py
+        - cmd: C:\Python37-x64\Scripts\pip install %pkagepath%
+        - cmd: C:\Python37-x64\Scripts\pip install wheel scikit-learn cython
+        - cmd: C:\Python37-x64\python.exe test_data_conversion.py
+        - cmd: C:\Python37-x64\python.exe test_python.py
         - cmd: C:\Python36-x64\Scripts\pip install %pkagepath%
         - cmd: C:\Python36-x64\Scripts\pip install wheel scikit-learn cython
         - cmd: C:\Python36-x64\python.exe test_data_conversion.py
