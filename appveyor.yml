@@ -26,6 +26,7 @@ test_script:
         - cmd: C:\Python35-x64\Scripts\pip install wheel scikit-learn cython
         - cmd: C:\Python35-x64\python.exe test_data_conversion.py
         - cmd: C:\Python35-x64\python.exe test_python.py
+        - cmd: set VS100COMNTOOLS=%VS140COMNTOOLS%
         - cmd: C:\Python34-x64\Scripts\pip install %pkagepath%
         - cmd: C:\Python34-x64\Scripts\pip install --upgrade setuptools
         - cmd: C:\Python34-x64\Scripts\pip install wheel scikit-learn cython
