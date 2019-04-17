@@ -1,34 +1,33 @@
 image: Visual Studio 2017
 build_script:
-        cmd &&
         mkdir build_win &&
         cd build_win &&
-        cmake -G "Visual Studio 15 Win64" ../
-#         MSBuild xLearn.sln /p:Configuration=Release &&
-#         cd python-package &&
-#         C:\Python36-x64\Scripts\pip install wheel numpy scipy scikit-learn cython pandas &&
-#         C:\Python36-x64\python.exe setup.py bdist_wheel --universal --plat-name win_amd64
+        cmake -G "Visual Studio 15 Win64" ../ &&
+        MSBuild xLearn.sln /p:Configuration=Release &&
+        cd python-package &&
+        C:\Python36-x64\Scripts\pip install wheel numpy scipy scikit-learn cython pandas &&
+        C:\Python36-x64\python.exe setup.py bdist_wheel --universal --plat-name win_amd64
 test_script:
         cd ..\test &&
         .\run_all_test.bat &&
         cd ..\python-package\test &&
-        dir /b ..\dist\*.whl>whlname &&
-        set/p pykage=<whlname &&
-        echo %pykage%
+        $pkage=Get-ChildItem -name ..\dist\*.whl &&
+        $pkagepath="..\dist\"+$pkage &&
         C:\Python27-x64\Scripts\pip install wheel numpy scipy scikit-learn cython pandas &&
-        C:\Python27-x64\Scripts\pip install ..\dist\xlearn-0.4.3-py2.py3-none-win_amd64.whl &&
+        C:\Python27-x64\Scripts\pip install $pkagepath &&
         C:\Python27-x64\python.exe test_data_conversion.py &&
         C:\Python27-x64\python.exe test_python.py &&
         C:\Python36-x64\Scripts\pip install wheel numpy scipy scikit-learn cython pandas &&
-        C:\Python36-x64\Scripts\pip install ..\dist\xlearn-0.4.3-py2.py3-none-win_amd64.whl &&
+        C:\Python36-x64\Scripts\pip install $pkagepath &&
         C:\Python36-x64\python.exe test_data_conversion.py &&
         C:\Python36-x64\python.exe test_python.py &&
         C:\Python35-x64\Scripts\pip install wheel numpy scipy scikit-learn cython pandas &&
-        C:\Python35-x64\Scripts\pip install ..\dist\xlearn-0.4.3-py2.py3-none-win_amd64.whl &&
+        C:\Python35-x64\Scripts\pip install $pkagepath &&
         C:\Python35-x64\python.exe test_data_conversion.py &&
         C:\Python35-x64\python.exe test_python.py &&
+        C:\Python34-x64\Scripts\pip install --upgrade setuptools && 
         C:\Python34-x64\Scripts\pip install wheel numpy scipy scikit-learn cython pandas &&
-        C:\Python34-x64\Scripts\pip install ..\dist\xlearn-0.4.3-py2.py3-none-win_amd64.whl &&
+        C:\Python34-x64\Scripts\pip install $pkagepath &&
         C:\Python34-x64\python.exe test_data_conversion.py &&
         C:\Python34-x64\python.exe test_python.py        
 artifacts:
