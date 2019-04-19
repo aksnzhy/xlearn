@@ -22,6 +22,9 @@
  */
 #ifndef PS_WINDOWS_UNISTD_H_
 #define PS_WINDOWS_UNISTD_H_
+
+#pragma warning(disable : 4996)
+
 #include <stdlib.h>
 #include <io.h>
 // #include "getopt.h" /* getopt at: https://gist.github.com/ashelly/7776712 */

@@ -22,6 +22,8 @@
 #ifndef _SYS_MMAN_H_
 #define _SYS_MMAN_H_
 
+#pragma warning(disable : 4996)
+
 // All the headers include this file.
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN

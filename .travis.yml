@@ -6,5 +6,9 @@ script:
   - ./build-travis.sh
   - cd build/test/
   - ./run_all_test.sh
-  - cd ../python-package/test/
-  - python test_python.py test_data_conversion.py
+  - cd ../python-package
+  - sudo python setup.py install
+  - cd test/
+  - sudo pip install scikit-learn cython pandas
+  - python test_python.py
+  - python test_data_conversion.py

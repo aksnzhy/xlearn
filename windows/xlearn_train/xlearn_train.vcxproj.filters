@@ -1,0 +1,228 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{0592b733-930d-4743-a186-b60f53c0983d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\base">
+      <UniqueIdentifier>{20af0d27-8b40-4a4d-bd6f-85273c63ffe2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\c_api">
+      <UniqueIdentifier>{a04ac42b-343e-438c-a94d-87a133dd2b4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\data">
+      <UniqueIdentifier>{04a15749-dc8e-433c-96e3-fd1aa6e36f62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\distributed">
+      <UniqueIdentifier>{2ce9d0b6-d8a3-41c6-9109-cf2faf226be9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\loss">
+      <UniqueIdentifier>{a3669496-2948-48e1-81f9-523e8b774ccc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\reader">
+      <UniqueIdentifier>{1481e781-12d5-42f4-8a8a-ef35eade6979}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\score">
+      <UniqueIdentifier>{78ee8558-1e50-4d53-a09c-42872ee8102c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\solver">
+      <UniqueIdentifier>{47c80e64-02e6-4e24-9c64-0de50d0f3e9c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\base\common.h">
+      <Filter>src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\base\file_util.h">
+      <Filter>src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\base\format_print.h">
+      <Filter>src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\base\levenshtein_distance.h">
+      <Filter>src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\base\logging.h">
+      <Filter>src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\base\math.h">
+      <Filter>src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\base\mman.h">
+      <Filter>src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\base\scoped_ptr.h">
+      <Filter>src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\base\split_string.h">
+      <Filter>src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\base\stl-util.h">
+      <Filter>src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\base\stringprintf.h">
+      <Filter>src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\base\system.h">
+      <Filter>src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\base\thread_pool.h">
+      <Filter>src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\base\timer.h">
+      <Filter>src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\base\unistd.h">
+      <Filter>src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\base\utsname.h">
+      <Filter>src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\base\class_register.h">
+      <Filter>src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\c_api\c_api.h">
+      <Filter>src\c_api</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\c_api\c_api_error.h">
+      <Filter>src\c_api</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\data\data_structure.h">
+      <Filter>src\data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\data\hyper_parameters.h">
+      <Filter>src\data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\data\model_parameters.h">
+      <Filter>src\data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\distributed\parameter_server.h">
+      <Filter>src\distributed</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\loss\cross_entropy_loss.h">
+      <Filter>src\loss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\loss\loss.h">
+      <Filter>src\loss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\loss\metric.h">
+      <Filter>src\loss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\loss\squared_loss.h">
+      <Filter>src\loss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\reader\file_splitor.h">
+      <Filter>src\reader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\reader\parser.h">
+      <Filter>src\reader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\reader\reader.h">
+      <Filter>src\reader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\score\ffm_score.h">
+      <Filter>src\score</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\score\fm_score.h">
+      <Filter>src\score</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\score\linear_score.h">
+      <Filter>src\score</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\score\score_function.h">
+      <Filter>src\score</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\solver\checker.h">
+      <Filter>src\solver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\solver\inference.h">
+      <Filter>src\solver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\solver\solver.h">
+      <Filter>src\solver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\solver\trainer.h">
+      <Filter>src\solver</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\base\format_print.cc">
+      <Filter>src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\levenshtein_distance.cc">
+      <Filter>src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\logging.cc">
+      <Filter>src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\split_string.cc">
+      <Filter>src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\stringprintf.cc">
+      <Filter>src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\timer.cc">
+      <Filter>src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c_api\c_api.cc">
+      <Filter>src\c_api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c_api\c_api_error.cc">
+      <Filter>src\c_api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\data\model_parameters.cc">
+      <Filter>src\data</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\distributed\parameter_server.cc">
+      <Filter>src\distributed</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\loss\cross_entropy_loss.cc">
+      <Filter>src\loss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\loss\loss.cc">
+      <Filter>src\loss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\loss\metric.cc">
+      <Filter>src\loss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\loss\squared_loss.cc">
+      <Filter>src\loss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\reader\file_splitor.cc">
+      <Filter>src\reader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\reader\parser.cc">
+      <Filter>src\reader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\reader\reader.cc">
+      <Filter>src\reader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\score\ffm_score.cc">
+      <Filter>src\score</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\score\fm_score.cc">
+      <Filter>src\score</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\score\linear_score.cc">
+      <Filter>src\score</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\score\score_function.cc">
+      <Filter>src\score</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\solver\checker.cc">
+      <Filter>src\solver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\solver\inference.cc">
+      <Filter>src\solver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\solver\solver.cc">
+      <Filter>src\solver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\solver\trainer.cc">
+      <Filter>src\solver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\solver\train_main.cc">
+      <Filter>src\solver</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -39,6 +39,10 @@ setup(name='xlearn',
       # this will use MANIFEST.in during install where we specify additional files,
       # this is the golden line
       include_package_data=True,
+      install_requires=[
+            "numpy", 
+            "scipy"
+      ],
       data_files=[('xlearn', LIB_PATH)],
       license='Apache-2.0',
       classifiers=['License :: OSI Approved :: Apache Software License'],
