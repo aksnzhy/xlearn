@@ -1,5 +1,11 @@
 ## What's New
 
+ - 2019-4-25 xLearn 0.4.4 version release. Main update:
+
+    * Support Python DMatrix
+    * Better Windows support
+    * Fix bugs in previous version
+
  - 2019-3-25 xLearn 0.4.3 version release. Main update:
     * Fix bugs in previous version
     
