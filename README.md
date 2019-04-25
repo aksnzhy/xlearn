@@ -1,7 +1,7 @@
 <img src="https://github.com/aksnzhy/xLearn/raw/master/img/xlearn_logo.png" width = "400"/>
 
 [![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](./LICENCE)
-[![Project Status](https://img.shields.io/badge/version-0.4.3-green.svg)]()
+[![Project Status](https://img.shields.io/badge/version-0.4.4-green.svg)]()
 
 ## What is xLearn?
 
@@ -53,6 +53,12 @@ If you are enterprise users and find xLearn is useful in your work, please let u
 <img src="https://github.com/aksnzhy/xLearn/raw/master/img/stategrid.jpg" width = "200"/>
 
 ## What's New
+
+ - 2019-4-25 xLearn 0.4.4 version release. Main update:
+
+    * Support Python DMatrix
+    * Better Windows support
+    * Fix bugs in previous version
 
  - 2019-3-25 xLearn 0.4.3 version release. Main update:
     * Fix bugs in previous version
