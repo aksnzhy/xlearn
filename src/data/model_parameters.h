@@ -173,14 +173,14 @@ class Model {
   /* Size of the linear term
   Note that we store both of the model parameters
   and the gradient cache in param_w_, so
-  param_num_w_ = num_feat_ * 2  */
+  param_num_w_ = num_feat_ * aux_size_  */
   index_t param_num_w_;
   /* Size of the latent factor. 
   We store both the model parameters and the gradient 
   cache for adagrad in param_v_. 
   For linear function, param_num_v = 0
-  For fm function, param_num_v_ = num_feat * num_K * 2
-  For ffm funtion, param_num_v_ = num_feat * num_field * num_K * 2  */
+  For fm function, param_num_v_ = num_feat * num_K * aux_size_
+  For ffm funtion, param_num_v_ = num_feat * num_field * num_K * aux_size_  */
   index_t  param_num_v_;
   /* Number of feature
   Feature id is start from 0 */
