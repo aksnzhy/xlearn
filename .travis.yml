@@ -3,7 +3,7 @@ python:
   - 3.5
 compiler: gcc
 sudo: required
-install: true
+install: false
 script:
   - ./build-travis.sh
   - cd build/test/
