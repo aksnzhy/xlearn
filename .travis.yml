@@ -15,6 +15,7 @@ script:
   - sudo python3 -m pip install setuptools wheel cython
   - sudo python3 setup_pip.py sdist
   - sudo python3 setup_pip.py --universal --plat-name manylinux1_x86_64
+  - sudo python3 -m pip install dist/*.whl
   - cd ../build/python-package/test/
   - sudo python3 -m pip install scikit-learn cython pandas
   - python3 test_python.py
