@@ -1,6 +1,8 @@
-language: cpp
-python3:
-  - 3.6
+language: 
+  - cpp
+  - python
+python:
+  - "3.6"
 compiler: gcc
 sudo: required
 install: true
