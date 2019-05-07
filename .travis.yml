@@ -3,6 +3,7 @@ compiler: gcc
 sudo: required
 install: true
 script:
+  - sudo apt-get install python3.6
   - python3.6 --version
 #   - mkdir build
 #   - cd build
