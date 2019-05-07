@@ -1,21 +1,22 @@
 language: cpp
 python:
-  - 3.5
+  - 3.6.3
 compiler: gcc
 sudo: required
 install: false
 script:
-  - mkdir build
-  - cd build
-  - cmake ..
-  - make
-  - cd test
-  - ./run_all_test.sh
-  - cd ../../python-package
   - pip3 install setuptools wheel cython
-  - sudo python3 setup_pip.py sdist
-  - sudo python3 setup_pip.py --universal --plat-name manylinux1_x86_64
-  - cd ../build/python-package/test/
-  - sudo pip3 install scikit-learn cython pandas
-  - python3 test_python.py
-  - python3 test_data_conversion.py
+#   - mkdir build
+#   - cd build
+#   - cmake ..
+#   - make
+#   - cd test
+#   - ./run_all_test.sh
+#   - cd ../../python-package
+#   - pip3 install setuptools wheel cython
+#   - sudo python3 setup_pip.py sdist
+#   - sudo python3 setup_pip.py --universal --plat-name manylinux1_x86_64
+#   - cd ../build/python-package/test/
+#   - sudo pip3 install scikit-learn cython pandas
+#   - python3 test_python.py
+#   - python3 test_data_conversion.py
