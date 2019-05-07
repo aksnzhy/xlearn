@@ -3,6 +3,7 @@ compiler: gcc
 sudo: required
 install: true
 script:
+  - sudo apt-get install cmake
   - mkdir build
   - cd build
   - cmake ..
