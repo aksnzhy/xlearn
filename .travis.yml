@@ -3,7 +3,8 @@ compiler: gcc
 sudo: required
 install: true
 script:
-  - which -a python3.6
+  - pyenv shell 3.6.3
+  - python3.6 --version
 #   - sudo apt-get install python3.6
 #   - python3.6 --version
 #   - mkdir build
