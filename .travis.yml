@@ -1,4 +1,6 @@
 language: cpp
+python:
+  - 3.5
 compiler: gcc
 sudo: required
 install: true
@@ -7,8 +9,9 @@ script:
   - cd build/test/
   - ./run_all_test.sh
   - cd ../../python-package
-  - sudo python setup_pip.py  --universal --plat-name manylinux1_x86_64
+  - sudo python3 setup_pip.py sdist
+  - sudo python3 setup_pip.py --universal --plat-name manylinux1_x86_64
   - cd build/python-package/test/
-  - sudo pip install scikit-learn cython pandas
-  - python test_python.py
-  - python test_data_conversion.py
+  - sudo pip3 install scikit-learn cython pandas
+  - python3 test_python.py
+  - python3 test_data_conversion.py
