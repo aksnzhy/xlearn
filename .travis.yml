@@ -1,11 +1,9 @@
 language: cpp
-python:
-  - 3.6.3
 compiler: gcc
 sudo: required
 install: false
 script:
-  - pip3 install setuptools wheel cython
+  - python3 -m pip install setuptools wheel cython
 #   - mkdir build
 #   - cd build
 #   - cmake ..
