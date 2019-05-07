@@ -1,4 +1,4 @@
-version: '0.4.6.{build}'
+version: '0.4.4.{build}'
 image: Visual Studio 2017
 build_script:
         - cmd: mkdir build_win
