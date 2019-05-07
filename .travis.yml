@@ -4,23 +4,19 @@ sudo: required
 install: true
 script:
   - pyenv shell 3.6.3
-  - python3 --version
-  - python --version
-#   - sudo apt-get install python3.6
-#   - python3.6 --version
-#   - mkdir build
-#   - cd build
-#   - cmake ..
-#   - make
-#   - cd test
-#   - ./run_all_test.sh
-#   - cd ../../python-package
-#   - sudo apt-get install python3-pip
-#   - sudo python3 -m pip install cython numpy==1.14.0 scipy==1.0.0
-#   - sudo python3 setup_pip.py sdist
-#   - sudo python3 setup_pip.py bdist_wheel --universal --plat-name manylinux1_x86_64
-#   - sudo python3 -m pip install dist/*.whl
-#   - cd ../build/python-package/test/
-#   - sudo python3 -m pip install scikit-learn pandas==0.24.0
-#   - python3 test_python.py
-#   - python3 test_data_conversion.py
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
+  - cd test
+  - ./run_all_test.sh
+  - cd ../../python-package
+  - sudo apt-get install python3-pip
+  - sudo python3 -m pip install cython numpy==1.14.0 scipy==1.0.0
+  - sudo python3 setup_pip.py sdist
+  - sudo python3 setup_pip.py bdist_wheel --universal --plat-name manylinux1_x86_64
+  - sudo python3 -m pip install dist/*.whl
+  - cd ../build/python-package/test/
+  - sudo python3 -m pip install scikit-learn pandas==0.24.0
+  - python3 test_python.py
+  - python3 test_data_conversion.py
