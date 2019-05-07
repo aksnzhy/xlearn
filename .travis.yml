@@ -3,12 +3,20 @@ compiler: gcc
 sudo: required
 install: true
 script:
-  - ./build-travis.sh
-  - cd build/test/
+  - sudo apt-get install cmake
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
+  - cd test
   - ./run_all_test.sh
-  - cd ../python-package
-  - sudo python setup.py install
-  - cd test/
-  - sudo pip install scikit-learn cython pandas
+  - cd ../../python-package
+  - sudo python -m pip install cython numpy==1.14.0 scipy==1.0.0
+  - sudo python setup_pip.py sdist
+  - sudo python setup_pip.py bdist_wheel --universal --plat-name manylinux1_x86_64
+  - cd dist
+  - sudo python -m pip install *.whl
+  - cd ../../build/python-package/test/
+  - sudo python -m pip install scikit-learn pandas==0.24.0
   - python test_python.py
   - python test_data_conversion.py
