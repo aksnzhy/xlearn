@@ -5,6 +5,8 @@ install: true
 script:
   - pyenv shell 3.6.3
   - sudo apt-get install python3-pip
+  - python3 --version
+  - python3 -m pip list
   - sudo python3 -m pip install cython numpy==1.14.0 scipy==1.0.0 scikit-learn pandas==0.24.0
 #   - mkdir build
 #   - cd build
