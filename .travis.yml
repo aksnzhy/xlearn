@@ -3,6 +3,7 @@ compiler: gcc
 sudo: required
 install: false
 script:
+  - sudo apt-get install python3-pip
   - python3 -m pip install setuptools wheel cython
 #   - mkdir build
 #   - cd build
