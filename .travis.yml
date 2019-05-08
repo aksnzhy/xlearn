@@ -3,6 +3,7 @@ compiler: gcc
 sudo: required
 install: true
 script:
+  - gem install travis -v 1.8.0 --no-rdoc --no-ri
   - travis setup releases
 #   - sudo apt-get install cmake
 #   - mkdir build
@@ -21,7 +22,6 @@ script:
 #   - sudo python -m pip install scikit-learn pandas==0.24.0
 #   - python test_python.py
 #   - python test_data_conversion.py
-
 deploy:
   provider: releases
   api_key:
