@@ -3,30 +3,20 @@ compiler: gcc
 sudo: required
 install: true
 script:
-  - lsb_release -a
-  - uname -a
-  - ldd --version
-#   - sudo apt-get install cmake
-#   - mkdir build
-#   - cd build
-#   - cmake ..
-#   - make
-#   - cd test
-#   - ./run_all_test.sh
-#   - cd ../../python-package
-#   - sudo python -m pip install cython numpy==1.14.0 scipy==1.0.0
-#   - sudo python setup_pip.py sdist
-#   - sudo python setup_pip.py bdist_wheel --universal --plat-name manylinux1_x86_64
-#   - cd dist
-#   - sudo python -m pip install *.whl
-#   - cd ../../build/python-package/test/
-#   - sudo python -m pip install scikit-learn pandas==0.24.0
-#   - python test_python.py
-#   - python test_data_conversion.py
-deploy:
-  provider: releases
-  api_key:
-  file: python-package/dist/*
-  skip_cleanup: true
-  on:
-    tags: false
+  - sudo apt-get install cmake
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
+  - cd test
+  - ./run_all_test.sh
+  - cd ../../python-package
+  - sudo python -m pip install cython numpy==1.14.0 scipy==1.0.0
+  - sudo python setup_pip.py sdist
+  - sudo python setup_pip.py bdist_wheel --universal --plat-name manylinux1_x86_64
+  - cd dist
+  - sudo python -m pip install *.whl
+  - cd ../../build/python-package/test/
+  - sudo python -m pip install scikit-learn pandas==0.24.0
+  - python test_python.py
+  - python test_data_conversion.py
