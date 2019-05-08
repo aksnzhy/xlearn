@@ -3,8 +3,9 @@ compiler: gcc
 sudo: required
 install: true
 script:
-  - gem install travis
-  - travis setup releases -y
+  - lsb_release -a
+  - uname -a
+  - ldd --version
 #   - sudo apt-get install cmake
 #   - mkdir build
 #   - cd build
