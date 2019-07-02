@@ -53,6 +53,7 @@ If you are enterprise users and find xLearn is useful in your work, please let u
 <img src="https://github.com/aksnzhy/xLearn/raw/master/img/tencent.png" width = "200"/>
 <img src="https://github.com/aksnzhy/xLearn/raw/master/img/stategrid.jpg" width = "200"/>
 <img src="https://github.com/aksnzhy/xLearn/raw/master/img/xiaodaka.png" width = "200"/>
+<img src="https://github.com/aksnzhy/xLearn/raw/master/img/beikezhaofang.png" width = "200"/>
 
 ## What's New
 
