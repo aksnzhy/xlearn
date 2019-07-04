@@ -23,8 +23,7 @@ RUN apt-get update && apt-get -y install \
     gcc \
     binutils \
     clang \ 
-    cmake \
-    protobuf-compiler 
+    cmake 
 
 # Install xlearn
 RUN git clone https://github.com/aksnzhy/xlearn.git 
