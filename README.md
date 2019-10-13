@@ -59,6 +59,8 @@ If you are enterprise users and find xLearn is useful in your work, please let u
 
 ## What's New
 
+ - 2019-10-13 [Andrew Kane](https://github.com/ankane) add [Ruby bindings](https://github.com/ankane/xlearn) for xLearn!
+
  - 2019-4-25 xLearn 0.4.4 version release. Main update:
 
     * Support Python DMatrix
