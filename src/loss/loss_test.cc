@@ -62,7 +62,7 @@ class LossTest : public ::testing::Test {
   virtual void SetUp() {
     param.learning_rate = 0.1;
     param.regu_lambda = 0;
-    param.loss_func = "sqaured";
+    param.loss_func = "squared";
     param.score_func = "linear";
     param.num_feature = 3;
     param.num_field = 3;
