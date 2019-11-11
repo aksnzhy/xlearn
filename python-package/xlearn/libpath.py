@@ -35,6 +35,7 @@ def find_lib_path():
     # make pythonpack hack: copy this directory one level upper for setup.py
     dll_path = [curr_path, os.path.join(curr_path, '../../lib/'),
                 os.path.join(curr_path, './lib/'),
+                os.path.join(curr_path, '../../build/lib/'),
                 os.path.join(sys.prefix, 'xlearn')]
     if sys.platform == 'win32':
         if platform.architecture()[0] == '64bit':
