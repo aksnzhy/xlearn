@@ -121,8 +121,9 @@ if __name__ == "__main__":
           # this is the golden line
           include_package_data=True,
           install_requires=[
-              "numpy", 
-              "scipy"
+              'numpy', 
+              'scipy<1.3.0; python_version<"3"',
+              'scipy>=1.3.0; python_version>="3"'
           ],
           # move data to MANIFEST.in
           license='Apache-2.0',
