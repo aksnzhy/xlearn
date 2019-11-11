@@ -41,7 +41,7 @@ setup(name='xlearn',
       include_package_data=True,
       install_requires=[
             "numpy", 
-            "scipy"
+            "scipy==1.2.2"
       ],
       data_files=[('xlearn', LIB_PATH)],
       license='Apache-2.0',
