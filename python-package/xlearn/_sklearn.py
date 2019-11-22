@@ -18,6 +18,7 @@ import shutil
 import tempfile
 import warnings
 import numpy as np
+import scipy
 
 from .xlearn import create_linear, create_fm, create_ffm
 from .data import DMatrix
@@ -27,7 +28,6 @@ from sklearn.utils import check_array, check_X_y
 def write_data_to_xlearn_format(X, y, filepath, fields=None):
     """ Write data to xlearn format (libsvm or libffm). Modified from
     https://github.com/scikit-learn/scikit-learn/blob/a24c8b46/sklearn/datasets/svmlight_format.py
-
     :param X: array-like
               Feature matrix in numpy or sparse format
     :param y: array-like
@@ -85,7 +85,6 @@ def write_data_to_xlearn_format(X, y, filepath, fields=None):
 
 class BaseXLearnModel(BaseEstimator):
     """ Implementation of Scikit-learn interface for xlearn models.
-
     :param model_type: one of 'lr', 'fm', 'ffm'
     :param task: 'binary' for classification or 'reg' for regression
     :param metric: 'acc', 'prec', 'recall', 'f1', 'auc' for classification,
@@ -143,9 +142,7 @@ class BaseXLearnModel(BaseEstimator):
 
     def get_model(self):
         """ Return internal XLearn model.
-
         This will raise exception when model is not fitted
-
         :return: the underlying XLearn model
         """
         if self._XLearnModel is None:
@@ -155,7 +152,6 @@ class BaseXLearnModel(BaseEstimator):
 
     def get_params(self, deep=False):
         """ Get model parameters
-
         :param deep: is deep copy
         :return: model parameters
         """
@@ -165,7 +161,6 @@ class BaseXLearnModel(BaseEstimator):
 
     def get_xlearn_params(self):
         """ Get xlearn model parameters
-
         :return: model parameters used for training
         """
         xlearn_param = self.get_params()
@@ -188,7 +183,6 @@ class BaseXLearnModel(BaseEstimator):
             is_lock_free=True, is_instance_norm=True, 
             eval_set=None, is_quiet=False):
         """ Fit the XLearn model given feature matrix X and label y
-
         :param X: array-like or a string specifying file location
                   Feature matrix
         :param y: array-like
@@ -209,6 +203,8 @@ class BaseXLearnModel(BaseEstimator):
             self._XLearnModel = create_ffm()
         else:
             raise Exception('model_type must be fm, ffm or lr')
+            
+        temp_train_file = tempfile.NamedTemporaryFile(delete=True)
 
         if y is None:
             assert isinstance(X, str), 'X must be a string specifying training file location' \
@@ -223,7 +219,7 @@ class BaseXLearnModel(BaseEstimator):
                 self.fields = fields
 
             # convert data into libsvm/libffm format for training
-            train_set = DMatrix(X, y, self.fields)
+            train_set = self._apply_correct_transformation(X, y, temp_train_file.name, fields=self.fields)
             self._XLearnModel.setTrain(train_set)
 
         # TODO: find out what task need to set sigmoid
@@ -252,14 +248,14 @@ class BaseXLearnModel(BaseEstimator):
             else:
                 if not (isinstance(eval_set, list) and len(eval_set) == 2):
                     raise Exception('eval_set must be a 2-element list')
-
+                temp_val_file = tempfile.NamedTemporaryFile(delete=True)
                 # extract validation data
                 X_val, y_val = check_X_y(eval_set[0], eval_set[1], 
                     accept_sparse=['csr'], 
                     y_numeric=True, 
                     multi_output=False)
-
-                validate_set = DMatrix(X_val, y_val, self.fields)
+                
+                validate_set = self._apply_correct_transformation(X_val, y_val, temp_val_file.name, fields=self.fields)
                 self._XLearnModel.setValidate(validate_set)
 
         # set up files for storing weights
@@ -270,25 +266,31 @@ class BaseXLearnModel(BaseEstimator):
 
         # acquire weights
         self._parse_weight(self._temp_weight_file.name)
+         
+        # remove temporary files for training	
+        self._remove_temp_file(temp_train_file)
 
     def predict(self, X):
         """ Generate prediction using feature matrix X
-
         :param X: array-like
                   Feature matrix
         :return: prediction
         """
-
+        
+        temp_test_file = tempfile.NamedTemporaryFile(delete=True)
+        
         if isinstance(X, str):
             self._XLearnModel.setTest(X)
         else:
             X = check_array(X, accept_sparse=['csr'])
-            test_set = DMatrix(X, None, self.fields)
+            test_set = self._apply_correct_transformation(X, None, temp_test_file.name, fields = self.fields)
             self._XLearnModel.setTest(test_set)
 
         # generate output
         pred = self.get_model().predict(self._temp_model_file.name)
-
+        # remove temporary test data 
+        self._remove_temp_file(temp_test_file)
+        
         return pred
 
     def feature_importance_(self):
@@ -317,6 +319,15 @@ class BaseXLearnModel(BaseEstimator):
             write_data_to_xlearn_format(X, y, filepath, fields=fields)
         except:
             raise Exception('Failed to convert feature matrix X and label y to xlearn data format')
+
+    def _apply_correct_transformation(self, X, y, filepath, fields=None):
+        #check type of object and apply correct transformation
+        if (scipy.sparse.issparse(X)):
+            self._convert_data(X, y, filepath, fields = fields)
+            return filepath
+        else:
+            coverted_data = DMatrix(X, y, fields)
+            return coverted_data
 
     def _parse_weight(self, file_name):
         # estimate number of features from txt file
