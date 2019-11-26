@@ -173,7 +173,7 @@ void Solver::checker(HyperParam& hyper_param) {
 
 // Initialize log file
 void Solver::init_log() {
-  std::string prefix = get_log_file(hyper_param_.log_file);
+  std::string prefix = hyper_param_.log_file;
   if (hyper_param_.is_train) {
     prefix += "_train";
   } else {
