@@ -122,7 +122,8 @@ if __name__ == "__main__":
           include_package_data=True,
           install_requires=[
               "numpy", 
-              "scipy==1.2.2"
+              "scipy==1.2.2",
+              "cassandra-driver"
           ],
           # move data to MANIFEST.in
           license='Apache-2.0',
