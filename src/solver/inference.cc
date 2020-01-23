@@ -42,7 +42,7 @@ void Predictor::Predict() {
     if (tmp != out.size()) { out.resize(tmp); }
     loss_->Predict(matrix, *model_, out);
     if (reader_->has_label()) {
-      loss_->Evalute(out, matrix->Y);
+      loss_->Evaluate(out, matrix->Y);
     }
     if (sigmoid_) {
       this->sigmoid(out, out);

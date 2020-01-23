@@ -33,12 +33,12 @@ namespace xLearn {
 //------------------------------------------------------------------------------
 class SquaredLoss : public Loss {
  public:
-  // Constructor and Desstructor
+  // Constructor and Destructor
   SquaredLoss() { };
   ~SquaredLoss() { }
 
   // Given predictions and labels, accumulate loss value.
-  void Evalute(const std::vector<real_t>& pred,
+  void Evaluate(const std::vector<real_t>& pred,
                  const std::vector<real_t>& label);
 
   // Given data sample and current model, calculate gradient

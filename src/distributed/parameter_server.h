@@ -95,7 +95,7 @@ class KVStore {
    	               const size_t length);
 
    //---------------------------------------------------------------------------
-   // In xLearn, we use a simple range strategy for model partiton
+   // In xLearn, we use a simple range strategy for model partition
    // on parameter server. For example, we have 10 features and 3 
    // server nodes.
    //

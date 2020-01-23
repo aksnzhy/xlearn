@@ -120,7 +120,7 @@ void Reader::shrink_block(char* block, size_t* ret, FILE* file) {
 //------------------------------------------------------------------------------
 
 // Pre-load all the data into memory buffer (data_buf_).
-// Note that this funtion will first check whether we 
+// Note that this function will first check whether we
 // can use the existing binary file. If not, reader will 
 // generate one automatically.
 void InmemReader::Initialize(const std::string& filename) {
@@ -158,7 +158,7 @@ void InmemReader::Initialize(const std::string& filename) {
   }
 }
 
-// Check wheter current path has a binary file.
+// Check whether current path has a binary file.
 // We use double check here, that is, we first check 
 // the hash value of a small data block, then check the whole file.
 bool InmemReader::hash_binary(const std::string& filename) {
@@ -251,7 +251,7 @@ void InmemReader::init_from_txt() {
   Close(file);
 }
 
-// Smaple data from memory buffer.
+// Sample data from memory buffer.
 index_t InmemReader::Samples(DMatrix* &matrix) {
   for (int i = 0; i < num_samples_; ++i) {
     if (pos_ >= data_buf_.row_length) {
@@ -276,7 +276,7 @@ index_t InmemReader::Samples(DMatrix* &matrix) {
   return num_samples_;
 }
 
-// Return to the begining of the data buffer.
+// Return to the beginning of the data buffer.
 void InmemReader::Reset() { pos_ = 0; }
 
 //------------------------------------------------------------------------------
@@ -310,7 +310,7 @@ void OndiskReader::Initialize(const std::string& filename) {
 #endif
 }
 
-// Return to the begining of the file
+// Return to the beginning of the file
 void OndiskReader::Reset() {
   int ret = fseek(file_ptr_, 0, SEEK_SET);
   if (ret != 0) {
@@ -349,7 +349,7 @@ void FromDMReader::Initialize(xLearn::DMatrix* &dmatrix) {
   }
 }
 
-// Smaple data from memory buffer.
+// Sample data from memory buffer.
 index_t FromDMReader::Samples(DMatrix* &matrix) {
   for (int i = 0; i < num_samples_; ++i) {
     if (pos_ >= this->data_ptr_->row_length) {

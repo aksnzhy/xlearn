@@ -13,6 +13,6 @@ REM # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 REM # See the License for the specific language governing permissions and
 REM # limitations under the License.
 
-REM # This script is for installization of xlearn python package
+REM # This script is for installation of xlearn python package
 REM # You may need to type your password here
 python setup.py install

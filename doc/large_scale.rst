@@ -12,7 +12,7 @@ across many machines to support distributed training by using the *parameter ser
 Out-of-Core Learning
 --------------------------------
 
-*Out-of-core* leanring refers to the machine learning algorithms working with data cannot fit into 
+*Out-of-core* learning refers to the machine learning algorithms working with data cannot fit into
 the memory of a single machine, but that can easily fit into some data storage such as local hard disk
 or web repository. Your available RAM, the core memory on your single machine, may indeed range from a few 
 gigabytes (sometimes 2 GB, more commonly 4 GB, but we assume that you have 2 GB at maximum) up to 256 GB on 
@@ -21,7 +21,7 @@ Elastic Compute Cloud (EC2), whereas your storage capabilities can easily exceed
 just an external drive (most likely about 1 TB but it can reach up to 4 TB).
 
 Actually, the ability to learn incrementally from a mini-batch of instances is key to *out-of-core* learning as
-it gurantees that at any given time there will be only a small amount of data in the main memory. Choose a good
+it guarantees that at any given time there will be only a small amount of data in the main memory. Choose a good
 size for the mini-batch that balances relevancy and memory footprint could involve some tuning.
 
 .. image:: ../images/out-of-core.png
@@ -130,7 +130,7 @@ become a prerequisite.
 
 The *Parameter Server* (PS) framework has emerged as an efficient approach to solve the “big model” machine learning 
 challenge recently. Under this framework, both the training data and workloads are spread across worker nodes, while 
-the server nodes maintain the globally shared model pa- rameters. The following figure demonstrates the architecture 
+the server nodes maintain the globally shared model parameters. The following figure demonstrates the architecture
 of the PS framework. 
 
 .. image:: ../images/ps.png

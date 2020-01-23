@@ -497,7 +497,7 @@ The disadvantage of ``disableLockFree()`` is that it is much slower than lock-fr
 Instance-wise Normalization
 ----------------------------------------
 
-For FM and FFM, xLearn uses *instance-wise normalizarion* by default. In some scenes like CTR prediction, 
+For FM and FFM, xLearn uses *instance-wise normalization* by default. In some scenes like CTR prediction,
 this technique is very useful. But sometimes it hurts model performance. Users can disable instance-wise 
 normalization by using ``disableNorm()`` API: ::
 

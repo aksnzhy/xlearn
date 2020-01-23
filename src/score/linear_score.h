@@ -29,15 +29,15 @@ namespace xLearn {
 
 //------------------------------------------------------------------------------
 // LinearScore is used to implement generalized linear
-// models (GLMs), where the socre function is y = wTx.
+// models (GLMs), where the score function is y = wTx.
 //------------------------------------------------------------------------------
 class LinearScore : public Score {
  public:
-  // Constructor and Desstructor
+  // Constructor and Destructor
   LinearScore() { }
   ~LinearScore() { }
 
-  // Given one exmaple and current model, this method
+  // Given one example and current model, this method
   // returns the linear score wTx.
   real_t CalcScore(const SparseRow* row,
                    Model& model,

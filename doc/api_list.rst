@@ -23,7 +23,7 @@ Options: ::
          5 -- field-aware factorization machines (FFM)
                                                                            
   -x <metric>          :  The metric can be 'acc', 'prec', 'recall', 'f1', 'auc' for classification, and
-                          'mae', 'mape', 'rmsd (rmse)' for regression. On defaurt, xLearn will not print
+                          'mae', 'mape', 'rmsd (rmse)' for regression. On default, xLearn will not print
                           any evaluation metric information (only print loss value).                                           
                                                                                                      
   -p <opt_method>      :  Choose the optimization method, including 'sgd', adagrad', and 'ftrl'. On default,
@@ -113,7 +113,7 @@ Options: ::
 
   --sign                   :  Converting output result to 0 and 1.
 
-  --sigmoid                :  Converting output result to 0 ~ 1 (problebility).
+  --sigmoid                :  Converting output result to 0 ~ 1 (probability).
 
   --disk                   :  On-disk prediction.
 
@@ -130,7 +130,7 @@ API List: ::
     xl.hello()               # Say hello to user
 
     # This part is for data
-    # X is feautres data, can be pandas DataFrame or numpy.ndarray,
+    # X is features data, can be pandas DataFrame or numpy.ndarray,
     # y is label, default None, can be pandas DataFrame\Series, array or list,
     # filed_map is field map of features, default None, can be pandas DataFrame\Series, array or list
     dmatrix = xl.DMatrix(X, y, field_map)  
@@ -139,7 +139,7 @@ API List: ::
 
     model = create_fm()      #  Create factorization machines.
 
-    model = create_ffm()     #  Create field-aware factorizarion machines.
+    model = create_ffm()     #  Create field-aware factorization machines.
 
     model.show()             #  Show model information.
 

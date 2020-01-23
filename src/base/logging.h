@@ -37,7 +37,7 @@ messages by their severities.
 //     InitializeLogger("/tmp/info.log", "/tmp/warn.log", "/tmp/erro.log");
 //     LOG(INFO)    << "An info message going into /tmp/info.log";
 //     LOG(WARNING) << "An warn message going into /tmp/warn.log";
-//     LOG(ERR)     << "An erro message going into /tmp/erro.log";
+//     LOG(ERR)     << "An error message going into /tmp/erro.log";
 //     LOG(FATAL)   << "An fatal message going into /tmp/erro.log, "
 //                  << "and kills current process by a segmentation fault.";
 //     return 0;
@@ -83,7 +83,7 @@ class Logger {
 //  - When the Logger instance is destructed, the destructor appends flush.
 //    If severity is FATAL, the destructor causes SEGFAULT and core dump.
 //
-// It is important to flush in Logger::Start() after outputing message
+// It is important to flush in Logger::Start() after outputting message
 // head.  This is because that the time when the destructor is invoked
 // depends on how/where the caller code defines the Logger instance.
 // If the caller code crashes before the Logger instance is properly

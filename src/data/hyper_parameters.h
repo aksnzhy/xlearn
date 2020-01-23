@@ -33,7 +33,7 @@ namespace xLearn {
 //------------------------------------------------------------------------------
 struct HyperParam {
 //------------------------------------------------------------------------------
-// Baisc parameters for current task
+// Basic parameters for current task
 //------------------------------------------------------------------------------
   /* Train or Predict.
   True for train, and false for predict. */
@@ -43,7 +43,7 @@ struct HyperParam {
   bool on_disk = false;
   /* Don't print any evaluation information 
   during the training, and just train the model.
-  Setting this option to true will accerlate the training. */
+  Setting this option to true will accelerate the training. */
   bool quiet = false;
   /* Score function. 
   For now, it can be 'linear', 'fm', or 'ffm' */
@@ -90,7 +90,7 @@ struct HyperParam {
   index_t num_feature = 0;
   /* Number of total model parameters */
   index_t num_param = 0;
-  /* Number of lateny factor for fm and ffm */
+  /* Number of latent factor for fm and ffm */
   index_t num_K = 4;
   /* Number of field, used by ffm tasks */
   index_t num_field = 0;
@@ -150,9 +150,9 @@ struct HyperParam {
   bool early_stop = true;
   /* Early stop window size */
   int stop_window = 2;
-  /* Convert predition output to 0 and 1 */
+  /* Convert prediction output to 0 and 1 */
   bool sign = false;
-  /* Convert predition output using sigmoid */
+  /* Convert prediction output using sigmoid */
   bool sigmoid = false;
 //------------------------------------------------------------------------------
 // Parameters for distributed learning

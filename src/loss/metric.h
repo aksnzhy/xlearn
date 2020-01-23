@@ -49,13 +49,13 @@ const index_t kMaxBucketSize = 1e6;
 //      int tmp = reader->Samples(matrix);
 //      if (tmp == 0) { break; }
 //      pred.resize(tmp);
-//      metric->Accumlate(matrix->Y, pred);
+//      metric->Accumulate(matrix->Y, pred);
 //    }
 //    real_t metric_val = metric.GetMetric();  
 //------------------------------------------------------------------------------
 class Metric {
  public:
-  // Constructor and Destrictor
+  // Constructor and Destructor
   Metric() { }
   virtual ~Metric() { }
 
@@ -96,8 +96,8 @@ class Metric {
   *********************************************************/
 
 //------------------------------------------------------------------------------
-// Accuarcy is used as statistical measure of how well a binary classfication
-// test correctly identifies or excludes a condition. That is, the accuarcy 
+// Accuracy is used as statistical measure of how well a binary classification
+// test correctly identifies or excludes a condition. That is, the Accuracy 
 // is the proportion of true results (both true positives and true negatives)
 // among the total number of cases examined. 
 //------------------------------------------------------------------------------
@@ -156,14 +156,14 @@ class AccMetric : public Metric {
     true_pred_ = 0;
   }
 
-  // Return accuarcy
+  // Return Accuracy
   real_t GetMetric() {
     return (true_pred_ * 1.0) / total_example_;
   }
 
   // Metric type
   std::string metric_type() { 
-    return "Accuarcy"; 
+    return "Accuracy"; 
   }
 
   // Compare two metric value
@@ -248,7 +248,7 @@ class PrecMetric : public Metric {
     false_positive_ = 0;
   }
 
-  // Return accuarcy
+  // Return Accuracy
   real_t GetMetric() {
     return (true_positive_ * 1.0) / 
            (true_positive_ + false_positive_);
@@ -341,7 +341,7 @@ class RecallMetric : public Metric {
     false_negative_ = 0;
   }
 
-  // Return accuarcy
+  // Return Accuracy
   real_t GetMetric() {
     return (true_positive_ * 1.0) / 
            (true_positive_ + false_negative_);
@@ -438,7 +438,7 @@ class F1Metric : public Metric {
     total_example_ = 0;
   }
 
-  // Return accuarcy
+  // Return Accuracy
   real_t GetMetric() {
     return (true_positive_ * 2.0) / 
            (total_example_ + true_positive_ - true_negative_);
@@ -481,7 +481,7 @@ class AUCMetric : public Metric {
   };
 
  public:
-  // Constrcutor and Destructor
+  // Constructor and Destructor
   AUCMetric() {
     all_positive_number_.clear();
     all_negative_number_.clear();
@@ -653,7 +653,7 @@ class MAEMetric : public Metric {
     total_example_ = 0;
   }
 
-  // Return accuarcy
+  // Return Accuracy
   real_t GetMetric() {
     return error_ / total_example_;
   }
@@ -732,7 +732,7 @@ class MAPEMetric : public Metric {
     total_example_ = 0;
   }
 
-  // Return accuarcy
+  // Return Accuracy
   real_t GetMetric() {
     return error_ / total_example_;
   }
@@ -813,7 +813,7 @@ class RMSDMetric : public Metric {
     total_example_ = 0;
   }
 
-  // Return accuarcy
+  // Return Accuracy
   real_t GetMetric() {
     return sqrt(error_ / total_example_);
   }

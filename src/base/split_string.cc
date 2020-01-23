@@ -37,7 +37,7 @@ static int CalculateReserveForVector(const std::string& full, const char* delim)
         ++p;
       } else {
         while (++p != end && *p != c) {
-          // Skip to the next occurence of the delimiter.
+          // Skip to the next occurrence of the delimiter.
         }
         ++count;
       }
