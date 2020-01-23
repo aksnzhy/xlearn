@@ -19,7 +19,7 @@ import xlearn as xl
 #  0. binary classification
 #  1. learning rate: 0.2
 #  2. epoch number: 10 (auto early-stop)
-#  3. evaluation metric: Accuracy
+#  3. evaluation metric: accuracy
 #  4. use sgd optimization method
 ffm_model = xl.FFMModel(task='binary', 
                         lr=0.2, 

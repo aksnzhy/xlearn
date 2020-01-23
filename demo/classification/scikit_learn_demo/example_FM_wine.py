@@ -41,7 +41,7 @@ X_val = scaler.transform(X_val)
 #  4. learning rate: 0.1
 #  5. regular lambda: 0.01
 #  6. use sgd optimization method
-#  7. evaluation metric: Accuracy
+#  7. evaluation metric: accuracy
 fm_model = xl.FMModel(task='binary', init=0.1, 
                       epoch=10, k=4, lr=0.1, 
                       reg_lambda=0.01, opt='sgd', 
