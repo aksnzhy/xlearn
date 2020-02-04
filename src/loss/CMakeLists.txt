@@ -3,7 +3,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/test/loss)
 
 # Build static library
 set(STA_DEPS score data base)
-add_library(loss STATIC loss.cc squared_loss.cc 
+add_library(loss SHARED loss.cc squared_loss.cc
 cross_entropy_loss.cc metric.cc)
 target_link_libraries(loss ${STA_DEPS})
 

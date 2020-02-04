@@ -3,7 +3,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/test/reader)
 
 # Build static library
 set(STA_DEPS data base)
-add_library(reader STATIC parser.cc file_splitor.cc reader.cc)
+add_library(reader SHARED parser.cc file_splitor.cc reader.cc)
 target_link_libraries(reader ${STA_DEPS})
 
 # Build uinttests.

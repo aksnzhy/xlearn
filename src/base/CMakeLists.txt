@@ -2,7 +2,7 @@
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/test/base)
 
 # Build static library
-add_library(base STATIC logging.cc stringprintf.cc split_string.cc 
+add_library(base SHARED logging.cc stringprintf.cc split_string.cc
 levenshtein_distance.cc timer.cc format_print.cc)
 
 # Build unittests.
