@@ -326,7 +326,7 @@ void Solver::init_train() {
     );
   }
   Color::print_info(
-    StringPrintf("Time cost for reading problem: %.2f (sec)",
+    StringPrintf("Time cost for reading problem: %.6f (sec)",
          timer.toc())
   );
   /*********************************************************
@@ -363,7 +363,7 @@ void Solver::init_train() {
          PrintSize(num_param*sizeof(real_t)).c_str())
   );
   Color::print_info(
-    StringPrintf("Time cost for model initial: %.2f (sec)",
+    StringPrintf("Time cost for model initial: %.6f (sec)",
          timer.toc())
   );
   /*********************************************************
@@ -458,7 +458,7 @@ void Solver::init_predict() {
     }
   }
   Color::print_info(
-    StringPrintf("Time cost for loading model: %.2f (sec)",
+    StringPrintf("Time cost for loading model: %.6f (sec)",
         timer.toc())
   );
   LOG(INFO) << "Initialize model.";
@@ -496,7 +496,7 @@ void Solver::init_predict() {
     }
   }
   Color::print_info(
-    StringPrintf("Time cost for reading problem: %.2f (sec)",
+    StringPrintf("Time cost for reading problem: %.6f (sec)",
                   timer.toc())
   );
   LOG(INFO) << "Initialize Reader: " << hyper_param_.test_set_file;
@@ -579,7 +579,7 @@ void Solver::start_train_work() {
         StringPrintf("Model file: %s", hyper_param_.model_file.c_str())
       );
       Color::print_info(
-        StringPrintf("Time cost for saving model: %.2f (sec)", timer.toc())
+        StringPrintf("Time cost for saving model: %.6f (sec)", timer.toc())
       );
     }
     // Save TXT model 
@@ -592,7 +592,7 @@ void Solver::start_train_work() {
         StringPrintf("TXT Model file: %s", hyper_param_.txt_model_file.c_str())
       );
       Color::print_info(
-        StringPrintf("Time cost for saving txt model: %.2f (sec)", timer.toc())
+        StringPrintf("Time cost for saving txt model: %.6f (sec)", timer.toc())
       );
     }
     Color::print_action("Finish training");
