@@ -146,12 +146,12 @@ struct DMatrix {
   // Destructor
   ~DMatrix() { }
 
-  // ReAlloc memoryfor the DMatrix.
+  // ReAlloc memory for the DMatrix.
   // This function will first release the original
   // memory allocated for the DMatrix, and then re-allocate 
   // memory for this new matrix. For some dataset, it does not
   // contains the label y, and hence we need to set the 
-  // has_label variable to false. On deafult, this value will
+  // has_label variable to false. On default, this value will
   // be set to true.
   void ReAlloc(size_t length, bool label = true) {
     CHECK_GE(length, 0);
@@ -162,7 +162,7 @@ struct DMatrix {
     this->row.resize(length, nullptr);
     this->Y.resize(length, 0);
     // Here we set norm to 1.0 by default, which means
-    // that we don't use instance-wise nomarlization
+    // that we don't use instance-wise normalization
     this->norm.resize(length, 1.0);
     // Indicate that if current dataset has the label y
     this->has_label = label;
@@ -311,7 +311,7 @@ struct DMatrix {
     }
   }
 
-  // Get a mini-batch of data from curremt data matrix. 
+  // Get a mini-batch of data from current data matrix.
   // This method will be used for distributed computation. 
   // Return the count of sample for each function call.
   index_t GetMiniBatch(index_t batch_size, DMatrix& mini_batch) {
@@ -416,7 +416,7 @@ struct DMatrix {
     return max;
   }
 
-  /* The DMatrix has a hash value that is geneerated 
+  /* The DMatrix has a hash value that is generated
   from the TXT file. These two values are used to check 
   whether we can use binary file to speedup data reading */
   uint64 hash_value_1;

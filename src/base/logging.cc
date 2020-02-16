@@ -42,19 +42,19 @@ void InitializeLogger(const std::string& info_log_filename,
   bool bo = false;
   if (Logger::info_log_file_.is_open() == 0) {
     std::cout << "Cannot create file: " << info_log_filename << ". "
-              << "Please check that wether you need to "
+              << "Please check that whether you need to "
               << "create a new directory. \n";
     bo = true;
   }
   if (Logger::warn_log_file_.is_open() == 0) {
     std::cout << "Cannot create file: " << warn_log_filename << ". "
-              << "Please check that wether you need to "
+              << "Please check that whether you need to "
               << "create a new directory. \n";
     bo = true;
   }
   if (Logger::erro_log_file_.is_open() == 0) {
     std::cout << "Cannot create file:  " << erro_log_filename << ". "
-              << "Please check that wether you need to "
+              << "Please check that whether you need to "
               << "create a new directory. \n";
     bo = true;
   }

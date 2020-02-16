@@ -60,7 +60,7 @@ const size_t kDefautBlockSize = 500;  // 500 MB
 //
 //      /* The reader will return 0 when reaching the end of
 //      data source, and then we can invoke Reset() to return
-//      to the begining of data */
+//      to the beginning of data */
 //  
 //      if (num_samples == 0) {
 //        reader->Reset()
@@ -75,7 +75,7 @@ const size_t kDefautBlockSize = 500;  // 500 MB
 //------------------------------------------------------------------------------
 class Reader {
  public:
-  // Constructor and Desstructor
+  // Constructor and Destructor
   Reader() : 
     shuffle_(false), 
     bin_out_(true),
@@ -89,11 +89,11 @@ class Reader {
   virtual void Initialize(xLearn::DMatrix* &dmatrix) = 0;
 
   // Sample data from disk or from memory buffer.
-  // Return the number of record in each samplling.
+  // Return the number of record in each sampling.
   // Samples() will return 0 when reaching end of the data.
   virtual index_t Samples(DMatrix* &matrix) = 0;
 
-  // Return to the begining of the data.
+  // Return to the beginning of the data.
   virtual void Reset() = 0;
 
   // Free the memory of data matrix.
@@ -109,7 +109,7 @@ class Reader {
     block_size_ = size; 
   }
 
-  // Wether current dataset has label y ?
+  // Whether current dataset has label y ?
   bool inline has_label() { return has_label_; }
 
   // Do not generate bin file
@@ -135,7 +135,7 @@ class Reader {
   /* Parser for a block of memory buffer */
   Parser* parser_;
   /* If this data has label y ?
-  This value will be set automitically
+  This value will be set automatically
   in initialization */
   bool has_label_;
   /* If shuffle data ? */
@@ -173,7 +173,7 @@ class Reader {
 
 //------------------------------------------------------------------------------
 // Sampling data from memory buffer.
-// For in-memory smaplling, the Reader will automatically convert
+// For in-memory sampling, the Reader will automatically convert
 // txt data to binary data, and uses this binary data in the next time.
 //------------------------------------------------------------------------------
 class InmemReader : public Reader {
@@ -189,7 +189,7 @@ class InmemReader : public Reader {
   // Sample data from the memory buffer.
   virtual index_t Samples(DMatrix* &matrix);
 
-  // Return to the begining of the data.
+  // Return to the beginning of the data.
   virtual void Reset();
 
   // Free the memory of data matrix.
@@ -224,14 +224,14 @@ class InmemReader : public Reader {
   /* Reader will load all the data 
   into this buffer */
   DMatrix data_buf_;
-  /* Number of record at each samplling */
+  /* Number of record at each sampling */
   index_t num_samples_;
-  /* Position for samplling */
+  /* Position for sampling */
   index_t pos_;
   /* For random shuffle */
   std::vector<index_t> order_;
 
-  // Check wheter current path has a binary file.
+  // Check whehter current path has a binary file.
   bool hash_binary(const std::string& filename);
 
   // Initialize Reader from existing binary file.
@@ -245,7 +245,7 @@ class InmemReader : public Reader {
 };
 
 //------------------------------------------------------------------------------
-// Samplling data from disk file.
+// Sampling data from disk file.
 // OndiskReader is used to train very big data, which cannot be
 // loaded into main memory of current single machine.
 //------------------------------------------------------------------------------
@@ -309,7 +309,7 @@ class FromDMReader : public Reader {
 
   virtual index_t Samples(DMatrix* &matrix);
 
-  // Return to the begining of the data.
+  // Return to the beginning of the data.
   virtual void Reset() { pos_ = 0; }
 
   // Free the memory of data matrix.
@@ -336,9 +336,9 @@ class FromDMReader : public Reader {
 
  protected:
   DMatrix* data_ptr_;
-  /* Number of record at each samplling */
+  /* Number of record at each sampling */
   index_t num_samples_;
-  /* Position for samplling */
+  /* Position for sampling */
   index_t pos_;
   /* For random shuffle */
   std::vector<index_t> order_;

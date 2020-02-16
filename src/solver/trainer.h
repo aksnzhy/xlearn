@@ -113,7 +113,7 @@ class Trainer {
   void train(std::vector<Reader*>& train_reader,
              std::vector<Reader*>& test_reader);
 
-  // Caculate gradient and update model.
+  // Calculate gradient and update model.
   // Return training loss.
   real_t calc_gradient(std::vector<Reader*>& reader_list);
 

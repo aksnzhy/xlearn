@@ -92,7 +92,7 @@ You can also test the Python package by using the following command: ::
 One-Button Building
 =======================
 
-We have already write a script ``build.sh`` to do all the cumbersome work for users, and users can just use the folloing commands: ::
+We have already write a script ``build.sh`` to do all the cumbersome work for users, and users can just use the following commands: ::
 
   git clone https://github.com/aksnzhy/xlearn.git
 

@@ -23,7 +23,7 @@ linear_model.setValidate("./agaricus_test.txt")  # Validation data
 #  0. binary classification
 #  1. learning rate: 0.2
 #  2. lambda: 0.002
-#  3. evaluation metric: accuarcy
+#  3. evaluation metric: accuracy
 #  4. use sgd optimization method
 param = {'task':'binary', 'lr':0.2, 
          'lambda':0.002, 'metric':'acc', 

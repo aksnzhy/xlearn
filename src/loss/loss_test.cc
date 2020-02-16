@@ -38,7 +38,7 @@ class TestLoss : public Loss {
   TestLoss() { }
   ~TestLoss() { }
 
-  void Evalute(const std::vector<real_t>& pred,
+  void Evaluate(const std::vector<real_t>& pred,
                const std::vector<real_t>& label) { return; }
 
   void CalcGrad(const DMatrix* data_matrix,

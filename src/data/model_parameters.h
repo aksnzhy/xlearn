@@ -33,7 +33,7 @@ namespace xLearn {
 
 //------------------------------------------------------------------------------
 // The Model class is responsible for storing the global
-// model prameters. We can dump a checkpoint for current model
+// model parameters. We can dump a checkpoint for current model
 // and we can also load a model checkpoint from disk file.
 // A model can be initialized by Initialize() function or from a
 // checkpoint file through constructor.
@@ -180,7 +180,7 @@ class Model {
   cache for adagrad in param_v_. 
   For linear function, param_num_v = 0
   For fm function, param_num_v_ = num_feat * num_K * aux_size_
-  For ffm funtion, param_num_v_ = num_feat * num_field * num_K * aux_size_  */
+  For ffm function, param_num_v_ = num_feat * num_field * num_K * aux_size_  */
   index_t  param_num_v_;
   /* Number of feature
   Feature id is start from 0 */
@@ -189,7 +189,7 @@ class Model {
   Field id is start from 0 */
   index_t  num_field_;
   /* Number of K (used in fm and ffm)
-  Becasue we use SSE, so the real k should be aligned.
+  Because we use SSE, so the real k should be aligned.
   User can get the aligned K by using get_aligned_k() */
   index_t  num_K_;
   /* Auxiliary memory size for different optimization method
@@ -201,7 +201,7 @@ class Model {
   real_t*  param_v_ = nullptr;
   /* Storing the bias term */
   real_t*  param_b_ = nullptr;
-  /* The following varibles are used for early-stopping */
+  /* The following variables are used for early-stopping */
   real_t* param_best_w_ = nullptr;
   real_t* param_best_v_ = nullptr;
   real_t* param_best_b_ = nullptr;

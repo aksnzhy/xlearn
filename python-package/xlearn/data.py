@@ -28,8 +28,8 @@ class DMatrix(object):
         Initial function.
         Parameters:
         data: NumPy 2D or pandas DataFrame of features data.
-        label: one-dimentional array, it presents samples label.
-        field_map: one-dimentional array, it presents the feautres'field repsepctively.
+        label: one-dimensional array, it presents samples label.
+        field_map: one-dimensional array, it presents the features'field respectively.
         This field_map like, [1, 2, 1, 3] means, the first and third features belong to field one, and the second belongs to field two, and so on.
         this parameter only useful for ffm model.
         Note: we only do roughly check, and do detail check in true work function.

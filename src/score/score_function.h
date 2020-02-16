@@ -46,7 +46,7 @@ namespace xLearn {
 //------------------------------------------------------------------------------
 class Score {
  public:
-  // Constructor and Desstructor
+  // Constructor and Destructor
   Score() { }
   virtual ~Score() { }
 
@@ -67,7 +67,7 @@ class Score {
     opt_type_ = opt_type;
   }
 
-  // Given one exmaple and current model, this method
+  // Given one example and current model, this method
   // returns the score
   virtual real_t CalcScore(const SparseRow* row,
                            Model& model,

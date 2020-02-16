@@ -1,7 +1,7 @@
 Scikit-learn api Guide
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-(Note that, the Scikit-Learn API will not be maintainned anymore.)
+(Note that, the Scikit-Learn API will not be maintained anymore.)
 
 xLearn can support scikit-learn-like api for users. Here is an example: ::
 

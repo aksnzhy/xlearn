@@ -26,7 +26,7 @@ This file defines the error handling for C API.
 #include "src/base/logging.h"
 #include "src/c_api/c_api.h"
 
-// Macro to guard begining and end section of all functions
+// Macro to guard beginning and end section of all functions
 #define API_BEGIN() try {
 
 // Every function starts with API_BEGIN(); 

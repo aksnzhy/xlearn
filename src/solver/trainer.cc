@@ -171,7 +171,7 @@ void Trainer::train(std::vector<Reader*>& train_reader,
   } else {
     std::string metric_type = metric_->metric_type();
     // Classification
-    if (metric_type.compare("Accuarcy") == 0 ||
+    if (metric_type.compare("Accuracy") == 0 ||
         metric_type.compare("Precision") == 0 ||
         metric_type.compare("Recall") == 0 ||
         metric_type.compare("F1") == 0 ||
@@ -200,7 +200,7 @@ void Trainer::train(std::vector<Reader*>& train_reader,
       if (!test_reader.empty()) { 
         te_info = calc_metric(test_reader); 
       }
-      // show evaludation metric info
+      // show evaluation metric info
       show_train_info(tr_loss, 
                       te_info.loss_val,
                       te_info.metric_val,
@@ -220,7 +220,7 @@ void Trainer::train(std::vector<Reader*>& train_reader,
         if ((metric_ == nullptr && te_info.loss_val > prev_result) ||
             (metric_ != nullptr && !metric_->cmp(te_info.metric_val, 
                                                  prev_result))) {
-          // If the validation loss goes up conntinuously
+          // If the validation loss goes up continuously
           // in stop_window epoch, we stop training
           if (stop_window == stop_window_) { break; }
           stop_window++;
@@ -281,7 +281,7 @@ MetricInfo Trainer::calc_metric(std::vector<Reader*>& reader_list) {
       if (tmp == 0) { break; }
       if (tmp != pred.size()) { pred.resize(tmp); }
       loss_->Predict(matrix, *model_, pred);
-      loss_->Evalute(pred, matrix->Y);
+      loss_->Evaluate(pred, matrix->Y);
       if (metric_ != nullptr) {
         metric_->Accumulate(matrix->Y, pred);
       }

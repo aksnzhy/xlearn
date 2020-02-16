@@ -27,18 +27,18 @@ This file defines the FFMScore (field-aware factorization machine) class.
 namespace xLearn {
 
 //------------------------------------------------------------------------------
-// FFMScore is used to implemente field-aware factorization machines,
-// in which the socre function is:
+// FFMScore is used to implement field-aware factorization machines,
+// in which the score function is:
 //   y = sum( (V_i_fj*V_j_fi)(x_i * x_j) )
 // Here leave out the bias and linear term.
 //------------------------------------------------------------------------------
 class FFMScore : public Score {
 public:
- // Constructor and Desstructor
+ // Constructor and Destructor
  FFMScore() { }
  ~FFMScore() { }
 
- // Given one exmaple and current model, this method
+ // Given one example and current model, this method
  // returns the ffm score.
  real_t CalcScore(const SparseRow* row,
                   Model& model,

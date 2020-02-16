@@ -23,7 +23,7 @@ This file is the implementation of SquaredLoss class.
 namespace xLearn {
 
 // Calculate loss in one thread.
-static void sq_evalute_thread(const std::vector<real_t>* pred,
+static void sq_evaluate_thread(const std::vector<real_t>* pred,
                               const std::vector<real_t>* label,
                               real_t* tmp_sum,
                               size_t start_idx,
@@ -50,7 +50,7 @@ static void sq_evalute_thread(const std::vector<real_t>* pred,
 //                       \       |        /
 //                         master_thread
 //------------------------------------------------------------------------------
-void SquaredLoss::Evalute(const std::vector<real_t>& pred,
+void SquaredLoss::Evaluate(const std::vector<real_t>& pred,
                           const std::vector<real_t>& label) {
   CHECK_NE(pred.empty(), true);
   CHECK_NE(label.empty(), true);
@@ -60,7 +60,7 @@ void SquaredLoss::Evalute(const std::vector<real_t>& pred,
   for (int i = 0; i < threadNumber_; ++i) {
     size_t start_idx = getStart(pred.size(), threadNumber_, i);
     size_t end_idx = getEnd(pred.size(), threadNumber_, i);
-    pool_->enqueue(std::bind(sq_evalute_thread,
+    pool_->enqueue(std::bind(sq_evaluate_thread,
                              &pred,
                              &label,
                              &(sum[i]),

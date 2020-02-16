@@ -38,7 +38,7 @@ namespace xLearn {
 // The Loss is an abstract class, which can be implemented by the real
 // loss functions such as cross-entropy loss (cross_entropy_loss.h),
 // squared loss (squared_loss.h), hinge loss (hinge_loss.h), etc.
-// There are three important method in Loss, including Evalute(), Predict(),
+// There are three important method in Loss, including Evaluate(), Predict(),
 // and CalcGrad(). We can use the Loss class like this:
 //
 //   // Create a squared loss with linear score function, which
@@ -63,13 +63,13 @@ namespace xLearn {
 //     if (tmp == 0) { break; }
 //     pred.resize(tmp);
 //     sq_loss->Predict(matrix, model, pred);
-//     sq_loss->Evalute(pred, matrix->Y);
+//     sq_loss->Evaluate(pred, matrix->Y);
 //   }
 //   loss_val = sq_loss->GetLoss()
 //------------------------------------------------------------------------------
 class Loss {
  public:
-  // Constructor and Desstructor
+  // Constructor and Destructor
   Loss() : loss_sum_(0), total_example_ (0) { };
   virtual ~Loss() { }
 
@@ -91,7 +91,7 @@ class Loss {
   }
 
   // Given predictions and labels, accumulate loss value.
-  virtual void Evalute(const std::vector<real_t>& pred,
+  virtual void Evaluate(const std::vector<real_t>& pred,
                        const std::vector<real_t>& label) = 0;
 
   // Given data sample and current model, return predictions.
@@ -101,7 +101,7 @@ class Loss {
 
   // Given data sample and current model, calculate gradient
   // and update current model parameters.
-  // This function will also acummulate loss value.
+  // This function will also accumulate loss value.
   virtual void CalcGrad(const DMatrix* data_matrix, 
                         Model& model) = 0;
 

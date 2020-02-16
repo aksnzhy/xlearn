@@ -26,7 +26,7 @@ This file is the implementation of CrossEntropyLoss class.
 namespace xLearn {
 
 // Calculate loss in one thread.
-static void ce_evalute_thread(const std::vector<real_t>* pred,
+static void ce_evaluate_thread(const std::vector<real_t>* pred,
                               const std::vector<real_t>* label,
                               real_t* tmp_sum,
                               size_t start_idx,
@@ -52,7 +52,7 @@ static void ce_evalute_thread(const std::vector<real_t>* pred,
 //                       \       |        /
 //                         master_thread
 //------------------------------------------------------------------------------
-void CrossEntropyLoss::Evalute(const std::vector<real_t>& pred,
+void CrossEntropyLoss::Evaluate(const std::vector<real_t>& pred,
                                const std::vector<real_t>& label) {
   CHECK_NE(pred.empty(), true);
   CHECK_NE(label.empty(), true);
@@ -62,7 +62,7 @@ void CrossEntropyLoss::Evalute(const std::vector<real_t>& pred,
   for (int i = 0; i < threadNumber_; ++i) {
     size_t start_idx = getStart(pred.size(), threadNumber_, i);
     size_t end_idx = getEnd(pred.size(), threadNumber_, i);
-    pool_->enqueue(std::bind(ce_evalute_thread,
+    pool_->enqueue(std::bind(ce_evaluate_thread,
                              &pred,
                              &label,
                              &(sum[i]),

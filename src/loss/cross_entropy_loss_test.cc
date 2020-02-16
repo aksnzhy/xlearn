@@ -29,7 +29,7 @@ namespace xLearn {
 
 index_t kLine = 10;
 
-TEST(CROSS_ENTROPY_LOSS, Evalute) {
+TEST(CROSS_ENTROPY_LOSS, Evaluate) {
   // Create pred vector
   std::vector<real_t> pred(kLine);
   for (int i = 0; i < pred.size(); ++i) {
@@ -46,7 +46,7 @@ TEST(CROSS_ENTROPY_LOSS, Evalute) {
   size_t threadNumber = std::thread::hardware_concurrency();
   ThreadPool* pool = new ThreadPool(threadNumber);
   loss.Initialize(score, pool);
-  loss.Evalute(pred, label);
+  loss.Evaluate(pred, label);
   real_t val = loss.GetLoss();
   EXPECT_LT(val, 0.000001);
   // Test2
@@ -56,7 +56,7 @@ TEST(CROSS_ENTROPY_LOSS, Evalute) {
   for (int i = 0; i < label.size(); ++i) {
     label[i] = -1.0;
   }
-  loss.Evalute(pred, label);
+  loss.Evaluate(pred, label);
   val = loss.GetLoss();
   EXPECT_LT(val, 0.000001);
 }

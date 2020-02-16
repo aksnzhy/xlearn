@@ -261,7 +261,7 @@ class XLearn(object):
         Parameters
         ----------
         model_path : str. path of model checkpoint.
-        out_path : str, default None. if a path of output result is setted, then will save result to local file,
+        out_path : str, default None. if a path of output result is set, then will save result to local file,
         and will not return numpy res.
         """
         if out_path is None:

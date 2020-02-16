@@ -302,7 +302,7 @@ void Solver::init_train() {
         if (tmp > max_field) { max_field = tmp; }
       }
     }
-    // Return to the begining of target file.
+    // Return to the beginning of target file.
     reader_[i]->Reset();
   }
   hyper_param_.num_feature = max_feat + 1;

@@ -26,10 +26,10 @@ This file provides StringSplit utilities.
 #include <vector>
 
 //------------------------------------------------------------------------------
-// Subdivide string |full| into substrings according to delimitors
+// Subdivide string |full| into substrings according to delimiters
 // given in |delim|.  |delim| should pointing to a string including
-// one or more characters.  Each character is considerred a possible
-// delimitor. For example:
+// one or more characters.  Each character is considered a possible
+// delimiter. For example:
 //
 //   vector<string> substrings;
 //   SplitStringUsing("apple orange\tbanana", "\t ", &substrings);
@@ -46,7 +46,7 @@ void SplitStringUsing(const std::string& full,
                       const char* delim,
                       std::vector<std::string>* result);
 
-// This function has the same semnatic as SplitStringUsing.  Results
+// This function has the same semantic as SplitStringUsing.  Results
 // are saved in an STL set container.
 void SplitStringToSetUsing(const std::string& full,
                            const char* delim,
@@ -100,7 +100,7 @@ void SplitStringToIteratorUsing(const StringType& full,
       } else {
         const char* start = p;
         while (++p != end && *p != c) {
-          // Skip to the next occurence of the delimiter.
+          // Skip to the next occurrence of the delimiter.
         }
         *result++ = StringType(start, p - start);
       }
