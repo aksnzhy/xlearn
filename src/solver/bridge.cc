@@ -3,6 +3,8 @@
 #include "src/solver/solver.h"
 #include "src/base/timer.h"
 
+const char *const RESULT_JAVA_CLASS = "com/inventale/coregistration/survey/providers/fm/PredictionResult";
+
 void Java_com_inventale_coregistration_survey_providers_fm_XLearnProvider_run(JNIEnv *env, jobject object, jobjectArray argsArray) {
     Timer timer;
     timer.tic();
@@ -31,25 +33,31 @@ void Java_com_inventale_coregistration_survey_providers_fm_XLearnProvider_run(JN
     Color::print_info(StringPrintf("Total time cost: %.6f (sec)", timer.toc()), NOT_IMPORTANT_MSG);
 }
 
-JNIEXPORT jint JNICALL
-Java_com_inventale_coregistration_survey_providers_fm_XLearnProvider_getBestTask(JNIEnv *env, jobject object, jstring jmodel,
-                                                                              jintArray tasks, jintArray keys,
-                                                                                 jintArray values, jstring joutput) {
+bool sortDescBySecond(const std::pair<int,float > &a, const std::pair<int,float> &b){
+    return (a.second > b.second);
+}
+
+JNIEXPORT jobjectArray JNICALL
+Java_com_inventale_coregistration_survey_providers_fm_XLearnProvider_predict(JNIEnv *env, jobject object,
+                                                                             jstring jmodel,
+                                                                             jintArray tasks, jintArray keys,
+                                                                             jintArray values, jint jtopSize,
+                                                                             jstring joutput) {
     Timer timer;
     timer.tic();
+    Color::print_action("Reading input parameters ...");
     jint *taskArray = (env)->GetIntArrayElements(tasks, nullptr);
     jint *keysArray = (env)->GetIntArrayElements(keys, nullptr);
     jint *valuesArray = (env)->GetIntArrayElements(values, nullptr);
     jsize tasks_size = (env)->GetArrayLength(tasks);
     jsize facts_size = (env)->GetArrayLength(keys);
-    printf("Input data was read\n");
-    printf("Tasks amount: %i \n", tasks_size);
-    printf("Facts amount: %i \n", facts_size);
+    Color::print_info(StringPrintf("Tasks amount: %i", tasks_size));
+    Color::print_info(StringPrintf("Knowledge amount: %i", facts_size));
 
     auto model = env->GetStringUTFChars(jmodel, nullptr);
     auto output = env->GetStringUTFChars(joutput, nullptr);
 
-    // Create test dataset
+    Color::print_action("Generating prediction matrix ...");
     xLearn::DMatrix matrix;
     matrix.Reset();
     matrix.has_label = false;
@@ -65,8 +73,7 @@ Java_com_inventale_coregistration_survey_providers_fm_XLearnProvider_getBestTask
         }
         row_id++;
     }
-
-    printf("Prediction matrix was generated\n");
+    Color::print_info(StringPrintf("Prediction matrix was generated"));
     xLearn::HyperParam param;
     param.model_file = model;
     param.output_file = output;
@@ -77,17 +84,30 @@ Java_com_inventale_coregistration_survey_providers_fm_XLearnProvider_getBestTask
     xLearn::Solver solver;
     solver.Initialize(param);
     solver.StartWork();
-    std::vector<real_t> result = solver.GetResult();
+    std::vector<float> result = solver.GetResult();
     solver.Clear();
     Color::print_info(StringPrintf("Total predict time cost: %.6f (sec)", timer.toc()), false);
 
-    // Selection of best task
-    auto bestTaskIterator = std::max_element(std::begin(result), std::end(result));
-    auto bestTaskPosition = taskArray[std::distance(std::begin(result), bestTaskIterator)];
+    // Selection of best tasks
+    std::vector<std::pair<int, float> > taskToResult;
+    for (int i = 0; i < result.size(); i++) {
+        taskToResult.emplace_back(std::make_pair(taskArray[i], result[i]));
+    }
+    auto topSize = jtopSize > tasks_size ? tasks_size : jtopSize;
+    std::partial_sort(taskToResult.begin(), taskToResult.begin() + topSize, taskToResult.end(), sortDescBySecond);
 
+    auto cls = (env)->FindClass(RESULT_JAVA_CLASS);
+    jobjectArray out = (env)->NewObjectArray(topSize, cls, nullptr);
+    jmethodID constructor = (env)->GetMethodID(cls, "<init>", "(ID)V");
+    if (nullptr == constructor) return nullptr;
+    for (int i = 0; i < topSize; i++) {
+        auto element =  taskToResult[i];
+        auto newObject = (env)->NewObject(cls, constructor, element.first, element.second);
+        (env)->SetObjectArrayElement(out, i, newObject);
+    }
     // Release resources
     (env)->ReleaseIntArrayElements(tasks, taskArray, 0);
     (env)->ReleaseIntArrayElements(keys, keysArray, 0);
     (env)->ReleaseIntArrayElements(values, valuesArray, 0);
-    return bestTaskPosition;
+    return out;
 }

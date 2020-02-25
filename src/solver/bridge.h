@@ -17,11 +17,11 @@ JNIEXPORT void JNICALL Java_com_inventale_coregistration_survey_providers_fm_XLe
 
 /*
  * Class:     com_inventale_coregistration_survey_providers_fm_XLearnProvider
- * Method:    getBestTask
- * Signature: (Ljava/lang/String;[I[I[ILjava/lang/String;)I
+ * Method:    predict
+ * Signature: (Ljava/lang/String;[I[I[IILjava/lang/String;)[Lcom/inventale/coregistration/survey/providers/fm/PredictionResult;
  */
-JNIEXPORT jint JNICALL Java_com_inventale_coregistration_survey_providers_fm_XLearnProvider_getBestTask
-        (JNIEnv *, jobject, jstring, jintArray, jintArray, jintArray, jstring);
+JNIEXPORT jobjectArray JNICALL Java_com_inventale_coregistration_survey_providers_fm_XLearnProvider_predict
+        (JNIEnv *, jobject, jstring, jintArray, jintArray, jintArray, jint, jstring);
 
 #ifdef __cplusplus
 }
