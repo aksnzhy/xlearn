@@ -3,7 +3,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 
 # Build static library
 set(STA_DEPS reader loss score data base)
-add_library(solver SHARED checker.cc trainer.cc inference.cc solver.cc bridge.cc)
+add_library(solver SHARED checker.cc trainer.cc inference.cc solver.cc coregistration.cc)
 if(NOT WIN32)
 target_link_libraries(solver ${STA_DEPS})
 else(WIN32)

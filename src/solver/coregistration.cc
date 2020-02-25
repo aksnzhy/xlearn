@@ -1,5 +1,5 @@
 #include <jni.h>
-#include "bridge.h"
+#include "coregistration.h"
 #include "src/solver/solver.h"
 #include "src/base/timer.h"
 
