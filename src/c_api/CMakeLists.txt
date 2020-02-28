@@ -1,4 +1,8 @@
 # Set output library.
+if(APPLE)
+    set(CMAKE_MACOSX_RPATH 1)
+endif()
+
 if(NOT WIN32)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/test/c_api)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
@@ -13,16 +17,16 @@ add_library(xlearn_api STATIC c_api.cc c_api_error.cc)
 target_link_libraries(xlearn_api ${STA_DEPS})
 
 # Build shared library
-add_library(xlearn_api_shared SHARED c_api.cc c_api_error.cc 
-../base/logging.cc ../base/stringprintf.cc ../base/split_string.cc 
+add_library(xlearn_api_shared SHARED c_api.cc c_api_error.cc
+../base/logging.cc ../base/stringprintf.cc ../base/split_string.cc
 ../base/levenshtein_distance.cc ../base/timer.cc ../base/format_print.cc
-../data/model_parameters.cc 
-../loss/loss.cc ../loss/squared_loss.cc ../loss/cross_entropy_loss.cc 
-../loss/metric.cc 
-../reader/parser.cc ../reader/file_splitor.cc ../reader/reader.cc 
-../score/score_function.cc ../score/linear_score.cc ../score/fm_score.cc 
-../score/ffm_score.cc 
-../solver/checker.cc ../solver/trainer.cc 
+../data/model_parameters.cc
+../loss/loss.cc ../loss/squared_loss.cc ../loss/cross_entropy_loss.cc
+../loss/metric.cc
+../reader/parser.cc ../reader/file_splitor.cc ../reader/reader.cc
+../score/score_function.cc ../score/linear_score.cc ../score/fm_score.cc
+../score/ffm_score.cc
+../solver/checker.cc ../solver/trainer.cc
 ../solver/inference.cc ../solver/solver.cc)
 
 if(WIN32)

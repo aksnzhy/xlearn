@@ -1,5 +1,8 @@
 # Set output library.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/test/base)
+if (APPLE)
+    set(CMAKE_MACOSX_RPATH 1)
+endif ()
 
 # Build static library
 add_library(base SHARED logging.cc stringprintf.cc split_string.cc
