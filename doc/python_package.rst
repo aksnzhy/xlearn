@@ -222,7 +222,7 @@ be the ``libffm`` format: ::
 
   CSV format:
 
-    value_1 value_2 .. value_n label
+    label value_1 value_2 .. value_n
 
   libffm format:
 
