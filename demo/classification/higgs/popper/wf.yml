@@ -1,0 +1,45 @@
+steps:
+
+- id: build-img
+  uses: docker://docker:19.03.10
+  args:
+  - build
+  -   --tag=xlearn
+  -   --file=Dockerfile
+  -   .
+
+- id: download-data
+  uses: docker://byrnedo/alpine-curl:0.1.8
+  runs: [sh]
+  dir: /workspace/demo/classification/higgs/popper
+  args:
+  - -c
+  - |
+    set -ex
+    if [ ! -f HIGGS.csv ]; then
+      curl -LO https://archive.ics.uci.edu/ml/machine-learning-databases/00280/HIGGS.csv.gz
+      if [ -f HIGGS.csv.gz ]; then
+        gunzip HIGGS.csv.gz
+      fi
+    fi
+
+- id: prepare-data
+  uses: docker://python:3.7
+  dir: /workspace/demo/classification/higgs/popper
+  runs: [python3]
+  args: ['csv2libsvm.py','HIGGS.csv','libsvm.data','0','False']
+
+
+- id: run-benchmark
+  uses: docker://xlearn
+  dir: /workspace/demo/classification/higgs/popper
+  skip_pull: true
+  runs: [sh]
+  args: [run_benchmark.sh]
+
+- id: show-results
+  uses: docker://jupyter/scipy-notebook:latest
+  dir: /workspace/demo/classification/higgs/popper
+  runs: [python3]
+  args: [show_results.py] 
+
