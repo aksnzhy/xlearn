@@ -27,9 +27,8 @@ This file is the implementation of Parser class.
 namespace xLearn {
 
 // Max size of one line TXT data
-static const uint32 kMaxLineSize = 10 * 1024 * 1024;  // 10 MB
+static const uint32 kMaxLineSize = 100 * 1024;  // 100 kB
 
-static char line_buf[kMaxLineSize];
 
 //------------------------------------------------------------------------------
 // Class register
@@ -73,6 +72,7 @@ void LibsvmParser::Parse(char* buf,
                          uint64 size, 
                          DMatrix& matrix, 
                          bool reset) {
+  char line_buf[kMaxLineSize];
   CHECK_NOTNULL(buf);
   CHECK_GT(size, 0);
   // Clear the data matrix
@@ -83,6 +83,7 @@ void LibsvmParser::Parse(char* buf,
   uint64 pos = 0;
   for (;;) {
     uint64 rd_size = get_line_from_buffer(line_buf, buf, pos, size);
+    char *next_token;
     if (rd_size == 0) break;
     pos += rd_size;
     matrix.AddRow();
@@ -91,7 +92,7 @@ void LibsvmParser::Parse(char* buf,
     }
     // Add Y
     if (has_label_) {  // for training task
-      char *y_char = strtok(line_buf, splitor_.c_str());
+      char *y_char = strtok_r(line_buf, splitor_.c_str(), &next_token);
       matrix.Y[i] = atof(y_char);
     } else {  // for predict task
       matrix.Y[i] = -2;
@@ -100,8 +101,8 @@ void LibsvmParser::Parse(char* buf,
     real_t norm = 0.0;
     // The first element
     if (!has_label_) {
-      char *idx_char = strtok(line_buf, ":");
-      char *value_char = strtok(nullptr, splitor_.c_str());
+      char *idx_char = strtok_r(line_buf,":", &next_token);
+      char *value_char = strtok_r(nullptr, splitor_.c_str(), &next_token);
       if (idx_char != nullptr && *idx_char != '\n') {
         index_t idx = atoi(idx_char);
         real_t value = atof(value_char);
@@ -111,8 +112,8 @@ void LibsvmParser::Parse(char* buf,
     }
     // The remain elements
     for (;;) {
-      char *idx_char = strtok(nullptr, ":");
-      char *value_char = strtok(nullptr, splitor_.c_str());
+      char *idx_char = strtok_r(nullptr, ":", &next_token);
+      char *value_char = strtok_r(nullptr, splitor_.c_str(), &next_token);
       if (idx_char == nullptr || *idx_char == '\n') {
         break;
       }
@@ -136,6 +137,8 @@ void FFMParser::Parse(char* buf,
                       uint64 size, 
                       DMatrix& matrix,
                       bool reset) {
+  char *next_token;
+  char line_buf[kMaxLineSize];
   CHECK_NOTNULL(buf);
   CHECK_GT(size, 0);
   // Clear the data matrix
@@ -152,7 +155,7 @@ void FFMParser::Parse(char* buf,
     int i = matrix.row_length - 1;
     // Add Y
     if (has_label_) {  // for training task
-      char *y_char = strtok(line_buf, splitor_.c_str());
+      char *y_char = strtok_r(line_buf, splitor_.c_str(), &next_token);
       matrix.Y[i] = atof(y_char);
     } else {  // for predict task
       matrix.Y[i] = -2;
@@ -161,9 +164,9 @@ void FFMParser::Parse(char* buf,
     real_t norm = 0.0;
     // The first element
     if (!has_label_) {
-      char *field_char = strtok(line_buf, ":");
-      char *idx_char = strtok(nullptr, ":");
-      char *value_char = strtok(nullptr, splitor_.c_str());
+      char *field_char = strtok_r(line_buf, ":", &next_token);
+      char *idx_char = strtok_r(nullptr, ":", &next_token);
+      char *value_char = strtok_r(nullptr, splitor_.c_str(), &next_token);
       if (idx_char != nullptr && *idx_char != '\n') {
         index_t idx = atoi(idx_char);
         real_t value = atof(value_char);
@@ -174,9 +177,9 @@ void FFMParser::Parse(char* buf,
     }
     // The remain elements
     for (;;) {
-      char *field_char = strtok(nullptr, ":");
-      char *idx_char = strtok(nullptr, ":");
-      char *value_char = strtok(nullptr, splitor_.c_str());
+      char *field_char = strtok_r(nullptr, ":", &next_token);
+      char *idx_char = strtok_r(nullptr, ":", &next_token);
+      char *value_char = strtok_r(nullptr, splitor_.c_str(), &next_token);
       if (field_char == nullptr || *field_char == '\n') {
         break;
       }
@@ -204,6 +207,7 @@ void CSVParser::Parse(char* buf,
                       uint64 size, 
                       DMatrix& matrix, 
                       bool reset) {
+  char line_buf[kMaxLineSize];
   CHECK_NOTNULL(buf);
   CHECK_GT(size, 0);
   // Clear the data matrix

@@ -285,6 +285,8 @@ void InmemReader::Reset() { pos_ = 0; }
 
 // Create parser and open file
 void OndiskReader::Initialize(const std::string& filename) {
+  finished = true;
+  reset = true;
   CHECK_NE(filename.empty(), true);
   this->filename_ = filename;
   // Init parser_                                 
@@ -310,31 +312,95 @@ void OndiskReader::Initialize(const std::string& filename) {
 #endif
 }
 
+void OndiskReader::blockWorkerThread(std::string *buf, uint64 size, int thread_idx) {
+  DMatrix *samples = new DMatrix;
+  assert(size == buf -> size());
+  char *bufData = (char *)(buf -> data());
+  parser_->Parse(bufData, size, *samples, true);
+  {
+    std::unique_lock<std::mutex> lk(condition_mutex);
+    mats.push(samples);
+    finished_threads[thread_idx] = std::move(worker_threads.at(thread_idx));
+    worker_threads.erase(thread_idx);
+  }
+  wait_variable.notify_all();
+  delete buf;
+}
+
+void OndiskReader::readData() {
+  // Convert MB to Byte
+  uint64 read_byte = block_size_ * 1024 * 1024;
+  uint32 num_threads = std::thread::hardware_concurrency();
+  for (int thread_idx = 0;; thread_idx++) {
+    // Read a block of data from disk file
+    size_t ret = ReadDataFromDisk(file_ptr_, block_, read_byte);
+    if (ret == 0) {
+      finished = true;
+      wait_variable.notify_all();
+      return;
+    } else if (ret == read_byte) {
+      // Find the last '\n', and shrink back file pointer
+      shrink_block(block_, &ret, file_ptr_);
+    } // else ret < read_byte: we don't need shrink_block()
+    // Parse block to data_sample_
+    {
+      std::unique_lock<std::mutex> lk(condition_mutex);
+      wait_variable.wait(lk, [&]{return worker_threads.size() < num_threads and mats.size() < 10;});
+      worker_threads[thread_idx] = std::thread ([ret, thread_idx, this](std::string *block) { this -> blockWorkerThread(block, ret, thread_idx);}, new std::string(block_, ret));
+    }
+  }
+}
+
 // Return to the beginning of the file
 void OndiskReader::Reset() {
+  reset = true;
   int ret = fseek(file_ptr_, 0, SEEK_SET);
   if (ret != 0) {
     LOG(FATAL) << "Fail to return to the head of file.";
   }
+  if (last_ret != nullptr) {
+    last_ret -> Reset();
+    delete last_ret;
+    last_ret = nullptr;
+  }
+  {
+    std::unique_lock<std::mutex> lk(condition_mutex);
+    assert(finished == true and mats.size() == 0 and worker_threads.size() == 0);
+  }
+  if (mainReaderThread.joinable())
+    mainReaderThread.join();
+  for (auto &thread : finished_threads)
+    thread.second.join();
+  finished_threads.clear();
 }
 
 // Sample data from disk file.
 index_t OndiskReader::Samples(DMatrix* &matrix) {
-  // Convert MB to Byte
-  uint64 read_byte = block_size_ * 1024 * 1024;
-  // Read a block of data from disk file
-  size_t ret = ReadDataFromDisk(file_ptr_, block_, read_byte);
-  if (ret == 0) {
-    matrix = nullptr;
-    return 0;
-  } else if (ret == read_byte) {
-    // Find the last '\n', and shrink back file pointer
-    shrink_block(block_, &ret, file_ptr_);
-  } // else ret < read_byte: we don't need shrink_block()
-  // Parse block to data_sample_
-  parser_->Parse(block_, ret, data_samples_, true);
-  matrix = &data_samples_;
-  return data_samples_.row_length;
+  if (last_ret != nullptr) {
+    last_ret -> Reset();
+    delete last_ret;
+    last_ret = nullptr;
+  }
+  if (reset) {
+    reset = false;
+    finished = false;
+    mainReaderThread = std::thread ([&] { this->readData(); });
+  } {
+    std::unique_lock<std::mutex> lk(condition_mutex);
+    wait_variable.wait(lk, [&]{return (finished == true and mats.size() == 0 and worker_threads.size() == 0)
+          or mats.size() > 0;});
+    if (finished and mats.size() == 0 and worker_threads.size() == 0) {
+        matrix = nullptr;
+        reset = true;
+        return 0;
+    }
+    last_ret = mats.front();
+    mats.pop();
+  }
+  wait_variable.notify_all();
+
+  matrix = last_ret;
+  return last_ret -> row_length;
 }
 
 void FromDMReader::Initialize(xLearn::DMatrix* &dmatrix) { 

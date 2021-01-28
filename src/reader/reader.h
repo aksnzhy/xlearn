@@ -26,6 +26,8 @@ reading data from data source.
 #include <vector>
 #include <thread>
 #include <algorithm>
+#include <set>
+#include <thread>
 
 #include "src/base/common.h"
 #include "src/base/class_register.h"
@@ -240,6 +242,7 @@ class InmemReader : public Reader {
   // Initialize Reader from a new txt file.
   void init_from_txt();
 
+
  private:
   DISALLOW_COPY_AND_ASSIGN(InmemReader);
 };
@@ -253,10 +256,22 @@ class InmemReader : public Reader {
 class OndiskReader : public Reader {
  public:
   // Constructor and Destructor
-  OndiskReader() { }
-  ~OndiskReader() { 
+  OndiskReader() : last_ret(nullptr) { }
+  ~OndiskReader() {
+    {
+      std::unique_lock<std::mutex> lk(condition_mutex);
+      assert(finished == true and mats.size() == 0 and worker_threads.size() == 0);
+    }
+    if (mainReaderThread.joinable())
+      mainReaderThread.join();
+    for (auto &thread : finished_threads)
+      thread.second.join();
     Clear();
-    Close(file_ptr_); 
+    Close(file_ptr_);
+    if (last_ret != nullptr) {
+      last_ret -> Reset();
+      delete last_ret;
+    }
   }
 
   // Create parser and open file
@@ -291,9 +306,23 @@ class OndiskReader : public Reader {
   }
 
  protected:
+  DMatrix *last_ret;
   /* Maintain the file pointer */
   FILE* file_ptr_; 
- 
+
+  void readData();
+
+  std::map<int, std::thread> worker_threads;
+  std::map<int, std::thread> finished_threads;
+  bool finished;
+  bool reset;
+  std::queue<DMatrix*> mats;
+
+  void blockWorkerThread(std::string *buf, uint64 size, int thread_idx);
+  std::thread mainReaderThread;
+
+  std::mutex condition_mutex;
+  std::condition_variable wait_variable;
  private:
   DISALLOW_COPY_AND_ASSIGN(OndiskReader);
 };
@@ -342,7 +371,6 @@ class FromDMReader : public Reader {
   index_t pos_;
   /* For random shuffle */
   std::vector<index_t> order_;
-
 
  private:
   DISALLOW_COPY_AND_ASSIGN(FromDMReader);
