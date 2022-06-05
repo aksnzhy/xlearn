@@ -27,7 +27,7 @@ xLearn does not rely on any third-party library and users can just clone the cod
 
 <img src="https://github.com/aksnzhy/xLearn/raw/master/img/scalability.png" width = "650"/>
 
-xLearn can be used for solving large-scale machine learning problems. First, xLearn supports out-of-core training, which can handle very large data (TB) by just leveraging the disk of a PC. In addition, xLearn supports distributed training, which scales beyond billions of example across many machines by using the Parameter Server framework.
+xLearn can be used for solving large-scale machine learning problems. xLearn supports out-of-core training, which can handle very large data (TB) by just leveraging the disk of a PC.
 
 ## How to Contribute
 
@@ -45,16 +45,6 @@ Note that, please post iusse and contribution in *English* so that everyone can 
 ### Contributors (rank randomly)
 
 <img src="https://github.com/aksnzhy/xLearn/raw/master/img/10520307.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/11278017.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/1289856.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/13925796.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/15322665.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/1842965.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/21072881.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/22660103.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/2387719.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/25626965.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/3086744.png" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/3928409.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/4606937.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/6054101.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/6161143.png" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/7145046.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/7608904.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/27916175.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/7608904.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/1443518.png" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/9783213.png" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/4609798.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/11628637.png" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/1726448.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/32598525.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/3285618.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/8625634.jpeg" width = "40"/><img src="https://github.com/aksnzhy/xLearn/raw/master/img/11938898.png" width = "40"/>
-
-
-## For Enterprise Users and Call for Sponsors
-
-If you are enterprise users and find xLearn is useful in your work, please let us know, and we are glad to add your company logo here. We also welcome you become a sponsor to make this project better.
-
-<img src="https://github.com/aksnzhy/xLearn/raw/master/img/tencent.png" width = "200"/>
-<img src="https://github.com/aksnzhy/xLearn/raw/master/img/stategrid.jpg" width = "200"/>
-<img src="https://github.com/aksnzhy/xLearn/raw/master/img/xiaodaka.png" width = "200"/>
-<img src="https://github.com/aksnzhy/xLearn/raw/master/img/beikezhaofang.png" width = "200"/>
 
 ## What's New
 
