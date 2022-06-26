@@ -180,7 +180,9 @@ class InmemReader : public Reader {
  public:
   // Constructor and Destructor
   InmemReader() : pos_(0) { }
-  ~InmemReader() { }
+  ~InmemReader() {
+    Clear();
+  }
 
   // Pre-load all the data into memory buffer.
   virtual void Initialize(const std::string& filename);
@@ -195,9 +197,8 @@ class InmemReader : public Reader {
   // Free the memory of data matrix.
   virtual void Clear() {
     data_buf_.Reset();
-    data_samples_.Reset();
     if (block_ != nullptr) {
-      delete [] block_;
+      free(block_);
     }
   }
 

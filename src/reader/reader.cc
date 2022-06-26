@@ -247,7 +247,8 @@ void InmemReader::init_from_txt() {
     std::string bin_file = filename_ + ".bin";
     data_buf_.Serialize(bin_file);
   }
-  delete [] block_;
+  free(block_);
+  block_ = nullptr;
   Close(file);
 }
 
