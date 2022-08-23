@@ -231,6 +231,20 @@ class XLearn(object):
         _check_call(_LIB.XLearnSetBool(ctypes.byref(self.handle),
                                        c_str(key), ctypes.c_bool(True)))
 
+
+    def disableSign(self):
+        """Disable convert output to 0 and 1"""
+        key = 'sign'
+        _check_call(_LIB.XLearnSetBool(ctypes.byref(self.handle),
+                                       c_str(key), ctypes.c_bool(False)))
+
+
+    def disableSigmoid(self):
+        """Disable convert output by using sigmoid"""
+        key = 'sigmoid'
+        _check_call(_LIB.XLearnSetBool(ctypes.byref(self.handle),
+                                       c_str(key), ctypes.c_bool(True)))
+
     def fit(self, param, model_path):
         """Check hyper-parameters, train model, and dump model.
 
