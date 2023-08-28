@@ -103,6 +103,7 @@ class CustomBuildPy(build_py):
         compile_cpp()
         build_py.run(self)
 
+
 if __name__ == "__main__":
     setup(name='xlearn',
           version=open(os.path.join(CURRENT_DIR, 'xlearn/VERSION')).read().strip(),
