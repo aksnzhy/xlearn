@@ -17,12 +17,11 @@
 from __future__ import absolute_import
 
 import os
-import subprocess
 import shutil
+import subprocess
 import sys
 
-from setuptools import find_packages
-from setuptools import setup
+from setuptools import find_packages, setup
 from setuptools.command.build_py import build_py
 from setuptools.command.install import install
 from setuptools.command.sdist import sdist
@@ -73,7 +72,7 @@ def compile_cpp():
     else:
         # Linux, Darwin (OS X), etc.
         silent_call(cmake_cmd, raise_error=True, error_msg='Please install CMake first')
-        silent_call(["make", "-j4"], raise_error=True, 
+        silent_call(["make", "-j4"], raise_error=True,
                 error_msg='An error has occurred while building xlearn library file')
         suffix_list = ['dylib', 'so']
         for suffix in suffix_list:
@@ -85,15 +84,15 @@ def compile_cpp():
                     shutil.copy('lib/libxlearn_api.{}'.format(suffix), '../build/lib/xlearn/')
 
     os.chdir(old_working_dir)
-    
+
 class CustomInstall(install):
-    
+
     def run(self):
         # compile_cpp();
         install.run(self)
 
 class CustomSdist(sdist):
-    
+
     def run(self):
         copy_files()
         sdist.run(self)
@@ -121,9 +120,9 @@ if __name__ == "__main__":
           # this is the golden line
           include_package_data=True,
           install_requires=[
-              'numpy', 
+              'numpy',
               'scipy<1.3.0; python_version<"3"',
-              'scipy>=1.3.0; python_version>="3"'
+              'scipy==1.10.1; python_version>="3"'
           ],
           # move data to MANIFEST.in
           license='Apache-2.0',

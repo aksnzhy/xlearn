@@ -22,11 +22,11 @@ RUN apt-get update && apt-get -y install \
     g++ \
     gcc \
     binutils \
-    clang \ 
-    cmake 
+    clang \
+    cmake
 
 # Install xlearn
-RUN git clone https://github.com/aksnzhy/xlearn.git 
+RUN git clone https://github.com/ryonsu/xlearn.git
 RUN cd xlearn && ./build.sh
 
 ENTRYPOINT ["/bin/bash"]

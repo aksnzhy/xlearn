@@ -15,9 +15,12 @@
 # coding: utf-8
 """Setup xlearn package."""
 from __future__ import absolute_import
-import sys
+
 import os
-from setuptools import setup, find_packages
+import sys
+
+from setuptools import find_packages, setup
+
 sys.path.insert(0, '.')
 
 CURRENT_DIR = os.path.dirname(__file__)
@@ -40,9 +43,9 @@ setup(name='xlearn',
       # this is the golden line
       include_package_data=True,
       install_requires=[
-            'numpy', 
+            'numpy',
             'scipy<1.3.0; python_version<"3"',
-            'scipy>=1.3.0; python_version>="3"'
+            'scipy==1.10.1; python_version>="3"'
       ],
       data_files=[('xlearn', LIB_PATH)],
       license='Apache-2.0',
