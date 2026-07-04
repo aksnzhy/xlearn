@@ -32,6 +32,7 @@ thread pool that used by xLearn.
 #include <functional>
 #include <stdexcept>
 #include <atomic>
+#include <type_traits>
 
 #include "src/base/common.h"
 
@@ -58,7 +59,7 @@ class ThreadPool {
   // Add task to current queue
   template<class F, class... Args>
   auto enqueue(F&& f, Args&&... args)
-    -> std::future<typename std::result_of<F(Args...)>::type>;
+    -> std::future<std::invoke_result_t<F, Args...>>;
 
   // Sync threads
   void Sync(int wait_count);
@@ -113,8 +114,8 @@ inline ThreadPool::ThreadPool(size_t threads)
 // Add new work item to the pool
 template<class F, class... Args>
 auto ThreadPool::enqueue(F&& f, Args&&... args)
-    -> std::future<typename std::result_of<F(Args...)>::type> {
-  using return_type = typename std::result_of<F(Args...)>::type;
+    -> std::future<std::invoke_result_t<F, Args...>> {
+  using return_type = std::invoke_result_t<F, Args...>;
   auto task = std::make_shared< std::packaged_task<return_type()> >(
     std::bind(std::forward<F>(f), std::forward<Args>(args)...)
   );

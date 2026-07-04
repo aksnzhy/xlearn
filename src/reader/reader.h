@@ -26,6 +26,7 @@ reading data from data source.
 #include <vector>
 #include <thread>
 #include <algorithm>
+#include <random>
 
 #include "src/base/common.h"
 #include "src/base/class_register.h"
@@ -37,6 +38,11 @@ reading data from data source.
 namespace xLearn {
 
 const size_t kDefautBlockSize = 500;  // 500 MB
+
+inline void ShuffleOrder(std::vector<index_t>& order, int seed) {
+  std::mt19937 rng(seed);
+  std::shuffle(order.begin(), order.end(), rng);
+}
 
 //------------------------------------------------------------------------------
 // Reader is an abstract class which can be implemented in different way,
@@ -210,8 +216,7 @@ class InmemReader : public Reader {
   virtual inline void SetShuffle(bool shuffle) {
     this->shuffle_ = shuffle;
     if (shuffle_ && !order_.empty()) {
-      srand(this->seed_);
-      random_shuffle(order_.begin(), order_.end());
+      ShuffleOrder(order_, this->seed_);
     }
   }
 
@@ -329,8 +334,7 @@ class FromDMReader : public Reader {
   virtual inline void SetShuffle(bool shuffle) {
     this->shuffle_ = shuffle;
     if (shuffle_ && !order_.empty()) {
-      srand(this->seed_);
-      random_shuffle(order_.begin(), order_.end());
+      ShuffleOrder(order_, this->seed_);
     }
   }
 

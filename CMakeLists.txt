@@ -19,19 +19,22 @@
 #
 # $> make install
 #
+cmake_minimum_required(VERSION 3.20)
+
 project ("xLearn")
 
-cmake_minimum_required(VERSION 2.8)
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 #-------------------------------------------------------------------------------
 # Take almost all warnings;
 # Do not generate debug symbols;
 # Optimization level 3;
-# Using c++11;
 # Optimization on architecture
 #-------------------------------------------------------------------------------
 if(NOT WIN32)
-add_definitions("-Wall -Wno-sign-compare -O3 -std=c++11 
+add_definitions("-Wall -Wno-sign-compare -O3
 -march=native -Wno-strict-aliasing -Wno-comment")
 else(WIN32)
 add_definitions("/WX- /MT")

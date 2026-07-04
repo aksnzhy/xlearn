@@ -21,7 +21,7 @@ This file is the implementation of Reader class.
 #include "src/reader/reader.h"
 
 #include <string.h>
-#include <algorithm> // for random_shuffle
+#include <algorithm>
 
 #include "src/base/file_util.h"
 #include "src/base/split_string.h"
@@ -258,8 +258,7 @@ index_t InmemReader::Samples(DMatrix* &matrix) {
       // End of the data buffer
       if (i == 0) {
         if (shuffle_) {
-          srand(this->seed_+1);
-          random_shuffle(order_.begin(), order_.end());
+          ShuffleOrder(order_, this->seed_+1);
         }
         matrix = nullptr;
         return 0;
@@ -356,8 +355,7 @@ index_t FromDMReader::Samples(DMatrix* &matrix) {
       // End of the data buffer
       if (i == 0) {
         if (shuffle_) {
-          srand(this->seed_+1);
-          random_shuffle(order_.begin(), order_.end());
+          ShuffleOrder(order_, this->seed_+1);
         }
         matrix = nullptr;
         return 0;
